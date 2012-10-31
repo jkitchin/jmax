@@ -1,0 +1,6 @@
+jmax
+====
+
+John's customizations to maximize emacs
+
+Try it you will like it.
