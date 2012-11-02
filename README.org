@@ -1,6 +1,8 @@
-jmax
-====
-
-John's customizations to maximize emacs
+#+TITLE: jmax - John's customizations to maximize emacs
 
 Try it you will like it.
+
+* Project goal
+=jmax= is a customized version of emacs to facilitate authoring and consuming org-mode based technical documents.
+
+All of the emacs customization is performed in an org-mode file.
