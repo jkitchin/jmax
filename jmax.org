@@ -272,7 +272,6 @@ start  empty title path
 	(concat "start \"title\" " (shell-quote-argument path)) t))
 #+END_SRC
 
-
 *** asynchronous shell commands
 #+BEGIN_SRC emacs-lisp
 (org-add-link-type "ashell" 'org-ashell-open)
@@ -411,6 +410,77 @@ Known limitations: if they key is not recognized as a word by emacs, the clickin
      ((eq format 'latex)
       (citeu-make-latex-links (citeu-split-keys keyword)))
       )))
+#+END_SRC
+
+*** cite links
+#+BEGIN_SRC emacs-lisp
+;;;;;;;;;;;;
+;; implemenation of cite:  to make bibtex citations that are also clickable.
+;; similar to the citeu link, you can click on one key and open that bibtex entry
+(defun cite-visit-key-at-point (arg)
+  "find key at point and open the bibtex file at the entry corresponding to key
+
+Note for future: a careful regexp will be needed to capture a key like j4:anythin that looks like two words to emacs, so word-at-point does not work.
+"
+  (setq key (word-at-point))
+  (message (format "not implemented yet, but you picked %s" key)))
+
+(defun cite-strip-key (key)
+  "strip leading and trailing whitespace from the key"
+  (interactive)
+  (replace-regexp-in-string
+   (concat search-whitespace-regexp "$" ) ""
+   (replace-regexp-in-string
+    (concat "^" search-whitespace-regexp ) "" key) ))
+
+(defun cite-split-keys (key-string)
+  "split key-string and strip keys. Assumes the key-string is comma delimited"
+  (mapcar 'citeu-strip-key (split-string key-string ",")))
+
+(defun cite-make-latex-links (stripped-keys)
+  "construct links as superscripted bracketed links in latex"
+  (interactive)
+  (concat "\\cite{" (mapconcat (lambda (key) key) stripped-keys ", ") "}"))
+
+(org-add-link-type
+ "cite"
+ 'cite-visit-key-at-point ; action on clicking
+ (lambda (keyword desc format)
+   (cond
+    ((eq format 'latex)
+     (cite-make-latex-links (cite-split-keys keyword))))))
+#+END_SRC
+*** ref and label links
+The idea here is to create links for label and ref. The reason for these additions is to provide clickable links to the references and labels, along with the org-mode navigation to quickly go back to where you were. These links get formatted to \ref and \label for latex. They are not formatted for HTML export yet.
+
+#+BEGIN_SRC emacs-lisp
+
+(org-add-link-type
+ "ref"
+ (lambda (label)
+   "on clicking goto the label. Navigate back with C-c &"
+   (let ((n (count-matches (format "label:%s\\b" label) (point-min) (point-max) t)))
+     (if (< n 1) (error (format "no matching label found for %s!" label)))
+     (if (> n 1) (error (format "%d matches found for %s!" n label)))
+   (org-mark-ring-push)
+   (goto-char (point-min))
+   (re-search-forward (format "label:%s\\b" label))
+   (message "go back with `C-c &`")))
+ ;formatting
+ (lambda (keyword desc format)
+   (cond
+    ((eq format 'latex)
+     (format "\\ref{%s}" keyword)))))
+
+(org-add-link-type
+ "label"
+ (lambda (label)
+   "on clicking count the number of label tags used in the buffer. A number greater than one means multiple labels!"
+   (count-matches (format "label:%s\\b" label) (point-min) (point-max) t))
+ (lambda (keyword desc format)
+   (cond
+    ((eq format 'latex)
+     (format "\\label{%s}" keyword)))))
 #+END_SRC
 * jmax lisp
 ** line-spacing
