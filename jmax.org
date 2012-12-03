@@ -5,28 +5,115 @@
 #+BEGIN_SRC emacs-lisp
 (setq frame-title-format "jmax - awesome editing")
 
-(global-visual-line-mode 1) ; how long lines are handled
-;; turn on font-lock mode
-(global-font-lock-mode t)
+(global-visual-line-mode 1) ;; how long lines are handled.
+                            ;; This appears to wrap long lines
 
-(show-paren-mode 1)
-(line-number-mode 1)
+(global-font-lock-mode t)   ;; turn on font-lock mode everywhere
 
-;disable backup
-(setq backup-inhibited t)
+(show-paren-mode 1)         ;; highlight parentheses
+(setq show-paren-style 'expression) ;; alternative is 'parenthesis
 
-(setq inhibit-startup-screen t)
+(line-number-mode 1)  ;; turn linumbers on in mode-line
+(global-linum-mode t) ;; put line numbers on left side of the screen
 
-; answer with y/n
-(fset 'yes-or-no-p 'y-or-n-p)
+(setq backup-inhibited t)  ;; disable backup file creation
+
+(setq inhibit-startup-screen t) ;; stop showing startup screen
+
+(fset 'yes-or-no-p 'y-or-n-p) ; answer with y/n instead of yes/no
 #+END_SRC
 
+** packages to always load
+#+begin_src emacs-lisp
+  (require 'cl)           ;; common-lisp functions
+
+  (require 'saveplace)     ;; When you visit a file, point goes to the
+                           ;; last place where it was when you
+                           ;; previously visited the same file.
+
+  (require 'ffap)          ;; find-file-at-point
+
+  (require 'uniquify)      ;; overrides Emacs’ default mechanism for
+                           ;; making buffer names unique (using suffixes
+                           ;; like <2>, <3> etc.) with a more sensible
+                           ;; behaviour which use parts of the file
+                           ;; names to make the buffer names
+                           ;; distinguishable.
+
+  (require 'ansi-color)    ;; translates ANSI SGR (Select Graphic
+                           ;; Rendition) escape sequences like “Esc [ 30
+                           ;; m” into EmacsOverlays, TextProperties, or
+                           ;; XEmacsExtents with face colours, bold,
+                           ;; etc.
+
+  (require 'recentf)       ;; Toggles "Open recent" menu
+#+end_src
+
+** Setup package manager
+#+begin_src emacs-lisp
+  (setq package-archives
+        '(("gnu"         . "http://elpa.gnu.org/packages/")
+          ("original"    . "http://tromey.com/elpa/")
+          ("org"         . "http://orgmode.org/elpa/")
+          ("marmalade"   . "http://marmalade-repo.org/packages/")))
+  (package-initialize)
+
+  (defvar starter-kit-packages
+    (list 'yasnippet-bundle)
+    "Libraries that should be installed by default.")
+
+  (unless package-archive-contents
+    (package-refresh-contents))
+
+  (dolist (package starter-kit-packages)
+    (unless (package-installed-p package)
+      (package-install package)))
+#+end_src
+* TODO color theme
+
 * TODO python
+Support for the Python programming language.
+
+** Check Dependencies
+
+Determine whether required packages are installed. If not, use ELPA to
+install them.
+#+begin_src emacs-lisp
+  (dolist (package '(python-mode ipython))
+    (unless (package-installed-p package)
+      (package-install package)))
+#+end_src
+
+** Use Python's python-mode.el instead of Emacs' python.el
+   :PROPERTIES:
+   :CUSTOM_ID: python
+   :END:
+Replace the Python mode that comes with Emacs by the Python mode
+supplied by the Python distribution itself.
+#+begin_src emacs-lisp
+(require 'python-mode)
+(add-to-list 'auto-mode-alist '("\\.py\\'" . python-mode))
+(add-to-list 'interpreter-mode-alist '("python" . python-mode))
+#+end_src
+
+** Use IPython if =ipython= command is present
+   :PROPERTIES:
+   :CUSTOM_ID: ipython
+   :END:
+If an =ipython= executable is on the path, then assume that IPython is
+the preferred method python evaluation.
+#+begin_src emacs-lisp
+  (when (executable-find "ipython")
+    (require 'ipython)
+    (setq org-babel-python-mode 'python-mode))
+#+end_src
+
 * org-mode
 #+BEGIN_SRC emacs-lisp
 (require 'org-list)
 (require 'org-special-blocks)
 (require 'org)
+;; (require 'org-drill)
 
 (add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode))
 (global-set-key "\C-cl" 'org-store-link)
@@ -45,7 +132,6 @@
 
 ; do not evaluate code on export
 (setq org-export-babel-evaluate nil)
-
 
 ; register python in org-mode
 (org-babel-do-load-languages
@@ -220,20 +306,31 @@ I use this to run commands asynchronously in the shell. org-mode runs shell link
 *** VASP incar keyword link
 #+BEGIN_SRC emacs-lisp
 ;; -*- emacs-lisp -*-   [[incar:keyword]]
-; this makes nice links in org-mode to the online documentation and
-; renders useful links in output
-(org-add-link-type
- "incar"
+;; this makes nice links in org-mode to the online documentation and
+;; renders useful links in output
+;;
+;; (org-add-link-type TYPE &optional FOLLOW EXPORT)
+;; FOLLOW is the function that takes the path and does what is
+;; necessary to "follow" the link.
+;; EXPORT takes three args
+;;  path the path of the link, the text after the prefix (like "http:")
+;;
+;;  desc the description of the link, if any, or a
+;;  description added by org-export-normalize-links if there is none
+;;
+;;  format the export format, a symbol like `html' or `latex' or
+;;  `ascii'..
+(org-add-link-type "incar"
+;; FOLLOW code
   (lambda (keyword)
     (shell-command (format "firefox http://cms.mpi.univie.ac.at/wiki/index.php/%s" keyword) nil))
-  ; this function is for formatting
-  (lambda (keyword link format)
+;; FORMAT code
+  (lambda (keyword description format)
    (cond
     ((eq format 'html)
      (format "<a href=http://cms.mpi.univie.ac.at/wiki/index.php/%s>%s</a>" keyword keyword))
     ((eq format 'latex)
      (format "\\href{http://cms.mpi.univie.ac.at/wiki/index.php/%s}{%s}"  keyword keyword)
-
 ))))
 #+END_SRC
 
@@ -250,7 +347,71 @@ This was to have a way to put a single file name into an org-file, but get the r
      (format "\\includegraphics{%s.pdf}" keyword)))))
 #+END_SRC
 
+*** citeulike link
+This adds a way to link to articles in citeulike. The syntax is citeu:11819912 or [[citeu:11819912, 11819910]]. The link exports as urls in brackets in html and as superscripted urls in latex. In org-mode if you click on the key, it will launch a browser opening to that article.
 
+Known limitations: if they key is not recognized as a word by emacs, the clicking will not work as expected. eg. if your key is something like j:345, this is not recognized as a word by emacs.
+
+#+BEGIN_SRC emacs-lisp
+(require 'thingatpt)
+
+(defvar citeu-user "jkitchin"
+  "The username for your citeulike account")
+
+(defvar citeu-url (format
+                   "http://www.citeulike.org/user/%s/article/"
+                   citeu-user)
+  "the url that points to an article in citeulike. you add a key to the end to get a specific article.")
+
+(defun citeu-strip-key (key)
+  "strip leading and trailing whitespace from the key"
+  (interactive)
+  (replace-regexp-in-string
+   (concat search-whitespace-regexp "$" ) ""
+   (replace-regexp-in-string
+    (concat "^" search-whitespace-regexp ) "" key) ))
+
+(defun citeu-split-keys (key-string)
+  "split key-string and strip keys. Assumes the key-string is comma delimited"
+  (mapcar 'citeu-strip-key (split-string key-string ",")))
+
+(defun citeu-visit-key-at-point (arg)
+  "find key at point and open a browser to the corresponding citeulike page"
+  (let ((key (word-at-point)))
+  (browse-url (concat citeu-url key))))
+
+(defun citeu-make-html-link (stripped-key)
+  "construct one href link from a stripped-key."
+  (let ((href (concat citeu-url stripped-key)))
+    (concat "<a href=\"" href "\">" stripped-key "</a>")))
+
+(defun citeu-make-html-links (stripped-keys)
+  "combine all links in brackets and output the html code"
+  (interactive)
+  (concat "[" (mapconcat 'citeu-make-html-link stripped-keys ", ") "]"))
+
+(defun citeu-make-latex-link (stripped-key)
+  "make a latex link from a stripped key"
+  (let ((href (concat citeu-url stripped-key)))
+     (concat "{\\href{" href"}{" stripped-key "}")))
+
+(defun citeu-make-latex-links (stripped-keys)
+  "construct links as superscripted bracketed links in latex"
+  (interactive)
+  (concat "$^{[" (mapconcat 'citeu-make-latex-link stripped-keys ", ") "]$"))
+
+(org-add-link-type "citeu"
+  ; visit the key the cursor is on when clicked or Entered
+  'citeu-visit-key-at-point
+  ; formatting
+  (lambda (keyword desc format)
+    (cond
+     ((eq format 'html)
+      (citeu-make-html-links (citeu-split-keys keyword)))
+     ((eq format 'latex)
+      (citeu-make-latex-links (citeu-split-keys keyword)))
+      )))
+#+END_SRC
 * jmax lisp
 ** line-spacing
 #+BEGIN_SRC emacs-lisp
