@@ -1,4 +1,4 @@
-#+TITLE: jmax - John's customizations to maximize emacs
+#+TITLE: jmax - John's customizations to maximize Emacs
 
 Try it you will like it.
 
@@ -6,3 +6,19 @@ Try it you will like it.
 =jmax= is a customized version of emacs to facilitate authoring and consuming org-mode based technical documents.
 
 All of the emacs customization is performed in an org-mode file.
+
+* Features
+- out of the box customization for org-mode
+- custom link-types for org-mode
+- functions we use all the time
+- customized python mode
+- vasp-mode for Emacs
+
+
+* TODO
+- git integration for emacs
+- color-theme
+- blog integration
+- auto-install some packages
+  + markdown-mode
+  + spell-checker

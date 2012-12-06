@@ -69,8 +69,13 @@
     (unless (package-installed-p package)
       (package-install package)))
 #+end_src
-* TODO color theme
-
+* color theme
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'load-path "~/jmax")
+(add-to-list 'custom-theme-load-path "themes")
+(load-theme 'zenburn t)
+(load-theme 'solarized-light t)
+#+END_SRC
 * TODO python
 Support for the Python programming language.
 
@@ -162,13 +167,13 @@ the preferred method python evaluation.
 #+END_SRC
 ** customized faces
 #+BEGIN_SRC emacs-lisp
-(custom-set-faces
+;(custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(flyspell-duplicate ((t (:foreground "red" :underline t :weight bold))))
- '(org-link ((t (:inherit link :foreground "medium blue" :underline t)))))
+; '(flyspell-duplicate ((t (:foreground "red" :underline t :weight bold))))
+; '(org-link ((t (:inherit link :foreground "medium blue" :underline t)))))
 #+END_SRC
 
 ** reftex setup
@@ -450,6 +455,9 @@ Note for future: a careful regexp will be needed to capture a key like j4:anythi
     ((eq format 'latex)
      (cite-make-latex-links (cite-split-keys keyword))))))
 #+END_SRC
+
+bibtex:../export.bib::citeulike:10862950
+
 *** ref and label links
 The idea here is to create links for label and ref. The reason for these additions is to provide clickable links to the references and labels, along with the org-mode navigation to quickly go back to where you were. These links get formatted to \ref and \label for latex. They are not formatted for HTML export yet.
 
@@ -481,6 +489,30 @@ The idea here is to create links for label and ref. The reason for these additio
    (cond
     ((eq format 'latex)
      (format "\\label{%s}" keyword)))))
+#+END_SRC
+** feedback function
+#+BEGIN_SRC emacs-lisp
+(defun insert-feedback (note)
+  "insert a note in feedback.org with the file and line-number."
+  (interactive "sNote: ")
+  (let ((current-point (point))
+        (current-line (line-number-at-pos))
+        (current-file-name (buffer-file-name)))
+    (find-file-other-window "feedback.org")
+
+    (goto-char (point-max))
+    (org-return-indent)
+
+    (insert
+    (format "[[elisp:(progn (find-file \"%s\")(goto-char %i))][%s:%i]]: %s"
+     current-file-name
+     current-point
+     (file-name-nondirectory current-file-name)
+     current-line note))
+    (save-buffer)
+    (other-window 1)))
+
+(global-set-key "\C-ci" 'insert-feedback)
 #+END_SRC
 * jmax lisp
 ** line-spacing
@@ -605,3 +637,70 @@ Uses `search-site-url' to do the actual search.
   (interactive)
   (dired-do-shell-command "ag" nil (list (dired-get-filename))))
 #+END_SRC
+
+
+\bibliography{../export}
+* send email through gmail
+Adapted from http://wideaperture.net/blog/?p=3343
+#+begin_src emacs-lisp
+;;Configure Outbound Mail
+
+;;Tell the program who you are
+
+(setq user-full-name "John Kitchin")
+(setq user-mail-address "johnrkitchin@gmail.com")
+
+;;Tell Emacs to use GNUTLS instead of STARTTLS
+;;to authenticate when sending mail.
+
+(setq starttls-use-gnutls t)
+
+;;Tell Emacs about your mail server and credentials
+
+(setq send-mail-function 'smtpmail-send-it
+      message-send-mail-function 'smtpmail-send-it
+      smtpmail-starttls-credentials
+      '(("smtp.gmail.com" 587 nil nil))
+      smtpmail-auth-credentials
+      (expand-file-name "~/.authinfo")
+      smtpmail-default-smtp-server "smtp.gmail.com"
+      smtpmail-smtp-server "smtp.gmail.com"
+      smtpmail-smtp-service 587
+      smtpmail-debug-info t)
+(require 'smtpmail)
+
+
+#+end_src
+
+
+* setup gnus for reading and sending mail
+#+begin_src emacs-lisp
+;; Customize the next three lines with your ISP information.
+(load "starttls")
+(load-library "smtpmail")
+
+(setq user-mail-address "johnrkitchin@gmail.com")
+(setq user-full-name "John Kitchin")
+
+;; Configure incoming mail (IMAP)
+(setq gnus-select-method '(nnimap "gmail"
+(nnimap-address "imap.gmail.com")
+(nnimap-server-port 993)
+(nnimap-authinfo-file "~/.imap-authinfo")
+(nnimap-stream ssl)))
+
+;; Configure outbound mail (SMTP)
+(setq smtpmail-starttls-credentials '(("smtp.gmail.com" 587 nil nil))
+      smtpmail-smtp-server "smtp.gmail.com"
+      smtpmail-default-smtp-server "smtp.gmail.com"
+      send-mail-function 'smtpmail-send-it
+      message-send-mail-function 'smtpmail-send-it
+      smtpmail-smtp-service 587
+      smtpmail-auth-credentials '(("smtp.gmail.com" 587 user-mail-address nil))
+      smtpmail-debug-info t
+      smtpmail-debug-verb t
+      )
+(setq smtpmail-local-domain nil)
+(setq gnus-permanently-visible-groups "gmail")
+(executable-find starttls-program)
+#+end_src
