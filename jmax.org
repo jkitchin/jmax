@@ -77,9 +77,8 @@
 * color theme
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'load-path "~/jmax")
-(add-to-list 'custom-theme-load-path "themes")
-(load-theme 'zenburn t)
-(load-theme 'solarized-light t)
+(add-to-list 'custom-theme-load-path "~/jmax/themes")
+(load-theme 'my t)
 #+END_SRC
 
 #+RESULTS:
@@ -480,10 +479,9 @@ returns a list of stripped file names"
 (org-add-link-type
  "cite"
  (lambda (link-string)
-   ;; the idea here is to find the boundaries of the link you
-   ;; clicked on. we have to make sure that the point you clicked on
-   ;; is between. I am not sure this works if the link happens to be
-   ;; more than one line.
+   ;; This code opens the bibtex file containing the clicked on
+   ;; key. First we find the boundaries of the link you clicked on,
+   ;; then identify the key you clicked on.
    (save-excursion
      (beginning-of-line) ; search forward from beginning of the line
      (search-forward link-string nil t 1)
@@ -523,9 +521,47 @@ returns a list of stripped file names"
      (cite-make-latex-links (cite-split-keys keyword))))))
 #+END_SRC
 
+Here we add links for the bibliography and bibliography style
+#+begin_src emacs-lisp
+;; link to hold a bibliography bibtex file. Mostly so I can click on the link and open the file.
+;; TODO replace click code to open file at point.
+(org-add-link-type "bibliography"
+(lambda (link-string) 
+    (save-excursion
+     (beginning-of-line) ; search forward from beginning of the line
+     (search-forward link-string nil t 1)
+     (setq link-string-beginning (match-beginning 0))
+     (setq link-string-end (match-end 0)))
+   ;; now we want to search forward to next comma from point
+   (save-excursion
+     (if (search-forward "," link-string-end 1 1)
+         (setq key-end (- (match-end 0) 1)) ; we found a match
+       (setq key-end (point)))) ; no comma found so take the point
+   ;; and backward to previous comma from point
+   (save-excursion
+     (if (search-backward "," link-string-beginning 1 1)
+         (setq key-beginning (+ (match-beginning 0) 1)) ; we found a match
+       (setq key-beginning (point)))) ; no match found
+                                        ; save the key we clicked on.
+   (setq bibfile (cite-strip-key (buffer-substring key-beginning key-end)))
+(find-file bibfile)) ; open file on click
+;; formatting code
+(lambda (keyword desc format)
+  (cond
+   ((eq format 'latex)
+    ; write out the latex bibliography command
+    (format "\\bibliography{%s}" (replace-in-string keyword ".bib" ""))))))
+
+(org-add-link-type "bibliographystyle"
+(lambda (arg) (message "Nothing implemented for clicking here.")) ; open file on click
+(lambda (keyword desc format)
+  (cond
+   ((eq format 'latex)
+    ; write out the latex bibliography command
+    (format "\\bibliographystyle{%s}" keyword ".bib" "")))))
+#+end_src
 
 
-bibtex:../export.bib::citeulike:10862950
 
 *** ref and label links
 The idea here is to create links for label and ref. The reason for these additions is to provide clickable links to the references and labels, along with the org-mode navigation to quickly go back to where you were. These links get formatted to \ref and \label for latex. They are not formatted for HTML export yet.
@@ -772,4 +808,8 @@ Adapted from http://wideaperture.net/blog/?p=3343
 (setq smtpmail-local-domain nil)
 (setq gnus-permanently-visible-groups "gmail")
 (executable-find starttls-program)
+#+end_src
+* finally
+#+begin_src emacs-lisp
+(find-file "~/org-mode/master.org")
 #+end_src
