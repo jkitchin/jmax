@@ -13,7 +13,7 @@
 (global-font-lock-mode t)   ;; turn on font-lock mode everywhere
 
 (show-paren-mode 1)         ;; highlight parentheses
-(setq show-paren-style 'expression) ;; alternative is 'parenthesis
+(setq show-paren-style 'parenthesis) ;; alternative is 'parenthesis
 
 (line-number-mode 1)  ;; turn linumbers on in mode-line
 (global-linum-mode t) ;; put line numbers on left side of the screen
@@ -23,6 +23,8 @@
 (setq inhibit-startup-screen t) ;; stop showing startup screen
 
 (fset 'yes-or-no-p 'y-or-n-p) ; answer with y/n instead of yes/no
+
+(global-set-key [f9] (lambda () (interactive) (load-file "~/jmax/init.el")))
 #+END_SRC
 
 ** packages to always load
@@ -35,7 +37,7 @@
 
   (require 'ffap)          ;; find-file-at-point
 
-  (require 'uniquify)      ;; overrides Emacs’ default mechanism for
+  (require 'uniquify)      ;; overrides Emacs' default mechanism for
                            ;; making buffer names unique (using suffixes
                            ;; like <2>, <3> etc.) with a more sensible
                            ;; behaviour which use parts of the file
@@ -43,12 +45,13 @@
                            ;; distinguishable.
 
   (require 'ansi-color)    ;; translates ANSI SGR (Select Graphic
-                           ;; Rendition) escape sequences like “Esc [ 30
-                           ;; m” into EmacsOverlays, TextProperties, or
+                           ;; Rendition) escape sequences like "Esc [ 30
+                           ;; m" into EmacsOverlays, TextProperties, or
                            ;; XEmacsExtents with face colours, bold,
                            ;; etc.
 
   (require 'recentf)       ;; Toggles "Open recent" menu
+  (require 'eieio)
 #+end_src
 
 ** Setup package manager
@@ -107,16 +110,16 @@ supplied by the Python distribution itself.
 (add-to-list 'interpreter-mode-alist '("python" . python-mode))
 #+end_src
 
-** Use IPython if =ipython= command is present
+** Use IPython if =ipython= command is present :noexport:
    :PROPERTIES:
    :CUSTOM_ID: ipython
    :END:
 If an =ipython= executable is on the path, then assume that IPython is
 the preferred method python evaluation.
-#+begin_src emacs-lisp
-  (when (executable-find "ipython")
-    (require 'ipython)
-    (setq org-babel-python-mode 'python-mode))
+#+begin_src emacs-lisp :exports none
+;  (when (executable-find "ipython")
+;    (require 'ipython)
+;    (setq org-babel-python-mode 'python-mode))
 #+end_src
 
 * org-mode
@@ -447,17 +450,8 @@ returns a list of stripped file names"
   "open bibfile in another window at the key"
   (interactive)
   (find-file-other-window bibfile)
+  (goto-char (point-min)) ; always start search from beginning.
   (re-search-forward key nil t 1))
-
-(defun cite-visit-key-at-point (arg)
-  "find key at point and open the bibtex file at the entry corresponding to key
-Note for future: a careful regexp will be needed to capture a key like j4:anythin that looks like two words to emacs, so word-at-point does not work.
-
-arg contains the whole citation. I could split by commas, and then return the one that matches the word at point.
-"
-  (setq key (word-at-point))
-  (let ((keys (split-string arg ","))
-  (message (format "not implemented yet, but you picked %s from %s" key arg)))
 
 (defun cite-strip-key (key)
   "strip leading and trailing whitespace from the key"
@@ -480,6 +474,7 @@ arg contains the whole citation. I could split by commas, and then return the on
   "determine if the key is in the file"
   (with-temp-buffer
     (insert-file-contents filename)
+    (goto-char (point-min))
     (search-forward key nil t 1)))
 
 (org-add-link-type
@@ -505,7 +500,7 @@ arg contains the whole citation. I could split by commas, and then return the on
          (setq key-beginning (+ (match-beginning 0) 1)) ; we found a match
        (setq key-beginning (point)))) ; no match found
                                         ; save the key we clicked on.
-   (setq bibtex-key (buffer-substring key-beginning key-end))
+   (setq bibtex-key (cite-strip-key (buffer-substring key-beginning key-end)))
    (message "(%s %s) p=%s %s %s: %s"
             link-string-beginning
             link-string-end
@@ -515,13 +510,12 @@ arg contains the whole citation. I could split by commas, and then return the on
             bibtex-key )
    ;; now we get the bibliography files
    (setq cite-bibliography-files (cite-find-bibliography))
-
+   ;(message "%S" cite-bibliography-files))
    ;; now find the first bib file containing the key
    (setq bib-file (loop for file in cite-bibliography-files do
          (if (cite-key-in-file-p bibtex-key file) (return file))))
    ;; and finally, open the file at the key
-   (find-file-other-window bib-file)
-   (search-forward bibtex-key))
+   (cite-goto-bibentry bib-file  bibtex-key))
  ;; formatting
  (lambda (keyword desc format)
    (cond
@@ -529,32 +523,7 @@ arg contains the whole citation. I could split by commas, and then return the on
      (cite-make-latex-links (cite-split-keys keyword))))))
 #+END_SRC
 
-#+RESULTS:
-| cite       | cite-visit-key-at-point                                                                                                                                | (lambda (keyword desc format) (cond ((eq format (quote latex)) (cite-make-latex-links (cite-split-keys keyword)))))                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| wl         | org-wl-open                                                                                                                                            | nil                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| vm-imap    | org-vm-imap-open                                                                                                                                       | nil                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| vm         | org-vm-open                                                                                                                                            | nil                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| rmail      | org-rmail-open                                                                                                                                         | nil                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| mhe        | org-mhe-open                                                                                                                                           | nil                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| mew        | org-mew-open                                                                                                                                           | nil                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| irc        | org-irc-visit                                                                                                                                          | nil                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| info       | org-info-open                                                                                                                                          | nil                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| gnus       | org-gnus-open                                                                                                                                          | nil                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| docview    | org-docview-open                                                                                                                                       | nil                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| bibtex     | org-bibtex-open                                                                                                                                        | nil                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| bbdb       | org-bbdb-open                                                                                                                                          | org-bbdb-export                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
-| ref        | (lambda (arg) nil)                                                                                                                                     | (lambda (keyword desc format) (cond ((eq format (quote latex)) (format \ref{%s} keyword))))                                                                                                                                                                                                                                                                                                                                                                                                                                                |
-| figure     | (lambda (arg) (find-file arg))                                                                                                                         | (lambda (keyword desc format) (cond ((eq format (quote html)) (format \n<table class='image'>\n<tr><td><img src='%s.png' alt='%s'/></td></tr>\n<tr><td class='caption'>%s</td></tr>\n</table>\n keyword desc desc)) ((eq format (quote latex)) (if desc (format \n\begin{figure}[H]\n\includegraphics[width=0.7\textwidth]{%s}\n\caption{%s}\n\end{figure}\n (replace-in-string keyword .svg .pdf) desc) (format \n\begin{figure}[H]\n\includegraphics[width=0.7\textwidth]{%s}\n\end{figure}\n (replace-in-string keyword .svg .pdf)))))) |
-| index      | (lambda (arg) nil)                                                                                                                                     | (lambda (keyword desc format) (cond ((eq format (quote html)) (format )) ((eq format (quote latex)) (format \index{%s} keyword))))                                                                                                                                                                                                                                                                                                                                                                                                         |
-| func       | (lambda (arg) (shell-command (format pydoc %s arg) nil))                                                                                               | (lambda (path desc format) (cond ((eq format (quote html)) (format %s path)) ((eq format (quote latex)) (format \texttt{%s} path))))                                                                                                                                                                                                                                                                                                                                                                                                       |
-| mod        | (lambda (arg) (shell-command (format pydoc %s arg) nil))                                                                                               | (lambda (path desc format) (cond ((eq format (quote html)) (format %s path)) ((eq format (quote latex)) (format \texttt{%s} path))))                                                                                                                                                                                                                                                                                                                                                                                                       |
-| incar      | (lambda (keyword) (shell-command (format firefox http://cms.mpi.univie.ac.at/wiki/index.php/%s keyword) nil))                                          | (lambda (keyword link format) (cond ((eq format (quote html)) (format <a href=http://cms.mpi.univie.ac.at/wiki/index.php/%s>%s</a> keyword keyword)) ((eq format (quote latex)) (format \href{http://cms.mpi.univie.ac.at/wiki/index.php/%s}{%s} keyword keyword))))                                                                                                                                                                                                                                                                       |
-| color      | (lambda (path) (message (concat color  (progn (add-text-properties 0 (length path) (list (quote face) (` ((t (:foreground (, path)))))) path) path)))) | (lambda (path desc format) (cond ((eq format (quote html)) (format <span style="color:%s;">%s</span> path desc)) ((eq format (quote latex)) (format {\color{%s}%s} path desc))))                                                                                                                                                                                                                                                                                                                                                           |
-| ashell     | org-ashell-open                                                                                                                                        | nil                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| msx        | org-msx-open                                                                                                                                           | nil                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| id         | org-id-open                                                                                                                                            | nil                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| file+emacs | org-open-file-with-emacs                                                                                                                               | nil                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| file+sys   | org-open-file-with-system                                                                                                                              | nil                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+
 
 bibtex:../export.bib::citeulike:10862950
 

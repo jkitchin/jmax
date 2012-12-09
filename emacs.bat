@@ -1,1 +1,1 @@
-%JMAX%\emacs\Emacs-24\bin\runemacs.exe -q -l %JMAX%\emacs\dft-course-init.el
+.\emacs-24.2\bin\runemacs.exe -q -l init.el
