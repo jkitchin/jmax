@@ -25,6 +25,8 @@
 (fset 'yes-or-no-p 'y-or-n-p) ; answer with y/n instead of yes/no
 
 (global-set-key [f9] (lambda () (interactive) (load-file "~/jmax/init.el")))
+
+(abbrev-mode 1) ; turn abbrev mode on
 #+END_SRC
 
 ** packages to always load
@@ -184,6 +186,20 @@ the preferred method python evaluation.
 ; '(org-link ((t (:inherit link :foreground "medium blue" :underline t)))))
 #+END_SRC
 
+** spell-checking
+#+begin_src emacs-lisp
+(require 'ispell)
+(setq flyspell-issue-welcome-flag nil)
+(global-set-key (kbd "<f8>") 'ispell-word)
+(global-set-key (kbd "C-<f8>") 'flyspell-mode)
+(flyspell-mode t)
+
+(setq-default ispell-program-name "aspell")
+;;(setq ispell-personal-dictionary (concat emacs-root "Dropbox/.emacs.d/.ispell"))
+
+;; stop annoying boxes from popping up when no makefile foundx
+(setq flymake-gui-warnings-enabled nil)
+#+end_src
 ** reftex setup
 #+BEGIN_SRC emacs-lisp
 (defun org-mode-reftex-setup ()
