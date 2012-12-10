@@ -41,7 +41,13 @@
  '(org-tag  ((t (:foreground "orange red"))))
  '(org-block-begin-line ((t (:foreground "red" :weight bold :bold t ))))
  '(org-block-end-line ((t (:foreground "red" :weight bold :bold t))))
-)
+ '(org-table ((t (:foreground "blue3"))))
+ '(org-document-title ((t (:foreground "black"  :scale 1.44))))
+ '(org-level-1 ((t (:foreground "RoyalBlue4" :scale 1.2))))
+ '(org-level-2 ((t (:foreground "RoyalBlue3" :scale 1.1))))
+ '(org-level-3 ((t (:foreground "RoyalBlue2" :scale 1.05))))
+ '(org-level-4 ((t (:foreground "RoyalBlue1" :scale 1.00))))
+ '(flyspell-duplicate ((t (:foreground "red" :underline t :weight bold)))))
 
 (provide-theme 'my)
 
