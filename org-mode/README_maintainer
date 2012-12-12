@@ -1,0 +1,273 @@
+# -*- mode:org -*-
+
+#+TITLE: Maintainer tasks
+#+STARTUP: noindent
+
+This document describes the tasks the Org-mode maintainer has to do
+and how they are performed.
+
+* Git workflow
+
+The git repository has two branches:
+
+- master :: for current development.
+
+- maint :: for bug fixes against latest major or minor release.
+
+Bug fixes always go on =maint= then are merged on =master=.
+
+New features always go on =master=.
+
+* Releasing
+
+** Major release
+
+The release number for main releases look like this: =7.13=
+
+Main releases are made whenever Org is in a state where the feature
+set is consistent and we feel that the features that are implemented
+is something we want to support in the future.
+
+A major release turns the current state of the master branch into a
+release.
+
+When doing a /major release/, make sure all changes from the maint
+branch are merged into the the master branch, then merge the master
+branch back into maint to synchronize the two.
+
+** Minor release
+
+The release number for minor releases look like this:  =7.13.01=
+
+Minor releases are small amends to main releases.  Usually they fix
+critical bugs discovered in a main release.  Minor bugs are usually
+not fixed -- they will be adressed in the next main release.
+
+Only the fix to the bug is bundled into a release, without the main
+development work going on in the master branch.  Since the bug fix
+will also be needed in the master branch, usually the fix is made in
+maint then merged in master.
+
+** Tagging the release
+
+When doing a major and a minor release, after all necessary merging
+is done, tag the _maint_ branch for the release with:
+
+  git tag -a "Adding release tag" release_7.9.1
+
+and push tags with
+
+  git push --tags
+
+** Uploading the release files from the orgmode.org server
+
+Log on the orgmode.org server as the emacs user and cd to
+~/git/org-mode
+
+From there do
+
+  make release
+  make upload
+
+to create the .tar.gz and .zip files, the documentation, and to
+upload everything at the right place.
+
+* Working with patchwork
+
+John Wiegley is running a patchwork server that looks at the
+emacs-orgmode mailing list and extracts patches.  The maintainer and
+his helpers should work through such patches, give feedback on them
+and apply the ones which are good and done.  A task for the maintainer
+is to every now and then try to get old stuff out of that list, by
+asking some helpers to investigate the patch, by rejecting or
+accepting it.
+
+I have found that the best workflow for this is using the pw script by
+Nate Case, with the modifications for Org-mode made by John Wiegley
+and Carsten Dominik.  The correct version of this script that should
+be used with Org mode is distributed in the =mk/= directory of the Org
+mode distribution.  Here is the basic workflow for this.
+
+** Access to the patchwork server
+
+If you want to work on patchwork patches, you need write access at the
+patchwork server.  You need to contact John Wiegley to get this
+access.
+
+There is a web interface to look at the patches and to change the
+status of patches.  This interface is self-explanatory.  There is also
+a command line script which can be very convenient to use.
+
+** Testing patches
+
+To start testing a patch, first assign it to yourself
+
+: pw update -s "Under Review" -d DELEGATE-NAME NNN
+
+where =NNN= is a patch number and =DELEGATE-NAME= is your user name on
+the patchwork server.
+
+The get the patch into a branch:
+
+: pw branch NNN
+
+This will create a local topic branch in your git repository with the
+name =t/patchNNN=.  You will also be switched to the branch so that
+you can immediately start testing it.  Quite often small amends need
+to be made, or documentation has to be added.  Also, many contributors
+do not yet provide the proper ChangeLog-like entries in the commit
+message for the patch.  As a maintainer, you have two options here.
+Either ask the contributor to make the changes and resubmit the patch,
+or fix it yourself.  In principle, asking to contributor to change the
+patch until it is complete is the best route, because it will educate
+the contributor and minimize the work for the maintainer.  However,
+sometimes it can be less hassle to fix things directly and commit the
+changes to the same branch =t/patchNNN=.
+
+If you ask the contributor to make the changes, the patch should be
+marked on the patchwork server as "changes requested".
+
+: pw update -s "Changes Requested" -m "What to change" NNN
+
+This will send an email to the contributor and the mailing list with a
+request for changes.  The =-m= message should not be more than one
+sentence and describe the requested changes.  If you need to explain
+in more detail, write a separate email to the contributor.
+
+When a new version of the patch arrives, you mark the old one as
+superseded
+
+: pw update -s "Superseded" NNN
+
+and start working at the new one.
+
+** Merging a final patch
+
+Once the patch has been iterated and is final (including the
+ChangeLog-like entries in the commit message), it should be merged.
+The assumption here is that the final version of the patch is given by
+the HEAD state in the branch =t/patchNNN=.  To merge, do this:
+
+: pw merge -m "maintainer comment" NNN
+
+This will merge the patch into master, switch back to master and send
+an email to both contributor and mailing list stating that this change
+has been accepted, along with the comment given in the =-m= message.
+
+At some point you might then want to remove the topic branch
+
+: git branch -d t/patchNNN
+
+* Synchonization with Emacs
+
+This is still a significant headache.  Some hand work is needed here.
+
+Emacs uses bzr.  A useful introduction to bzr for Emacs developers can
+be found [[http://www.emacswiki.org/emacs/BzrForEmacsDevs][here]].  While I see all the advantages this would have, I
+cannot bring myself to switch away from git for my day-to-day work,
+because I know git so well, and because git seems to me as being much
+more powerful, conceptionally simple (once you have [[http://newartisans.com/2008/04/git-from-the-bottom-up/][bent your head
+around it]]), and so much faster.
+
+So the way I have been doing things with Emacs is this:
+
+1. I do not update the version in Emacs too often.  Just once every
+   few months - this is frequently enough for the Emacs release cycle.
+   Care must be taken to get in a *new and stable* version shortly
+   before Emacs goes into feature freeze and pretest, because that
+   version is going to be in the wild for a long time.
+
+2. I watch the Emacs diffs for changes made by the maintainers of
+   Emacs in the org-mode files in Emacs.  Any changes that come up
+   there, I merge into the development version of Org-mode.
+   Occasionally I do not do this, if I do not agree with a change.
+   The changes go into Org /without/ a ChangeLog-like entry in the
+   commit message.  The reason for this is that we will later generate
+   a ChangeLog file from our commit messages, and I do not want double
+   ChangeLog entries in the Emacs ChangeLog file.
+
+3. When I have made a release (usually I wait for the minor releases
+   to stabilize), I *copy* org files into the Emacs repository.  Yes,
+   I do not merge, I copy.  This has been the source of some problems
+   in the past - Emacs developers are not happy when I accidentally
+   overwrite changes they made.  But I have not had the patience to
+   work out a better mechanism, and I really dislike the idea that the
+   version in Emacs starts diverging from my own.
+
+   Careful: Copy /org.texi/ and /orgcard.tex/ into the right places,
+   and also copy the lisp files with *two exceptions*: Do *not* copy
+   /org-colview-xemacs.el/ and /org-install.el/.  The former does not
+   belong in Emacs.  And the latter would actually be harmful because
+   Emacs generates its own autoloads.  The Emacs distribution contains
+   an empty /org-install.el/, so that users can have =(require
+   'org-install)= in .emacs with no ill effects.  So if you were to
+   copy /org-install.el/, you would overwrite that empty placeholder
+   file.
+
+4. Generate the ChangeLog entries
+
+   For this, I do in the org-mode git repository
+
+   : mk/make_emacs_changelog release_7.02.05..release_7.03.02
+
+   This will spit out ChangeLog entries (for the given commit range)
+   that need to go into the ChangeLog files in Emacs.  Org-mode
+   contributes to 3 different ChangeLog files in Emacs:
+
+   : lisp/org/ChangeLog    (for lisp changes)
+   : doc/misc/ChangeLog    (for org.texi changes)
+   : etc/ChangeLog         (for refcard changes)
+
+   When you run the =make_emacs_changelog= program, you will be
+   prompted for a date in ISO format YYYY-MM-DD, this date will be
+   used in the ChangeLog entries - Emacs developers want these dates
+   to be the time when the change has been installed into Emacs, not
+   the time when we made the change in our own repository.  So all the
+   ChangeLog entries will get the same date.  You will also be
+   prompted for the kind of ChangeLog you want to make, possible
+   answers are =lisp=, =texi=, and =card=.  The program will then
+   select the correct entries for the specified ChangeLog file.  If
+   you don't like being prompted, you can give the date and type as
+   second and third command line arguments to =make_emacs_changelog=,
+   for example
+
+   : mk/make_emacs_changelog release_7.02.05..release_7.03.02 2010-12-11 lisp
+
+   These entries need to be added to the ChangeLog files in Emacs.
+   You should, in the ChangeLog file, select the inserted region of
+   new entries and do =M-x fill-region=, so that the entries are
+   formatted correctly.  I then do look through the entries quickly to
+   make sure they are formatted properly, that the email addresses
+   look right etc.
+
+5. Commit the changes into the bzr repository and you are done.  Emacs
+   developers often look throught the commit and make minor changes -
+   these need to be merged back into our own repo.
+
+* Updating the list of hooks/commands/options on Worg
+
+  Load the =mk/eldo.el= file then =M-x eldo-make-doc RET=.
+
+  This will produce an org file with the documentation.
+
+  Import this file into =worg/doc.org=, leaving the header untouched
+  (except for the release number).
+
+  Then commit and push the change on the =worg.git= repository.
+
+* Copyright assignments
+
+  The maintainer needs to keep track of copyright assignments.  Even
+  better, find a volunteer to do this.
+
+  The list of all contributors from who we have the papers is kept on
+  Worg at http://orgmode.org/worg/org-contribute.php, so that
+  committers can check if a patch can go into the core.
+
+  The assignment process does not allways go smoothly, and it has
+  happened several times that it gets stuck or forgotten at the FSF.
+  The contact at the FSF for this is: copyright-clerk@fsf.org
+
+  Emails from the paper submitter have been ignored in the past, but
+  an email from me (Carsten) as the maintainer of Org mode has usually
+  fixed such cases within a few days.

@@ -1,9 +1,24 @@
 #+TITLE: Emacs customizations to maximize John's Emacs
+#+TITLE:     jmax.org
+#+AUTHOR:    John Kitchin
+#+EMAIL:     jkitchin@cmu.edu
+#+DATE:      2012-12-12 Wed
+#+DESCRIPTION:
+#+KEYWORDS:
+#+LANGUAGE:  en
+#+OPTIONS:   H:3 num:t toc:t \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+OPTIONS:   TeX:t LaTeX:t skip:nil d:nil todo:t pri:nil tags:not-in-toc
+#+INFOJS_OPT: view:nil toc:nil ltoc:t mouse:underline buttons:0 path:http://orgmode.org/org-info.js
+#+EXPORT_SELECT_TAGS: export
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+LINK_UP:
+#+LINK_HOME:
+#+XSLT:
 
-* tasks								   :noexport:
+* tasks								   
+empty
 
-
-q* personal setup						   :personal:
+* personal setup                                                   :personal:
 Obviously this will have to be customized.
 #+begin_src emacs-lisp
 ;; I need some lisp voodoo here to set paths according to the machine I am on.
@@ -21,8 +36,13 @@ Obviously this will have to be customized.
           (string= system-name "JKITCHIN-2012"))
        (defvar emacs-root "c:/users/jkitchin/Dropbox/jmax")
        (defvar my-aspell "C:/Program Files (x86)/Aspell/bin/aspell.exe"))
+
+(add-to-list 'load-path emacs-root)
 #+end_src
-* Basic customizations
+
+#+RESULTS:
+
+* Basic customizations                                             
 #+BEGIN_SRC emacs-lisp
 (setq frame-title-format "jmax - awesome editing")
 (tool-bar-mode 0) ; remove the icons
@@ -36,7 +56,7 @@ Obviously this will have to be customized.
 (setq show-paren-style 'parenthesis) ;; alternative is 'parenthesis
 
 (line-number-mode 1)  ;; turn linumbers on in mode-line
-(global-linum-mode t) ;; put line numbers on left side of the screen
+;(global-linum-mode t) ;; put line numbers on left side of the screen
 
 (setq backup-inhibited t)  ;; disable backup file creation
 
@@ -46,10 +66,15 @@ Obviously this will have to be customized.
 
 (global-set-key [f9] (lambda () (interactive) (save-buffer) (load-file (concat emacs-root "/init.el"))))
 #+END_SRC
+
+#+RESULTS:
+| lambda | nil | (interactive) | (save-buffer) | (load-file (concat emacs-root /init.el)) |
+
 ** abbrev mode
 #+begin_src emacs-lisp
 (abbrev-mode 1) ; turn abbrev mode on
 (setq-default abbrev-mode t)
+(setq abbrev-file-name (concat emacs-root "/abbrev_defs"))
 (read-abbrev-file (concat emacs-root "/abbrev_defs"))
 (setq save-abbrevs t)
 #+end_src
@@ -83,33 +108,33 @@ Obviously this will have to be customized.
   (require 'eieio)
 #+end_src
 
-* Setup package manager
+* Setup package manager                                            
 #+begin_src emacs-lisp
-  (setq package-archives
-        '(("gnu"         . "http://elpa.gnu.org/packages/")
-          ("original"    . "http://tromey.com/elpa/")
-          ("org"         . "http://orgmode.org/elpa/")
-          ("marmalade"   . "http://marmalade-repo.org/packages/")))
-  (package-initialize)
+;;   (setq package-archives
+;;         '(("gnu"         . "http://elpa.gnu.org/packages/")
+;;           ("original"    . "http://tromey.com/elpa/")
+;;           ("org"         . "http://orgmode.org/elpa/")
+;;           ("marmalade"   . "http://marmalade-repo.org/packages/")))
+;;   (package-initialize)
 
-(setq package-user-dir (concat emacs-root "/elpa"))
-(add-to-list 'load-path (concat emacs-root "/elpa/ipython-2927"))
-  (defvar starter-kit-packages
-    (list 'yasnippet-bundle
-          'magit)
-    "Libraries that should be installed by default.")
+;; (setq package-user-dir (concat emacs-root "/elpa"))
 
-  (unless package-archive-contents
-    (package-refresh-contents))
+;;   (defvar starter-kit-packages
+;;     (list 'yasnippet-bundle
+;;           'magit)
+;;     "Libraries that should be installed by default.")
 
-  (dolist (package starter-kit-packages)
-    (unless (package-installed-p package)
-      (package-install package)))
+;;   (unless package-archive-contents
+;;     (package-refresh-contents))
+
+;;   (dolist (package starter-kit-packages)
+;;     (unless (package-installed-p package)
+;;       (package-install package)))
 #+end_src
 
 #+RESULTS:
 
-* color theme
+* color theme                                                      
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'custom-theme-load-path (concat emacs-root "/themes"))
 (load-theme 'my t)
@@ -118,51 +143,39 @@ Obviously this will have to be customized.
 #+RESULTS:
 : t
 
-* TODO python
-Support for the Python programming language.
-
-** Check Dependencies
-
-Determine whether required packages are installed. If not, use ELPA to
-install them.
+* auto-complete                                                    
+see: http://cx4a.org/software/auto-complete/manual.html
 #+begin_src emacs-lisp
-  (dolist (package '(python-mode ipython))
-    (unless (package-installed-p package)
-      (package-install package)))
+(add-to-list 'load-path (concat emacs-root "/auto-complete-1.3.1"))
+(require 'auto-complete-config)
+(add-to-list 'ac-dictionary-directories (concat emacs-root "/auto-complete-1.3.1/ac-dict"))
+(ac-config-default)
 #+end_src
 
-** Use Python's python-mode.el instead of Emacs' python.el
-   :PROPERTIES:
-   :CUSTOM_ID: python
-   :END:
-Replace the Python mode that comes with Emacs by the Python mode
-supplied by the Python distribution itself.
+* spell-checking
 #+begin_src emacs-lisp
-(require 'python-mode)
-(add-to-list 'auto-mode-alist '("\\.py\\'" . python-mode))
-(add-to-list 'interpreter-mode-alist '("python" . python-mode))
+(require 'ispell)
+(setq flyspell-issue-welcome-flag nil)
+(global-set-key (kbd "<f8>") 'ispell-word)
+(global-set-key (kbd "C-<f8>") 'flyspell-mode)
+(flyspell-mode t)
+
+(setq-default ispell-program-name my-aspell)
+(setq ispell-personal-dictionary (concat emacs-root "/.ispell"))
+(setq text-mode-hook '(lambda()
+			(flyspell-mode t)       ; spellchek (sic) on the fly
+			))
+;;(setq ispell-personal-dictionary (concat emacs-root "Dropbox/.emacs.d/.ispell"))
+
+;; stop annoying boxes from popping up when no makefile foundx
+(setq flymake-gui-warnings-enabled nil)
 #+end_src
-
-#+RESULTS:
-
-** Use IPython if =ipython= command is present :noexport:
-   :PROPERTIES:
-   :CUSTOM_ID: ipython
-   :END:
-If an =ipython= executable is on the path, then assume that IPython is
-the preferred method python evaluation.
-#+begin_src emacs-lisp :exports none
-;  (when (executable-find "ipython")
-;    (require 'ipython)
-;    (setq org-babel-python-mode 'python-mode))
-#+end_src
-
-* org-mode
+* org-mode                                                         
 #+BEGIN_SRC emacs-lisp
-(require 'org-list)
-(require 'org-special-blocks)
+(add-to-list 'load-path (concat emacs-root "/org-mode/lisp"))
+(add-to-list 'load-path (concat emacs-root "/org-mode/contrib/lisp"))
 (require 'org)
-;; (require 'org-drill)
+(require 'org-special-blocks)
 
 (add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode))
 (global-set-key "\C-cl" 'org-store-link)
@@ -175,6 +188,10 @@ the preferred method python evaluation.
 (global-set-key "\C-cL" 'org-insert-link-global)
 (global-set-key "\C-co" 'org-open-at-point-global)
 #+END_SRC
+
+#+RESULTS:
+: org-open-at-point-global
+
 ** basic setup
 #+BEGIN_SRC emacs-lisp
 (setq org-return-follows-link t)
@@ -209,26 +226,6 @@ the preferred method python evaluation.
       (cons '(:exports . "both")
 	    (assq-delete-all :exports org-babel-default-header-args)))
 #+END_SRC
-
-
-** spell-checking
-#+begin_src emacs-lisp
-(require 'ispell)
-(setq flyspell-issue-welcome-flag nil)
-(global-set-key (kbd "<f8>") 'ispell-word)
-(global-set-key (kbd "C-<f8>") 'flyspell-mode)
-(flyspell-mode t)
-
-(setq-default ispell-program-name my-aspell)
-(setq ispell-personal-dictionary (concat emacs-root "/.ispell"))
-(setq text-mode-hook '(lambda()
-			(flyspell-mode t)       ; spellchek (sic) on the fly
-			))
-;;(setq ispell-personal-dictionary (concat emacs-root "Dropbox/.emacs.d/.ispell"))
-
-;; stop annoying boxes from popping up when no makefile foundx
-(setq flymake-gui-warnings-enabled nil)
-#+end_src
 ** reftex setup
 #+BEGIN_SRC emacs-lisp
 (defun org-mode-reftex-setup ()
@@ -391,7 +388,7 @@ I use this to run commands asynchronously in the shell. org-mode runs shell link
 ))))
 #+END_SRC
 
-*** experimental image link :noexport:
+*** experimental image link 
 This was to have a way to put a single file name into an org-file, but get the right figure type for different outputs, e.g. png for html, and pdf for pdflatex
 #+BEGIN_SRC emacs-lisp
 (org-add-link-type
@@ -664,7 +661,85 @@ The idea here is to create links for label and ref. The reason for these additio
 
 (global-set-key "\C-ci" 'insert-feedback)
 #+END_SRC
-* jmax lisp
+
+* TODO python                                                      
+Support for the Python programming language.
+** Use Python's python-mode.el instead of Emacs' python.el
+   :PROPERTIES:
+   :CUSTOM_ID: python
+   :END:
+
+Replace the Python mode that comes with Emacs by the Python mode
+supplied by the Python distribution itself.
+
+#+begin_src emacs-lisp
+(setq py-install-directory (concat emacs-root "/python-mode/"))
+(add-to-list 'load-path py-install-directory)
+(add-to-list 'load-path (concat emacs-root "/python-mode/completion/"))
+(add-to-list 'load-path (concat emacs-root "/python-mode/Pymacs/"))
+
+(require 'python-mode)
+(add-to-list 'auto-mode-alist '("\\.py\\'" . python-mode))
+;(add-to-list 'interpreter-mode-alist '("ipython" . python-mode))
+
+;To enable code completion:
+(require 'pycomplete)
+(setq py-load-pymacs-p t)
+(add-to-list 'ac-sources 'ac-source-pycomplete)
+
+;To use auto-complete, just prepend the following lines:
+(require 'auto-complete-config)
+(ac-config-default)
+
+(setq-default indent-tabs-mode nil)    ; use only spaces and no tabs
+(setq default-tab-width 4)
+
+(require 'pymacs)
+(pymacs-load "ropemacs" "rope-")
+(setq ropemacs-enable-autoimport t)
+#+end_src
+
+#+RESULTS:
+
+** Use IPython if =ipython= command is present 
+   :PROPERTIES:
+   :CUSTOM_ID: ipython
+   :END:
+If an =ipython= executable is on the path, then assume that IPython is
+the preferred method python evaluation.
+#+begin_src emacs-lisp :exports none
+(setq py-shell-name "ipython")
+(setq py-python-command-args '("--pylab" "--colors" "Linux"))
+(setq org-babel-python-mode 'python-mode)
+#+end_src
+
+** Code checking option 1: On-the-fly w/ Flymake
+http://www.saltycrane.com/blog/2010/05/my-emacs-python-environment/
+
+#+begin_src emacs-lisp
+(add-hook 'find-file-hook 'flymake-find-file-hook)
+(when (load "flymake" t)
+  (defun flymake-pyflakes-init ()
+    (let* ((temp-file (flymake-init-create-temp-buffer-copy
+               'flymake-create-temp-inplace))
+       (local-file (file-relative-name
+            temp-file
+            (file-name-directory buffer-file-name))))
+      (list "pycheckers"  (list local-file))))
+   (add-to-list 'flymake-allowed-file-name-masks
+             '("\\.py\\'" flymake-pyflakes-init)))
+(require 'flymake-cursor)
+(global-set-key [f10] 'flymake-goto-prev-error)
+(global-set-key [f11] 'flymake-goto-next-error)
+#+end_src
+
+#+begin_src sh :tangle ~/bin/pycheckers
+#!/bin/bash
+pyflakes "$1"
+pep8 --ignore=E221,E701,E202 --repeat "$1"
+true
+#+end_src
+* jmax lisp                                                        
 ** line-spacing
 #+BEGIN_SRC emacs-lisp
 ;; http://sdpconfig.wordpress.com/2011/12/21/unwrapping-paragraphs-in-emacs/
@@ -790,7 +865,7 @@ Uses `search-site-url' to do the actual search.
 
 
 \bibliography{../export}
-* TODO send email through gmail					   :personal:
+* TODO send email through gmail                           :personal:
 contains personal info
 Adapted from http://wideaperture.net/blog/?p=3343
 
@@ -821,7 +896,7 @@ Adapted from http://wideaperture.net/blog/?p=3343
 #+end_src
 
 
-* TODO setup gnus for reading and sending mail			   :personal:
+* TODO setup gnus for reading and sending mail            :personal:
 contains personal info
 #+begin_src emacs-lisp
 ;; Customize the next three lines with your ISP information.
@@ -854,7 +929,7 @@ contains personal info
 (executable-find starttls-program)
 #+end_src
 
-* ebib setup
+* ebib setup                                                       ::
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'load-path (concat emacs-root "./ebib"))
 (autoload 'ebib "ebib" "Ebib, a BibTeX database manager." t)
@@ -862,12 +937,3 @@ contains personal info
 
 #+RESULTS:
 | autoload | ebib | Ebib, a BibTeX database manager. | t | nil |
-
-* auto-complete
-see: http://cx4a.org/software/auto-complete/manual.html
-#+begin_src emacs-lisp
-(add-to-list 'load-path (concat emacs-root "/auto-complete-1.3.1"))
-(require 'auto-complete-config)
-(add-to-list 'ac-dictionary-directories (concat emacs-root "/auto-complete-1.3.1/ac-dict"))
-(ac-config-default)
-#+end_src
