@@ -1,12 +1,32 @@
 #+TITLE: Emacs customizations to maximize John's Emacs
 
-* tasks
-** autocomplete
+* tasks								   :noexport:
 
+
+q* personal setup						   :personal:
+Obviously this will have to be customized.
+#+begin_src emacs-lisp
+;; I need some lisp voodoo here to set paths according to the machine I am on.
+(when (or (string= system-name "jkitchin-780.cheme.cmu.edu")
+	  (string= system-name "gilgamesh.cheme.cmu.edu"))
+  (defvar emacs-root "/home/jkitchin/Dropbox/jmax")
+  (defvar my-aspell "aspell"))
+
+(when (or (string= system-name "JKITCHIN-PC")
+	  (string= system-name "KITCHIN-TABLET"))
+  (defvar emacs-root "c:/users/jkitchin/Dropbox/jmax")
+  (defvar my-aspell "C:/Program Files/Aspell/bin/aspell.exe"))
+
+(when (or (string= system-name "HOME-OFFICE")
+          (string= system-name "JKITCHIN-2012"))
+       (defvar emacs-root "c:/users/jkitchin/Dropbox/jmax")
+       (defvar my-aspell "C:/Program Files (x86)/Aspell/bin/aspell.exe"))
+#+end_src
 * Basic customizations
 #+BEGIN_SRC emacs-lisp
 (setq frame-title-format "jmax - awesome editing")
-
+(tool-bar-mode 0) ; remove the icons
+(menu-bar-mode 1) ; keep the menus
 (global-visual-line-mode 1) ;; how long lines are handled.
                             ;; This appears to wrap long lines
 
@@ -24,10 +44,17 @@
 
 (fset 'yes-or-no-p 'y-or-n-p) ; answer with y/n instead of yes/no
 
-(global-set-key [f9] (lambda () (interactive) (load-file "~/jmax/init.el")))
-
-(abbrev-mode 1) ; turn abbrev mode on
+(global-set-key [f9] (lambda () (interactive) (save-buffer) (load-file (concat emacs-root "/init.el"))))
 #+END_SRC
+** abbrev mode
+#+begin_src emacs-lisp
+(abbrev-mode 1) ; turn abbrev mode on
+(setq-default abbrev-mode t)
+(read-abbrev-file (concat emacs-root "/abbrev_defs"))
+(setq save-abbrevs t)
+#+end_src
+
+#+RESULTS:
 
 ** packages to always load
 #+begin_src emacs-lisp
@@ -56,7 +83,7 @@
   (require 'eieio)
 #+end_src
 
-** Setup package manager
+* Setup package manager
 #+begin_src emacs-lisp
   (setq package-archives
         '(("gnu"         . "http://elpa.gnu.org/packages/")
@@ -65,8 +92,11 @@
           ("marmalade"   . "http://marmalade-repo.org/packages/")))
   (package-initialize)
 
+(setq package-user-dir (concat emacs-root "/elpa"))
+(add-to-list 'load-path (concat emacs-root "/elpa/ipython-2927"))
   (defvar starter-kit-packages
-    (list 'yasnippet-bundle)
+    (list 'yasnippet-bundle
+          'magit)
     "Libraries that should be installed by default.")
 
   (unless package-archive-contents
@@ -76,10 +106,12 @@
     (unless (package-installed-p package)
       (package-install package)))
 #+end_src
+
+#+RESULTS:
+
 * color theme
 #+BEGIN_SRC emacs-lisp
-(add-to-list 'load-path "~/jmax")
-(add-to-list 'custom-theme-load-path "~/jmax/themes")
+(add-to-list 'custom-theme-load-path (concat emacs-root "/themes"))
 (load-theme 'my t)
 #+END_SRC
 
@@ -110,6 +142,8 @@ supplied by the Python distribution itself.
 (add-to-list 'auto-mode-alist '("\\.py\\'" . python-mode))
 (add-to-list 'interpreter-mode-alist '("python" . python-mode))
 #+end_src
+
+#+RESULTS:
 
 ** Use IPython if =ipython= command is present :noexport:
    :PROPERTIES:
@@ -175,16 +209,7 @@ the preferred method python evaluation.
       (cons '(:exports . "both")
 	    (assq-delete-all :exports org-babel-default-header-args)))
 #+END_SRC
-** customized faces
-#+BEGIN_SRC emacs-lisp
-;(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
-; '(flyspell-duplicate ((t (:foreground "red" :underline t :weight bold))))
-; '(org-link ((t (:inherit link :foreground "medium blue" :underline t)))))
-#+END_SRC
+
 
 ** spell-checking
 #+begin_src emacs-lisp
@@ -194,7 +219,11 @@ the preferred method python evaluation.
 (global-set-key (kbd "C-<f8>") 'flyspell-mode)
 (flyspell-mode t)
 
-(setq-default ispell-program-name "aspell")
+(setq-default ispell-program-name my-aspell)
+(setq ispell-personal-dictionary (concat emacs-root "/.ispell"))
+(setq text-mode-hook '(lambda()
+			(flyspell-mode t)       ; spellchek (sic) on the fly
+			))
 ;;(setq ispell-personal-dictionary (concat emacs-root "Dropbox/.emacs.d/.ispell"))
 
 ;; stop annoying boxes from popping up when no makefile foundx
@@ -207,8 +236,8 @@ the preferred method python evaluation.
   (and (buffer-file-name)
        (file-exists-p (buffer-file-name))
        (reftex-parse-all))
-  (define-key org-mode-map (kbd "C-c )") 'reftex-citation)
-  )
+  (define-key org-mode-map (kbd "C-c )") 'reftex-citation))
+
 (add-hook 'org-mode-hook 'org-mode-reftex-setup)
 #+END_SRC
 ** publishing setup
@@ -483,7 +512,7 @@ returns a list of stripped file names"
 (defun cite-make-latex-links (stripped-keys)
   "construct links as superscripted bracketed links in latex"
   (interactive)
-  (concat "\\cite{" (mapconcat (lambda (key) key) stripped-keys ", ") "}"))
+  (concat "\\cite{" (mapconcat (lambda (key) key) stripped-keys ",") "}"))
 
 (defun cite-key-in-file-p (key filename)
   "determine if the key is in the file"
@@ -542,7 +571,7 @@ Here we add links for the bibliography and bibliography style
 ;; link to hold a bibliography bibtex file. Mostly so I can click on the link and open the file.
 ;; TODO replace click code to open file at point.
 (org-add-link-type "bibliography"
-(lambda (link-string) 
+(lambda (link-string)
     (save-excursion
      (beginning-of-line) ; search forward from beginning of the line
      (search-forward link-string nil t 1)
@@ -566,7 +595,7 @@ Here we add links for the bibliography and bibliography style
   (cond
    ((eq format 'latex)
     ; write out the latex bibliography command
-    (format "\\bibliography{%s}" (replace-in-string keyword ".bib" ""))))))
+    (format "\\bibliography{%s}" (replace-regexp-in-string  ".bib" "" keyword))))))
 
 (org-add-link-type "bibliographystyle"
 (lambda (arg) (message "Nothing implemented for clicking here.")) ; open file on click
@@ -574,7 +603,7 @@ Here we add links for the bibliography and bibliography style
   (cond
    ((eq format 'latex)
     ; write out the latex bibliography command
-    (format "\\bibliographystyle{%s}" keyword ".bib" "")))))
+    (format "\\bibliographystyle{%s}" keyword)))))
 #+end_src
 
 
@@ -761,19 +790,19 @@ Uses `search-site-url' to do the actual search.
 
 
 \bibliography{../export}
-* send email through gmail
+* TODO send email through gmail					   :personal:
+contains personal info
 Adapted from http://wideaperture.net/blog/?p=3343
+
 #+begin_src emacs-lisp
 ;;Configure Outbound Mail
 
 ;;Tell the program who you are
-
 (setq user-full-name "John Kitchin")
 (setq user-mail-address "johnrkitchin@gmail.com")
 
 ;;Tell Emacs to use GNUTLS instead of STARTTLS
 ;;to authenticate when sending mail.
-
 (setq starttls-use-gnutls t)
 
 ;;Tell Emacs about your mail server and credentials
@@ -789,12 +818,11 @@ Adapted from http://wideaperture.net/blog/?p=3343
       smtpmail-smtp-service 587
       smtpmail-debug-info t)
 (require 'smtpmail)
-
-
 #+end_src
 
 
-* setup gnus for reading and sending mail
+* TODO setup gnus for reading and sending mail			   :personal:
+contains personal info
 #+begin_src emacs-lisp
 ;; Customize the next three lines with your ISP information.
 (load "starttls")
@@ -825,7 +853,21 @@ Adapted from http://wideaperture.net/blog/?p=3343
 (setq gnus-permanently-visible-groups "gmail")
 (executable-find starttls-program)
 #+end_src
-* finally
+
+* ebib setup
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'load-path (concat emacs-root "./ebib"))
+(autoload 'ebib "ebib" "Ebib, a BibTeX database manager." t)
+#+END_SRC
+
+#+RESULTS:
+| autoload | ebib | Ebib, a BibTeX database manager. | t | nil |
+
+* auto-complete
+see: http://cx4a.org/software/auto-complete/manual.html
 #+begin_src emacs-lisp
-(find-file "~/org-mode/master.org")
+(add-to-list 'load-path (concat emacs-root "/auto-complete-1.3.1"))
+(require 'auto-complete-config)
+(add-to-list 'ac-dictionary-directories (concat emacs-root "/auto-complete-1.3.1/ac-dict"))
+(ac-config-default)
 #+end_src

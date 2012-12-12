@@ -2,6 +2,13 @@
 
 Try it you will like it.
 
+Clone the git repository, change into the jmax directory, and run this command:
+#+begin_src sh
+emacs -q -l init.el
+#+end_src
+
+This will load the emacs on your path, without using whatever you have defined in .emacs.d.
+
 * Project goal
 =jmax= is a customized version of emacs to facilitate authoring and consuming org-mode based technical documents.
 
@@ -17,7 +24,6 @@ All of the emacs customization is performed in an org-mode file.
 
 * TODO
 - git integration for emacs
-- color-theme
 - blog integration
 - auto-install some packages
   + markdown-mode
