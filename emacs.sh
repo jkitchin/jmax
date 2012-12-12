@@ -1,2 +1,2 @@
 #!/bin/sh
-emacs -q -l ${JMAX}/init.el
+emacs -q -l ${HOME}/Dropbox/jmax/init.el
