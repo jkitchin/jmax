@@ -3,7 +3,10 @@
 ; custom faces
 (custom-theme-set-faces
  'my
- '(default ((t (:foreground "black" :background "gray80" :height 110))))
+ '(default ((t (:foreground "black" 
+			    :background "gray80" 
+			    :bold t
+			    :height 100))))
  
  '(font-latex-bold-face ((t (nil))))
  '(font-latex-italic-face ((t (:italic t :foreground "DarkOliveGreen" :slant italic))))
