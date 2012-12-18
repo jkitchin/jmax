@@ -76,7 +76,7 @@ Obviously this will have to be customized.
 (setq-default abbrev-mode t)
 (setq abbrev-file-name (concat starter-kit-dir "abbrev_defs"))
 (if (not (file-exists-p abbrev-file-name))
-(progn (find-file-no-select abbrev-file-name) (write-file abbrev-file-name))
+(progn (find-file-noselect abbrev-file-name) (write-file abbrev-file-name))
 )
 (read-abbrev-file (concat starter-kit-dir "abbrev_defs"))
 (setq save-abbrevs t)
