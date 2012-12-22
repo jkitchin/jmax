@@ -963,6 +963,46 @@ Uses `search-site-url' to do the actual search.
 
 
 \bibliography{../export}
+** blog post
+#+BEGIN_SRC emacs-lisp
+(defun new-blog-post (title &optional directory)
+  "open a buffer with name year-month-day-title.org if C-u called
+first, then create a directory with the title name, and a buffer
+inside the directory"
+  (interactive
+   (cond
+    ((equal current-prefix-arg nil) ; universal argument not called
+     (message "no prefix arg")
+     (list
+      ; first read title, and set directory to nil
+      (read-string "Title: " nil nil "span") nil))
+    ((equal current-prefix-arg '(4)) ; C-u was called
+     ; first read title, and set directory to t
+     (list (read-string "Title: " nil nil "span") t))))
+  (if directory
+      ; directory is true, so create one
+      (progn
+        (message "making a directory")
+        (make-directory (format "%s-%s"
+                                (format-time-string "%Y-%m-%d")
+                                (replace-regexp-in-string " " "-" title)) t)
+        (message "made a directory")
+        (setq post-buffer
+              (format "%s-%s/%s-%s.org"
+                      (format-time-string "%Y-%m-%d")
+                      (replace-regexp-in-string " " "-" title)
+                      (format-time-string "%Y-%m-%d")
+                      (replace-regexp-in-string " " "-" title)))
+        (find-file post-buffer)
+        )
+
+    (progn
+      (setq post-buffer
+           (format "%s-%s.org"
+            (format-time-string "%Y-%m-%d")
+            (replace-regexp-in-string " " "-" title)))
+     (find-file post-buffer))))
+#+END_SRC
 * TODO send email through gmail
 Adapted from http://wideaperture.net/blog/?p=3343
 
