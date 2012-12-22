@@ -76,9 +76,12 @@ Obviously this will have to be customized.
 (setq-default abbrev-mode t)
 (setq abbrev-file-name (concat starter-kit-dir "abbrev_defs"))
 (if (not (file-exists-p abbrev-file-name))
-(progn (find-file-noselect abbrev-file-name) (write-file abbrev-file-name))
-)
-(read-abbrev-file (concat starter-kit-dir "abbrev_defs"))
+    (progn (find-file-noselect abbrev-file-name) 
+	   (write-file abbrev-file-name)))
+
+(if (file-exists-p abbrev-file-name)
+        (quietly-read-abbrev-file))
+
 (setq save-abbrevs t)
 #+end_src
 
@@ -178,6 +181,7 @@ see: http://cx4a.org/software/auto-complete/manual.html
 (require 'org)
 (require 'org-special-blocks)
 (require 'org-inlinetask)
+(require 'org-mouse)
 ;(require 'org-latex)
 
 (add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode))
@@ -233,10 +237,32 @@ This allows you insert citations from reftex. I am not sure I like this a lot, a
 
 #+BEGIN_SRC emacs-lisp
 (defun org-mode-reftex-setup ()
+"use my bibliography link to set the default bibliography in an org-file"
   (load-library "reftex")
   (and (buffer-file-name)
        (file-exists-p (buffer-file-name))
        (reftex-parse-all))
+
+  ; this allows you to choose these different link formats. Not all of
+  ; them are implemented yet.
+  (setq reftex-cite-format '((13  . "cite:%l")
+			     (116 . "citet:%l")
+			     (84  . "citet*:%l")
+			     (112 . "citep:%l")
+			     (80  . "citep*:%l")
+			     (101 . "citep:[e.g.][]{%l}")
+			     (115 . "citep:[see][]{%l}")
+			     (97  . "citeauthor:%l")
+			     (65  . "citeauthor*:%l")
+			     (121 . "citeyear:%l")
+			     (110 . "nocite:%l")))
+  ; check if default bibliography is set. 
+  (if (not (reftex-default-bibliography))
+      (let ((n (count-matches "bibliography:" (point-min) (point-max))))
+	(if (> n 1) (error (format "too many bibliography entries found")))
+	(if (< n 1) (error (format "no matching bibliography found")))
+	(setq reftex-default-bibliography (cite-find-bibliography))))
+
   (define-key org-mode-map (kbd "C-c )") 'reftex-citation))
 
 (add-hook 'org-mode-hook 'org-mode-reftex-setup)
@@ -528,9 +554,8 @@ returns a list of stripped file names"
     (goto-char (point-min))
     (search-forward key nil t 1)))
 
-(org-add-link-type
- "cite"
- (lambda (link-string)
+(defun cite-onclick (link-string)
+"function that visits the bib-file at the key selected on clicking"
    ;; This code opens the bibtex file containing the clicked on
    ;; key. First we find the boundaries of the link you clicked on,
    ;; then identify the key you clicked on.
@@ -551,13 +576,7 @@ returns a list of stripped file names"
        (setq key-beginning (point)))) ; no match found
                                         ; save the key we clicked on.
    (setq bibtex-key (cite-strip-key (buffer-substring key-beginning key-end)))
-   (message "(%s %s) p=%s %s %s: %s"
-            link-string-beginning
-            link-string-end
-            (point)
-            key-beginning
-            key-end
-            bibtex-key )
+
    ;; now we get the bibliography files
    (setq cite-bibliography-files (cite-find-bibliography))
    ;(message "%S" cite-bibliography-files))
@@ -566,13 +585,89 @@ returns a list of stripped file names"
          (if (cite-key-in-file-p bibtex-key file) (return file))))
    ;; and finally, open the file at the key
    (cite-goto-bibentry bib-file  bibtex-key))
+
+(org-add-link-type
+ "cite"
+ 'cite-onclick
  ;; formatting
  (lambda (keyword desc format)
    (cond
     ((eq format 'latex)
      (cite-make-latex-links (cite-split-keys keyword))))))
 
-(setq reftex-cite-format "[[cite:%l]]")
+(org-add-link-type
+ "citet"
+ 'cite-onclick
+ ;; formatting
+ (lambda (keyword desc format)
+   (cond
+    ((eq format 'latex)
+  (concat "\\citet{" (mapconcat (lambda (key) key) (cite-split-keys keyword) ",") "}")))))
+
+(org-add-link-type
+ "citet*"
+ 'cite-onclick
+ ;; formatting
+ (lambda (keyword desc format)
+   (cond
+    ((eq format 'latex)
+  (concat "\\citet*{" (mapconcat (lambda (key) key) (cite-split-keys keyword) ",") "}")))))
+
+;; TODO these links do not support options [see][] 
+(org-add-link-type
+ "citep"
+ 'cite-onclick
+ ;; formatting
+ (lambda (keyword desc format)
+   (cond
+    ((eq format 'latex)
+  (concat "\\citep{" (mapconcat (lambda (key) key) (cite-split-keys keyword) ",") "}")))))
+
+(org-add-link-type
+ "citep*"
+ 'cite-onclick
+ ;; formatting
+ (lambda (keyword desc format)
+   (cond
+    ((eq format 'latex)
+  (concat "\\citep*{" (mapconcat (lambda (key) key) (cite-split-keys keyword) ",") "}")))))
+
+(org-add-link-type
+ "citeauthor"
+ 'cite-onclick
+ ;; formatting
+ (lambda (keyword desc format)
+   (cond
+    ((eq format 'latex)
+  (concat "\\citeauthor{" (mapconcat (lambda (key) key) (cite-split-keys keyword) ",") "}")))))
+
+(org-add-link-type
+ "citeauthor*"
+ 'cite-onclick
+ ;; formatting
+ (lambda (keyword desc format)
+   (cond
+    ((eq format 'latex)
+  (concat "\\citeauthor*{" (mapconcat (lambda (key) key) (cite-split-keys keyword) ",") "}")))))
+
+(org-add-link-type
+ "citeyear"
+ 'cite-onclick
+ ;; formatting
+ (lambda (keyword desc format)
+   (cond
+    ((eq format 'latex)
+  (concat "\\citeyear{" (mapconcat (lambda (key) key) (cite-split-keys keyword) ",") "}")))))
+
+(org-add-link-type
+ "nocite"
+ 'cite-onclick
+ ;; formatting
+ (lambda (keyword desc format)
+   (cond
+    ((eq format 'latex)
+  (concat "\\nocite{" (mapconcat (lambda (key) key) (cite-split-keys keyword) ",") "}")))))
+
 #+END_SRC
 
 Here we add links for the bibliography and bibliography style
