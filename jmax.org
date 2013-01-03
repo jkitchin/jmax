@@ -33,7 +33,8 @@ Obviously this will have to be customized.
 
 (when (or (string= system-name "HOME-OFFICE")
           (string= system-name "JKITCHIN-2012"))
-       (defvar my-aspell "C:/Program Files (x86)/Aspell/bin/aspell.exe"))
+  (setq org-agenda-files '("c:/Users/jkitchin/Dropbox/org-mode"))
+  (defvar my-aspell "C:/Program Files (x86)/Aspell/bin/aspell.exe"))
 
 ;;Tell the program who you are
 (setq user-full-name "John Kitchin")
@@ -44,7 +45,14 @@ Obviously this will have to be customized.
 
 * Basic customizations
 #+BEGIN_SRC emacs-lisp
-(setq frame-title-format "jmax - awesome editing")
+;(setq frame-title-format "jmax - awesome editing")
+
+;; set frame title to something useful
+(setq frame-title-format
+  '((buffer-file-name "%f"
+    (dired-directory dired-directory "%b"))))
+
+
 (tool-bar-mode 0) ; remove the icons
 (menu-bar-mode 1) ; keep the menus
 (global-visual-line-mode 1) ;; how long lines are handled.
@@ -205,16 +213,100 @@ see: http://cx4a.org/software/auto-complete/manual.html
 
 ; enable prompt-free code running
 (setq org-confirm-babel-evaluate nil)
+(setq org-confirm-elisp-link-function nil)
 
 ; register python in org-mode
 (org-babel-do-load-languages
  'org-babel-load-languages
  '((emacs-lisp . t)
-   (python . t)))
+   (python . t)
+   (sh . t)))
 
 ; no extra indentation
 (setq org-src-preserve-indentation t)
 (setq org-startup-with-inline-images "inlineimages")
+#+END_SRC
+** agenda setup
+#+BEGIN_SRC emacs-lisp
+; I don't want to see things that are done. turn that off here.
+; http://orgmode.org/manual/Global-TODO-list.html#Global-TODO-list
+(setq org-agenda-skip-scheduled-if-done t)
+(setq org-agenda-skip-deadline-if-done t)
+(setq org-agenda-skip-timestamp-if-done t)
+(setq org-agenda-todo-ignore-scheduled t)
+(setq org-agenda-todo-ignore-deadlines t)
+(setq org-agenda-todo-ignore-timestamp t)
+(setq org-agenda-todo-ignore-with-date t)
+(setq org-agenda-start-on-weekday nil) ;; start on current day
+
+(setq org-upcoming-deadline '(:foreground "blue" :weight bold))
+
+(setq org-deadline-warning-days 0)
+
+(setq org-agenda-custom-commands
+      '(("w" "Weekly Review"
+         (
+          ;; deadlines
+          (tags-todo "+DEADLINE<=\"<today>\""
+                     ((org-agenda-overriding-header "Late Deadlines")
+                      ;(org-agenda-tags-todo-honor-ignore-options t)
+                      ;(org-agenda-todo-ignore-scheduled t)
+                      ;(org-agenda-todo-ignore-deadlines t)
+		      ))
+
+          ;; scheduled  past due
+          (tags-todo "+SCHEDULED<=\"<today>\""
+                     ((org-agenda-overriding-header "Late Scheduled")
+                      ;(org-agenda-tags-todo-honor-ignore-options t)
+                      ;(org-agenda-todo-ignore-scheduled t)
+                      ;(org-agenda-todo-ignore-deadlines t)
+		      ))
+
+	  ;; now the agenda
+	  (agenda ""
+		  ((org-agenda-overriding-header "weekly agenda")
+		   (org-agenda-ndays 7)
+		   (org-agenda-tags-todo-honor-ignore-options t)
+		   (org-agenda-todo-ignore-scheduled nil)
+		   (org-agenda-todo-ignore-deadlines nil)
+		   (org-deadline-warning-days 0)
+		   ))
+
+	  ;; and last a global todo list
+          (todo "TODO"))) ;; review waiting items ...other commands
+			     ;; here
+        ))
+
+(setq org-log-done 'time)
+#+END_SRC
+
+#+RESULTS:
+
+** IMAGE handling
+#+BEGIN_SRC emacs-lisp
+(setq org-startup-with-inline-images "inlineimages")
+
+;; enable image mode first
+(iimage-mode)
+;; add the org file link format to the iimage mode regex
+(add-to-list 'iimage-mode-image-regex-alist
+  (cons (concat "\\[\\[file:\\(~?" iimage-mode-image-filename-regex "\\)\\]")  1))
+;;  add a hook so we can display images on load
+(add-hook 'org-mode-hook '(lambda () (org-turn-on-iimage-in-org)))
+;; function to setup images for display on load
+(defun org-turn-on-iimage-in-org ()
+  "display images in your org file"
+  (interactive)
+  (turn-on-iimage-mode)
+  (set-face-underline-p 'org-link nil))
+;; function to toggle images in a org buffer
+(defun org-toggle-iimage-in-org ()
+  "display images in your org file"
+  (interactive)
+  (if (face-underline-p 'org-link)
+      (set-face-underline-p 'org-link nil)
+      (set-face-underline-p 'org-link t))
+  (call-interactively 'iimage-mode))
 #+END_SRC
 ** default output for code blocks
 #+BEGIN_SRC emacs-lisp
@@ -227,19 +319,6 @@ see: http://cx4a.org/software/auto-complete/manual.html
 (setq org-babel-default-header-args
       (cons '(:exports . "both")
 	    (assq-delete-all :exports org-babel-default-header-args)))
-#+END_SRC
-** reftex setup
-This allows you insert citations from reftex. I am not sure I like this a lot, as I prefer the citations to go in as links. I think this can be done via ebib, or I will one day write my own insert citation function that puts in the links I want like these [[cite links]].
-
-#+BEGIN_SRC emacs-lisp
-(defun org-mode-reftex-setup ()
-  (load-library "reftex")
-  (and (buffer-file-name)
-       (file-exists-p (buffer-file-name))
-       (reftex-parse-all))
-  (define-key org-mode-map (kbd "C-c )") 'reftex-citation))
-
-(add-hook 'org-mode-hook 'org-mode-reftex-setup)
 #+END_SRC
 
 ** publishing setup
@@ -493,9 +572,9 @@ returns a list of stripped file names"
   (interactive)
   (save-excursion
     (goto-char (point-min))
-    (re-search-forward "bibliography:\\([^\]\|\n]+\\)")
+    (re-search-forward "bibliography:\\([^\]\|\n]+\\)" nil t)
     (setq cite-bibliography-files
-          (mapcar 'citeu-strip-key (split-string (match-string 1) ",")))))
+          (mapcar 'cite-strip-key (split-string (match-string 1) ",")))))
 
 (defun cite-goto-bibentry (bibfile key)
   "open bibfile in another window at the key"
@@ -510,16 +589,11 @@ returns a list of stripped file names"
   (replace-regexp-in-string
    (concat search-whitespace-regexp "$" ) ""
    (replace-regexp-in-string
-    (concat "^" search-whitespace-regexp ) "" key) ))
+    (concat "^" search-whitespace-regexp ) "" key)))
 
 (defun cite-split-keys (key-string)
   "split key-string and strip keys. Assumes the key-string is comma delimited"
   (mapcar 'citeu-strip-key (split-string key-string ",")))
-
-(defun cite-make-latex-links (stripped-keys)
-  "construct links as superscripted bracketed links in latex"
-  (interactive)
-  (concat "\\cite{" (mapconcat (lambda (key) key) stripped-keys ",") "}"))
 
 (defun cite-key-in-file-p (key filename)
   "determine if the key is in the file"
@@ -528,9 +602,7 @@ returns a list of stripped file names"
     (goto-char (point-min))
     (search-forward key nil t 1)))
 
-(org-add-link-type
- "cite"
- (lambda (link-string)
+(defun cite-onclick (link-string)
    ;; This code opens the bibtex file containing the clicked on
    ;; key. First we find the boundaries of the link you clicked on,
    ;; then identify the key you clicked on.
@@ -566,11 +638,33 @@ returns a list of stripped file names"
          (if (cite-key-in-file-p bibtex-key file) (return file))))
    ;; and finally, open the file at the key
    (cite-goto-bibentry bib-file  bibtex-key))
+
+(defun cite-make-latex-links (stripped-keys)
+  "construct links as superscripted bracketed links in latex"
+  (interactive)
+  (concat "\\cite{" (mapconcat (lambda (key) key) stripped-keys ",") "}"))
+
+(org-add-link-type
+ "cite"
+ 'cite-onclick
  ;; formatting
  (lambda (keyword desc format)
    (cond
     ((eq format 'latex)
-     (cite-make-latex-links (cite-split-keys keyword))))))
+     (concat "\\cite{" 
+	     (mapconcat (lambda (key) key) (cite-split-keys keyword) ",")
+	     "}")))))
+
+(org-add-link-type
+ "citealp"
+ 'cite-onclick
+ ;; formatting
+ (lambda (keyword desc format)
+   (cond
+    ((eq format 'latex)
+     (concat "\\citealp{" 
+	     (mapconcat (lambda (key) key) (cite-split-keys keyword) ",")
+	     "}")))))
 
 (setq reftex-cite-format "[[cite:%l]]")
 #+END_SRC
@@ -624,12 +718,12 @@ The idea here is to create links for label and ref. The reason for these additio
  "ref"
  (lambda (label)
    "on clicking goto the label. Navigate back with C-c &"
-   (let ((n (count-matches (format "label:%s\\b" label) (point-min) (point-max) t)))
+   (let ((n (count-matches (format "\\label{%s}\\b" label) (point-min) (point-max) t)))
      (if (< n 1) (error (format "no matching label found for %s!" label)))
      (if (> n 1) (error (format "%d matches found for %s!" n label)))
    (org-mark-ring-push)
    (goto-char (point-min))
-   (re-search-forward (format "label:%s\\b" label))
+   (re-search-forward (format "\\label{%s}\\b" label))
    (message "go back with `C-c &`")))
  ;formatting
  (lambda (keyword desc format)
@@ -647,6 +741,27 @@ The idea here is to create links for label and ref. The reason for these additio
     ((eq format 'latex)
      (format "\\label{%s}" keyword)))))
 #+END_SRC
+
+#+RESULTS:
+** reftex setup
+This allows you insert citations from reftex. I am not sure I like this a lot, as I prefer the citations to go in as links. I think this can be done via ebib, or I will one day write my own insert citation function that puts in the links I want like these [[cite links]].
+
+#+BEGIN_SRC emacs-lisp
+(defun org-mode-reftex-setup ()
+  (load-library "reftex")
+  (and (buffer-file-name)
+       (file-exists-p (buffer-file-name))
+       (reftex-parse-all))
+  (setq reftex-cite-format "cite:%l") ; use cite links in orgmode
+  ; we need to be sure there is a bibliography defined
+  (if (not (reftex-default-bibliography))
+      (setq reftex-default-bibliography (cite-find-bibliography)))
+  ; define a convenient key for adding citations
+  (define-key org-mode-map (kbd "C-c ]") 'reftex-citation))
+
+;(add-hook 'org-mode-hook 'org-mode-reftex-setup)
+#+END_SRC
+
 ** feedback function
 #+BEGIN_SRC emacs-lisp
 (defun insert-feedback (note)
@@ -672,6 +787,146 @@ The idea here is to create links for label and ref. The reason for these additio
 (global-set-key "\C-ci" 'insert-feedback)
 #+END_SRC
 
+** org-annotation
+#+BEGIN_SRC emacs-lisp :tangle org-annotate-file.el
+;;; org-annotate-file.el --- Annotate a file with org syntax
+
+;; Copyright (C) 2008-2012 Philip Jackson
+
+;; Author: Philip Jackson <phil@shellarchive.co.uk>
+;; Version: 0.2
+
+;; This file is not currently part of GNU Emacs.
+
+;; This program is free software; you can redistribute it and/or
+;; modify it under the terms of the GNU General Public License as
+;; published by the Free Software Foundation; either version 2, or (at
+;; your option) any later version.
+
+;; This program is distributed in the hope that it will be useful, but
+;; WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+;; General Public License for more details.
+
+;; You should have received a copy of the GNU General Public License
+;; along with this program ; see the file COPYING.  If not, write to
+;; the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+;; Boston, MA 02111-1307, USA.
+
+;;; Commentary:
+
+;; This is yet another implementation to allow the annotation of a
+;; file without modification of the file itself. The annotation is in
+;; org syntax so you can use all of the org features you are used to.
+
+;; To use you might put the following in your .emacs:
+;;
+;; (require 'org-annotate-file)
+;; (global-set-key (kbd "C-c C-l") 'org-annotate-file) ; for example
+;;
+;; To change the location of the annotation file:
+;;
+;; (setq org-annotate-file-storage-file "~/annotated.org")
+;;
+;; Then when you visit any file and hit C-c C-l you will find yourself
+;; in an org buffer on a headline which links to the file you were
+;; visiting, e.g:
+
+;; * ~/org-annotate-file.el
+
+;; Under here you can put anything you like, save the file
+;; and next time you hit C-c C-l you will hit those notes again.
+;;
+;; To put a subheading with a text search for the current line set
+;; `org-annotate-file-add-search` to non-nil value. Then when you hit
+;; C-c C-l (on the above line for example) you will get:
+
+;; * ~/org-annotate-file.el
+;; ** `org-annotate-file-add-search` to non-nil value. Then whe...
+
+;; Note that both of the above will be links.
+
+(require 'org)
+
+(defvar org-annotate-file-storage-file "~/.org-annotate-file.org"
+  "File in which to keep annotations.")
+
+(defvar org-annotate-file-add-search nil
+  "If non-nil then add a link as a second level to the actual
+location in the file")
+
+(defvar org-annotate-file-always-open t
+  "non-nil means always expand the full tree when you visit
+`org-annotate-file-storage-file'.")
+
+(defun org-annotate-file-elipsify-desc (string &optional after)
+  "Strip starting and ending whitespace and replace any chars
+that appear after the value in `after' with '...'"
+  (let* ((after (number-to-string (or after 30)))
+         (replace-map (list (cons "^[ \t]*" "")
+                            (cons "[ \t]*$" "")
+                            (cons (concat "^\\(.\\{" after
+                                          "\\}\\).*") "\\1..."))))
+    (mapc (lambda (x)
+            (when (string-match (car x) string)
+              (setq string (replace-match (cdr x) nil nil string))))
+          replace-map)
+    string))
+
+(defun org-annotate-file ()
+  "Put a section for the current file into your annotation file"
+  (interactive)
+  (unless (buffer-file-name)
+    (error "This buffer has no associated file"))
+  (org-annotate-file-show-section))
+
+(defun org-annotate-file-show-section (&optional buffer)
+  "Visit the buffer named `org-annotate-file-storage-file' and
+show the relevant section"
+  (let* ((filename (abbreviate-file-name (or buffer (buffer-file-name))))
+         (line (buffer-substring-no-properties (point-at-bol) (point-at-eol)))
+         (link (org-make-link-string (concat "file:" filename) filename))
+         (search-link (org-make-link-string
+                       (concat "file:" filename "::" line)
+                               (org-annotate-file-elipsify-desc line))))
+    (with-current-buffer (find-file org-annotate-file-storage-file)
+      (unless (eq major-mode 'org-mode)
+        (org-mode))
+      (goto-char (point-min))
+      (widen)
+      (when org-annotate-file-always-open
+        (show-all))
+      (unless (search-forward-regexp
+               (concat "^* " (regexp-quote link)) nil t)
+        (org-annotate-file-add-upper-level link))
+      (beginning-of-line)
+      (org-narrow-to-subtree)
+      ;; deal with a '::' search if need be
+      (when org-annotate-file-add-search
+        (unless (search-forward-regexp
+                 (concat "^** " (regexp-quote search-link)) nil t)
+          (org-annotate-file-add-second-level search-link))))))
+
+(defun org-annotate-file-add-upper-level (link)
+  (goto-char (point-min))
+  (call-interactively 'org-insert-heading)
+  (insert link))
+
+(defun org-annotate-file-add-second-level (link)
+  (goto-char (point-at-eol))
+  (call-interactively 'org-insert-subheading)
+  (insert link))
+
+(provide 'org-annotate-file)
+
+;;; org-annotate-file.el ends here
+
+#+END_SRC
+
+** TODO bookmarklet to remember webpages
+http://orgmode.org/worg/org-contrib/org-annotation-helper.html
+** TODO org-registry
+http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=contrib/lisp/org-registry.el;hb=HEAD
 * TODO python
 Support for the Python programming language.
 ** Use Python's python-mode.el instead of Emacs' python.el
@@ -764,6 +1019,9 @@ true
 #+END_SRC
 
 ** get paths and insert functions
+*************** TODO convert insert path to use a prefix arg for relative/absolute paths.
+*************** END
+
 #+BEGIN_SRC emacs-lisp
 ;http://www.gnu.org/software/emacs/manual/html_node/elisp/File-Name-Expansion.html#File-Name-Expansion
 
@@ -866,8 +1124,214 @@ Uses `search-site-url' to do the actual search.
   (dired-do-shell-command "ag" nil (list (dired-get-filename))))
 #+END_SRC
 
+** create a blog post
+#+BEGIN_SRC emacs-lisp
+; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; To export my site I just run C-c e X blog.
+;(add-to-list 'load-path (concat starter-kit-dir "/org-jekyll"))
+;(require 'org-jekyll)
+(setq org-publish-project-alist '())
+;; (setq org-publish-project-alist
+;;              '("jekyll-blog"
+;;                :base-directory "~/org-mode/blog/"
+;;                :recursive t
+;;                :base-extension "org"
+;;                :publishing-directory "~/blog/gh-pages/"
+;;                :exclude "^blog\\|^bitacora"
+;;                :site-root "http://http://jkitchin.github.com"
+;;                :jekyll-sanitize-permalinks t
+;;                :publishing-function org-publish-org-to-html
+;;                :section-numbers nil
+;;                :headline-levels 4
+;;                :table-of-contents t
+;;                :auto-index nil
+;;                :auto-preamble nil
+;;                :body-only t
+;;                :auto-postamble nil))
 
-\bibliography{../export}
+;; (add-to-list 'org-publish-project-alist
+;;              '("jekyll-blog-img"
+;;                :base-directory "~/org-mode/blog/"
+;;                :recursive t
+;;                :exclude "^publish"
+;;                :base-extension "jpg\\|gif\\|png"
+;;                :publishing-directory "~/blog/gh-pages/"
+;;                :publishing-function org-publish-attachment))
+
+;; (add-to-list 'org-publish-project-alist
+;;              '("jekyll-blog" :components ("jekyll-blog"  "jekyll-blog-img")))
+
+
+;; (add-to-list 'org-publish-project-alist
+;;       '("blog-posts"
+;;          ;org -files location and extension
+;;          :base-directory "~/org-mode/blog"
+;;          :base-extension "org"  ; files named foo.org
+
+;;           ;; Path to your Jekyll project.
+;;           :publishing-directory "~/blog/gh-pages/"
+;;           :recursive t
+;;           :publishing-function org-publish-org-to-html
+;;           :headline-levels 4
+;;           :html-extension "html"
+;;           :body-only t)) ;; Only export section between <body> </body>
+
+;; (add-to-list 'org-publish-project-alist
+;;         '("blog" :components ("blog-posts")))
+
+;; (require 'org-publish)
+;; (add-to-list 'org-publish-project-alist
+;;              '("org-jekyll-posts"
+;;                :base-directory "c:/Users/jkitchin/Dropbox/.emacs.d/org-jekyll/test"
+;;                :recursive t
+;;                :base-extension "org"
+;;                :publishing-directory "c:/Users/jkitchin/Dropbox/.emacs.d/org-jekyll/"
+;;                :publishing-function org-publish-org-to-html
+;;                :section-numbers nil
+;;                :headline-levels 4
+;;                :table-of-contents nil
+;;                :auto-index nil
+;;                :auto-preamble nil
+;;                :body-only t
+;;                :auto-postamble nil))
+
+;; ; get the images where we want them
+;; (add-to-list 'org-publish-project-alist
+;;              '("org-jekyll-images"
+;;                :base-directory "c:/Users/jkitchin/Dropbox/.emacs.d/org-jekyll/test"
+;;                :recursive t
+;;                :exclude "^publish"
+;;                :base-extension "jpg\\|gif\\|png"
+;;                :publishing-directory "c:/Users/jkitchin/Dropbox/.emacs.d/org-jekyll/_posts"
+;;                :publishing-function org-publish-attachment))
+
+;; (add-to-list 'org-publish-project-alist
+;;              '("org-jekyll-test" :components ("org-jekyll-posts" "org-jekyll-images")))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; jkitchin.github.com
+;; this block creates posts
+(add-to-list 'org-publish-project-alist
+             '("jkitchin-posts"
+               :base-directory "/home/jkitchin/Dropbox/jkitchin.github.com/source/_org"
+               :recursive t
+               :base-extension "org"
+               :publishing-directory "/home/jkitchin/Dropbox/jkitchin.github.com/source/_posts/"
+               :publishing-function org-publish-org-to-html
+               :section-numbers nil
+               :headline-levels 4
+               :table-of-contents nil
+               :auto-index nil
+               :auto-preamble nil
+               :body-only t
+               :auto-postamble nil))
+
+;; this grabs everything else not in the _org directory.
+(add-to-list 'org-publish-project-alist
+             '("jkitchin-pages"
+               :base-directory "/home/jkitchin/Dropbox/jkitchin.github.com/source"
+               :exclude "^_org"
+               :recursive t
+               :base-extension "org"
+               :publishing-directory "/home/jkitchin/Dropbox/jkitchin.github.com/source/"
+               :publishing-function org-publish-org-to-html
+               :section-numbers nil
+               :headline-levels 4
+               :table-of-contents nil
+               :auto-index nil
+               :auto-preamble nil
+               :body-only t
+               :auto-postamble nil))
+
+; I want to have the raw org files moved over too
+;(add-to-list 'org-publish-project-alist
+;             '("jkitchin-org"
+;               :base-directory "/home/jkitchin/Dropbox/jkitchin.github.com/source/_org"
+;               :recursive t
+;               :exclude "^publish"
+;               :base-extension "org"
+;               :publishing-directory "/home/jkitchin/Dropbox/jkitchin.github.com/source/org"
+;               :publishing-function org-publish-attachment))
+
+; get the images where we want them, in the images directory.
+(add-to-list 'org-publish-project-alist
+             '("jkitchin-images"
+               :base-directory "/home/jkitchin/Dropbox/jkitchin.github.com/source/_org"
+               :recursive t
+               :exclude "^publish"
+               :base-extension "jpg\\|gif\\|png"
+               :publishing-directory "/home/jkitchin/Dropbox/jkitchin.github.com/source/images"
+               :publishing-function org-publish-attachment))
+
+(add-to-list 'org-publish-project-alist
+             '("jkitchin" :components ("jkitchin-posts" "jkitchin-pages" "jkitchin-images")))
+
+(org-add-link-type
+ "img"
+ (lambda (keyword)
+   (find-file keyword)) ; open the file
+ (lambda (keyword link format)
+   (cond
+    ((eq format 'html)
+     (format "<img src=\"http://jkitchin.github.com/images/%s\">" keyword)))))
+
+(defun generate-blog ()
+  (interactive)
+  (org-publish-project "jkitchin")
+  (shell-command "rake generate"))
+
+(defun publish-blog ()
+  (interactive)
+  (shell-command "rake deploy"))
+
+(defun new-blog-post (title &optional directory)
+  "create a new blog post with name year-month-day-title.org.
+If C-u called first, then create a directory with the title name, and
+a buffer inside the directory. The buffer is pre-formatted for jekyll blog posts."
+  (interactive
+   (cond
+    ((equal current-prefix-arg nil) ; universal argument not called
+     (message "no prefix arg")
+     (list
+      ; first read title, and set directory to nil
+      (read-string "Title: " nil nil "span") nil))
+    ((equal current-prefix-arg '(4)) ; C-u was called
+     ; first read title, and set directory to t
+     (list (read-string "Title: " nil nil "span") t))))
+  (if directory
+      ; directory is true, so create one
+      (progn
+        (message "making a directory")
+        (make-directory (format "%s-%s"
+                                (format-time-string "%Y-%m-%d")
+                                (replace-regexp-in-string " " "-" title)) t)
+        (message "made a directory")
+        (setq post-buffer
+              (format "%s-%s/%s-%s.org"
+                      (format-time-string "%Y-%m-%d")
+                      (replace-regexp-in-string " " "-" title)
+                      (format-time-string "%Y-%m-%d")
+                      (replace-regexp-in-string " " "-" title)))
+        (find-file post-buffer))
+    (progn
+      (setq post-buffer
+           (format "%s-%s.org"
+            (format-time-string "%Y-%m-%d")
+            (replace-regexp-in-string " " "-" title)))
+     (find-file post-buffer)))
+  ;; now insert the header stuff required for jekyll
+  (insert (format "#+begin_html
+---
+layout: post
+title: %s
+tags:
+categories:
+---
+,#+end_html
+
+" title)))
+#+END_SRC
+
 * TODO send email through gmail
 Adapted from http://wideaperture.net/blog/?p=3343
 
@@ -940,3 +1404,7 @@ machine imap.gmail.com login john_doe@gmail.com password notapassword port 993
 
 #+RESULTS:
 | autoload | ebib | Ebib, a BibTeX database manager. | t | nil |
+
+
+* Bibliography
+bibliography:../bibliography/bibliography.bib
