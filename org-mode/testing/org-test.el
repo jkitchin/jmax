@@ -1,6 +1,6 @@
 ;;;; org-test.el --- Tests for Org-mode
 
-;; Copyright (c) 2010-2012 Sebastian Rose, Eric Schulte
+;; Copyright (c) 2010-2013 Sebastian Rose, Eric Schulte
 ;; Authors:
 ;;     Sebastian Rose, Hannover, Germany, sebastian_rose gmx de
 ;;     Eric Schulte, Santa Fe, New Mexico, USA, schulte.eric gmail com
@@ -201,7 +201,7 @@ otherwise place the point at the beginning of the inserted text."
 		      (goto-char ,(match-beginning 0)))
 	    `(progn (insert ,inside-text)
 		    (goto-char (point-min)))))
-       (prog1 ,@body (kill-buffer)))))
+       ,@body)))
 (def-edebug-spec org-test-with-temp-text (form body))
 
 (defmacro org-test-with-temp-text-in-file (text &rest body)

@@ -1,16 +1,24 @@
 ;;; test-org-export.el --- Tests for org-export.el
 
-;; Copyright (C) 2012  Nicolas Goaziou
+;; Copyright (C) 2012, 2013  Nicolas Goaziou
 
 ;; Author: Nicolas Goaziou <n.goaziou at gmail dot com>
 
-;; Released under the GNU General Public License version 3
-;; see: http://www.gnu.org/licenses/gpl-3.0.html
+;; This file is not part of GNU Emacs.
 
-;;;; Comments
+;; This program is free software; you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
 
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
 
-
+;; You should have received a copy of the GNU General Public License
+;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 ;;; Code:
 
 (unless (featurep 'org-export)
@@ -1068,20 +1076,7 @@ Another text. (ref:text)
 #+END_EXAMPLE"
       (goto-line 5)
       (should (equal (org-export-unravel-code (org-element-at-point))
-		     '("(+ 2 2)\n(+ 3 3)\n" (2 . "one")))))
-    ;; 5. Free up comma-protected lines.
-    ;;
-    ;; 5.1. In an Org source block, every line is protected.
-    (org-test-with-temp-text
-	"#+BEGIN_SRC org\n,* Test\n,# comment\n,Text\n#+END_SRC"
-      (should (equal (org-export-unravel-code (org-element-at-point))
-		     '("* Test\n# comment\nText\n"))))
-    ;; 5.2. In other blocks, only headlines, comments and keywords are
-    ;;      protected.
-    (org-test-with-temp-text
-	"#+BEGIN_EXAMPLE\n,* Headline\n, * Not headline\n,Keep\n#+END_EXAMPLE"
-      (should (equal (org-export-unravel-code (org-element-at-point))
-		     '("* Headline\n, * Not headline\n,Keep\n"))))))
+		     '("(+ 2 2)\n(+ 3 3)\n" (2 . "one")))))))
 
 
 

@@ -483,6 +483,11 @@
      (nil ((t (nil))))
      (nobreak-space ((t (nil))))
      (overlay-empty-face ((t (nil))))
+
+     (org-block-begin-line ((t (:underline "#A7A6AA" :foreground "#008ED1" :background "#EAEAFF"))))
+     (org-block-background  ((t (:background "#FFFFEA"))))
+     (org-block-end-line ((t (:overline "#A7A6AA" :foreground "#008ED1" :background "#EAEAFF"))))
+
      (paren-blink-off ((t (:foreground "gray80"))))
      (paren-face-match ((t (:background "turquoise"))))
      (paren-face-mismatch ((t (:background "purple" :foreground "white"))))

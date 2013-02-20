@@ -1,6 +1,6 @@
 ;;; org-contacts.el --- Contacts management
 
-;; Copyright (C) 2010-2012 Julien Danjou <julien@danjou.info>
+;; Copyright (C) 2010-2013 Julien Danjou <julien@danjou.info>
 
 ;; Author: Julien Danjou <julien@danjou.info>
 ;; Keywords: outlines, hypermedia, calendar
@@ -42,6 +42,7 @@
 (eval-and-compile
   (require 'org))
 (require 'gnus-util)
+(require 'org-agenda)
 
 (defgroup org-contacts nil
   "Options concerning contacts management."

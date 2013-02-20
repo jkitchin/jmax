@@ -1,6 +1,6 @@
 ;;; org-e-odt.el --- OpenDocument Text exporter for Org-mode
 
-;; Copyright (C) 2010-2012 Free Software Foundation, Inc.
+;; Copyright (C) 2010-2013 Free Software Foundation, Inc.
 
 ;; Author: Jambunathan K <kjambunathan at gmail dot com>
 ;; Keywords: outlines, hypermedia, calendar, wp
@@ -98,9 +98,10 @@
 (declare-function org-id-find-id-file "org-id" (id))
 (declare-function hfy-face-to-style "htmlfontify" (fn))
 (declare-function hfy-face-or-def-to-name "htmlfontify" (fn))
-(declare-function archive-zip-extract "arc-mode.el" (archive name))
+(declare-function archive-zip-extract "arc-mode" (archive name))
 (declare-function org-create-math-formula "org" (latex-frag &optional mathml-file))
 (declare-function browse-url-file-url "browse-url" (file))
+(declare-function org-solidify-link-text "org-exp" (s &optional alist))
 
 
 
@@ -2885,7 +2886,7 @@ and prefix with \"OrgSrc\".  For example,
 	  (lambda (style text-block text-id text-begins-block-p)
 	    (insert (format "<text:span text:style-name=\"%s\">" style))))
 	 (hfy-end-span-handler (lambda nil (insert "</text:span>"))))
-    (with-no-warnings (htmlfontify-string line))))
+    (org-no-warnings (htmlfontify-string line))))
 
 (defun org-e-odt-do-format-code
   (code &optional lang refs retain-labels num-start)

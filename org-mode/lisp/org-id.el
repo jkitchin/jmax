@@ -1,6 +1,6 @@
 ;;; org-id.el --- Global identifiers for Org-mode entries
 ;;
-;; Copyright (C) 2008-2012 Free Software Foundation, Inc.
+;; Copyright (C) 2008-2013 Free Software Foundation, Inc.
 ;;
 ;; Author: Carsten Dominik <carsten at orgmode dot org>
 ;; Keywords: outlines, hypermedia, calendar, wp
@@ -83,7 +83,7 @@
   :tag "Org ID"
   :group 'org)
 
-(define-obsolete-variable-alias
+(org-define-obsolete-variable-alias
   'org-link-to-org-use-id 'org-id-link-to-org-use-id "24.3")
 (defcustom org-id-link-to-org-use-id nil
   "Non-nil means storing a link to an Org file will use entry IDs.
@@ -233,7 +233,6 @@ With optional argument FORCE, force the creation of a new ID."
     (org-entry-put (point) "ID" nil))
   (org-id-get (point) 'create))
 
-;;;###autoload
 (defun org-id-copy ()
   "Copy the ID of the entry at point to the kill ring.
 Create an ID if necessary."
@@ -259,7 +258,6 @@ In any case, the ID of the entry is returned."
 	(org-id-add-location id (buffer-file-name (buffer-base-buffer)))
 	id)))))
 
-;;;###autoload
 (defun org-id-get-with-outline-path-completion (&optional targets)
   "Use outline-path-completion to retrieve the ID of an entry.
 TARGETS may be a setting for `org-refile-targets' to define the eligible
@@ -276,7 +274,6 @@ It returns the ID of the entry.  If necessary, the ID is created."
     (prog1 (org-id-get pom 'create)
       (move-marker pom nil))))
 
-;;;###autoload
 (defun org-id-get-with-outline-drilling (&optional targets)
   "Use an outline-cycling interface to retrieve the ID of an entry.
 This only finds entries in the current buffer, using `org-get-location'.
@@ -680,5 +677,9 @@ optional argument MARKERP, return the position as a new marker."
 (org-add-link-type "id" 'org-id-open)
 
 (provide 'org-id)
+
+;; Local variables:
+;; generated-autoload-file: "org-loaddefs.el"
+;; End:
 
 ;;; org-id.el ends here

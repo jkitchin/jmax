@@ -1,6 +1,6 @@
 ;;; org-capture.el --- Fast note taking in Org-mode
 
-;; Copyright (C) 2010-2012  Free Software Foundation, Inc.
+;; Copyright (C) 2010-2013 Free Software Foundation, Inc.
 
 ;; Author: Carsten Dominik <carsten at orgmode dot org>
 ;; Keywords: outlines, hypermedia, calendar, wp
@@ -434,9 +434,10 @@ Turning on this mode runs the normal hook `org-capture-mode-hook'."
 
 ;;; The main commands
 
-;;;###autoload
 (defvar org-capture-initial nil)
 (defvar org-capture-entry nil)
+
+;;;###autoload
 (defun org-capture-string (string &optional keys)
   (interactive "sInitial text: \n")
   (let ((org-capture-initial string)
@@ -978,7 +979,7 @@ it.  When it is a variable, retrieve the value.  Return whatever we get."
   (show-all)
   (goto-char (org-capture-get :pos))
   (org-set-local 'org-capture-target-marker
-		 (move-marker (make-marker) (point)))
+		 (point-marker))
   (org-set-local 'outline-level 'org-outline-level)
   (let* ((template (org-capture-get :template))
 	 (type (org-capture-get :type)))
@@ -1249,7 +1250,8 @@ Of course, if exact position has been required, just put it there."
 	(save-restriction
 	  (widen)
 	  (goto-char pos)
-	  (bookmark-set "org-capture-last-stored")
+	  (with-demoted-errors
+	    (bookmark-set "org-capture-last-stored"))
 	  (move-marker org-capture-last-stored-marker (point)))))))
 
 (defun org-capture-narrow (beg end)
@@ -1280,7 +1282,7 @@ Point will remain at the first line after the inserted text."
     (goto-char pos)))
 
 (defvar org-clock-marker) ; Defined in org.el
-;;;###autoload
+
 (defun org-capture-insert-template-here ()
   (let* ((template (org-capture-get :template))
 	 (type  (org-capture-get :type))

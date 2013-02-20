@@ -33,6 +33,7 @@
  '(font-lock-variable-name-face ((t (:foreground "magenta4"))))
  '(font-lock-warning-face ((t (:bold t :foreground "Red" :weight bold))))
  '(fringe ((t (:foreground "gray80"))))
+ '(left-fringe ((t (:foreground "gray80"))))
  ;; org faces
  '(org-link ((t (:underline t :foreground "blue" :weight bold))))
  '(org-tag  ((t (:foreground "orange red"))))
@@ -44,6 +45,11 @@
 ; '(org-level-2 ((t (:foreground "RoyalBlue3" :height 1.1))))
 ; '(org-level-3 ((t (:foreground "RoyalBlue2" :height 1.05))))
 ; '(org-level-4 ((t (:foreground "RoyalBlue1" :height 1.00))))
+ ;; codeblock highlight http://orgmode.org/worg/org-contrib/babel/examples/fontify-src-code-blocks.html
+ '(org-block-begin-line ((t (:underline "#A7A6AA" :foreground "#008ED1" :background "#EAEAFF"))))
+ '(org-block-background ((t (:background "#FFFFEA"))))
+ '(org-block-end-line ((t (:overline "#A7A6AA" :foreground "#008ED1" :background "#EAEAFF"))))
+
  '(flyspell-duplicate ((t (:foreground "red" :underline t :weight bold)))))
 
 (provide-theme 'my)

@@ -134,6 +134,8 @@ The CMDLINE should be something like:
        (virtualenv-activate virtualenv)
        (desktop-change-dir virtualenv))
 
+     (setq python-indent-offset 4)
+
      
      )
   )

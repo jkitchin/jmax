@@ -1,0 +1,6 @@
+*.elc
+*.pyc
+org-mode
+emacs-24.2
+elpa
+magit

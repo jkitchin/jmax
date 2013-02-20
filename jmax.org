@@ -25,10 +25,12 @@ Obviously this will have to be customized.
 ;; I need some lisp voodoo here to set paths according to the machine I am on.
 (when (or (string= system-name "jkitchin-780.cheme.cmu.edu")
 	  (string= system-name "gilgamesh.cheme.cmu.edu"))
+  (setq org-agenda-files '("~/Dropbox/org-mode"))
   (defvar my-aspell "aspell"))
 
 (when (or (string= system-name "JKITCHIN-PC")
 	  (string= system-name "KITCHIN-TABLET"))
+  (setq org-agenda-files '("c:/Users/jkitchin/Dropbox/org-mode"))
   (defvar my-aspell "C:/Program Files/Aspell/bin/aspell.exe"))
 
 (when (or (string= system-name "HOME-OFFICE")
@@ -39,6 +41,23 @@ Obviously this will have to be customized.
 ;;Tell the program who you are
 (setq user-full-name "John Kitchin")
 (setq user-mail-address "johnrkitchin@gmail.com")
+
+; adapted from http://ergoemacs.org/emacs/emacs_hotkey_open_file_fast.html
+(defun j-open-file-fast (openCode)
+  "Prompt to open a file from a pre-defined set."
+  (interactive "sOpen file: [m]master.org [b]blog [j]jmax.org:")
+  (let (file )
+    (setq file
+          (cond
+           ((string= openCode "m") "~/Dropbox/org-mode/master.org" )
+           ((string= openCode "j") "~/Dropbox/.emacs.d/jmax.org" )
+           ((string= openCode "b") "~/Dropbox/jkitchin.github.com/source/_org")           
+           (t (error "You typed %s, it doesn't associate with a file." openCode ))
+           )
+          )
+    (find-file file ) ) )
+
+(global-set-key [f9] 'j-open-file-fast)
 #+end_src
 
 #+RESULTS:
@@ -61,7 +80,7 @@ Obviously this will have to be customized.
 (global-font-lock-mode t)   ;; turn on font-lock mode everywhere
 
 (show-paren-mode 1)         ;; highlight parentheses
-(setq show-paren-style 'parenthesis) ;; alternative is 'parenthesis
+(setq show-paren-style 'mixed) ;; alternative is 'expression, 'parenthesis or 'mixed
 
 (line-number-mode 1)  ;; turn linumbers on in mode-line
 ;(global-linum-mode t) ;; put line numbers on left side of the screen
@@ -72,7 +91,13 @@ Obviously this will have to be customized.
 
 (fset 'yes-or-no-p 'y-or-n-p) ; answer with y/n instead of yes/no
 
-(global-set-key [f9] (lambda () (interactive) (save-buffer) (load-file (concat starter-kit-dir "/init.el"))))
+(global-set-key (kbd "C-x C-b") 'ibuffer)
+(require 'ido)
+(ido-mode t)
+(setq ido-enable-flex-matching t) ;; enable fuzzy matching
+
+;; Disable all version control. makes startup and opening files much faster
+(setq vc-handled-backends nil)
 #+END_SRC
 
 #+RESULTS:
@@ -121,14 +146,15 @@ Obviously this will have to be customized.
 
 * Setup package manager
 #+begin_src emacs-lisp
-;;   (setq package-archives
-;;         '(("gnu"         . "http://elpa.gnu.org/packages/")
-;;           ("original"    . "http://tromey.com/elpa/")
-;;           ("org"         . "http://orgmode.org/elpa/")
-;;           ("marmalade"   . "http://marmalade-repo.org/packages/")))
-;;   (package-initialize)
+(setq package-archives
+      '(("gnu"         . "http://elpa.gnu.org/packages/")
+	("original"    . "http://tromey.com/elpa/")
+	("org"         . "http://orgmode.org/elpa/")
+	("melpa" . "http://melpa.milkbox.net/packages/")
+	("marmalade"   . "http://marmalade-repo.org/packages/")))
+(package-initialize)
 
-;; (setq package-user-dir (concat starter-kit-dir "/elpa"))
+(setq package-user-dir (concat starter-kit-dir "/elpa"))
 
 ;;   (defvar starter-kit-packages
 ;;     (list 'yasnippet-bundle
@@ -186,7 +212,6 @@ see: http://cx4a.org/software/auto-complete/manual.html
 (require 'org)
 (require 'org-special-blocks)
 (require 'org-inlinetask)
-;(require 'org-latex)
 
 (add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode))
 (global-set-key "\C-cl" 'org-store-link)
@@ -201,6 +226,8 @@ see: http://cx4a.org/software/auto-complete/manual.html
 
 ; I like to press enter to follow a link. mouse clicks also work.
 (setq org-return-follows-link t)
+
+(load "jorg-bib.el")
 #+END_SRC
 
 ** basic setup
@@ -215,12 +242,13 @@ see: http://cx4a.org/software/auto-complete/manual.html
 (setq org-confirm-babel-evaluate nil)
 (setq org-confirm-elisp-link-function nil)
 
-; register python in org-mode
+; register languages in org-mode
 (org-babel-do-load-languages
  'org-babel-load-languages
  '((emacs-lisp . t)
    (python . t)
-   (sh . t)))
+   (sh . t)
+   (org . t)))
 
 ; no extra indentation
 (setq org-src-preserve-indentation t)
@@ -367,6 +395,8 @@ see: http://cx4a.org/software/auto-complete/manual.html
         "bibtex %f"
         "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
         "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+
+;(setq org-latex-to-pdf-process '("texi2dvi --pdf --clean --verbose --batch")) 
 #+END_SRC
 ** org-mode links
 *** pydoc
@@ -489,7 +519,7 @@ This was to have a way to put a single file name into an org-file, but get the r
      (format "\\includegraphics{%s.pdf}" keyword)))))
 #+END_SRC
 
-*** citeulike link
+*** citeulike link						   :noexport:
 This adds a way to link to articles in citeulike. The syntax is citeu:11819912 or [[citeu:11819912, 11819910]]. The link exports as urls in brackets in html and as superscripted urls in latex. In org-mode if you click on the key, it will launch a browser opening to that article.
 
 Known limitations: if they key is not recognized as a word by emacs, the clicking will not work as expected. eg. if your key is something like j:345, this is not recognized as a word by emacs.
@@ -555,7 +585,7 @@ Known limitations: if they key is not recognized as a word by emacs, the clickin
       )))
 #+END_SRC
 
-*** cite links
+*** cite links							   :noexport:
 
 #+BEGIN_SRC emacs-lisp
 ;;;;;;;;;;;;
@@ -650,6 +680,7 @@ returns a list of stripped file names"
  ;; formatting
  (lambda (keyword desc format)
    (cond
+    ((eq format 'html) (format "(<cite>%s</cite>)" path))
     ((eq format 'latex)
      (concat "\\cite{" 
 	     (mapconcat (lambda (key) key) (cite-split-keys keyword) ",")
@@ -696,6 +727,7 @@ Here we add links for the bibliography and bibliography style
 ;; formatting code
 (lambda (keyword desc format)
   (cond
+   ((eq format 'html) (format ""))
    ((eq format 'latex)
     ; write out the latex bibliography command
     (format "\\bibliography{%s}" (replace-regexp-in-string  ".bib" "" keyword))))))
@@ -709,21 +741,20 @@ Here we add links for the bibliography and bibliography style
     (format "\\bibliographystyle{%s}" keyword)))))
 #+end_src
 
-*** ref and label links
+*** ref and label links						   :noexport:
 The idea here is to create links for label and ref. The reason for these additions is to provide clickable links to the references and labels, along with the org-mode navigation to quickly go back to where you were. These links get formatted to \ref and \label for latex. They are not formatted for HTML export yet.
 
 #+BEGIN_SRC emacs-lisp
-
 (org-add-link-type
  "ref"
  (lambda (label)
    "on clicking goto the label. Navigate back with C-c &"
-   (let ((n (count-matches (format "\\label{%s}\\b" label) (point-min) (point-max) t)))
-     (if (< n 1) (error (format "no matching label found for %s!" label)))
+   (let ((n (count-matches (format "\\label{%s}" label) (point-min) (point-max) t)))
+     (if (< n 1) (error (format "no matching label found for \\label{%s}!" label)))
      (if (> n 1) (error (format "%d matches found for %s!" n label)))
    (org-mark-ring-push)
    (goto-char (point-min))
-   (re-search-forward (format "\\label{%s}\\b" label))
+   (re-search-forward (format "\\label{%s}" label))
    (message "go back with `C-c &`")))
  ;formatting
  (lambda (keyword desc format)
@@ -743,7 +774,7 @@ The idea here is to create links for label and ref. The reason for these additio
 #+END_SRC
 
 #+RESULTS:
-** reftex setup
+** reftex setup							   :noexport:
 This allows you insert citations from reftex. I am not sure I like this a lot, as I prefer the citations to go in as links. I think this can be done via ebib, or I will one day write my own insert citation function that puts in the links I want like these [[cite links]].
 
 #+BEGIN_SRC emacs-lisp
@@ -754,15 +785,16 @@ This allows you insert citations from reftex. I am not sure I like this a lot, a
        (reftex-parse-all))
   (setq reftex-cite-format "cite:%l") ; use cite links in orgmode
   ; we need to be sure there is a bibliography defined
-  (if (not (reftex-default-bibliography))
-      (setq reftex-default-bibliography (cite-find-bibliography)))
+;  (if (not (reftex-default-bibliography))
+;      (setq reftex-default-bibliography (cite-find-bibliography)))
   ; define a convenient key for adding citations
   (define-key org-mode-map (kbd "C-c ]") 'reftex-citation))
 
 ;(add-hook 'org-mode-hook 'org-mode-reftex-setup)
 #+END_SRC
 
-** feedback function
+** TODO feedback function					   :noexport:
+this may be superceded by org-annotation. also it should insert the relative path, not absolute path in teh output
 #+BEGIN_SRC emacs-lisp
 (defun insert-feedback (note)
   "insert a note in feedback.org with the file and line-number."
@@ -787,7 +819,7 @@ This allows you insert citations from reftex. I am not sure I like this a lot, a
 (global-set-key "\C-ci" 'insert-feedback)
 #+END_SRC
 
-** org-annotation
+** org-annotation						   :noexport:
 #+BEGIN_SRC emacs-lisp :tangle org-annotate-file.el
 ;;; org-annotate-file.el --- Annotate a file with org syntax
 
@@ -925,8 +957,13 @@ show the relevant section"
 
 ** TODO bookmarklet to remember webpages
 http://orgmode.org/worg/org-contrib/org-annotation-helper.html
+http://orgmode.org/worg/org-contrib/org-protocol.html
 ** TODO org-registry
-http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=contrib/lisp/org-registry.el;hb=HEAD
+   http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=contrib/lisp/org-registry.el;hb=HEAD
+* blog
+#+BEGIN_SRC emacs-lisp
+(load-file (concat starter-kit-dir "jekyll-blog.el"))
+#+END_SRC
 * TODO python
 Support for the Python programming language.
 ** Use Python's python-mode.el instead of Emacs' python.el
@@ -938,37 +975,38 @@ Replace the Python mode that comes with Emacs by the Python mode
 supplied by the Python distribution itself.
 
 #+begin_src emacs-lisp
-;; (setq py-install-directory (concat starter-kit-dir "/python-mode/"))
-;; (add-to-list 'load-path py-install-directory)
-;; (add-to-list 'load-path (concat starter-kit-dir "/python-mode/completion/"))
-;; (add-to-list 'load-path (concat starter-kit-dir "/python-mode/Pymacs/"))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; python-mode 5.2
+;(setq org-babel-python-command "ipython"
+;      py-python-command "ipython"
+;      py-python-command-args '("-pylab" "-colors" "LightBG"))
 
-;; (require 'python-mode)
-;; (add-to-list 'auto-mode-alist '("\\.py\\'" . python-mode))
-;; (add-to-list 'interpreter-mode-alist '("ipython" . python-mode))
-;; (setq py-shell-name "ipython")
-;; (setq py-python-command-args '("--pylab" "--colors" "Linux"))
-;; (setq org-babel-python-mode 'python-mode)
-;; (setq py-python-command "ipython")
+(setq org-babel-python-command "python"
+      py-python-command "python")
 
-;; ;To enable code completion:
-;; (require 'pycomplete)
-;; (setq py-load-pymacs-p t)
-;; (add-to-list 'ac-sources 'ac-source-pycomplete)
+(load-file (concat starter-kit-dir "python-mode-5.2.el"))
+(require 'python-mode)
 
-;; ;To use auto-complete, just prepend the following lines:
-;; (require 'auto-complete-config)
-;; (ac-config-default)
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; emacs python mode
+;; (require 'python)
+;; (setq org-babel-python-mode 'python)
 ;; (setq-default indent-tabs-mode nil)    ; use only spaces and no tabs
 ;; (setq default-tab-width 4)
 
-;; (require 'pymacs)
-;; (pymacs-load "ropemacs" "rope-")
-;; (setq ropemacs-enable-autoimport t)
+;; ;; Auto Completion
+;; (require 'auto-complete-config)
+;; (add-to-list 'ac-dictionary-directories 
+;; 	     (concat starter-kit-dir "auto-complete/ac-dict"))
+;; (ac-config-default)
 
-(load-file (concat starter-kit-dir "/emacs-for-python/epy-init.el"))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; emacs-for-python
+;; (load-file (concat starter-kit-dir "/emacs-for-python/epy-init.el"))
 #+end_src
+
+#+RESULTS:
 
 ** Code checking option 1: On-the-fly w/ Flymake
 http://www.saltycrane.com/blog/2010/05/my-emacs-python-environment/
@@ -1275,14 +1313,6 @@ Uses `search-site-url' to do the actual search.
     ((eq format 'html)
      (format "<img src=\"http://jkitchin.github.com/images/%s\">" keyword)))))
 
-(defun generate-blog ()
-  (interactive)
-  (org-publish-project "jkitchin")
-  (shell-command "rake generate"))
-
-(defun publish-blog ()
-  (interactive)
-  (shell-command "rake deploy"))
 
 (defun new-blog-post (title &optional directory)
   "create a new blog post with name year-month-day-title.org.
@@ -1366,7 +1396,7 @@ It has a format like this:
 machine imap.gmail.com login john_doe@gmail.com password notapassword port 993
 #+end_example
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp  :tangle no
 ;; Customize the next three lines with your ISP information.
 (load "starttls")
 (load-library "smtpmail")
@@ -1396,7 +1426,12 @@ machine imap.gmail.com login john_doe@gmail.com password notapassword port 993
 (executable-find starttls-program)
 #+end_src
 
-* ebib setup
+
+#+begin_src emacs-lisp 
+(setq gnus-select-method '(nntp "news.gmane.org"))
+#+end_src
+
+* ebib setup							   :noexport:
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'load-path (concat starter-kit-dir "./ebib"))
 (autoload 'ebib "ebib" "Ebib, a BibTeX database manager." t)
@@ -1406,5 +1441,14 @@ machine imap.gmail.com login john_doe@gmail.com password notapassword port 993
 | autoload | ebib | Ebib, a BibTeX database manager. | t | nil |
 
 
-* Bibliography
-bibliography:../bibliography/bibliography.bib
+
+* magit
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'load-path (concat starter-kit-dir "/magit-1.2.0/"))
+(require 'magit)
+
+(global-set-key "\C-cm" 'magit-status)
+#+END_SRC
+
+#+RESULTS:
+

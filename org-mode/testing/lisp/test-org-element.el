@@ -1,6 +1,6 @@
 ;;; test-org-element.el --- Tests for org-element.el
 
-;; Copyright (C) 2012  Nicolas Goaziou
+;; Copyright (C) 2012, 2013  Nicolas Goaziou
 
 ;; Author: Nicolas Goaziou <n.goaziou at gmail dot com>
 
@@ -16,6 +16,8 @@
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+;;; Code:
 
 (unless (featurep 'org-element)
   (signal 'missing-test-dependency "org-element"))
@@ -465,7 +467,13 @@ CLOCK: [2012-01-01 sun. 00:01]--[2012-01-01 sun. 00:02] =>  0:01"
   (should-not
    (org-test-with-temp-text "#+BEGIN_EXAMPLE"
      (org-element-map
-      (org-element-parse-buffer) 'example-block 'identity nil t))))
+      (org-element-parse-buffer) 'example-block 'identity nil t)))
+  ;; Properly un-escape code.
+  (should
+   (equal "* Headline\n #+keyword\nText\n"
+	  (org-test-with-temp-text
+	      "#+BEGIN_EXAMPLE\n,* Headline\n ,#+keyword\nText\n#+END_EXAMPLE"
+	    (org-element-property :value (org-element-at-point))))))
 
 (ert-deftest test-org-element/block-switches ()
   "Test `example-block' and `src-block' switches parsing."
@@ -1068,7 +1076,13 @@ e^{i\\pi}+1=0
     (should
      (org-test-with-temp-text "\\[a\\]"
        (org-element-map
-	(org-element-parse-buffer) 'latex-fragment 'identity)))))
+	(org-element-parse-buffer) 'latex-fragment 'identity)))
+    ;; Test fragment at the beginning of an item.
+    (should
+     (eq 'latex-fragment
+	 (org-test-with-temp-text "- $x$"
+	   (progn (search-forward "$")
+		  (org-element-type (org-element-context))))))))
 
 
 ;;;; Line Break
@@ -1450,7 +1464,13 @@ Outside list"
   ;; Ignore incomplete block.
   (should-not
    (org-test-with-temp-text "#+BEGIN_SRC"
-     (org-element-map (org-element-parse-buffer) 'src-block 'identity))))
+     (org-element-map (org-element-parse-buffer) 'src-block 'identity)))
+  ;; Properly un-escape code.
+  (should
+   (equal "* Headline\n #+keyword\nText\n"
+	  (org-test-with-temp-text
+	      "#+BEGIN_SRC org\n,* Headline\n ,#+keyword\nText\n#+END_SRC"
+	    (org-element-property :value (org-element-at-point))))))
 
 
 ;;;; Statistics Cookie
@@ -1499,7 +1519,19 @@ Outside list"
   ;; With braces.
   (should
    (org-test-with-temp-text "a_{b}"
-     (org-element-map (org-element-parse-buffer) 'subscript 'identity))))
+     (org-element-map (org-element-parse-buffer) 'subscript 'identity)))
+  ;; At the beginning of an item.
+  (should
+   (eq 'subscript
+       (org-test-with-temp-text "- _b"
+	 (progn (search-forward "_")
+		(org-element-type (org-element-context))))))
+  ;; Multiple subscripts in a paragraph.
+  (should
+   (= 2
+      (org-test-with-temp-text "a_b and c_d"
+	(length
+	 (org-element-map (org-element-parse-buffer) 'subscript 'identity))))))
 
 
 ;;;; Superscript
@@ -1513,7 +1545,20 @@ Outside list"
   ;; With braces.
   (should
    (org-test-with-temp-text "a^{b}"
-     (org-element-map (org-element-parse-buffer) 'superscript 'identity))))
+     (org-element-map (org-element-parse-buffer) 'superscript 'identity)))
+  ;; At the beginning of an item.
+  (should
+   (eq 'superscript
+       (org-test-with-temp-text "- ^b"
+	 (progn (search-forward "^")
+		(org-element-type (org-element-context))))))
+  ;; Multiple superscript in a paragraph.
+  (should
+   (= 2
+      (org-test-with-temp-text "a^b and c^d"
+	(length
+	 (org-element-map
+	  (org-element-parse-buffer) 'superscript 'identity))))))
 
 
 ;;;; Table
@@ -1536,7 +1581,9 @@ Outside list"
 	(length (org-element-property
 		 :tblfm
 		 (org-element-map
-		  (org-element-parse-buffer) 'table 'identity nil t)))))))
+		  (org-element-parse-buffer) 'table 'identity nil t))))))
+  ;; Do not error when parsing a table with trailing white spaces.
+  (should (org-test-with-temp-text "| a |\n  " (org-element-parse-buffer))))
 
 
 ;;;; Table Cell
@@ -1911,7 +1958,12 @@ CLOCK: [2012-01-01 sun. 00:01]--[2012-01-01 sun. 00:02] =>  0:01"))
   (should
    (equal (org-test-parse-and-interpret
 	   "#+BEGIN_EXAMPLE -n -k\n(+ 1 1)\n#+END_EXAMPLE")
-	  "#+BEGIN_EXAMPLE -n -k\n(+ 1 1)\n#+END_EXAMPLE\n")))
+	  "#+BEGIN_EXAMPLE -n -k\n(+ 1 1)\n#+END_EXAMPLE\n"))
+  ;; Preserve code escaping.
+  (should
+   (equal (org-test-parse-and-interpret
+	   "#+BEGIN_EXAMPLE\n,* Headline\n ,#+keyword\nText #+END_EXAMPLE")
+	  "#+BEGIN_EXAMPLE\n,* Headline\n ,#+keyword\nText #+END_EXAMPLE\n")))
 
 (ert-deftest test-org-element/export-block-interpreter ()
   "Test export block interpreter."
@@ -1975,7 +2027,12 @@ CLOSED: [2012-01-01] DEADLINE: <2012-01-01> SCHEDULED: <2012-01-01>\n"))))
    (equal (let ((org-edit-src-content-indentation 2))
 	    (org-test-parse-and-interpret
 	     "#+BEGIN_SRC emacs-lisp -n -k\n(+ 1 1)\n#+END_SRC"))
-	  "#+BEGIN_SRC emacs-lisp -n -k\n  (+ 1 1)\n#+END_SRC\n")))
+	  "#+BEGIN_SRC emacs-lisp -n -k\n  (+ 1 1)\n#+END_SRC\n"))
+  ;; Preserve code escaping.
+  (should
+   (equal (org-test-parse-and-interpret
+	   "#+BEGIN_SRC org\n,* Headline\n ,#+keyword\nText #+END_SRC")
+	  "#+BEGIN_SRC org\n,* Headline\n ,#+keyword\nText #+END_SRC\n")))
 
 (ert-deftest test-org-element/table-interpreter ()
   "Test table, table-row and table-cell interpreters."
@@ -2017,8 +2074,8 @@ CLOSED: [2012-01-01] DEADLINE: <2012-01-01> SCHEDULED: <2012-01-01>\n"))))
 		  "[2012-03-29 16:40]--[2012-03-29 16:41]")
 		 "[2012-03-29 16:40]--[2012-03-29 16:41]\n"))
   ;; Diary.
-  (should (equal (org-test-parse-and-interpret "<%%org-float t 4 2>")
-		 "<%%org-float t 4 2>\n"))
+  (should (equal (org-test-parse-and-interpret "<%%diary-float t 4 2>")
+		 "<%%diary-float t 4 2>\n"))
   ;; Timestamp with repeater interval.
   (should (equal (org-test-parse-and-interpret "<2012-03-29 +1y>")
 		 "<2012-03-29 +1y>\n")))
@@ -2402,7 +2459,15 @@ Paragraph \\alpha."
    (equal '(paragraph center-block)
 	  (org-test-with-temp-text "#+BEGIN_CENTER\nA\n#+END_CENTER\nZ"
 	    (progn (search-forward "Z")
-		   (mapcar 'org-element-type (org-element-at-point t)))))))
+		   (mapcar 'org-element-type (org-element-at-point t))))))
+  ;; Parse a list within a block itself contained in a list.
+  (should
+   (eq 'plain-list
+       (org-test-with-temp-text
+	   "- outer\n  #+begin_center\n  - inner\n  #+end_center"
+	 (search-forward "inner")
+	 (beginning-of-line)
+	 (org-element-type (org-element-at-point))))))
 
 (ert-deftest test-org-element/context ()
   "Test `org-element-context' specifications."
@@ -2418,13 +2483,31 @@ Paragraph \\alpha."
        (org-test-with-temp-text "* Headline _with_ underlining"
 	 (progn (search-forward "w")
 		(org-element-type (org-element-context))))))
+  ;; Find objects in objects.
+  (should
+   (eq 'macro
+       (org-test-with-temp-text "| a | {{{macro}}} |"
+	 (progn (search-forward "{")
+		(org-element-type (org-element-context))))))
+  (should
+   (eq 'table-cell
+       (org-test-with-temp-text "| a | b {{{macro}}} |"
+	 (progn (search-forward "b")
+		(org-element-type (org-element-context))))))
   ;; Correctly set `:parent' property.
   (should
    (eq 'paragraph
        (org-test-with-temp-text "Some *bold* text"
 	 (progn (search-forward "bold")
 		(org-element-type
-		 (org-element-property :parent (org-element-context))))))))
+		 (org-element-property :parent (org-element-context)))))))
+  ;; Between two objects, return the second one.
+  (should
+   (eq 'macro
+       (org-test-with-temp-text "<<target>>{{{test}}}"
+	 (progn (search-forward "{")
+		(backward-char)
+		(org-element-type (org-element-context)))))))
 
 
 (provide 'test-org-element)

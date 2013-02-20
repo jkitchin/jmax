@@ -1,12 +1,24 @@
-;;; test-org.el
+;;; test-org.el --- tests for org.el
 
-;; Copyright (c) ߚ David Maus
+;; Copyright (c)  David Maus
 ;; Authors: David Maus
 
-;; Released under the GNU General Public License version 3
-;; see: http://www.gnu.org/licenses/gpl-3.0.html
+;; This file is not part of GNU Emacs.
 
-;;;; Comments:
+;; This program is free software; you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+
+;; You should have received a copy of the GNU General Public License
+;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+;;; Comments:
 
 ;; Template test file for Org-mode tests
 
@@ -87,6 +99,25 @@ http://article.gmane.org/gmane.emacs.orgmode/21459/"
   (org-test-at-id "75282ba2-f77a-4309-a970-e87c149fe125"
     (org-babel-next-src-block)
     (should (equal '(2 1) (org-babel-execute-src-block)))))
+
+
+
+;;; Date Analysis
+
+(ert-deftest test-org/org-read-date ()
+  "Test `org-read-date' specifications."
+  ;; Parse ISO date with abbreviated year and month.
+  (should (equal "2012-03-29 16:40"
+		 (let ((org-time-was-given t))
+		   (org-read-date t nil "12-3-29 16:40"))))
+  ;; Parse Europeans dates.
+  (should (equal "2012-03-29 16:40"
+		 (let ((org-time-was-given t))
+		   (org-read-date t nil "29.03.2012 16:40"))))
+  ;; Parse Europeans dates without year.
+  (should (string-match "2[0-9]\\{3\\}-03-29 16:40"
+			(let ((org-time-was-given t))
+			  (org-read-date t nil "29.03. 16:40")))))
 
 
 
@@ -233,6 +264,22 @@ http://article.gmane.org/gmane.emacs.orgmode/21459/"
 	  (org-test-with-temp-text "  # 12345 7890"
 	    (let ((fill-column 10))
 	      (end-of-line)
+	      (org-auto-fill-function)
+	      (buffer-string)))))
+  ;; A hash within a line isn't a comment.
+  (should-not
+   (equal "12345 # 7890\n# 1"
+	  (org-test-with-temp-text "12345 # 7890 1"
+	    (let ((fill-column 12))
+	      (end-of-line)
+	      (org-auto-fill-function)
+	      (buffer-string)))))
+  ;; Correctly interpret empty prefix.
+  (should-not
+   (equal "# a\n# b\nRegular\n# paragraph"
+	  (org-test-with-temp-text "# a\n# b\nRegular paragraph"
+	    (let ((fill-column 12))
+	      (end-of-line 3)
 	      (org-auto-fill-function)
 	      (buffer-string)))))
   ;; Comment block: auto fill contents.
@@ -383,6 +430,76 @@ http://article.gmane.org/gmane.emacs.orgmode/21459/"
  
 ;; Navigation
 
+(ert-deftest test-org/beginning-of-line ()
+  "Test `org-beginning-of-line' specifications."
+  ;; Standard test.
+  (should
+   (org-test-with-temp-text "Some text\nSome other text"
+     (progn (org-beginning-of-line) (bolp))))
+  ;; Standard test with `visual-line-mode'.
+  (should-not
+   (org-test-with-temp-text "A long line of text\nSome other text"
+     (progn (visual-line-mode)
+	    (forward-char 2)
+	    (dotimes (i 1000) (insert "very "))
+	    (org-beginning-of-line)
+	    (bolp))))
+  ;; At an headline with special movement.
+  (should
+   (org-test-with-temp-text "* TODO Headline"
+     (let ((org-special-ctrl-a/e t))
+       (org-end-of-line)
+       (and (progn (org-beginning-of-line) (looking-at "Headline"))
+	    (progn (org-beginning-of-line) (bolp))
+	    (progn (org-beginning-of-line) (looking-at "Headline")))))))
+
+(ert-deftest test-org/end-of-line ()
+  "Test `org-end-of-line' specifications."
+  ;; Standard test.
+  (should
+   (org-test-with-temp-text "Some text\nSome other text"
+     (progn (org-end-of-line) (eolp))))
+  ;; Standard test with `visual-line-mode'.
+  (should-not
+   (org-test-with-temp-text "A long line of text\nSome other text"
+     (progn (visual-line-mode)
+	    (forward-char 2)
+	    (dotimes (i 1000) (insert "very "))
+	    (goto-char (point-min))
+	    (org-end-of-line)
+	    (eolp))))
+  ;; At an headline with special movement.
+  (should
+   (org-test-with-temp-text "* Headline1 :tag:\n"
+     (let ((org-special-ctrl-a/e t))
+       (and (progn (org-end-of-line) (looking-at " :tag:"))
+	    (progn (org-end-of-line) (eolp))
+	    (progn (org-end-of-line) (looking-at " :tag:"))))))
+  ;; At an headline without special movement.
+  (should
+   (org-test-with-temp-text "* Headline2 :tag:\n"
+     (let ((org-special-ctrl-a/e nil))
+       (and (progn (org-end-of-line) (eolp))
+	    (progn (org-end-of-line) (eolp))))))
+  ;; At an headline, with reversed movement.
+  (should
+   (org-test-with-temp-text "* Headline3 :tag:\n"
+     (let ((org-special-ctrl-a/e 'reversed)
+	   (this-command last-command))
+       (and (progn (org-end-of-line) (eolp))
+	    (progn (org-end-of-line) (looking-at " :tag:"))))))
+  ;; At a block without hidden contents.
+  (should
+   (org-test-with-temp-text "#+BEGIN_CENTER\nContents\n#+END_CENTER"
+     (progn (org-end-of-line) (eolp))))
+  ;; At a block with hidden contents.
+  (should-not
+   (org-test-with-temp-text "#+BEGIN_CENTER\nContents\n#+END_CENTER"
+     (let ((org-special-ctrl-a/e t))
+       (org-hide-block-toggle)
+       (org-end-of-line)
+       (eobp)))))
+
 (ert-deftest test-org/forward-element ()
   "Test `org-forward-element' specifications."
   ;; 1. At EOB: should error.
@@ -501,7 +618,7 @@ Outside."
     (should-error (org-backward-element)))
   ;; 5. At beginning of first element inside a greater element:
   ;;    expected to move to greater element's beginning.
-  (org-test-with-temp-text "Before.\n#+BEGIN_CENTER\nInside.\n#+END_CENTER."
+  (org-test-with-temp-text "Before.\n#+BEGIN_CENTER\nInside.\n#+END_CENTER"
     (goto-line 3)
     (org-backward-element)
     (should (looking-at "#\\+BEGIN_CENTER")))

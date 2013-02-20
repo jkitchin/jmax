@@ -1,5 +1,5 @@
 ;;; org-depend.el --- TODO dependencies for Org-mode
-;; Copyright (C) 2008-2012 Free Software Foundation, Inc.
+;; Copyright (C) 2008-2013 Free Software Foundation, Inc.
 ;;
 ;; Author: Carsten Dominik <carsten at orgmode dot org>
 ;; Keywords: outlines, hypermedia, calendar, wp
@@ -205,6 +205,8 @@ This does two different kinds of triggers:
   property is seen as an entry id.  Org-mode finds the entry with the
   corresponding ID property and switches it to the state TODO as well."
 
+  ;; Refresh the effort text properties
+  (org-refresh-effort-properties)
   ;; Get information from the plist
   (let* ((type (plist-get change-plist :type))
 	       (pos (plist-get change-plist :position))
@@ -268,7 +270,7 @@ This does two different kinds of triggers:
 			    (tags (match-string 5))
 			    (priority (org-get-priority (or (match-string 3) "")))
 			    (effort (when (or effort-up effort-down)
-				      (let ((effort (org-get-effort)))
+				      (let ((effort (get-text-property (point) 'org-effort)))
 					(when effort
 					  (org-duration-string-to-minutes effort))))))
 			(push (list (point) todo-kwd priority tags effort)

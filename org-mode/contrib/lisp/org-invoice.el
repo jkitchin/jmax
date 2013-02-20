@@ -1,6 +1,6 @@
 ;;; org-invoice.el --- Help manage client invoices in OrgMode
 ;;
-;; Copyright (C) 2008-2012 pmade inc. (Peter Jones pjones@pmade.com)
+;; Copyright (C) 2008-2013 pmade inc. (Peter Jones pjones@pmade.com)
 ;;
 ;; This file is not part of GNU Emacs.
 ;;
@@ -290,7 +290,7 @@ information about dblock parameters, please see the Org manual):
 :summary Set to nil to turn off the final summary line."
   (let ((scope (plist-get params :scope))
         (org-invoice-table-params params)
-        (zone (move-marker (make-marker) (point)))
+        (zone (point-marker))
         table)
     (unless scope (setq scope 'default))
     (unless (plist-member params :price) (plist-put params :price t))
