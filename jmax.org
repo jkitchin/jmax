@@ -109,9 +109,12 @@ Obviously this will have to be customized.
 (setq-default abbrev-mode t)
 (setq abbrev-file-name (concat starter-kit-dir "abbrev_defs"))
 (if (not (file-exists-p abbrev-file-name))
-(progn (find-file-noselect abbrev-file-name) (write-file abbrev-file-name))
-)
-(read-abbrev-file (concat starter-kit-dir "abbrev_defs"))
+    (progn (find-file-noselect abbrev-file-name) 
+	   (write-file abbrev-file-name)))
+
+(if (file-exists-p abbrev-file-name)
+        (quietly-read-abbrev-file))
+
 (setq save-abbrevs t)
 #+end_src
 
@@ -212,6 +215,9 @@ see: http://cx4a.org/software/auto-complete/manual.html
 (require 'org)
 (require 'org-special-blocks)
 (require 'org-inlinetask)
+(require 'org-mouse)
+;(require 'org-latex)
+
 
 (add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode))
 (global-set-key "\C-cl" 'org-store-link)
@@ -347,6 +353,42 @@ see: http://cx4a.org/software/auto-complete/manual.html
 (setq org-babel-default-header-args
       (cons '(:exports . "both")
 	    (assq-delete-all :exports org-babel-default-header-args)))
+#+END_SRC
+
+** reftex setup
+This allows you insert citations from reftex. I am not sure I like this a lot, as I prefer the citations to go in as links. I think this can be done via ebib, or I will one day write my own insert citation function that puts in the links I want like these [[cite links]].
+
+#+BEGIN_SRC emacs-lisp
+(defun org-mode-reftex-setup ()
+"use my bibliography link to set the default bibliography in an org-file"
+  (load-library "reftex")
+  (and (buffer-file-name)
+       (file-exists-p (buffer-file-name))
+       (reftex-parse-all))
+
+  ; this allows you to choose these different link formats. Not all of
+  ; them are implemented yet.
+  (setq reftex-cite-format '((13  . "cite:%l")
+			     (116 . "citet:%l")
+			     (84  . "citet*:%l")
+			     (112 . "citep:%l")
+			     (80  . "citep*:%l")
+			     (101 . "citep:[e.g.][]{%l}")
+			     (115 . "citep:[see][]{%l}")
+			     (97  . "citeauthor:%l")
+			     (65  . "citeauthor*:%l")
+			     (121 . "citeyear:%l")
+			     (110 . "nocite:%l")))
+  ; check if default bibliography is set. 
+  (if (not (reftex-default-bibliography))
+      (let ((n (count-matches "bibliography:" (point-min) (point-max))))
+	(if (> n 1) (error (format "too many bibliography entries found")))
+	(if (< n 1) (error (format "no matching bibliography found")))
+	(setq reftex-default-bibliography (cite-find-bibliography))))
+
+  (define-key org-mode-map (kbd "C-c )") 'reftex-citation))
+
+(add-hook 'org-mode-hook 'org-mode-reftex-setup)
 #+END_SRC
 
 ** publishing setup
@@ -633,6 +675,7 @@ returns a list of stripped file names"
     (search-forward key nil t 1)))
 
 (defun cite-onclick (link-string)
+"function that visits the bib-file at the key selected on clicking"
    ;; This code opens the bibtex file containing the clicked on
    ;; key. First we find the boundaries of the link you clicked on,
    ;; then identify the key you clicked on.
@@ -653,13 +696,7 @@ returns a list of stripped file names"
        (setq key-beginning (point)))) ; no match found
                                         ; save the key we clicked on.
    (setq bibtex-key (cite-strip-key (buffer-substring key-beginning key-end)))
-   (message "(%s %s) p=%s %s %s: %s"
-            link-string-beginning
-            link-string-end
-            (point)
-            key-beginning
-            key-end
-            bibtex-key )
+
    ;; now we get the bibliography files
    (setq cite-bibliography-files (cite-find-bibliography))
    ;(message "%S" cite-bibliography-files))
@@ -673,7 +710,6 @@ returns a list of stripped file names"
   "construct links as superscripted bracketed links in latex"
   (interactive)
   (concat "\\cite{" (mapconcat (lambda (key) key) stripped-keys ",") "}"))
-
 (org-add-link-type
  "cite"
  'cite-onclick
@@ -697,7 +733,79 @@ returns a list of stripped file names"
 	     (mapconcat (lambda (key) key) (cite-split-keys keyword) ",")
 	     "}")))))
 
-(setq reftex-cite-format "[[cite:%l]]")
+(org-add-link-type
+ "citet"
+ 'cite-onclick
+ ;; formatting
+ (lambda (keyword desc format)
+   (cond
+    ((eq format 'latex)
+  (concat "\\citet{" (mapconcat (lambda (key) key) (cite-split-keys keyword) ",") "}")))))
+
+(org-add-link-type
+ "citet*"
+ 'cite-onclick
+ ;; formatting
+ (lambda (keyword desc format)
+   (cond
+    ((eq format 'latex)
+  (concat "\\citet*{" (mapconcat (lambda (key) key) (cite-split-keys keyword) ",") "}")))))
+
+;; TODO these links do not support options [see][] 
+(org-add-link-type
+ "citep"
+ 'cite-onclick
+ ;; formatting
+ (lambda (keyword desc format)
+   (cond
+    ((eq format 'latex)
+  (concat "\\citep{" (mapconcat (lambda (key) key) (cite-split-keys keyword) ",") "}")))))
+
+(org-add-link-type
+ "citep*"
+ 'cite-onclick
+ ;; formatting
+ (lambda (keyword desc format)
+   (cond
+    ((eq format 'latex)
+  (concat "\\citep*{" (mapconcat (lambda (key) key) (cite-split-keys keyword) ",") "}")))))
+
+(org-add-link-type
+ "citeauthor"
+ 'cite-onclick
+ ;; formatting
+ (lambda (keyword desc format)
+   (cond
+    ((eq format 'latex)
+  (concat "\\citeauthor{" (mapconcat (lambda (key) key) (cite-split-keys keyword) ",") "}")))))
+
+(org-add-link-type
+ "citeauthor*"
+ 'cite-onclick
+ ;; formatting
+ (lambda (keyword desc format)
+   (cond
+    ((eq format 'latex)
+  (concat "\\citeauthor*{" (mapconcat (lambda (key) key) (cite-split-keys keyword) ",") "}")))))
+
+(org-add-link-type
+ "citeyear"
+ 'cite-onclick
+ ;; formatting
+ (lambda (keyword desc format)
+   (cond
+    ((eq format 'latex)
+  (concat "\\citeyear{" (mapconcat (lambda (key) key) (cite-split-keys keyword) ",") "}")))))
+
+(org-add-link-type
+ "nocite"
+ 'cite-onclick
+ ;; formatting
+ (lambda (keyword desc format)
+   (cond
+    ((eq format 'latex)
+  (concat "\\nocite{" (mapconcat (lambda (key) key) (cite-split-keys keyword) ",") "}")))))
+
 #+END_SRC
 
 Here we add links for the bibliography and bibliography style
@@ -1362,6 +1470,46 @@ categories:
 " title)))
 #+END_SRC
 
+** blog post
+#+BEGIN_SRC emacs-lisp
+(defun new-blog-post (title &optional directory)
+  "open a buffer with name year-month-day-title.org if C-u called
+first, then create a directory with the title name, and a buffer
+inside the directory"
+  (interactive
+   (cond
+    ((equal current-prefix-arg nil) ; universal argument not called
+     (message "no prefix arg")
+     (list
+      ; first read title, and set directory to nil
+      (read-string "Title: " nil nil "span") nil))
+    ((equal current-prefix-arg '(4)) ; C-u was called
+     ; first read title, and set directory to t
+     (list (read-string "Title: " nil nil "span") t))))
+  (if directory
+      ; directory is true, so create one
+      (progn
+        (message "making a directory")
+        (make-directory (format "%s-%s"
+                                (format-time-string "%Y-%m-%d")
+                                (replace-regexp-in-string " " "-" title)) t)
+        (message "made a directory")
+        (setq post-buffer
+              (format "%s-%s/%s-%s.org"
+                      (format-time-string "%Y-%m-%d")
+                      (replace-regexp-in-string " " "-" title)
+                      (format-time-string "%Y-%m-%d")
+                      (replace-regexp-in-string " " "-" title)))
+        (find-file post-buffer)
+        )
+
+    (progn
+      (setq post-buffer
+           (format "%s-%s.org"
+            (format-time-string "%Y-%m-%d")
+            (replace-regexp-in-string " " "-" title)))
+     (find-file post-buffer))))
+#+END_SRC
 * TODO send email through gmail
 Adapted from http://wideaperture.net/blog/?p=3343
 
@@ -1441,7 +1589,6 @@ machine imap.gmail.com login john_doe@gmail.com password notapassword port 993
 | autoload | ebib | Ebib, a BibTeX database manager. | t | nil |
 
 
-
 * magit
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'load-path (concat starter-kit-dir "/magit-1.2.0/"))
@@ -1452,3 +1599,144 @@ machine imap.gmail.com login john_doe@gmail.com password notapassword port 993
 
 #+RESULTS:
 
+
+* org-annotation
+#+BEGIN_SRC emacs-lisp :tangle org-annotate-file.el
+;;; org-annotate-file.el --- Annotate a file with org syntax
+
+;; Copyright (C) 2008-2012 Philip Jackson
+
+;; Author: Philip Jackson <phil@shellarchive.co.uk>
+;; Version: 0.2
+
+;; This file is not currently part of GNU Emacs.
+
+;; This program is free software; you can redistribute it and/or
+;; modify it under the terms of the GNU General Public License as
+;; published by the Free Software Foundation; either version 2, or (at
+;; your option) any later version.
+
+;; This program is distributed in the hope that it will be useful, but
+;; WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+;; General Public License for more details.
+
+;; You should have received a copy of the GNU General Public License
+;; along with this program ; see the file COPYING.  If not, write to
+;; the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+;; Boston, MA 02111-1307, USA.
+
+;;; Commentary:
+
+;; This is yet another implementation to allow the annotation of a
+;; file without modification of the file itself. The annotation is in
+;; org syntax so you can use all of the org features you are used to.
+
+;; To use you might put the following in your .emacs:
+;;
+;; (require 'org-annotate-file)
+;; (global-set-key (kbd "C-c C-l") 'org-annotate-file) ; for example
+;;
+;; To change the location of the annotation file:
+;;
+;; (setq org-annotate-file-storage-file "~/annotated.org")
+;;
+;; Then when you visit any file and hit C-c C-l you will find yourself
+;; in an org buffer on a headline which links to the file you were
+;; visiting, e.g:
+
+;; * ~/org-annotate-file.el
+
+;; Under here you can put anything you like, save the file
+;; and next time you hit C-c C-l you will hit those notes again.
+;;
+;; To put a subheading with a text search for the current line set
+;; `org-annotate-file-add-search` to non-nil value. Then when you hit
+;; C-c C-l (on the above line for example) you will get:
+
+;; * ~/org-annotate-file.el
+;; ** `org-annotate-file-add-search` to non-nil value. Then whe...
+
+;; Note that both of the above will be links.
+
+(require 'org)
+
+(defvar org-annotate-file-storage-file "~/.org-annotate-file.org"
+  "File in which to keep annotations.")
+
+(defvar org-annotate-file-add-search nil
+  "If non-nil then add a link as a second level to the actual
+location in the file")
+
+(defvar org-annotate-file-always-open t
+  "non-nil means always expand the full tree when you visit
+`org-annotate-file-storage-file'.")
+
+(defun org-annotate-file-elipsify-desc (string &optional after)
+  "Strip starting and ending whitespace and replace any chars
+that appear after the value in `after' with '...'"
+  (let* ((after (number-to-string (or after 30)))
+         (replace-map (list (cons "^[ \t]*" "")
+                            (cons "[ \t]*$" "")
+                            (cons (concat "^\\(.\\{" after
+                                          "\\}\\).*") "\\1..."))))
+    (mapc (lambda (x)
+            (when (string-match (car x) string)
+              (setq string (replace-match (cdr x) nil nil string))))
+          replace-map)
+    string))
+
+(defun org-annotate-file ()
+  "Put a section for the current file into your annotation file"
+  (interactive)
+  (unless (buffer-file-name)
+    (error "This buffer has no associated file"))
+  (org-annotate-file-show-section))
+
+(defun org-annotate-file-show-section (&optional buffer)
+  "Visit the buffer named `org-annotate-file-storage-file' and
+show the relevant section"
+  (let* ((filename (abbreviate-file-name (or buffer (buffer-file-name))))
+         (line (buffer-substring-no-properties (point-at-bol) (point-at-eol)))
+         (link (org-make-link-string (concat "file:" filename) filename))
+         (search-link (org-make-link-string
+                       (concat "file:" filename "::" line)
+                               (org-annotate-file-elipsify-desc line))))
+    (with-current-buffer (find-file org-annotate-file-storage-file)
+      (unless (eq major-mode 'org-mode)
+        (org-mode))
+      (goto-char (point-min))
+      (widen)
+      (when org-annotate-file-always-open
+        (show-all))
+      (unless (search-forward-regexp
+               (concat "^* " (regexp-quote link)) nil t)
+        (org-annotate-file-add-upper-level link))
+      (beginning-of-line)
+      (org-narrow-to-subtree)
+      ;; deal with a '::' search if need be
+      (when org-annotate-file-add-search
+        (unless (search-forward-regexp
+                 (concat "^** " (regexp-quote search-link)) nil t)
+          (org-annotate-file-add-second-level search-link))))))
+
+(defun org-annotate-file-add-upper-level (link)
+  (goto-char (point-min))
+  (call-interactively 'org-insert-heading)
+  (insert link))
+
+(defun org-annotate-file-add-second-level (link)
+  (goto-char (point-at-eol))
+  (call-interactively 'org-insert-subheading)
+  (insert link))
+
+(provide 'org-annotate-file)
+
+;;; org-annotate-file.el ends here
+
+#+END_SRC
+* TODO bookmarklet to remember webpages
+http://orgmode.org/worg/org-contrib/org-annotation-helper.html
+* TODO org-registry
+http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=contrib/lisp/org-registry.el;hb=HEAD
+>>>>>>> 765eb0e65a9d4f5ebf53a40a5b9b11d02a0484c4
