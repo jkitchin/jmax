@@ -3,4 +3,13 @@
 org-mode
 emacs-24.2
 elpa
-magit
+magit*
+jmax.el
+python-mode
+sandbox*
+src
+presentation-modes
+auto-save-list
+ac-comphist.dat
+abbrev_defs
+.ispell

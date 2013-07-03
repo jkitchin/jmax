@@ -4,7 +4,7 @@
 
 ;; John Kitchin
 
-;(require 'org-e-html)
+(require 'ox-html)
 
 (defvar bf-root-dir "~/Dropbox/blogofile-jkitchin.github.com/"
   "Directory where all the files are stored")
@@ -18,7 +18,7 @@
 (defvar bf-posts-directory (concat bf-root-dir "_posts/")
   "Directory where all html versions of posts are stored.")
 
-(defvar bf-url-base "http://jkitchin.github.com/"
+(defvar bf-url-base "http://jkitchin.github.io/"
   "Base url of the whole site")
 
 (defvar bf-image-url-base "/img/"
@@ -81,11 +81,11 @@ all keys and values are taken from properties."
 (defun bf-get-HTML () 
   "use the new org export mechanism to get html string with corrected image links. This function does not save the post!
 
-the creates a buffer *Org E-HTML Export* with the content in it."
+the creates a buffer *Org HTML Export* with the content in it."
   (interactive)
-  ;; temporarily replace org-e-html-format-inline-image so it puts the
+  ;; temporarily replace org-html-format-inline-image so it puts the
   ;; right links to images in. in the blog, the link is a full URL, not a path
-  (flet ((org-e-html-format-inline-image 
+  (flet ((org-html-format-inline-image 
 	  (src &optional
 	       caption 
 	       label 
@@ -109,14 +109,15 @@ the creates a buffer *Org E-HTML Export* with the content in it."
 	    (format "<p><img src=\"%s\"><p>" (concat bf-image-url-base src)))))
 	  
     ;; body in flet with temporary image function
-    (let ((subtreep t)
+    (let ((async nil)
+	  (subtreep t)
 	  (visible-only nil)
 	  (body-only t)
 	  (ext-plist '()))
-      (org-e-html-export-as-html subtreep visible-only body-only ext-plist)))
-  ;; now switch to the *Org E-HTML Export* buffer and get the string
+      (org-html-export-as-html async subtreep visible-only body-only ext-plist)))
+  ;; now switch to the *Org HTML Export* buffer and get the string
   (setq cb (current-buffer))
-  (set-buffer "*Org E-HTML Export*")
+  (set-buffer "*Org HTML Export*")
   (setq output (buffer-string))
   (set-buffer cb)
   (format "%s" output))
@@ -263,7 +264,7 @@ would lead to this post filename
     (with-temp-file post-filename 
       (insert content)))
   ;; clean up
-  (kill-buffer "*Org E-HTML Export*")
+  (kill-buffer "*Org HTML Export*")
   (switch-to-buffer thisb)
   (delete-other-windows))
 

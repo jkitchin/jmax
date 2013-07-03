@@ -15,14 +15,14 @@
 #+LINK_HOME:
 #+XSLT:
 
-* tasks
+* tasks to do
 empty
 
-* personal setup                                                   :personal:
+* personal setup 						   :personal:
 Obviously this will have to be customized.
 
 #+begin_src emacs-lisp
-;; I need some lisp voodoo here to set paths according to the machine I am on.
+;; I need some lisp voodoo here to set paths according to the machine I am on, especially for aspell and org-files.
 (when (or (string= system-name "jkitchin-780.cheme.cmu.edu")
 	  (string= system-name "gilgamesh.cheme.cmu.edu"))
   (setq org-agenda-files '("~/Dropbox/org-mode"))
@@ -45,13 +45,16 @@ Obviously this will have to be customized.
 ; adapted from http://ergoemacs.org/emacs/emacs_hotkey_open_file_fast.html
 (defun j-open-file-fast (openCode)
   "Prompt to open a file from a pre-defined set."
-  (interactive "sOpen file: [m]master.org [b]blog [j]jmax.org:")
+  (interactive "sOpen file: [m]master.org [b]blog [j]jmax.org [p]pycse.org [e]ese-book: ")
   (let (file )
     (setq file
           (cond
            ((string= openCode "m") "~/Dropbox/org-mode/master.org" )
            ((string= openCode "j") "~/Dropbox/.emacs.d/jmax.org" )
-           ((string= openCode "b") "~/Dropbox/jkitchin.github.com/source/_org")           
+           ((string= openCode "b") "~/Dropbox/blogofile-jkitchin.github.com/_blog")
+           ((string= openCode "p") "~/Dropbox/pycse/pycse.org" )
+           ((string= openCode "e") "~/Dropbox/ese-book/ese.org" )
+
            (t (error "You typed %s, it doesn't associate with a file." openCode ))
            )
           )
@@ -67,9 +70,14 @@ Obviously this will have to be customized.
 ;(setq frame-title-format "jmax - awesome editing")
 
 ;; set frame title to something useful
+;(setq frame-title-format
+;  '((buffer-file-name "%f"
+;    (dired-directory dired-directory "%b"))))
+
 (setq frame-title-format
-  '((buffer-file-name "%f"
-    (dired-directory dired-directory "%b"))))
+      '((:eval (if (buffer-file-name)
+                   (abbreviate-file-name (buffer-file-name))
+                 "%b"))))
 
 
 (tool-bar-mode 0) ; remove the icons
@@ -98,6 +106,13 @@ Obviously this will have to be customized.
 
 ;; Disable all version control. makes startup and opening files much faster
 (setq vc-handled-backends nil)
+
+;; http://emacsredux.com/blog/2013/04/05/recently-visited-files
+(require 'recentf)
+(setq recentf-max-saved-items 200
+      recentf-max-menu-items 15)
+(recentf-mode +1)
+
 #+END_SRC
 
 #+RESULTS:
@@ -177,7 +192,37 @@ Obviously this will have to be customized.
 * color theme
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'custom-theme-load-path (concat starter-kit-dir "/themes"))
+(add-to-list 'custom-theme-load-path (concat starter-kit-dir "/themes/base16-emacs"))
+(add-to-list 'custom-theme-load-path (concat starter-kit-dir "/themes/tomorrow-theme/GNU Emacs"))
+(add-to-list 'load-path (concat starter-kit-dir "/themes/tomorrow-theme/GNU Emacs"))
 (load-theme 'my t)
+
+
+(setq my-color-themes (list
+		 'my
+		 'solarized-dark
+		 'solarized-light
+		 'zenburn
+		 'tomorrow-day
+		 'tomorrow-night
+		 'tomorrow-night-blue
+		 'tomorrow-night-bright
+		 'tomorrow-night-eighties))
+
+(setq theme-current my-color-themes)
+
+(defun my-theme-cycle ()
+  (interactive)
+  ;; cut one of of theme-current
+  (setq theme-current (cdr theme-current))
+  ;; if theme-current gets empty, reset it
+  (if (null theme-current) (setq theme-current my-color-themes))
+  ;; load the top-theme and print a message of what theme it is.
+  (load-theme (car theme-current))
+  (message "%S" (car theme-current)))
+
+(global-set-key [f4] 'my-theme-cycle)
+
 #+END_SRC
 
 #+RESULTS:
@@ -207,8 +252,8 @@ see: http://cx4a.org/software/auto-complete/manual.html
 			))
 ;;(setq ispell-personal-dictionary (concat starter-kit-dir "Dropbox/.emacs.d/.ispell"))
 
-;; stop annoying boxes from popping up when no makefile foundx
-(setq flymake-gui-warnings-enabled nil)
+;; stop annoying boxes from popping up when no makefile found
+;; (setq flymake-gui-warnings-enabled nil)
 #+end_src
 * org-mode
 #+BEGIN_SRC emacs-lisp
@@ -216,14 +261,15 @@ see: http://cx4a.org/software/auto-complete/manual.html
 (require 'org-special-blocks)
 (require 'org-inlinetask)
 (require 'org-mouse)
-;(require 'org-latex)
 
+(require 'ox-html)
+(require 'ox-latex)
+(require 'ox-beamer)
 
 (add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode))
 (global-set-key "\C-cl" 'org-store-link)
 (global-set-key "\C-ca" 'org-agenda)
 (global-set-key "\C-cb" 'org-iswitchb)
-(global-set-key [f12] 'org-mode)
 
 (global-set-key "\C-e" 'end-of-line); overwrites org-mode \C-e definition
 
@@ -247,18 +293,24 @@ see: http://cx4a.org/software/auto-complete/manual.html
 ; enable prompt-free code running
 (setq org-confirm-babel-evaluate nil)
 (setq org-confirm-elisp-link-function nil)
-
+(setq org-confirm-shell-link-function nil)
 ; register languages in org-mode
 (org-babel-do-load-languages
  'org-babel-load-languages
  '((emacs-lisp . t)
    (python . t)
    (sh . t)
-   (org . t)))
+   (matlab . t)
+   (org . t)
+   (dot . t)))
 
 ; no extra indentation
 (setq org-src-preserve-indentation t)
 (setq org-startup-with-inline-images "inlineimages")
+#+END_SRC
+** archive setup
+#+BEGIN_SRC emacs-lisp
+(setq org-archive-location "archive/%s_archive::")
 #+END_SRC
 ** agenda setup
 #+BEGIN_SRC emacs-lisp
@@ -355,86 +407,90 @@ see: http://cx4a.org/software/auto-complete/manual.html
 	    (assq-delete-all :exports org-babel-default-header-args)))
 #+END_SRC
 
-** reftex setup
+#+RESULTS:
+
+
+** COMMENT reftex setup
 This allows you insert citations from reftex. I am not sure I like this a lot, as I prefer the citations to go in as links. I think this can be done via ebib, or I will one day write my own insert citation function that puts in the links I want like these [[cite links]].
 
 #+BEGIN_SRC emacs-lisp
-(defun org-mode-reftex-setup ()
-"use my bibliography link to set the default bibliography in an org-file"
-  (load-library "reftex")
-  (and (buffer-file-name)
-       (file-exists-p (buffer-file-name))
-       (reftex-parse-all))
+;; (defun org-mode-reftex-setup ()
+;; "use my bibliography link to set the default bibliography in an org-file"
+;;   (load-library "reftex")
+;;   (and (buffer-file-name)
+;;        (file-exists-p (buffer-file-name))
+;;        (reftex-parse-all))
 
-  ; this allows you to choose these different link formats. Not all of
-  ; them are implemented yet.
-  (setq reftex-cite-format '((13  . "cite:%l")
-			     (116 . "citet:%l")
-			     (84  . "citet*:%l")
-			     (112 . "citep:%l")
-			     (80  . "citep*:%l")
-			     (101 . "citep:[e.g.][]{%l}")
-			     (115 . "citep:[see][]{%l}")
-			     (97  . "citeauthor:%l")
-			     (65  . "citeauthor*:%l")
-			     (121 . "citeyear:%l")
-			     (110 . "nocite:%l")))
-  ; check if default bibliography is set. 
-  (if (not (reftex-default-bibliography))
-      (let ((n (count-matches "bibliography:" (point-min) (point-max))))
-	(if (> n 1) (error (format "too many bibliography entries found")))
-	(if (< n 1) (error (format "no matching bibliography found")))
-	(setq reftex-default-bibliography (cite-find-bibliography))))
+;;   ; this allows you to choose these different link formats. Not all of
+;;   ; them are implemented yet.
+;;   (setq reftex-cite-format '((13  . "cite:%l")
+;; 			     (116 . "citet:%l")
+;; 			     (84  . "citet*:%l")
+;; 			     (112 . "citep:%l")
+;; 			     (80  . "citep*:%l")
+;; 			     (101 . "citep:[e.g.][]{%l}")
+;; 			     (115 . "citep:[see][]{%l}")
+;; 			     (97  . "citeauthor:%l")
+;; 			     (65  . "citeauthor*:%l")
+;; 			     (121 . "citeyear:%l")
+;; 			     (110 . "nocite:%l")))
+;;   ; check if default bibliography is set. 
+;;   (if (not (reftex-default-bibliography))
+;;       (let ((n (count-matches "bibliography:" (point-min) (point-max))))
+;; 	(if (> n 1) (error (format "too many bibliography entries found")))
+;; 	(if (< n 1) (error (format "no matching bibliography found")))
+;; 	(setq reftex-default-bibliography (cite-find-bibliography))))
 
-  (define-key org-mode-map (kbd "C-c )") 'reftex-citation))
+;;   (define-key org-mode-map (kbd "C-c )") 'reftex-citation))
 
-(add-hook 'org-mode-hook 'org-mode-reftex-setup)
+;; (add-hook 'org-mode-hook 'org-mode-reftex-setup)
 #+END_SRC
 
 ** publishing setup
 #+BEGIN_SRC emacs-lisp
-(setq org-export-latex-default-packages-alist
-      (quote
-       (("AUTO" "inputenc" t)
-	("" "fixltx2e" nil)
-	("" "url")
-	("" "graphicx" t)
-	("" "minted" t)
-	("" "color" t)
-	("" "longtable" nil)
-	("" "float" nil)
-	("" "wrapfig" nil)
-	("" "soul" t)
-	("" "textcomp" t)
-	("" "amsmath" t)
-	("" "marvosym" t)
-	("" "wasysym" t)
-	("" "latexsym" t)
-	("" "amssymb" t)
-	("linktocpage,
-  pdfstartview=FitH,
-  colorlinks,
-  linkcolor=blue,
-  anchorcolor=blue,
-  citecolor=blue,
-  filecolor=blue,
-  menucolor=blue,
-  urlcolor=blue" "hyperref" t)
-	("" "attachfile" t)
-	"\\tolerance=1000")))
+;(setq org-latex-default-packages-alist
+;      (quote
+;       (("AUTO" "inputenc" t);
+;	("" "fixltx2e" nil);
+;	("" "url")
+;	("" "graphicx" t)
+;	("" "minted" t)
+;	("" "color" t)
+;	("" "longtable" nil)
+;	("" "float" nil)
+;	("" "wrapfig" nil)
+;	("" "soul" t)
+;	("" "textcomp" t)
+;	("" "amsmath" t)
+;	("" "marvosym" t)
+;	("" "wasysym" t)
+;	("" "latexsym" t)
+;	("" "amssymb" t)
+;	("linktocpage,
+ ; pdfstartview=FitH,
+  ;colorlinks,
+  ;linkcolor=blue,
+  ;anchorcolor=blue,
+  ;citecolor=blue,
+  ;filecolor=blue,
+  ;menucolor=blue,
+  ;urlcolor=blue" "hyperref" t)
+;	("" "attachfile" t)
+;	"\\tolerance=1000")))
 
 ; this is for code syntax highlighting
-(setq org-export-latex-listings 'minted)
+(setq org-latex-listings 'minted)
 
-(setq org-export-latex-minted-options
+(setq org-latex-minted-options
            '(("frame" "lines")
              ("fontsize" "\\scriptsize")
              ("linenos" "")))
 
 ; for minted you must run latex with -shell-escape because it calls pygmentize as an external program
-(setq org-latex-to-pdf-process
+(setq org-latex-pdf-process
       '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
         "bibtex %f"
+        "makeindex %f"
         "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
         "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
 
@@ -457,6 +513,8 @@ This allows you insert citations from reftex. I am not sure I like this a lot, a
    (shell-command (format "pydoc %s" arg) nil))
  (lambda (path desc format)
    (cond
+((eq format 'html)
+     (format "%s" desc))
     ((eq format 'latex)
      (format "\\texttt{%s}" path)))))
 
@@ -466,6 +524,8 @@ This allows you insert citations from reftex. I am not sure I like this a lot, a
    (shell-command (format "pydoc %s" arg) nil))
  (lambda (path desc format)
    (cond
+    ((eq format 'html)
+     (format "%s" desc))
     ((eq format 'latex)
      (format "\\texttt{%s}" path)))))
 #+END_SRC
@@ -627,279 +687,6 @@ Known limitations: if they key is not recognized as a word by emacs, the clickin
       )))
 #+END_SRC
 
-*** cite links							   :noexport:
-
-#+BEGIN_SRC emacs-lisp
-;;;;;;;;;;;;
-;; implemenation of cite:  to make bibtex citations that are also clickable.
-;; similar to the citeu link, you can click on one key and open that bibtex entry
-
-(defun cite-find-bibliography ()
-  "find the bibliography file(s) in the buffer
-
-search for [[bibliography:()]]
-and extract out what is in the () with a regexp
-
-returns a list of stripped file names"
-  (interactive)
-  (save-excursion
-    (goto-char (point-min))
-    (re-search-forward "bibliography:\\([^\]\|\n]+\\)" nil t)
-    (setq cite-bibliography-files
-          (mapcar 'cite-strip-key (split-string (match-string 1) ",")))))
-
-(defun cite-goto-bibentry (bibfile key)
-  "open bibfile in another window at the key"
-  (interactive)
-  (find-file-other-window bibfile)
-  (goto-char (point-min)) ; always start search from beginning.
-  (re-search-forward key nil t 1))
-
-(defun cite-strip-key (key)
-  "strip leading and trailing whitespace from the key"
-  (interactive)
-  (replace-regexp-in-string
-   (concat search-whitespace-regexp "$" ) ""
-   (replace-regexp-in-string
-    (concat "^" search-whitespace-regexp ) "" key)))
-
-(defun cite-split-keys (key-string)
-  "split key-string and strip keys. Assumes the key-string is comma delimited"
-  (mapcar 'citeu-strip-key (split-string key-string ",")))
-
-(defun cite-key-in-file-p (key filename)
-  "determine if the key is in the file"
-  (with-temp-buffer
-    (insert-file-contents filename)
-    (goto-char (point-min))
-    (search-forward key nil t 1)))
-
-(defun cite-onclick (link-string)
-"function that visits the bib-file at the key selected on clicking"
-   ;; This code opens the bibtex file containing the clicked on
-   ;; key. First we find the boundaries of the link you clicked on,
-   ;; then identify the key you clicked on.
-   (save-excursion
-     (beginning-of-line) ; search forward from beginning of the line
-     (search-forward link-string nil t 1)
-     (setq link-string-beginning (match-beginning 0))
-     (setq link-string-end (match-end 0)))
-   ;; now we want to search forward to next comma from point
-   (save-excursion
-     (if (search-forward "," link-string-end 1 1)
-         (setq key-end (- (match-end 0) 1)) ; we found a match
-       (setq key-end (point)))) ; no comma found so take the point
-   ;; and backward to previous comma from point
-   (save-excursion
-     (if (search-backward "," link-string-beginning 1 1)
-         (setq key-beginning (+ (match-beginning 0) 1)) ; we found a match
-       (setq key-beginning (point)))) ; no match found
-                                        ; save the key we clicked on.
-   (setq bibtex-key (cite-strip-key (buffer-substring key-beginning key-end)))
-
-   ;; now we get the bibliography files
-   (setq cite-bibliography-files (cite-find-bibliography))
-   ;(message "%S" cite-bibliography-files))
-   ;; now find the first bib file containing the key
-   (setq bib-file (loop for file in cite-bibliography-files do
-         (if (cite-key-in-file-p bibtex-key file) (return file))))
-   ;; and finally, open the file at the key
-   (cite-goto-bibentry bib-file  bibtex-key))
-
-(defun cite-make-latex-links (stripped-keys)
-  "construct links as superscripted bracketed links in latex"
-  (interactive)
-  (concat "\\cite{" (mapconcat (lambda (key) key) stripped-keys ",") "}"))
-(org-add-link-type
- "cite"
- 'cite-onclick
- ;; formatting
- (lambda (keyword desc format)
-   (cond
-    ((eq format 'html) (format "(<cite>%s</cite>)" path))
-    ((eq format 'latex)
-     (concat "\\cite{" 
-	     (mapconcat (lambda (key) key) (cite-split-keys keyword) ",")
-	     "}")))))
-
-(org-add-link-type
- "citealp"
- 'cite-onclick
- ;; formatting
- (lambda (keyword desc format)
-   (cond
-    ((eq format 'latex)
-     (concat "\\citealp{" 
-	     (mapconcat (lambda (key) key) (cite-split-keys keyword) ",")
-	     "}")))))
-
-(org-add-link-type
- "citet"
- 'cite-onclick
- ;; formatting
- (lambda (keyword desc format)
-   (cond
-    ((eq format 'latex)
-  (concat "\\citet{" (mapconcat (lambda (key) key) (cite-split-keys keyword) ",") "}")))))
-
-(org-add-link-type
- "citet*"
- 'cite-onclick
- ;; formatting
- (lambda (keyword desc format)
-   (cond
-    ((eq format 'latex)
-  (concat "\\citet*{" (mapconcat (lambda (key) key) (cite-split-keys keyword) ",") "}")))))
-
-;; TODO these links do not support options [see][] 
-(org-add-link-type
- "citep"
- 'cite-onclick
- ;; formatting
- (lambda (keyword desc format)
-   (cond
-    ((eq format 'latex)
-  (concat "\\citep{" (mapconcat (lambda (key) key) (cite-split-keys keyword) ",") "}")))))
-
-(org-add-link-type
- "citep*"
- 'cite-onclick
- ;; formatting
- (lambda (keyword desc format)
-   (cond
-    ((eq format 'latex)
-  (concat "\\citep*{" (mapconcat (lambda (key) key) (cite-split-keys keyword) ",") "}")))))
-
-(org-add-link-type
- "citeauthor"
- 'cite-onclick
- ;; formatting
- (lambda (keyword desc format)
-   (cond
-    ((eq format 'latex)
-  (concat "\\citeauthor{" (mapconcat (lambda (key) key) (cite-split-keys keyword) ",") "}")))))
-
-(org-add-link-type
- "citeauthor*"
- 'cite-onclick
- ;; formatting
- (lambda (keyword desc format)
-   (cond
-    ((eq format 'latex)
-  (concat "\\citeauthor*{" (mapconcat (lambda (key) key) (cite-split-keys keyword) ",") "}")))))
-
-(org-add-link-type
- "citeyear"
- 'cite-onclick
- ;; formatting
- (lambda (keyword desc format)
-   (cond
-    ((eq format 'latex)
-  (concat "\\citeyear{" (mapconcat (lambda (key) key) (cite-split-keys keyword) ",") "}")))))
-
-(org-add-link-type
- "nocite"
- 'cite-onclick
- ;; formatting
- (lambda (keyword desc format)
-   (cond
-    ((eq format 'latex)
-  (concat "\\nocite{" (mapconcat (lambda (key) key) (cite-split-keys keyword) ",") "}")))))
-
-#+END_SRC
-
-Here we add links for the bibliography and bibliography style
-#+begin_src emacs-lisp
-;; link to hold a bibliography bibtex file. Mostly so I can click on the link and open the file.
-;; TODO replace click code to open file at point.
-(org-add-link-type "bibliography"
-(lambda (link-string)
-    (save-excursion
-     (beginning-of-line) ; search forward from beginning of the line
-     (search-forward link-string nil t 1)
-     (setq link-string-beginning (match-beginning 0))
-     (setq link-string-end (match-end 0)))
-   ;; now we want to search forward to next comma from point
-   (save-excursion
-     (if (search-forward "," link-string-end 1 1)
-         (setq key-end (- (match-end 0) 1)) ; we found a match
-       (setq key-end (point)))) ; no comma found so take the point
-   ;; and backward to previous comma from point
-   (save-excursion
-     (if (search-backward "," link-string-beginning 1 1)
-         (setq key-beginning (+ (match-beginning 0) 1)) ; we found a match
-       (setq key-beginning (point)))) ; no match found
-                                        ; save the key we clicked on.
-   (setq bibfile (cite-strip-key (buffer-substring key-beginning key-end)))
-(find-file bibfile)) ; open file on click
-;; formatting code
-(lambda (keyword desc format)
-  (cond
-   ((eq format 'html) (format ""))
-   ((eq format 'latex)
-    ; write out the latex bibliography command
-    (format "\\bibliography{%s}" (replace-regexp-in-string  ".bib" "" keyword))))))
-
-(org-add-link-type "bibliographystyle"
-(lambda (arg) (message "Nothing implemented for clicking here.")) ; open file on click
-(lambda (keyword desc format)
-  (cond
-   ((eq format 'latex)
-    ; write out the latex bibliography command
-    (format "\\bibliographystyle{%s}" keyword)))))
-#+end_src
-
-*** ref and label links						   :noexport:
-The idea here is to create links for label and ref. The reason for these additions is to provide clickable links to the references and labels, along with the org-mode navigation to quickly go back to where you were. These links get formatted to \ref and \label for latex. They are not formatted for HTML export yet.
-
-#+BEGIN_SRC emacs-lisp
-(org-add-link-type
- "ref"
- (lambda (label)
-   "on clicking goto the label. Navigate back with C-c &"
-   (let ((n (count-matches (format "\\label{%s}" label) (point-min) (point-max) t)))
-     (if (< n 1) (error (format "no matching label found for \\label{%s}!" label)))
-     (if (> n 1) (error (format "%d matches found for %s!" n label)))
-   (org-mark-ring-push)
-   (goto-char (point-min))
-   (re-search-forward (format "\\label{%s}" label))
-   (message "go back with `C-c &`")))
- ;formatting
- (lambda (keyword desc format)
-   (cond
-    ((eq format 'latex)
-     (format "\\ref{%s}" keyword)))))
-
-(org-add-link-type
- "label"
- (lambda (label)
-   "on clicking count the number of label tags used in the buffer. A number greater than one means multiple labels!"
-   (count-matches (format "label:%s\\b" label) (point-min) (point-max) t))
- (lambda (keyword desc format)
-   (cond
-    ((eq format 'latex)
-     (format "\\label{%s}" keyword)))))
-#+END_SRC
-
-#+RESULTS:
-** reftex setup							   :noexport:
-This allows you insert citations from reftex. I am not sure I like this a lot, as I prefer the citations to go in as links. I think this can be done via ebib, or I will one day write my own insert citation function that puts in the links I want like these [[cite links]].
-
-#+BEGIN_SRC emacs-lisp
-(defun org-mode-reftex-setup ()
-  (load-library "reftex")
-  (and (buffer-file-name)
-       (file-exists-p (buffer-file-name))
-       (reftex-parse-all))
-  (setq reftex-cite-format "cite:%l") ; use cite links in orgmode
-  ; we need to be sure there is a bibliography defined
-;  (if (not (reftex-default-bibliography))
-;      (setq reftex-default-bibliography (cite-find-bibliography)))
-  ; define a convenient key for adding citations
-  (define-key org-mode-map (kbd "C-c ]") 'reftex-citation))
-
-;(add-hook 'org-mode-hook 'org-mode-reftex-setup)
-#+END_SRC
 
 ** TODO feedback function					   :noexport:
 this may be superceded by org-annotation. also it should insert the relative path, not absolute path in teh output
@@ -924,7 +711,7 @@ this may be superceded by org-annotation. also it should insert the relative pat
     (save-buffer)
     (other-window 1)))
 
-(global-set-key "\C-ci" 'insert-feedback)
+;(global-set-key "\C-ci" 'insert-feedback)
 #+END_SRC
 
 ** org-annotation						   :noexport:
@@ -1063,16 +850,80 @@ show the relevant section"
 
 #+END_SRC
 
+#+BEGIN_SRC emacs-lisp
+(defun my-annotate (note)
+  "Goto end of file and add annotation with link to point, and go back to point."
+  (interactive "sNote: ")
+  (let ((POINT (point)))
+    (org-mark-ring-push)
+    (message "Go back with C-c &")
+    ;; create annotation section if it isn't here
+    (if (not (search-forward "* ANNOTATION" nil t))
+	(progn
+	  (goto-char (point-max))
+	  (newline)
+	  (insert "* ANNOTATION\n"))
+      (goto-char (point-max))
+      (newline))
+    (insert "- " (format "[[elisp:(goto-char %i)]]: %s\n" POINT note))
+    (org-mark-ring-goto)))
+
+(global-set-key "\C-ci" 'my-annotate)
+#+END_SRC
+
 ** TODO bookmarklet to remember webpages
 http://orgmode.org/worg/org-contrib/org-annotation-helper.html
 http://orgmode.org/worg/org-contrib/org-protocol.html
 ** TODO org-registry
    http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=contrib/lisp/org-registry.el;hb=HEAD
+** epresent
+#+BEGIN_SRC emacs-lisp
+;(add-to-list 'load-path (concat starter-kit-dir "/epresent"))
+;(require 'epresent)
+;(global-set-key [f5] 'epresent-run)
+;; these overwrite scroll-up-command and scroll-down-command so my remote works in epresent 
+;(global-set-key [next] 'epresent-next-page)
+;(global-set-key [prev] 'epresent-previous-page)
+#+END_SRC
+** org-tree-slide
+#+BEGIN_SRC emacs-lisp
+;(add-to-list 'load-path (concat starter-kit-dir "/org-tree-slide"))
+;(require 'org-tree-slide)
+
+;(global-set-key [f5] 'org-tree-slide-play-with-timer)
+;(global-set-key [f5] 'org-tree-slide-play-with-timer)
+;(global-set-key (kbd "<f8>") 'org-tree-slide-mode)
+;(global-set-key (kbd "S-<f8>") 'org-tree-slide-skip-done-toggle)
+
+
+;(global-set-key [next] 'org-tree-slide-move-next-tree)
+;(global-set-key [prev] 'org-tree-slide-move-previous-tree)
+#+END_SRC
+
+** org-present
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'load-path (concat starter-kit-dir "/org-present"))
+(autoload 'org-present "org-present" nil t)
+
+(add-hook 'org-present-mode-hook
+          (lambda ()
+            (org-present-big)
+            (org-display-inline-images)))
+
+(add-hook 'org-present-mode-quit-hook
+          (lambda ()
+            (org-present-small)
+            (org-remove-inline-images)))
+
+#+END_SRC
+
+#+RESULTS:
+
 * blog
 #+BEGIN_SRC emacs-lisp
-(load-file (concat starter-kit-dir "jekyll-blog.el"))
+(load-file (concat starter-kit-dir "blogofile.el"))
 #+END_SRC
-* TODO python
+* python
 Support for the Python programming language.
 ** Use Python's python-mode.el instead of Emacs' python.el
    :PROPERTIES:
@@ -1120,20 +971,20 @@ supplied by the Python distribution itself.
 http://www.saltycrane.com/blog/2010/05/my-emacs-python-environment/
 
 #+begin_src emacs-lisp
-(add-hook 'find-file-hook 'flymake-find-file-hook)
-(when (load "flymake" t)
-  (defun flymake-pyflakes-init ()
-    (let* ((temp-file (flymake-init-create-temp-buffer-copy
-               'flymake-create-temp-inplace))
-       (local-file (file-relative-name
-            temp-file
-            (file-name-directory buffer-file-name))))
-      (list "pycheckers"  (list local-file))))
-   (add-to-list 'flymake-allowed-file-name-masks
-             '("\\.py\\'" flymake-pyflakes-init)))
+;(add-hook 'find-file-hook 'flymake-find-file-hook)
+;(when (load "flymake" t)
+;  (defun flymake-pyflakes-init ()
+;    (let* ((temp-file (flymake-init-create-temp-buffer-copy
+;               'flymake-create-temp-inplace))
+;       (local-file (file-relative-name
+;            temp-file
+;            (file-name-directory buffer-file-name))))
+;      (list "pycheckers"  (list local-file))))
+;   (add-to-list 'flymake-allowed-file-name-masks
+;             '("\\.py\\'" flymake-pyflakes-init)))
 ;(require 'flymake-cursor)
-(global-set-key [f10] 'flymake-goto-prev-error)
-(global-set-key [f11] 'flymake-goto-next-error)
+;(global-set-key [f10] 'flymake-goto-prev-error)
+;(global-set-key [f11] 'flymake-goto-next-error)
 #+end_src
 
 You need this shell script.
@@ -1510,7 +1361,7 @@ inside the directory"
             (replace-regexp-in-string " " "-" title)))
      (find-file post-buffer))))
 #+END_SRC
-* TODO send email through gmail
+* send email through gmail
 Adapted from http://wideaperture.net/blog/?p=3343
 
 #+begin_src emacs-lisp
@@ -1532,7 +1383,6 @@ Adapted from http://wideaperture.net/blog/?p=3343
       smtpmail-debug-info t)
 (require 'smtpmail)
 #+end_src
-
 
 * TODO setup gnus for reading and sending mail
 Note: this is not working completely yet.
@@ -1588,7 +1438,6 @@ machine imap.gmail.com login john_doe@gmail.com password notapassword port 993
 #+RESULTS:
 | autoload | ebib | Ebib, a BibTeX database manager. | t | nil |
 
-
 * magit
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'load-path (concat starter-kit-dir "/magit-1.2.0/"))
@@ -1598,7 +1447,6 @@ machine imap.gmail.com login john_doe@gmail.com password notapassword port 993
 #+END_SRC
 
 #+RESULTS:
-
 
 * org-annotation
 #+BEGIN_SRC emacs-lisp :tangle org-annotate-file.el

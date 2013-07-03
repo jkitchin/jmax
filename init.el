@@ -17,7 +17,9 @@
 (add-to-list 'load-path (concat starter-kit-dir "/org-mode/contrib/lisp"))
 
 ;; load up the starter kit
+(require 'org)
 (org-babel-load-file (expand-file-name "jmax.org" starter-kit-dir))
+
 
 ;;; init.el ends here
 (custom-set-variables
