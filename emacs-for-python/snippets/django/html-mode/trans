@@ -1,4 +1,0 @@
-#contributor : Fidel Ramos <fidelramos@gmail.com>
-#name : {% trans "..." %}
-# --
-{% trans "$1" %}

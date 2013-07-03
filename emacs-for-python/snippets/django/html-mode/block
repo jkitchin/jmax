@@ -1,6 +1,0 @@
-#contributor : Fidel Ramos <fidelramos@gmail.com>
-#name : {% block ... %}...{% endblock %}
-# --
-{% block $1 %}
-  $2
-{% endblock %}
