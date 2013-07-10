@@ -1,9 +1,7 @@
 *.elc
 *.pyc
-org-mode
 emacs-24.2
 elpa
-magit*
 jmax.el
 python-mode
 sandbox*

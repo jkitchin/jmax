@@ -258,12 +258,12 @@ see: http://cx4a.org/software/auto-complete/manual.html
 * org-mode
 #+BEGIN_SRC emacs-lisp
 (require 'org)
-(require 'org-special-blocks)
-(require 'org-inlinetask)
-(require 'org-mouse)
+;(require 'org-special-blocks)
+;(require 'org-inlinetask)
+;(require 'org-mouse)
 
-(require 'ox-html)
-(require 'ox-latex)
+;(require 'ox-html)
+;(require 'ox-latex)
 (require 'ox-beamer)
 
 (add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode))
@@ -373,26 +373,26 @@ see: http://cx4a.org/software/auto-complete/manual.html
 (setq org-startup-with-inline-images "inlineimages")
 
 ;; enable image mode first
-(iimage-mode)
+;(iimage-mode)
 ;; add the org file link format to the iimage mode regex
-(add-to-list 'iimage-mode-image-regex-alist
-  (cons (concat "\\[\\[file:\\(~?" iimage-mode-image-filename-regex "\\)\\]")  1))
+;(add-to-list 'iimage-mode-image-regex-alist
+;  (cons (concat "\\[\\[file:\\(~?" iimage-mode-image-filename-regex "\\)\\]")  1))
 ;;  add a hook so we can display images on load
-(add-hook 'org-mode-hook '(lambda () (org-turn-on-iimage-in-org)))
+;(add-hook 'org-mode-hook '(lambda () (org-turn-on-iimage-in-org)))
 ;; function to setup images for display on load
-(defun org-turn-on-iimage-in-org ()
-  "display images in your org file"
-  (interactive)
-  (turn-on-iimage-mode)
-  (set-face-underline-p 'org-link nil))
+;(defun org-turn-on-iimage-in-org ()
+;  "display images in your org file"
+;  (interactive)
+;  (turn-on-iimage-mode)
+;  (set-face-underline-p 'org-link nil))
 ;; function to toggle images in a org buffer
-(defun org-toggle-iimage-in-org ()
-  "display images in your org file"
-  (interactive)
-  (if (face-underline-p 'org-link)
-      (set-face-underline-p 'org-link nil)
-      (set-face-underline-p 'org-link t))
-  (call-interactively 'iimage-mode))
+;(defun org-toggle-iimage-in-org ()
+;  "display images in your org file"
+;  (interactive)
+;  (if (face-underline-p 'org-link)
+;      (set-face-underline-p 'org-link nil)
+;      (set-face-underline-p 'org-link t))
+;  (call-interactively 'iimage-mode))
 #+END_SRC
 ** default output for code blocks
 #+BEGIN_SRC emacs-lisp
