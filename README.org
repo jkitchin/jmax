@@ -9,6 +9,8 @@ emacs -q -l init.el
 
 This will load the emacs on your path, without using whatever you have defined in .emacs.d.
 
+The first time you run this, a lot of packages will be downloaded into the elpa folder. This takes a few minutes. 
+
 * Project goal
 =jmax= is a customized version of emacs to facilitate authoring and consuming org-mode based technical documents.
 
