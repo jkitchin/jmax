@@ -1,13 +1,12 @@
 *.elc
 *.pyc
-emacs-24.2
 elpa
-jmax.el
-python-mode
 sandbox*
-src
-presentation-modes
 auto-save-list
 ac-comphist.dat
 abbrev_defs
 .ispell
+org-mode
+saved-places
+.smex-items
+bbdb

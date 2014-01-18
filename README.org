@@ -1,6 +1,6 @@
 #+TITLE: jmax - John's customizations to maximize Emacs
 
-Try it you will like it.
+Try it you will like it. These customizations have been compiled and derived from prelude and the emacs24-starterkit.
 
 Clone the git repository, change into the jmax directory, and run this command:
 #+begin_src sh
@@ -14,17 +14,6 @@ This will load the emacs on your path, without using whatever you have defined i
 
 All of the emacs customization is performed in an org-mode file.
 
-* Features
-- out of the box customization for org-mode
-- custom link-types for org-mode
-- functions we use all the time
-- customized python mode
-- vasp-mode for Emacs
 
 
-* TODO
-- git integration for emacs
-- blog integration
-- auto-install some packages
-  + markdown-mode
-  + spell-checker
+
