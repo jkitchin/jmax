@@ -11,6 +11,16 @@ This will load the emacs on your path, without using whatever you have defined i
 
 The first time you run this, a lot of packages will be downloaded into the elpa folder. This takes a few minutes. 
 
+You should clone the org-mode repository, and run the make command to build the autoloads. I usually use =make up2= which updates the git repository. 
+
+#+BEGIN_SRC sh
+git clone git://orgmode.org/org-mode.git
+cd org-mode
+make autoloads
+#+END_SRC
+
+That is it.
+
 * Project goal
 =jmax= is a customized version of emacs to facilitate authoring and consuming org-mode based technical documents.
 
