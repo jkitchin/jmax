@@ -47,7 +47,14 @@
 (setq reb-re-syntax 'string)
 
 (require 'icicles)
+;; reclaim C-c ' for org-mode
+(setq icicle-top-level-key-bindings
+      (remove '("'" icicle-occur t) icicle-top-level-key-bindings))
+
 (icy-mode 1)
+
+
+
 (require 'ido)
 (require 'ido-ubiquitous)
 (require 'flx-ido)
@@ -215,6 +222,13 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (setq python-indent-offset 4)
+
+;; Enter key executes newline-and-indent
+(defun set-newline-and-indent ()
+  "Map the return key with `newline-and-indent'"
+  (local-set-key (kbd "RET") 'newline-and-indent))
+(add-hook 'python-mode-hook 'set-newline-and-indent)
+
 
 ;; I want python to always show me the output. this advice makes that happen.
 (defadvice python-shell-send-buffer (before switch-to-python-output activate)
