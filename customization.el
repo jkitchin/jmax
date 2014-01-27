@@ -3,6 +3,14 @@
 (add-to-list 'load-path (expand-file-name "org-mode/lisp" starter-kit-dir))
 (add-to-list 'load-path (expand-file-name "org-mode/contrib/lisp" starter-kit-dir))
 
+(when (string= system-name "gilgamesh.cheme.cmu.edu")
+  (setq-default ispell-program-name "aspell"
+		ispell-personal-dictionary (concat starter-kit-dir "user/.ispell")))
+
+(when (or (string= system-name "JKITCHIN-PC")
+	  (string= system-name "KITCHIN-TABLET"))
+  (setq-default ispell-program-name "C:/Program Files/Aspell/bin/aspell.exe"))
+
 
 (add-to-list 'load-path user-dir)
 (when (file-exists-p user-dir)
@@ -32,8 +40,9 @@
 ;; diminish keeps the modeline tidy
 (require 'diminish)
 
-(require 'undo-tree)
+
 ;; sensible undo
+(require 'undo-tree)
 (global-undo-tree-mode)
 (diminish 'undo-tree-mode)
 
@@ -45,14 +54,6 @@
 ;; saner regex syntax
 (require 're-builder)
 (setq reb-re-syntax 'string)
-
-(require 'icicles)
-;; reclaim C-c ' for org-mode
-(setq icicle-top-level-key-bindings
-      (remove '("'" icicle-occur t) icicle-top-level-key-bindings))
-
-(icy-mode 1)
-
 
 
 (require 'ido)
@@ -125,6 +126,9 @@
 
 (global-font-lock-mode t)   ;; turn on font-lock mode everywhere
 
+;; I do not like autofill mode.
+(auto-fill-mode -1)
+
 (show-paren-mode 1)         ;; highlight parentheses
 (setq show-paren-style 'mixed) ;; alternative is 'expression, 'parenthesis or 'mixed
 
@@ -133,7 +137,6 @@
 (setq backup-inhibited t)  ;; disable backup file creation
 
 (fset 'yes-or-no-p 'y-or-n-p) ; answer with y/n instead of yes/no
-
 
 ;; Disable all version control. makes startup and opening files much faster
 (setq vc-handled-backends nil)
@@ -144,8 +147,19 @@
       recentf-max-menu-items 15)
 (recentf-mode +1)
 (setq save-place-file (expand-file-name "user/saved-places" starter-kit-dir))
-
 (global-set-key (kbd "<f7>") 'recentf-open-files)
+
+;; Spell-checking on the fly
+(flyspell-mode +1)  
+(global-set-key (kbd "<f5>") 'flyspell-buffer)
+
+(defun flyspell-check-next-highlighted-word ()
+  (interactive)
+  (flyspell-goto-next-error)
+  (ispell-word))
+
+(global-set-key (kbd "<f6>") 'flyspell-check-next-highlighted-word)
+(global-set-key (kbd "C-<f6>") 'flyspell-check-previous-highlighted-word)
 
 
 ;; modified from http://ergoemacs.org/emacs/emacs_hotkey_open_file_fast.html
@@ -153,7 +167,7 @@
 (setq my-filelist
       '(
         ("master" . "~/Dropbox/org-mode/master.org")
-        (".emacs.d" . "~/Dropbox/.emacs.d" )
+        (".emacs.d" . "~/Dropbox/kitchingroup/jmax" )
         ("blog" . "~/Dropbox/blogofile-jkitchin.github.com/_blog/blog.org")
         ("ese" . "~/Dropbox/books/ese-book/ese.org" )
         ("pycse" . "~/Dropbox/books/pycse/pycse.org")
@@ -237,27 +251,32 @@
    (process-buffer (python-shell-get-or-create-process))))
 
 ;; http://www.yilmazhuseyin.com/blog/dev/emacs-setup-python-development/
-(require 'flymake)
-(when (load "flymake" t) 
-     (defun flymake-pyflakes-init () 
-       (let* ((temp-file (flymake-init-create-temp-buffer-copy 
-                          'flymake-create-temp-inplace)) 
-      (local-file (file-relative-name 
-               temp-file 
-               (file-name-directory buffer-file-name)))) 
-         (list "pyflakes" (list local-file))))
+;; (require 'flymake)
+;; (when (load "flymake" t) 
+;;      (defun flymake-pyflakes-init () 
+;;        (let* ((temp-file (flymake-init-create-temp-buffer-copy 
+;;                           'flymake-create-temp-inplace)) 
+;;       (local-file (file-relative-name 
+;;                temp-file 
+;;                (file-name-directory buffer-file-name)))) 
+;;          (list "pyflakes" (list local-file))))
 
-     (add-to-list 'flymake-allowed-file-name-masks 
-          '("\\.py\\'" flymake-pyflakes-init)))
+;;      (add-to-list 'flymake-allowed-file-name-masks 
+;;           '("\\.py\\'" flymake-pyflakes-init)))
 
-(add-hook 'find-file-hook 'flymake-find-file-hook)
+;; (add-hook 'find-file-hook 'flymake-find-file-hook)
 
-(defun my-flymake-show-help ()
-  (when (get-char-property (point) 'flymake-overlay)
-   (let ((help (get-char-property (point) 'help-echo)))
-    (if help (message "%s" help)))))
+;; (defun my-flymake-show-help ()
+;;   (when (get-char-property (point) 'flymake-overlay)
+;;    (let ((help (get-char-property (point) 'help-echo)))
+;;     (if help (message "%s" help)))))
 
-(add-hook 'post-command-hook 'my-flymake-show-help)
+;; (add-hook 'post-command-hook 'my-flymake-show-help)
+
+;; ;; http://www.emacswiki.org/emacs/FlymakeTex
+;; (defun flymake-get-tex-args (file-name)
+;;     (list "chktex" (list "-q" "-v0" file-name)))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;; 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -304,5 +323,13 @@
 )
 
 (require 'org)
+
+
+(require 'icicles)
+;; reclaim C-c ' for org-mode
+(setq icicle-top-level-key-bindings
+      (remove '("'" icicle-occur t) icicle-top-level-key-bindings))
+
+(icy-mode 1)
 
 (provide 'customization)
