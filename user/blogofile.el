@@ -324,20 +324,24 @@ would lead to this post filename
   (interactive)
   ;; we have to get all data before we put the post together. these
   ;; functions all rely on point being in an org section
-  (org-narrow-to-subtree)
-  (setq thisb (current-buffer))
-  (setq post-filename (bf-get-post-filename))
-  (org-entry-put nil "updated" (format-time-string "%Y/%m/%d %H:%M:%S"))
-  (save-buffer)
-  (bf-copy-org-to-blog)
-  (let ((content (bf-get-post-html)))
-    (with-temp-file post-filename 
-      (insert content)))
-  ;; clean up
-  (kill-buffer "*Org HTML Export*")
-  (switch-to-buffer thisb)
-  (delete-other-windows)
-  (widen))
+  (save-excursion
+    (org-narrow-to-subtree)
+    (setq thisb (current-buffer))
+    (setq post-filename (bf-get-post-filename))
+    (org-entry-put nil "updated" (format-time-string "%Y/%m/%d %H:%M:%S"))
+    (save-buffer)
+    (bf-copy-org-to-blog)
+    (let ((content (bf-get-post-html)))
+      (with-temp-file post-filename 
+	(insert content)))
+    ;; clean up
+    (kill-buffer "*Org HTML Export*")
+    (switch-to-buffer thisb)
+    (goto-char (point-min)) ; beginning of buffer
+    (widen))
+
+  (org-todo 'done) ; should mark headline done
+  )
 
 
 (global-set-key [f8] 'bf-blogpost)
