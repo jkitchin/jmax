@@ -4,6 +4,16 @@
 ;(require 'org-mouse)
 (require 'org-id)
 
+;; http://orgmode.org/worg/exporters/koma-letter-export.html
+(require 'ox-koma-letter)
+(add-to-list 'org-latex-classes
+             '("my-letter"
+               "\\documentclass\{scrlttr2\}
+\\usepackage[english]{babel}
+\[NO-DEFAULT-PACKAGES]
+\[NO-PACKAGES]
+\[EXTRA]"))
+
 (add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode))
 (global-set-key "\C-cl" 'org-store-link)
 (global-set-key "\C-ca" 'org-agenda)
@@ -22,6 +32,12 @@
 
 ;; default with images open
 (setq org-startup-with-inline-images "inlineimages")
+
+;; clocking setup http://www.gnu.org/software/emacs/manual/html_node/org/Clocking-work-time.html
+(setq org-clock-persist 'history)
+(org-clock-persistence-insinuate)
+;; store clock entries in a drawer
+(setq org-clock-into-drawer t)
 
 ;; add <p for python expansion
 (add-to-list 'org-structure-template-alist
@@ -67,6 +83,15 @@
       (cons '(:exports . "both")
 	    (assq-delete-all :exports org-babel-default-header-args)))
 
+(setq org-babel-default-header-args:emacs-lisp 
+      (cons '(:results . "value")
+	    (assq-delete-all :results org-babel-default-header-args)))
+
+
+;; flyspell mode for spell checking everywhere
+(add-hook 'org-mode-hook 'turn-on-flyspell 'append)
+
+(setq org-list-allow-alphabetical t)
 
 ;;;;;; capture
 (setq org-default-notes-file "~/Dropbox/org-mode/notes.org")
@@ -83,14 +108,17 @@
          "* TODO %?\n  %i\n  %a")
 
         ("g" "TODO from gnus" entry (file "~/Dropbox/org-mode/tasks.org")
-         "* TODO gnus: %?\n \n\nLink: %a")
+         "* TODO gnus: %:subject
+  DEADLINE: %t
+  
+ \nLink: %a\n")
 
         ("j" "Journal" entry (file+datetree "~/Dropbox/org-mode/journal.org" "Journal")
          "* %?\nEntered on %U\n  %i\n  %a")))
 
 ;; this is only available in gnus
-(setq org-capture-templates-contexts
-      '(("g" ((in-mode . "message-mode")))))
+;(setq org-capture-templates-contexts nil)
+;      '(("g" ((in-mode . "message-mode")))))
 
 ;; setup archive location in archive directory in current folder
 (setq org-archive-location "archive/%s_archive::")
@@ -403,4 +431,4 @@ start  empty title path
   (org-cycle))
 
 
-(global-set-key (kbd "<f5>") 'delete-feed-headline)
+(global-set-key (kbd "<f4>") 'delete-feed-headline)
