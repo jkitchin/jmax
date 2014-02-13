@@ -13,3 +13,14 @@
   "make buffer single-spaced"
   (interactive)
   (setq line-spacing nil))
+
+(defun kitchingroup-list-deadlines ()
+  "Show an agenda of deadlines for the next 30 days from the current file."
+  (interactive)
+  (let ((org-agenda-custom-commands))
+    (setq org-agenda-custom-commands
+          '(("d" "Upcoming deadlines" agenda ""
+             ((org-agenda-time-grid nil)
+              (org-deadline-warning-days 30)
+              (org-agenda-entry-types '(:deadline))))))
+    (org-agenda "" "d" "<")))
