@@ -2,7 +2,7 @@
 (require 'ox-texinfo)
 (require 'org-inlinetask)
 ;(require 'org-mouse)
-(require 'org-id)
+;(require 'org-id)
 
 ;; http://orgmode.org/worg/exporters/koma-letter-export.html
 (require 'ox-koma-letter)
@@ -28,7 +28,7 @@
 (setq org-return-follows-link t)
 
 ;; automatically create ids for links
-(setq org-id-link-to-org-use-id 'create-if-interactive-and-no-custom-id)
+;(setq org-id-link-to-org-use-id 'create-if-interactive-and-no-custom-id)
 
 ;; default with images open
 (setq org-startup-with-inline-images "inlineimages")
@@ -62,8 +62,10 @@
    (python . t)
    (sh . t)
    (matlab . t)
+   (ruby . t)
    (org . t)
-   (dot . t)))
+   (dot . t)
+   (R . t)))
 
 ; no extra indentation
 (setq org-src-preserve-indentation t)
@@ -73,9 +75,13 @@
 ;; make code blocks stand out a little from my gray80 background
 (set-face-attribute 'org-block-background nil :background "gray")
 
+(setq org-babel-default-header-args:emacs-lisp 
+      (cons '(:results . "value replace")
+	    (assq-delete-all :results org-babel-default-header-args)))
+
 ;; set default :results to output
 (setq org-babel-default-header-args
-      (cons '(:results . "replace output")
+      (cons '(:results . "output replace")
 	    (assq-delete-all :results org-babel-default-header-args)))
 
 ;; set default exports to both code and results
@@ -83,9 +89,7 @@
       (cons '(:exports . "both")
 	    (assq-delete-all :exports org-babel-default-header-args)))
 
-(setq org-babel-default-header-args:emacs-lisp 
-      (cons '(:results . "value")
-	    (assq-delete-all :results org-babel-default-header-args)))
+
 
 
 ;; flyspell mode for spell checking everywhere
@@ -144,7 +148,7 @@
 (setq org-upcoming-deadline '(:foreground "blue" :weight bold))
 
 ;; give me some warning of upcoming deadlines
-(setq org-deadline-warning-days 4)
+(setq org-deadline-warning-days 0)
 
 (require 'reftex)
 (require 'reftex-cite)
