@@ -159,7 +159,7 @@ key author journal year volume pages doi url key jorg-bib-pdf-directory key ))))
 ;;;;;;; bibliography and bibliography style code
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; link to hold a bibliography bibtex file. Mostly so I can click on
+;; link to hold a bibliography bibtex file(s). Mostly so I can click on
 ;; the link and open the file. It also sets the default bibliography
 (org-add-link-type "bibliography"
 		   ;; this code is run on clicking. The bibliography
@@ -169,11 +169,20 @@ key author journal year volume pages doi url key jorg-bib-pdf-directory key ))))
 		     (message (format "link-string = %s" link-string))
 		     (save-excursion
 		       ;; get link-string boundaries
-		       ;; we have to go to the beginning of the line, and then search forwardq
+		       ;; we have to go to the beginning of the line, and then search forward
 		       (beginning-of-visual-line)
 		       (search-forward link-string nil nil 1)
 		       (setq link-string-beginning (match-beginning 0))
 		       (setq link-string-end (match-end 0)))
+
+		     ;; We set the reftex-default-bibliography
+		     ;; here. it should be a local variable only in
+		     ;; the current buffer. We need this for using
+		     ;; reftex to do citations.
+		     (set (make-local-variable 'reftex-default-bibliography) 
+			  (split-string
+			   (buffer-substring link-string-beginning link-string-end)
+			   ","))
 		     (message (format "link found %s "(buffer-substring link-string-beginning link-string-end)))
 		     ;; now if we have comma separated bibliographies
 		     ;; we find the one clicked on. we want to
@@ -189,7 +198,7 @@ key author journal year volume pages doi url key jorg-bib-pdf-directory key ))))
 			 (setq key-beginning (point)))) ; no match found
 		     ;; save the key we clicked on.
 		     (setq bibfile (cite-strip-key (buffer-substring key-beginning key-end)))
-		     (message (format "bibfile = %s" bibfile))
+		     (message (format "bibfile = %s" bibfile))		     
 		     (find-file bibfile)) ; open file on click
 		   ;; formatting code
 		   (lambda (keyword desc format)
@@ -253,9 +262,15 @@ key author journal year volume pages doi url key jorg-bib-pdf-directory key ))))
 ;;;;;;; cite links
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; implemenation of cite:  to make bibtex citations that are also clickable.
-; TODO make this use contents of reftex-default-bibliography if not bibliography found
 (defun cite-find-bibliography ()
-  "find the bibliography in the buffer."
+  "find the bibliography in the buffer.
+This function sets and returns cite-bibliography-files, which is a list of files
+either from bibliography:f1.bib,f2.bib
+\bibliography{f1,f2}
+internal bibliographies
+
+falling back to what the user has set in jorg-bib-default-bibliography
+"
   (interactive)
   (save-excursion
     (goto-char (point-min))
@@ -490,6 +505,36 @@ key author journal year volume pages doi url key jorg-bib-pdf-directory key ))))
      (format ""))
     ((eq format 'latex)
      (format "\\index{%s}" keyword)))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defun build-full-bibliography ()
+  "build pdf of all bibtex entries"
+  (interactive)
+  (let* ((bibfile (file-name-nondirectory (buffer-file-name)))
+	(bib-base (file-name-sans-extension bibfile))
+	(texfile (concat bib-base ".tex")))
+    (find-file texfile)
+    (erase-buffer)
+    (insert (format "\\documentclass[12pt]{article}
+\\usepackage[version=3]{mhchem}
+\\usepackage{url}
+\\usepackage[numbers]{natbib}
+\\usepackage[colorlinks=true, linkcolor=blue, urlcolor=blue, pdfstartview=FitH]{hyperref}
+\\usepackage{doi}
+\\begin{document}
+\\nocite{*}
+\\bibliographystyle{plainnat}
+\\bibliography{%s}
+\\end{document}" bib-base))
+    (save-buffer)
+    (shell-command (concat "pdflatex " bib-base))
+    (shell-command (concat "bibtex " bib-base))
+    (shell-command (concat "pdflatex " bib-base))
+    (shell-command (concat "pdflatex " bib-base))
+     (kill-buffer texfile)
+     ) 
+)
+    
 
 (provide 'jorg-bib)
 ;;; jorg-bib.el ends here
