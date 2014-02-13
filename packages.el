@@ -17,13 +17,14 @@
 
 (defvar starter-kit-packages
   (list 'flx-ido 'ido-ubiquitous 'smex
-        'yasnippet-bundle
+        'yasnippet
         'magit 
 	'bbdb 'bbdb-ext
         'auctex 'reftex
         'undo-tree
 	'diminish
 	'icicles
+	'elpy
         'rainbow-mode)
   "Libraries that should be installed by default.")
 
