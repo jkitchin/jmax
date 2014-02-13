@@ -55,6 +55,8 @@
 (require 're-builder)
 (setq reb-re-syntax 'string)
 
+;; disable auto-fill
+(auto-fill-mode -1)
 
 (require 'ido)
 (require 'ido-ubiquitous)
