@@ -125,14 +125,20 @@ all keys and values are taken from properties."
     ;; parse tree
     (setq url-list (org-element-map parsetree 'link
       (lambda (link) 
+	(message "%s" link)
         (let* ((type (nth 0 link))
                (plist (nth 1 link))
                (content (nth 2 link))
                (path (plist-get plist :path))
                (type (plist-get plist ':type))
                (fname (car (last (split-string path "/")))))
-          (message (format "type=%s  content=%s path=%s fname=%s" type content path fname))
+	  (message "type=%s" type)
+	  (message "content=%s" content)
+	  (message "path=%s" path)
+	  (message "fname=%s" fname)
+          ;(message (format "type=%s  content=%s path=%s fname=%s" type content path fname))
           ;; construct urls for different types of links
+	  ;; "fuzzy" links are not working. I think these are internal links.
           (cond
            ;; image
            ((and (string= type "file") (file-name-extension fname) (string-match "png" (file-name-extension fname))) 
