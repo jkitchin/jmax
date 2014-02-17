@@ -233,9 +233,13 @@ key author journal year volume pages doi url key jorg-bib-pdf-directory key ))))
    (org-mark-ring-push)
    ;; next search from beginning of the buffer
    (goto-char (point-min))
-   (or (re-search-forward (format "label:%s" label) nil t)
-       (re-search-forward (format "\\label{%s}" label) nil t)
-       (re-search-forward (format "#\\+label:%s" label) nil t))
+   (unless
+       (or (re-search-forward (format "label:%s" label) nil t)
+	   (re-search-forward (format "\\label{%s}" label) nil t)
+	   (re-search-forward (format "^#\\+label:\\s-*\\(%s\\)\\b" label) nil t)
+	   (re-search-forward (format "^#\\+tblname:\\s-*\\(%s\\)\\b" label) nil t))
+     (org-mark-ring-goto)
+     (error "%s not found" label))
    (message "go back with `C-c &`"))
  ;formatting
  (lambda (keyword desc format)
