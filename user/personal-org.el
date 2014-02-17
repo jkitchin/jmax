@@ -28,21 +28,14 @@
                         (file-expand-wildcards "~/Dropbox/kitchingroup/students/*/*.org")))
 
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;  You should not need to modify paths below here
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (require 'ox-beamer)
 (require 'ox-texinfo)
 (require 'org-inlinetask)
-;(require 'org-mouse)
-;(require 'org-id)
-
-;; http://orgmode.org/worg/exporters/koma-letter-export.html
-(require 'ox-koma-letter)
-(add-to-list 'org-latex-classes
-             '("my-letter"
-               "\\documentclass\{scrlttr2\}
-\\usepackage[english]{babel}
-\[NO-DEFAULT-PACKAGES]
-\[NO-PACKAGES]
-\[EXTRA]"))
+(require 'org-mouse)
 
 (add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode))
 (global-set-key "\C-cl" 'org-store-link)
@@ -57,9 +50,6 @@
 ;; I like to press enter to follow a link. mouse clicks also work.
 (setq org-return-follows-link t)
 
-;; automatically create ids for links
-;(setq org-id-link-to-org-use-id 'create-if-interactive-and-no-custom-id)
-
 ;; default with images open
 (setq org-startup-with-inline-images "inlineimages")
 
@@ -72,6 +62,15 @@
 ;; add <p for python expansion
 (add-to-list 'org-structure-template-alist
              '("p" "#+BEGIN_SRC python\n?\n#+END_SRC" "<src lang=\"python\">\n?\n</src>"))
+
+;; add <por for python expansion with raw output
+(add-to-list 'org-structure-template-alist
+             '("por" "#+BEGIN_SRC python :results output raw\n?\n#+END_SRC" "<src lang=\"python\">\n?\n</src>"))
+
+;; add <pv for python expansion with raw output
+(add-to-list 'org-structure-template-alist
+             '("pv" "#+BEGIN_SRC python :results value\n?\n#+END_SRC" "<src lang=\"python\">\n?\n</src>"))
+
 
 ;; add <el for emacs-lisp expansion
 (add-to-list 'org-structure-template-alist
@@ -105,6 +104,7 @@
 ;; make code blocks stand out a little from my gray80 background
 (set-face-attribute 'org-block-background nil :background "gray")
 
+;; language specific headers. I think this comes before the defaults
 (setq org-babel-default-header-args:emacs-lisp 
       (cons '(:results . "value replace")
 	    (assq-delete-all :results org-babel-default-header-args)))
@@ -119,13 +119,14 @@
       (cons '(:exports . "both")
 	    (assq-delete-all :exports org-babel-default-header-args)))
 
-
-
 ;; flyspell mode for spell checking everywhere
 (add-hook 'org-mode-hook 'turn-on-flyspell 'append)
 
-;; turn off auto-fill in org-mode
-(add-hook 'org-mode-hook (lambda () (auto-fill-mode -1)) 'append)
+;; I do not like this mode
+(auto-fill-mode -1)
+
+;; turn off auto-fill in org-mode. It is not enough to turn it off
+;; everywhere.
 (remove-hook 'text-mode-hook #'turn-on-auto-fill)
 
 (setq org-list-allow-alphabetical t)
@@ -133,14 +134,8 @@
 ;;;;;; capture
 (define-key global-map "\C-cc" 'org-capture)
 
-
-;; this is only available in gnus
-;(setq org-capture-templates-contexts nil)
-;      '(("g" ((in-mode . "message-mode")))))
-
 ;; setup archive location in archive directory in current folder
 (setq org-archive-location "archive/%s_archive::")
-
 
 ; I don't want to see things that are done. turn that off here.
 ; http://orgmode.org/manual/Global-TODO-list.html#Global-TODO-list
@@ -189,7 +184,6 @@ this treats all entries as a journal article."
                          (when doi (format " http://dx.doi.org/%s" doi)))))
 
 ;; this returns a string for my agenda.
-
 (defun get-random-bibtex-entry (&optional arg)
   "for printing in my agenda"
   (let ((keys) (lucky-key) (output))
@@ -281,23 +275,24 @@ this treats all entries as a journal article."
 
 ;; Customize generic export
 ;; I reset this variable to get my hyperref setup
-;; I don't like it, but there is no way to get defaults like this otherwise.
-(setq org-latex-default-packages-alist
-      '(("AUTO" "inputenc" t)
-        ("T1" "fontenc" t)
-        ("" "fixltx2e" nil)
-        ("" "graphicx" t)
-        ("" "longtable" nil)
-        ("" "float" nil)
-        ("" "wrapfig" nil)
-        ("" "rotating" nil)
-        ("normalem" "ulem" t)
-        ("" "amsmath" t)
-        ("" "textcomp" t)
-        ("" "marvosym" t)
-        ("" "wasysym" t)
-        ("" "amssymb" t)
-        ("linktocpage,
+(defun index (element list)
+  "return the index of element in list"
+  (let ((i 0)
+	(found nil))
+    (dolist (el list i)
+      (if (equal el element) 
+	  (progn 
+	    (setq found t)
+	    (return i)))
+      (setq i (+ i 1)))
+    ;; return counter if found, otherwise return nil
+    (if found i nil)))
+
+;; replace the default hyperref options with these
+(setf (elt org-latex-default-packages-alist 
+	   (index '("" "hyperref" nil) 
+		  org-latex-default-packages-alist))
+      '("linktocpage,
   pdfstartview=FitH,
   colorlinks,
   linkcolor=blue,
@@ -305,8 +300,34 @@ this treats all entries as a journal article."
   citecolor=blue,
   filecolor=blue,
   menucolor=blue,
-  urlcolor=blue" "hyperref" nil)
-        "\\tolerance=1000"))
+  urlcolor=blue" "hyperref" nil))
+
+;; I don't like it, but there is no way to get defaults like this otherwise.
+;; (setq org-latex-default-packages-alist
+;;       '(("AUTO" "inputenc" t)
+;;         ("T1" "fontenc" t)
+;;         ("" "fixltx2e" nil)
+;;         ("" "graphicx" t)
+;;         ("" "longtable" nil)
+;;         ("" "float" nil)
+;;         ("" "wrapfig" nil)
+;;         ("" "rotating" nil)
+;;         ("normalem" "ulem" t)
+;;         ("" "amsmath" t)
+;;         ("" "textcomp" t)
+;;         ("" "marvosym" t)
+;;         ("" "wasysym" t)
+;;         ("" "amssymb" t)
+;;         ("linktocpage,
+;;   pdfstartview=FitH,
+;;   colorlinks,
+;;   linkcolor=blue,
+;;   anchorcolor=blue,
+;;   citecolor=blue,
+;;   filecolor=blue,
+;;   menucolor=blue,
+;;   urlcolor=blue" "hyperref" nil)
+;;         "\\tolerance=1000"))
 
 ;; do not put in \hypersetup
 ;; use your own \hypersetup{pdfkeywords={%s},\n  pdfsubject={%s},\n  pdfcreator={%s}
@@ -336,6 +357,11 @@ start  empty title path
 
 (org-add-link-type "msx" 'org-msx-open)
 
+(setq org-link-frame-setup (quote ((gnus . org-gnus-no-new-news)
+                                   (file . find-file))))
+
+; Use the current window for C-c ' source editing
+(setq org-src-window-setup 'current-window)
 
 
 
