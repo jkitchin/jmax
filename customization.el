@@ -1,7 +1,24 @@
-;; we use our own org-mode
-;; load my org-mode
-(add-to-list 'load-path (expand-file-name "org-mode/lisp" starter-kit-dir))
-(add-to-list 'load-path (expand-file-name "org-mode/contrib/lisp" starter-kit-dir))
+(setq reftex-default-bibliography '("~/Dropbox/bibliography/references.bib"))
+;; see jorg-bib.el for use of these variables
+(setq jorg-bib-bibliography-notes "~/Dropbox/bibliography/notes.org"
+      jorg-bib-default-bibliography '("~/Dropbox/bibliography/references.bib")
+      jorg-bib-pdf-directory "~/Dropbox/bibliography/bibtex-pdfs/")
+
+;;Tell the program who you are
+(setq user-full-name "John Kitchin"
+      andrewid "jkitchin"
+      user-mail-address "jkitchin@andrew.cmu.edu")
+
+;; setup to send email out by andrewid.
+;; you will be prompted for a password, and asked to store 
+(setq send-mail-function 'smtpmail-send-it
+      message-send-mail-function 'smtpmail-send-it
+      smtpmail-default-smtp-server "smtp.andrew.cmu.edu"
+      smtpmail-smtp-server smtpmail-default-smtp-server
+      smtpmail-starttls-credentials `((,smtpmail-smtp-server 587 nil nil))
+      smtpmail-auth-credentials `((,smtpmail-smtp-server 587 andrewid nil))
+      smtpmail-smtp-service 587)
+
 
 (when (string= system-name "gilgamesh.cheme.cmu.edu")
   (setq-default ispell-program-name "aspell"
@@ -10,6 +27,40 @@
 (when (or (string= system-name "JKITCHIN-PC")
 	  (string= system-name "KITCHIN-TABLET"))
   (setq-default ispell-program-name "C:/Program Files/Aspell/bin/aspell.exe"))
+
+
+;; modified from http://ergoemacs.org/emacs/emacs_hotkey_open_file_fast.html
+(defvar my-filelist nil "alist for files i need to open frequently. Key is a short abbrev, Value is file path.")
+(setq my-filelist
+      '(
+        ("master" . "~/Dropbox/org-mode/master.org")
+        (".emacs.d" . "~/Dropbox/kitchingroup/jmax" )
+        ("blog" . "~/Dropbox/blogofile-jkitchin.github.com/_blog/blog.org")
+        ("ese" . "~/Dropbox/books/ese-book/ese.org" )
+        ("pycse" . "~/Dropbox/books/pycse/pycse.org")
+        ("references" . "~/Dropbox/bibliography/references.bib")
+        ("notes" . "~/Dropbox/bibliography/notes.org")
+        ("journal" . "~/Dropbox/org-mode/journal.org")
+        ("tasks" . "~/Dropbox/org-mode/tasks.org")
+        ;; more here
+        ) )
+
+(defun my-open-file-fast (openCode)
+  "Prompt to open a file from a pre-defined set in `my-filelist."
+  (interactive
+   (list (ido-completing-read "Open:" (mapcar (lambda (x) (car x)) my-filelist))))
+  (find-file (cdr (assoc openCode my-filelist))))
+
+(global-set-key [f9] 'my-open-file-fast)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;; You should not need to modify below here
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; we use our own org-mode
+;; load my org-mode
+(add-to-list 'load-path (expand-file-name "org-mode/lisp" starter-kit-dir))
+(add-to-list 'load-path (expand-file-name "org-mode/contrib/lisp" starter-kit-dir))
 
 
 (add-to-list 'load-path user-dir)
@@ -95,20 +146,6 @@
 (add-to-list 'custom-theme-load-path (expand-file-name "themes" starter-kit-dir))
 (load-theme 'my t) ; my old theme from grad school. it looks like xemacs.
 
-;;Tell the program who you are
-(setq user-full-name "John Kitchin"
-      andrewid "jkitchin"
-      user-mail-address "jkitchin@andrew.cmu.edu")
-
-;; setup to send email out by andrewid.
-;; you will be prompted for a password, and asked to store 
-(setq send-mail-function 'smtpmail-send-it
-      message-send-mail-function 'smtpmail-send-it
-      smtpmail-default-smtp-server "smtp.andrew.cmu.edu"
-      smtpmail-smtp-server smtpmail-default-smtp-server
-      smtpmail-starttls-credentials `((,smtpmail-smtp-server 587 nil nil))
-      smtpmail-auth-credentials `((,smtpmail-smtp-server 587 andrewid nil))
-      smtpmail-smtp-service 587)
 
 ;; kill mail buffers when exiting
 (setq  message-kill-buffer-on-exit t)
@@ -164,29 +201,6 @@
 (global-set-key (kbd "C-<f6>") 'flyspell-check-previous-highlighted-word)
 
 
-;; modified from http://ergoemacs.org/emacs/emacs_hotkey_open_file_fast.html
-(defvar my-filelist nil "alist for files i need to open frequently. Key is a short abbrev, Value is file path.")
-(setq my-filelist
-      '(
-        ("master" . "~/Dropbox/org-mode/master.org")
-        (".emacs.d" . "~/Dropbox/kitchingroup/jmax" )
-        ("blog" . "~/Dropbox/blogofile-jkitchin.github.com/_blog/blog.org")
-        ("ese" . "~/Dropbox/books/ese-book/ese.org" )
-        ("pycse" . "~/Dropbox/books/pycse/pycse.org")
-        ("references" . "~/Dropbox/bibliography/references.bib")
-        ("notes" . "~/Dropbox/bibliography/notes.org")
-        ("journal" . "~/Dropbox/org-mode/journal.org")
-        ("tasks" . "~/Dropbox/org-mode/tasks.org")
-        ;; more here
-        ) )
-
-(defun my-open-file-fast (openCode)
-  "Prompt to open a file from a pre-defined set in `my-filelist."
-  (interactive
-   (list (ido-completing-read "Open:" (mapcar (lambda (x) (car x)) my-filelist))))
-  (find-file (cdr (assoc openCode my-filelist))))
-
-(global-set-key [f9] 'my-open-file-fast)
 
 ;http://www.gnu.org/software/emacs/manual/html_node/elisp/File-Name-Expansion.html#File-Name-Expansion
 
@@ -223,15 +237,6 @@
 (global-set-key "\C-cg" 'get-path)
 (global-set-key "\C-cp" 'insert-relative-path)
 (global-set-key "\C-cf" 'insert-buffer-filename)
-
-
-(setq reftex-default-bibliography '("~/Dropbox/bibliography/references.bib"))
-
-;; see jorg-bib.el for use of these variables
-(setq jorg-bib-bibliography-notes "~/Dropbox/bibliography/notes.org"
-      jorg-bib-default-bibliography '("~/Dropbox/bibliography/references.bib")
-      jorg-bib-pdf-directory "~/Dropbox/bibliography/bibtex-pdfs/")
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;; python customizations
