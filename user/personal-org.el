@@ -1,3 +1,33 @@
+(setq org-default-notes-file "~/Dropbox/org-mode/notes.org")
+
+;; see http://orgmode.org/manual/Template-elements.html#Template-elements
+;; (add-hook 'org-capture-after-finalize-hook 'org-capture-goto-last-stored)
+(setq org-capture-templates
+      '(
+        ("t"   ; key
+         "Todo"; description
+         entry ; type
+         (file "~/Dropbox/org-mode/tasks.org") ;target
+         "* TODO %?\n  %i\n  %a")
+
+        ("g" "TODO from gnus" entry (file "~/Dropbox/org-mode/tasks.org")
+         "* TODO gnus: %:subject
+  DEADLINE: %t
+  
+ \nLink: %a\n")
+
+        ("j" "Journal" entry (file+datetree "~/Dropbox/org-mode/journal.org" "Journal")
+         "* %?\nEntered on %U\n  %i\n  %a")))
+
+
+(setq org-agenda-files '("~/Dropbox/org-mode"
+                         "~/Dropbox/kitchingroup"))
+
+(setq org-agenda-files (append 
+                        org-agenda-files 
+                        (file-expand-wildcards "~/Dropbox/kitchingroup/students/*/*.org")))
+
+
 (require 'ox-beamer)
 (require 'ox-texinfo)
 (require 'org-inlinetask)
@@ -91,34 +121,18 @@
 
 
 
-
 ;; flyspell mode for spell checking everywhere
 (add-hook 'org-mode-hook 'turn-on-flyspell 'append)
+
+;; turn off auto-fill in org-mode
+(add-hook 'org-mode-hook (lambda () (auto-fill-mode -1)) 'append)
+(remove-hook 'text-mode-hook #'turn-on-auto-fill)
 
 (setq org-list-allow-alphabetical t)
 
 ;;;;;; capture
-(setq org-default-notes-file "~/Dropbox/org-mode/notes.org")
 (define-key global-map "\C-cc" 'org-capture)
 
-;; see http://orgmode.org/manual/Template-elements.html#Template-elements
-;; (add-hook 'org-capture-after-finalize-hook 'org-capture-goto-last-stored)
-(setq org-capture-templates
-      '(
-        ("t"   ; key
-         "Todo"; description
-         entry ; type
-         (file "~/Dropbox/org-mode/tasks.org") ;target
-         "* TODO %?\n  %i\n  %a")
-
-        ("g" "TODO from gnus" entry (file "~/Dropbox/org-mode/tasks.org")
-         "* TODO gnus: %:subject
-  DEADLINE: %t
-  
- \nLink: %a\n")
-
-        ("j" "Journal" entry (file+datetree "~/Dropbox/org-mode/journal.org" "Journal")
-         "* %?\nEntered on %U\n  %i\n  %a")))
 
 ;; this is only available in gnus
 ;(setq org-capture-templates-contexts nil)
@@ -127,12 +141,6 @@
 ;; setup archive location in archive directory in current folder
 (setq org-archive-location "archive/%s_archive::")
 
-(setq org-agenda-files '("~/Dropbox/org-mode"
-                         "~/Dropbox/kitchingroup"))
-
-(setq org-agenda-files (append 
-                        org-agenda-files 
-                        (file-expand-wildcards "~/Dropbox/kitchingroup/students/*/*.org")))
 
 ; I don't want to see things that are done. turn that off here.
 ; http://orgmode.org/manual/Global-TODO-list.html#Global-TODO-list
@@ -186,7 +194,7 @@ this treats all entries as a journal article."
   "for printing in my agenda"
   (let ((keys) (lucky-key) (output))
     (with-current-buffer
-	(find-file "~/Dropbox/bibliography/references.bib")
+	(find-file (car reftex-default-bibliography))
       (setq keys (bibtex-parse-keys))
       (setq lucky-key (car
 		       (nth
@@ -198,6 +206,7 @@ this treats all entries as a journal article."
       (format "%s\ncite:%s" output lucky-key))))
 
 (setq initial-scratch-message (get-random-bibtex-entry))
+;; this only works on linux for some reason
 (setq initial-major-mode 'org-mode)
 
 (setq org-agenda-custom-commands
@@ -237,7 +246,7 @@ this treats all entries as a journal article."
 			     ;; here
         ))
 
-;; recorde time I finished a task when I change it to DONE
+;; record time I finished a task when I change it to DONE
 (setq org-log-done 'time)
 
 ;; function to open agenda
@@ -259,8 +268,8 @@ this treats all entries as a journal article."
       (call-interactively 'org-agenda-list)))
   )
 
-;; open agenda after 5 minutes of idle time
-(run-with-idle-timer 300 t 'jump-to-org-agenda)
+;; open agenda after 15 minutes of idle time
+(run-with-idle-timer 900 t 'jump-to-org-agenda)
 
 ;; this is for code syntax highlighting in export
 (add-to-list 'org-latex-packages-alist '("" "minted"))
@@ -329,110 +338,4 @@ start  empty title path
 
 
 
-;; my org-feeds. i am torn about doing this here or in gnus
 
-;; http://www.gnu.org/software/emacs/manual/html_node/emacs/HTML-Mode.html
-;; http://ergoemacs.org/emacs/emacs_html.html
-;; http://ergoemacs.org/emacs/elisp_process_html.html
-;; http://www.gnu.org/software/emacs/manual/html_node/elisp/Parsing-HTML_002fXML.html
-
-;; http://stackoverflow.com/questions/4448055/download-a-file-with-emacs-lisp
-;; http://stackoverflow.com/questions/11912027/emacs-lisp-search-anything-in-a-nested-list
-
-;; (libxml-parse-html-region start end)
-
-;; (defun ph(start end) (interactive "r")
-;;   (message "%s" (libxml-parse-html-region start end)))
-
-;; It would be really sweet to convert html to plain text, keeping links, downloading imagesso they would display here.
-;; (sgml
-
-(defun textify (s &optional chars)
-  "strip control and escaped html ^M &lt; &gt; etc"
-  (when s
-  (let ((output s))
-    (mapcar (lambda (arg)
-              (setq output (replace-regexp-in-string (nth 0 arg) (nth 1 arg) output)))
-            chars)
-    ;; these are like line feeds
-    (setq output (replace-regexp-in-string "" " " output))
-    ;; these are some escaped html codes
-    (setq output (replace-regexp-in-string "&lt;" "<" output))
-    (setq output (replace-regexp-in-string "&gt;" ">" output))
-    (setq output (replace-regexp-in-string "&quot;" "\"" output))
-    (setq output (replace-regexp-in-string "&amp;" "&" output))
-    (setq output (replace-regexp-in-string "&apos;" "'" output))
-    (setq output (replace-regexp-in-string "<br \>" "
-" output))
-    (setq output (replace-regexp-in-string "<br\>" "
-" output))
-    (setq output (replace-regexp-in-string "<pre>\\|</pre>" "" output))
-    ;; replace <a>
-    (setq output (replace-regexp-in-string "<a href=\"\\([^>]+\\)\">\\(.+?\\)</a>" "[[\\1][\\2]]" output))
-
-    ;; get rid of images. there are a couple of styles
-    (setq output (replace-regexp-in-string "<img src=\\\"\\([^\\\"].*\\)[^>]/>" " [[\\1][image]] " output))
-    (setq output (replace-regexp-in-string "<img src=\\\"\\([^\\\"].*\\)></img>" " [[\\1][image]] " output))
-
-    ;; get rid of <p></p>
-    (setq output (replace-regexp-in-string "<p>\\(.*\\)</p>" "\\1" output))
-
-    (setq output (replace-regexp-in-string "<script.*</script>" "" output))
-
-    (setq output (replace-regexp-in-string "<span [^>]*>\\([^<]\\)?</span>" "\\1" output))
-
-    ;; superscripts
-    (setq output (replace-regexp-in-string "<sup>\\([^<>].\\)?</sup>" "^{\\1}" output))
-    ;; get rid of <div> and <cite>
-    (setq output (replace-regexp-in-string "<div\\([^>].*\\)?>\\|</div>" "" output))
-    (setq output (replace-regexp-in-string "<cite>\\|</cite>" " " output))
-    output)))
-
-(defun my-formatter (e)
-  "format for rss feed to eventually do something useful"
-  (format "* TODO %S
-%s
-
-%s" (textify (plist-get e :title) '(("
-" ""))) ; get rid of carriage returns in the title
-(or (and (plist-get entry :guid-permalink)
-         (plist-get entry :guid))
-    (plist-get entry :link))
-(textify (plist-get e :description))))
-
-(setq org-feed-alist
-        '(
-          ;("JEE" "http://onlinelibrary.wiley.com/rss/journal/10.1002/%28ISSN%292168-9830" "~/Dropbox/org-mode/feeds.org" "J Eng. Ed.")
-          ("Chem. Mat" "http://feeds.feedburner.com/acs/cmatex" "~/Dropbox/org-mode/feeds.org" "Chem. Mat." :formatter my-formatter)
-          ("JACS" "http://feeds.feedburner.com/acs/jacsat" "~/Dropbox/org-mode/feeds.org" "JACS" :formatter my-formatter)
-          ("JPC"  "http://feeds.feedburner.com/acs/jpccck" "~/Dropbox/org-mode/feeds.org" "J. Phys. Chem. C" :formatter my-formatter )
-          ("JCP" "http://scitation.aip.org/rss/content/aip/journal/jcp/latestarticles;jsessionid=30u8d08ebab6g.x-aip-live-03?fmt=rss"
-	   "~/Dropbox/org-mode/feeds.org" "J. Chem. Phys."  :formatter my-formatter)
-          ("ACS Cat." "http://feeds.feedburner.com/acs/accacs" "~/Dropbox/org-mode/feeds.org" "ACS Catalysis" :formatter my-formatter)
-          ("IECR" "http://feeds.feedburner.com/acs/iecred" "~/Dropbox/org-mode/feeds.org" "I&ECR" :formatter my-formatter)
-	  ("ES&T" "http://feeds.feedburner.com/acs/esthag" "~/Dropbox/org-mode/feeds.org" "ES&T" :formatter my-formatter)
-          ("Science" "http://www.sciencemag.org/site/rss/" "~/Dropbox/org-mode/feeds.org" "Science" :formatter my-formatter)
-          ("Nature" "http://feeds.nature.com/nature/rss/current" "~/Dropbox/org-mode/feeds.org" "Nature":formatter my-formatter )
-          ("surf-sci" "http://rss.sciencedirect.com/publication/science/00396028"
-	   "~/Dropbox/org-mode/feeds.org" "Surface Science" :formatter my-formatter )
-          ("Nat. Mat." "http://feeds.nature.com/nmat/rss/current" "~/Dropbox/org-mode/feeds.org" "Nature Materials" :formatter my-formatter)
-          ("PRL" "http://feeds.aps.org/rss/recent/prl.xml"  "~/Dropbox/org-mode/feeds.org" "PRL Entries" :formatter my-formatter)
-          ("PRB" "http://feeds.aps.org/rss/recent/prb.xml"  "~/Dropbox/org-mode/feeds.org" "PRB Entries" :formatter my-formatter)
-       ("planet-python" "http://planet.python.org/rss20.xml" "~/Dropbox/org-mode/feeds.org" "Planet Python" :formatter my-formatter)
-       ("planet-scipy" "http://planet.scipy.org/rss20.xml" "~/Dropbox/org-mode/feeds.org" "Planet Scipy" :formatter my-formatter)
-       ("planet-emacs" "http://planet.emacsen.org/atom.xml" "~/Dropbox/org-mode/feeds.org" "Planet Emacs" :formatter my-formatter)
-))
-
-
-;; convenience to delete uninteresting articles
-(defun delete-feed-headline ()
-  (interactive)
-  (org-mark-subtree)
-  (delete-forward-char 1) 
-  (widen)
-  (re-search-forward "* TODO")
-  (org-narrow-to-subtree)
-  (org-cycle))
-
-
-(global-set-key (kbd "<f4>") 'delete-feed-headline)
