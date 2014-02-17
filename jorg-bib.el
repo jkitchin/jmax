@@ -286,10 +286,13 @@ falling back to what the user has set in jorg-bib-default-bibliography
       (progn ;we did not find a bibliography link. now look for \bibliography
 	(message "no bibliography link found")
 	(goto-char (point-min))
-	(re-search-forward "\\bibliography{\\([^\]\|\n]+\\)}" nil t)
+	(re-search-forward "\\\\bibliography{\\([^}]+\\)}" nil t)
 	(if (match-string 1) ; we found a link
+	    ;; split, and add .bib to each file
 	    (setq cite-bibliography-files
-		  (mapcar 'cite-strip-key (split-string (match-string 1) ",")))
+		  (mapcar (lambda (x) (concat x ".bib"))
+			  (mapcar 'cite-strip-key 
+				  (split-string (match-string 1) ","))))
 	 ; we did not find a raw latex bibliography. look for bibitems
 	 (progn
 	   (message "no \\bibliography found")
