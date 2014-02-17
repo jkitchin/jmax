@@ -1,3 +1,32 @@
+
+
+
+
+(defvar kitchingroup-root "~/Dropbox/kitchingroup"
+  "root directory where kitchingroup is")
+
+(defvar kitchingroup
+  '("ahallenb"
+    "jboes"
+    "jdmichae"
+    "mcurnan"
+    "mehakc"
+    "meihengl"
+    "ngovinda"
+    "qingqif"
+    "silles"
+    "wenqiny"
+    "zhongnax")
+  "list of andrewids in the group")
+
+
+
+
+
+
+
+
+
 (defun unfill-paragraph ()
   "Unfill paragraph at or after point."
   (interactive "*")
