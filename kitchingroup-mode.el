@@ -1,7 +1,13 @@
-;; kitchingroup minor mode
-;; I should figure out some good stuff to put here for the group.
+;;; kitchingroup-mode --- Summary
+;;;
+;;;
+;;; Commentary:
+;;; some utilities for the kitchingroup
+;;;
+
 
 (require 'easymenu)
+
 
 (defvar kitchingroup-mode-map
   (let ((map (make-sparse-keymap)))
@@ -15,7 +21,9 @@
   "Keymap for kitchingroup mode.")
 
 (defun kg-open-my-org ()
-  "Open my org-file"
+  "Open my org-file
+
+you have to define `my-kitchingroup-org-file' in your init files"
   (find-file my-kitchingroup-org-file))
 
 (easy-menu-define my-menu kitchingroup-mode-map "My own menu"
