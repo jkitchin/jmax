@@ -21,6 +21,12 @@ make autoloads
 
 That is it.
 
+* Customization
+These files contain variables with paths specific to your computer. You probably need to change them.
+
+1. Check and modify the variables at the top of  [[./customization.el]]
+2. Check and modify the variables at the top of [[./user/personal-org.el]]
+
 * Project goal
 =jmax= is a customized version of emacs to facilitate authoring and consuming org-mode based technical documents.
 
