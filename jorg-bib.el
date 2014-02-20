@@ -206,7 +206,7 @@ key author journal year volume pages doi url key jorg-bib-pdf-directory key ))))
 		      ((eq format 'html) (format "")); no output for html
 		      ((eq format 'latex)
 		       ;; write out the latex bibliography command
-		       (format "\\bibliography{%s}" (replace-regexp-in-string  ".bib" "" keyword))))))
+		       (format "\\bibliography{%s}" (replace-regexp-in-string  "\\.bib" "" keyword))))))
 
 (org-add-link-type "bibliographystyle"
 		   (lambda (arg) (message "Nothing implemented for clicking here."))
@@ -542,6 +542,63 @@ falling back to what the user has set in jorg-bib-default-bibliography
      ) 
 )
     
+
+(defun jb-extract-bibtex ()
+  "extract the bibtex entries referred to by cite links in the current buffer into a src block at the bottom of the current buffer.
+
+If no bibliography is in the buffer the `reftex-default-bibliography' is used."
+  (interactive)
+  (let* ((tempname (make-temp-file "extract-bib"))
+         (contents (buffer-string))
+         (cb (current-buffer))
+	 basename texfile bibfile results)
+    
+    ;; open tempfile and insert org-buffer contents
+    (find-file tempname)
+    (insert contents)
+    (setq basename (file-name-sans-extension 
+		    (file-name-nondirectory buffer-file-name))
+	  texfile (concat tempname ".tex")
+	  bibfile (concat tempname ".bib"))
+    
+    ;; see if we have a bibliography, and insert the default one if not.
+    (save-excursion
+      (goto-char (point-min))
+      (unless (re-search-forward "^bibliography:" (point-max) 'end)
+	(insert (format "\nbibliography:%s" 
+			(mapconcat 'identity reftex-default-bibliography ",")))))
+    (save-buffer)
+
+    ;; get a latex file and extract the references
+    (org-latex-export-to-latex)
+    (find-file texfile)
+    (reftex-parse-all)
+    (reftex-create-bibtex-file bibfile)
+    (save-buffer)
+    ;; save results of the references
+    (setq results (buffer-string))
+
+    ;; kill buffers. these are named by basename, not full path
+    (kill-buffer (concat basename ".bib"))
+    (kill-buffer (concat basename ".tex"))
+    (kill-buffer basename)
+
+    (delete-file bibfile)
+    (delete-file texfile)
+    (delete-file tempname)
+
+    ;; Now back to the original org buffer and insert the results
+    (switch-to-buffer cb)
+    (save-excursion
+      (goto-char (point-max))
+      (insert (format "
+
+** Bibtex entries
+
+#+BEGIN_SRC: :tangle %s
+%s
+#+END_SRC" bibfile results)))))
+
 
 (provide 'jorg-bib)
 ;;; jorg-bib.el ends here
