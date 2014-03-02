@@ -600,5 +600,94 @@ If no bibliography is in the buffer the `reftex-default-bibliography' is used."
 #+END_SRC" bibfile results)))))
 
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; http://www.emacswiki.org/emacs/ElispCookbook#toc4
+(defun string/ends-with (s ending)
+  "return non-nil if string S ends with ENDING."
+  (cond ((>= (length s) (length ending))
+	 (let ((elength (length ending)))
+	   (string= (substring s (- 0 elength)) ending)))
+	(t nil)))
+
+(defun jorg-list-of-figures (&optional arg)
+  "Generate buffer with list of figures in them"
+  (interactive)
+  (let* ((c-b (buffer-name))
+	 (counter 0)
+	 (list-of-figures 
+	  (org-element-map (org-element-parse-buffer) 'link
+	    (lambda (link) 
+	      "create a link for to the figure"
+	      (when 
+		  (and (string= (org-element-property :type link) "file")
+		       (string-match-p  
+			"[^.]*\\.\\(png\\|jpg\\)$"
+			(org-element-property :path link)))                   
+		(incf counter)
+		
+		(let* ((start (org-element-property :begin link))
+		       (parent (car (cdr (org-element-property :parent link))))
+		       (caption (caaar (plist-get parent :caption)))
+		       (name (plist-get parent :name)))
+		  (if caption 
+		      (format 
+		       "[[elisp:(progn (switch-to-buffer \"%s\")(goto-char %s))][figure %s: %s]] %s\n" 
+		       c-b start counter (or name "") caption)
+		    (format 
+		     "[[elisp:(progn (switch-to-buffer \"%s\")(goto-char %s))][figure %s: %s]]\n" 
+		     c-b start counter (or name "")))))))))
+    (switch-to-buffer "*List of Figures*")
+    (org-mode)
+    (erase-buffer)
+    (insert (mapconcat 'identity list-of-figures ""))
+    (setq buffer-read-only t)
+    (use-local-map (copy-keymap org-mode-map))
+    (local-set-key "q" #'(lambda () (interactive) (kill-buffer)))))
+
+(org-add-link-type 
+ "list-of-figures"
+ 'jorg-list-of-figures ; on click
+ (lambda (keyword desc format)
+   (cond
+    ((eq format 'latex)
+     (format "\\listoffigures")))))
+
+
+(defun jorg-list-of-tables (&optional arg)
+  "Generate a buffer with a list of tables"
+  (interactive)
+  (let* ((c-b (buffer-name))
+	 (counter 0)
+	 (list-of-tables 
+	  (org-element-map (org-element-parse-buffer 'element) 'table
+	    (lambda (table) 
+	      "create a link for to the table"
+	      (incf counter)
+	      (let ((start (org-element-property :begin table))
+		    (name  (org-element-property :name table))
+		    (caption (caaar (org-element-property :caption table))))
+		(if caption 
+		    (format 
+		     "[[elisp:(progn (switch-to-buffer \"%s\")(goto-char %s))][table %s: %s]] %s\n" 
+		     c-b start counter (or name "") caption)
+		  (format 
+		   "[[elisp:(progn (switch-to-buffer \"%s\")(goto-char %s))][table %s: %s]]\n" 
+		   c-b start counter (or name ""))))))))
+    (switch-to-buffer "*List of Tables*")
+    (org-mode)
+    (erase-buffer)
+    (insert (mapconcat 'identity list-of-tables ""))
+    (setq buffer-read-only t)
+    (use-local-map (copy-keymap org-mode-map))
+    (local-set-key "q" #'(lambda () (interactive) (kill-buffer)))))
+
+(org-add-link-type 
+ "list-of-tables"
+ 'jorg-list-of-tables
+ (lambda (keyword desc format)
+   (cond
+    ((eq format 'latex)
+     (format "\\listoftables")))))
+
 (provide 'jorg-bib)
 ;;; jorg-bib.el ends here
