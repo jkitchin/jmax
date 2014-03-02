@@ -6,10 +6,11 @@
 
 (setq package-archives
       '(("gnu"         . "http://elpa.gnu.org/packages/")
-	("original"    . "http://tromey.com/elpa/")
+;	("original"    . "http://tromey.com/elpa/")
 	("org"         . "http://orgmode.org/elpa/")
 	("melpa" . "http://melpa.milkbox.net/packages/")
-	("marmalade"   . "http://marmalade-repo.org/packages/")))
+;	("marmalade"   . "http://marmalade-repo.org/packages/")
+	))
 
 (setq package-user-dir (expand-file-name "elpa"  starter-kit-dir))
 
