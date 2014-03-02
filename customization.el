@@ -232,13 +232,28 @@
   (interactive)
   (insert (buffer-file-name)))
 
-;; These do not seem to work in prelude
 (global-unset-key "\C-cg")
 (global-set-key "\C-cg" 'get-path)
 (global-set-key "\C-cp" 'insert-relative-path)
 (global-set-key "\C-cf" 'insert-buffer-filename)
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defun unfill-paragraph ()
+  "Unfill paragraph at or after point."
+  (interactive "*")
+  (let ((fill-column most-positive-fixnum))
+    (fill-paragraph nil (region-active-p))))
+
+(defun double-space ()
+  "make buffer look approximately double-spaced"
+  (interactive)
+  (setq line-spacing 10))
+
+(defun single-space ()
+  "make buffer single-spaced"
+  (interactive)
+  (setq line-spacing nil))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;; python customizations
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -331,6 +346,9 @@
 
 (require 'org)
 
+;; hide details in dired
+(require 'dired-details+)
+(setq dired-details-hidden-string "")
 
 (require 'icicles)
 ;; reclaim C-c ' for org-mode
