@@ -1,0 +1,331 @@
+XMLLINT(1)                                                          XMLLINT(1)
+
+
+
+NNAAMMEE
+       xmllint - command line XML tool
+
+SSYYNNOOPPSSIISS
+       xxmmlllliinntt [----vveerrssiioonn ----ddeebbuugg ----sshheellll ----ddeebbuuggeenntt ----ccooppyy ----rreeccoovveerr ----nnooeenntt
+               ----nnoooouutt ----nnoonneett ----ppaatthh ""_P_A_T_H_(_S_)"" ----llooaadd--ttrraaccee ----hhttmmlloouutt
+               ----nnoowwrraapp ----vvaalliidd ----ppoossttvvaalliidd ----ddttddvvaalliidd _U_R_L ----ddttddvvaalliiddffppii _F_P_I
+               ----ttiimmiinngg ----oouuttppuutt _F_I_L_E ----rreeppeeaatt ----iinnsseerrtt ----ccoommpprreessss ----hhttmmll
+               ----xxmmlloouutt ----ppuusshh ----mmeemmoorryy ----mmaaxxmmeemm _N_B_B_Y_T_E_S ----nnoowwaarrnniinngg
+               ----nnoobbllaannkkss ----nnooccddaattaa ----ffoorrmmaatt ----eennccooddee _E_N_C_O_D_I_N_G ----ddrrooppddttdd
+               ----nnsscclleeaann ----tteessttIIOO ----ccaattaallooggss ----nnooccaattaallooggss ----aauuttoo ----xxiinncclluuddee
+               ----nnooxxiinncclluuddeennooddee ----llooaaddddttdd ----ddttddaattttrr ----ssttrreeaamm ----wwaallkkeerr
+               ----ppaatttteerrnn _P_A_T_T_E_R_N_V_A_L_U_E ----cchhkkrreeggiisstteerr ----rreellaaxxnngg _S_C_H_E_M_A
+               ----sscchheemmaa _S_C_H_E_M_A ----cc1144nn] {_X_M_L_-_F_I_L_E_(_S_)... -}
+
+       xxmmlllliinntt ----hheellpp
+
+DDEESSCCRRIIPPTTIIOONN
+       The xxmmlllliinntt program parses one or more XML files, specified on the
+       command line as _X_M_L_-_F_I_L_E (or the standard input if the filename
+       provided is -- ). It prints various types of output, depending upon the
+       options selected. It is useful for detecting errors both in XML code
+       and in the XML parser itself.
+
+       xxmmlllliinntt is included in lliibbxxmmll(3).
+
+OOPPTTIIOONNSS
+       xxmmlllliinntt accepts the following options (in alphabetical order):
+
+       ----aauuttoo Generate a small document for testing purposes.
+
+       ----ccaattaallooggss
+              Use the SGML catalog(s) from SSGGMMLL__CCAATTAALLOOGG__FFIILLEESS. Otherwise XML
+              catalogs starting from _/_e_t_c_/_x_m_l_/_c_a_t_a_l_o_g are used by default.
+
+       ----cchhkkrreeggiisstteerr
+              Turn on node registration. Useful for developers testing
+              lliibbxxmmll(3) node tracking code.
+
+       ----ccoommpprreessss
+              Turn on ggzziipp(1) compression of output.
+
+       ----ccooppyy Test the internal copy implementation.
+
+       ----cc1144nn Use the W3C XML Canonicalisation (C14N) to serialize the result
+              of parsing to _s_t_d_o_u_t. It keeps comments in the result.
+
+       ----ddttddvvaalliidd _U_R_L
+              Use the DTD specified by an _U_R_L for validation.
+
+       ----ddttddvvaalliiddffppii _F_P_I
+              Use the DTD specified by a Formal Public Identifier _F_P_I for
+              validation, note that this will require a catalog exporting that
+              Formal Public Identifier to work.
+
+       ----ddeebbuugg
+              Parse a file and output an annotated tree of the in-memory
+              version of the document.
+
+       ----ddeebbuuggeenntt
+              Debug the entities defined in the document.
+
+       ----ddrrooppddttdd
+              Remove DTD from output.
+
+       ----ddttddaattttrr
+              Fetch external DTD and populate the tree with inherited
+              attributes.
+
+       ----eennccooddee _E_N_C_O_D_I_N_G
+              Output in the given encoding.
+
+       ----ffoorrmmaatt
+              Reformat and reindent the output. The XXMMLLLLIINNTT__IINNDDEENNTT environment
+              variable controls the indentation. The default value is two
+              spaces " ").
+
+       ----hheellpp Print out a short usage summary for xxmmlllliinntt.
+
+       ----hhttmmll Use the HTML parser.
+
+       ----hhttmmlloouutt
+              Output results as an HTML file. This causes xxmmlllliinntt to output
+              the necessary HTML tags surrounding the result tree output so
+              the results can be displayed/viewed in a browser.
+
+       ----iinnsseerrtt
+              Test for valid insertions.
+
+       ----llooaaddddttdd
+              Fetch an external DTD.
+
+       ----llooaadd--ttrraaccee
+              Display all the documents loaded during the processing to
+              _s_t_d_e_r_r.
+
+       ----mmaaxxmmeemm _N_N_B_Y_T_E_S
+              Test the parser memory support.  _N_N_B_Y_T_E_S is the maximum number
+              of bytes the library is allowed to allocate. This can also be
+              used to make sure batch processing of XML files will not exhaust
+              the virtual memory of the server running them.
+
+       ----mmeemmoorryy
+              Parse from memory.
+
+       ----nnoobbllaannkkss
+              Drop ignorable blank spaces.
+
+       ----nnooccaattaallooggss
+              Do not use any catalogs.
+
+       ----nnooccddaattaa
+              Substitute CDATA section by equivalent text nodes.
+
+       ----nnooeenntt
+              Substitute entity values for entity references. By default,
+              xxmmlllliinntt leaves entity references in place.
+
+       ----nnoonneett
+              Do not use the Internet to fetch DTDs or entities.
+
+       ----nnoooouutt
+              Suppress output. By default, xxmmlllliinntt outputs the result tree.
+
+       ----nnoowwaarrnniinngg
+              Do not emit warnings from the parser and/or validator.
+
+       ----nnoowwrraapp
+              Do not output HTML doc wrapper.
+
+       ----nnooxxiinncclluuddeennooddee
+              Do XInclude processing but do not generate XInclude start and
+              end nodes.
+
+       ----nnsscclleeaann
+              Remove redundant namespace declarations.
+
+       ----oouuttppuutt _F_I_L_E
+              Define a file path where xxmmlllliinntt will save the result of
+              parsing. Usually the programs build a tree and save it on
+              _s_t_d_o_u_t, with this option the result XML instance will be saved
+              onto a file.
+
+       ----ppaatthh ""_P_A_T_H_(_S_)""
+              Use the (space- or colon-separated) list of filesystem paths
+              specified by _P_A_T_H_S to load DTDs or entities. Enclose
+              space-separated lists by quotation marks.
+
+       ----ppaatttteerrnn _P_A_T_T_E_R_N_V_A_L_U_E
+              Used to exercise the pattern recognition engine, which can be
+              used with the reader interface to the parser. It allows to
+              select some nodes in the document based on an XPath (subset)
+              expression. Used for debugging.
+
+       ----ppoossttvvaalliidd
+              Validate after parsing has completed.
+
+       ----ppuusshh Use the push mode of the parser.
+
+       ----rreeccoovveerr
+              Output any parsable portions of an invalid document.
+
+       ----rreellaaxxnngg _S_C_H_E_M_A
+              Use RelaxNG file named _S_C_H_E_M_A for validation.
+
+       ----rreeppeeaatt
+              Repeat 100 times, for timing or profiling.
+
+       ----sscchheemmaa _S_C_H_E_M_A
+              Use a W3C XML Schema file named _S_C_H_E_M_A for validation.
+
+       ----sshheellll
+              Run a navigating shell. Details on available commands in shell
+              mode are below (see the section called "SHELL COMMANDS").
+
+       ----ssttrreeaamm
+              Use streaming API - useful when used in combination with
+              ----rreellaaxxnngg or ----vvaalliidd options for validation of files that are
+              too large to be held in memory.
+
+       ----tteessttIIOO
+              Test user input/output support.
+
+       ----ttiimmiinngg
+              Output information about the time it takes xxmmlllliinntt to perform
+              the various steps.
+
+       ----vvaalliidd
+              Determine if the document is a valid instance of the included
+              Document Type Definition (DTD). A DTD to be validated against
+              also can be specified at the command line using the ----ddttddvvaalliidd
+              option. By default, xxmmlllliinntt also checks to determine if the
+              document is well-formed.
+
+       ----vveerrssiioonn
+              Display the version of lliibbxxmmll(3) used.
+
+       ----wwaallkkeerr
+              Test the walker module, which is a reader interface but for a
+              document tree, instead of using the reader API on an unparsed
+              document it works on an existing in-memory tree. Used for
+              debugging.
+
+       ----xxiinncclluuddee
+              Do XInclude processing.
+
+       ----xxmmlloouutt
+              Used in conjunction with ----hhttmmll. Usually when HTML is parsed the
+              document is saved with the HTML serializer. But with this option
+              the resulting document is saved with the XML serializer. This is
+              primarily used to generate XHTML from HTML input.
+
+SSHHEELLLL CCOOMMMMAANNDDSS
+       xxmmlllliinntt offers an interactive shell mode invoked with the ----sshheellll
+       command. Available commands in shell mode include (in alphabetical
+       order):
+
+       bbaassee   Display XML base of the node.
+
+       bbyyee    Leave the shell.
+
+       ccaatt _N_O_D_E
+              Display the given node or the current one.
+
+       ccdd _P_A_T_H
+              Change the current node to the given path (if unique) or root if
+              no argument is given.
+
+       ddiirr _P_A_T_H
+              Dumps information about the node (namespace, attributes,
+              content).
+
+       dduu _P_A_T_H
+              Show the structure of the subtree under the given path or the
+              current node.
+
+       eexxiitt   Leave the shell.
+
+       hheellpp   Show this help.
+
+       ffrreeee   Display memory usage.
+
+       llooaadd _F_I_L_E_N_A_M_E
+              Load a new document with the given filename.
+
+       llss _P_A_T_H
+              List contents of the given path or the current directory.
+
+       ppwwdd    Display the path to the current node.
+
+       qquuiitt   Leave the shell.
+
+       ssaavvee _F_I_L_E_N_A_M_E
+              Save the current document to the given filename or to the
+              original name.
+
+       vvaalliiddaattee
+              Check the document for errors.
+
+       wwrriittee _F_I_L_E_N_A_M_E
+              Write the current node to the given filename.
+
+EENNVVIIRROONNMMEENNTT
+       SSGGMMLL__CCAATTAALLOOGG__FFIILLEESS
+              SGML catalog behavior can be changed by redirecting queries to
+              the user's own set of catalogs. This can be done by setting the
+              SSGGMMLL__CCAATTAALLOOGG__FFIILLEESS environment variable to a list of catalogs.
+              An empty one should deactivate loading the default
+              _/_e_t_c_/_s_g_m_l_/_c_a_t_a_l_o_g catalog.
+
+       XXMMLL__CCAATTAALLOOGG__FFIILLEESS
+              XML catalog behavior can be changed by redirecting queries to
+              the user's own set of catalogs. This can be done by setting the
+              XXMMLL__CCAATTAALLOOGG__FFIILLEESS environment variable to a list of catalogs. An
+              empty one should deactivate loading the default _/_e_t_c_/_x_m_l_/_c_a_t_a_l_o_g
+              catalog.
+
+       XXMMLL__DDEEBBUUGG__CCAATTAALLOOGG
+              Setting the environment variable XXMMLL__DDEEBBUUGG__CCAATTAALLOOGG to _n_o_n_-_z_e_r_o
+              using the eexxppoorrtt command outputs debugging information related
+              to catalog operations.
+
+       XXMMLLLLIINNTT__IINNDDEENNTT
+              Setting the environment variable XXMMLLLLIINNTT__IINNDDEENNTT controls the
+              indentation. The default value is two spaces " ".
+
+DDIIAAGGNNOOSSTTIICCSS
+       xxmmlllliinntt return codes provide information that can be used when calling
+       it from scripts.
+
+       00      No error
+
+       11      Unclassified
+
+       22      Error in DTD
+
+       33      Validation error
+
+       44      Validation error
+
+       55      Error in schema compilation
+
+       66      Error writing output
+
+       77      Error in pattern (generated when ----ppaatttteerrnn option is used)
+
+       88      Error in Reader registration (generated when ----cchhkkrreeggiisstteerr
+              option is used)
+
+       99      Out of memory error
+
+SSEEEE AALLSSOO
+       lliibbxxmmll(3)
+
+       More information can be found at
+
+       +o  lliibbxxmmll(3) web page _h_t_t_p_:_/_/_w_w_w_._x_m_l_s_o_f_t_._o_r_g_/
+
+       +o  W3C XSLT page _h_t_t_p_:_/_/_w_w_w_._w_3_._o_r_g_/_T_R_/_x_s_l_t
+
+AAUUTTHHOORR
+       John Fleck <jfleck@inkstain.net>, Ziying Sherwin <sherwin@nlm.nih.gov>,
+       Heiko Rupp <hwr@pilhuhn.de>.
+
+
+
+libxml2                             $Date$                          XMLLINT(1)

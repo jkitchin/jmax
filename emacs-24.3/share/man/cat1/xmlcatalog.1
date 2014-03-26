@@ -1,0 +1,149 @@
+XMLCATALOG(1)                                                    XMLCATALOG(1)
+
+
+
+NNAAMMEE
+       xmlcatalog - Command line tool to parse and manipulate XML or SGML
+       catalog files.
+
+SSYYNNOOPPSSIISS
+       xxmmllccaattaalloogg [----ssggmmll ----sshheellll ----ccrreeaattee ----ddeell _V_A_L_U_E_(_S_)
+                  [ ----aadddd _T_Y_P_E _O_R_I_G _R_E_P_L_A_C_E  ----aadddd _F_I_L_E_N_A_M_E] ----nnoooouutt
+                  ----nnoo--ssuuppeerr--uuppddaattee [--vv ----vveerrbboossee]] {_C_A_T_A_L_O_G_F_I_L_E}
+                  {_E_N_T_I_T_I_E_S...}
+
+DDEESSCCRRIIPPTTIIOONN
+       xxmmllccaattaalloogg is a command line application allowing users to monitor and
+       manipulate XML and SGML catalogs. It is included in lliibbxxmmll(3).
+
+       Its functions can be invoked from a single command from the command
+       line, or it can perform multiple functions in interactive mode. It can
+       operate on both XML and SGML files.
+
+OOPPTTIIOONNSS
+       xxmmllccaattaalloogg accepts the following options (in alphabetical order):
+
+       ----aadddd _T_Y_P_E _O_R_I_G _R_E_P_L_A_C_E
+              Add an entry to _C_A_T_A_L_O_G_F_I_L_E.  _T_Y_P_E indicates the type of entry.
+              Possible types are: _p_u_b_l_i_c, _s_y_s_t_e_m, _r_e_w_r_i_t_e_S_y_s_t_e_m, _r_e_w_r_i_t_e_U_R_I,
+              _d_e_l_e_g_a_t_e_P_u_b_l_i_c, _d_e_l_e_g_a_t_e_S_y_s_t_e_m, _n_e_x_t_C_a_t_a_l_o_g.  _O_R_I_G is the
+              original reference to be replaced, and _R_E_P_L_A_C_E is the URI of the
+              replacement entity to be used. The ----aadddd option will not
+              overwrite _C_A_T_A_L_O_G_F_I_L_E, outputting to _s_t_d_o_u_t, unless ----nnoooouutt is
+              used. The ----aadddd will always take three parameters even if some
+              of the XML catalog constructs will have only a single argument.
+
+       ----aadddd _F_I_L_E_N_A_M_E
+              If the ----aadddd option is used following the ----ssggmmll option, only a
+              single argument, a _F_I_L_E_N_A_M_E, is used. This is used to add the
+              name of a catalog file to an SGML supercatalog, a file that
+              contains references to other included SGML catalog files.
+
+       ----ccrreeaattee
+              Create a new XML catalog. Outputs to _s_t_d_o_u_t, ignoring _f_i_l_e_n_a_m_e
+              unless ----nnoooouutt is used, in which case it creates a new catalog
+              file _f_i_l_e_n_a_m_e.
+
+       ----ddeell _V_A_L_U_E_(_S_)
+              Remove entries from _C_A_T_A_L_O_G_F_I_L_E matching _V_A_L_U_E_(_S_). The ----ddeell
+              option will not overwrite _C_A_T_A_L_O_G_F_I_L_E, outputting to _s_t_d_o_u_t,
+              unless ----nnoooouutt is used.
+
+       ----nnoooouutt
+              Save output to the named file rather than outputting to _s_t_d_o_u_t.
+
+       ----nnoo--ssuuppeerr--uuppddaattee
+              Do not update the SGML super catalog.
+
+       ----sshheellll
+              Run a shell allowing interactive queries on catalog file
+              _C_A_T_A_L_O_G_F_I_L_E. For the set of available commands see the section
+              called "SHELL COMMANDS".
+
+       ----ssggmmll Uses SGML super catalogs for ----aadddd and ----ddeell options.
+
+       --vv, ----vveerrbboossee
+              Output debugging information.
+
+SSHHEELLLL CCOOMMMMAANNDDSS
+       Invoking xxmmllccaattaalloogg with the ----sshheellll _C_A_T_A_L_O_G_F_I_L_E option opens a command
+       line shell allowing interactive access to the catalog file identified
+       by _C_A_T_A_L_O_G_F_I_L_E. Invoking the shell provides a command line prompt after
+       which the following commands (described in alphabetical order) can be
+       entered.
+
+       aadddd _T_Y_P_E _O_R_I_G _R_E_P_L_A_C_E
+              Add an entry to the catalog file.  _T_Y_P_E indicates the type of
+              entry. Possible types are: _p_u_b_l_i_c, _s_y_s_t_e_m, _r_e_w_r_i_t_e_S_y_s_t_e_m,
+              _r_e_w_r_i_t_e_U_R_I, _d_e_l_e_g_a_t_e_P_u_b_l_i_c, _d_e_l_e_g_a_t_e_S_y_s_t_e_m, _n_e_x_t_C_a_t_a_l_o_g.  _O_R_I_G
+              is the original reference to be replaced, and _R_E_P_L_A_C_E is the URI
+              of the replacement entity to be used. The ----aadddd option will not
+              overwrite _C_A_T_A_L_O_G_F_I_L_E, outputting to _s_t_d_o_u_t, unless ----nnoooouutt is
+              used. The ----aadddd will always take three parameters even if some
+              of the XML catalog constructs will have only a single argument.
+
+       ddeebbuugg  Print debugging statements showing the steps xxmmllccaattaalloogg is
+              executing.
+
+       ddeell _V_A_L_U_E_(_S_)
+              Remove the catalog entry corresponding to _V_A_L_U_E_(_S_).
+
+       dduummpp   Print the current catalog.
+
+       eexxiitt   Quit the shell.
+
+       ppuubblliicc _P_U_B_L_I_C_-_I_D
+              Execute a Formal Public Identifier look-up of the catalog entry
+              for _P_U_B_L_I_C_-_I_D. The corresponding entry will be output to the
+              command line.
+
+       qquuiieett  Stop printing debugging statements.
+
+       ssyysstteemm _S_Y_S_T_E_M_-_I_D
+              Execute a Formal Public Identifier look-up of the catalog entry
+              for _S_Y_S_T_E_M_-_I_D. The corresponding entry will be output to the
+              command line.
+
+EENNVVIIRROONNMMEENNTT
+       XXMMLL__CCAATTAALLOOGG__FFIILLEESS
+              XML catalog behavior can be changed by redirecting queries to
+              the user's own set of catalogs. This can be done by setting the
+              XXMMLL__CCAATTAALLOOGG__FFIILLEESS environment variable to a list of catalogs. An
+              empty one should deactivate loading the default _/_e_t_c_/_x_m_l_/_c_a_t_a_l_o_g
+              catalog.
+
+DDIIAAGGNNOOSSTTIICCSS
+       xxmmllccaattaalloogg return codes provide information that can be used when
+       calling it from scripts.
+
+       00      No error
+
+       11      Failed to remove an entry from the catalog
+
+       22      Failed to save to the catalog, check file permissions
+
+       33      Failed to add an entry to the catalog
+
+       44      Failed to look up an entry in the catalog
+
+SSEEEE AALLSSOO
+       lliibbxxmmll(3)
+
+       More information can be found at
+
+       +o  lliibbxxmmll(3) web page _h_t_t_p_:_/_/_w_w_w_._x_m_l_s_o_f_t_._o_r_g_/
+
+       +o  lliibbxxmmll(3) catalog support web page at
+          _h_t_t_p_:_/_/_w_w_w_._x_m_l_s_o_f_t_._o_r_g_/_c_a_t_a_l_o_g_._h_t_m_l
+
+       +o  James Clark's SGML catalog page _h_t_t_p_:_/_/_w_w_w_._j_c_l_a_r_k_._c_o_m_/_s_p_/_c_a_t_a_l_o_g_._h_t_m
+
+       +o  OASISXML catalog specification
+          _h_t_t_p_:_/_/_w_w_w_._o_a_s_i_s_-_o_p_e_n_._o_r_g_/_c_o_m_m_i_t_t_e_e_s_/_e_n_t_i_t_y_/_s_p_e_c_._h_t_m_l
+
+AAUUTTHHOORR
+       John Fleck <jfleck@inkstain.net>.
+
+
+
+libxml2                             $Date$                       XMLCATALOG(1)
