@@ -1,67 +1,14 @@
-(setq reftex-default-bibliography '("~/Dropbox/bibliography/references.bib"))
-;; see jorg-bib.el for use of these variables
-(setq jorg-bib-bibliography-notes "~/Dropbox/bibliography/notes.org"
-      jorg-bib-default-bibliography '("~/Dropbox/bibliography/references.bib")
-      jorg-bib-pdf-directory "~/Dropbox/bibliography/bibtex-pdfs/")
-
-;;Tell the program who you are
-(setq user-full-name "John Kitchin"
-      andrewid "jkitchin"
-      user-mail-address "jkitchin@andrew.cmu.edu")
-
-;; setup to send email out by andrewid.
-;; you will be prompted for a password, and asked to store 
-(setq send-mail-function 'smtpmail-send-it
-      message-send-mail-function 'smtpmail-send-it
-      smtpmail-default-smtp-server "smtp.andrew.cmu.edu"
-      smtpmail-smtp-server smtpmail-default-smtp-server
-      smtpmail-starttls-credentials `((,smtpmail-smtp-server 587 nil nil))
-      smtpmail-auth-credentials `((,smtpmail-smtp-server 587 andrewid nil))
-      smtpmail-smtp-service 587)
-
-
-(when (string= system-name "gilgamesh.cheme.cmu.edu")
-  (setq-default ispell-program-name "aspell"
-		ispell-personal-dictionary (concat starter-kit-dir "user/.ispell")))
-
-(when (or (string= system-name "JKITCHIN-PC")
-	  (string= system-name "KITCHIN-TABLET"))
-  (setq-default ispell-program-name "C:/Program Files/Aspell/bin/aspell.exe"))
-
-
-;; modified from http://ergoemacs.org/emacs/emacs_hotkey_open_file_fast.html
-(defvar my-filelist nil "alist for files i need to open frequently. Key is a short abbrev, Value is file path.")
-(setq my-filelist
-      '(
-        ("master" . "~/Dropbox/org-mode/master.org")
-        (".emacs.d" . "~/Dropbox/kitchingroup/jmax" )
-        ("blog" . "~/Dropbox/blogofile-jkitchin.github.com/_blog/blog.org")
-        ("ese" . "~/Dropbox/books/ese-book/ese.org" )
-        ("pycse" . "~/Dropbox/books/pycse/pycse.org")
-        ("references" . "~/Dropbox/bibliography/references.bib")
-        ("notes" . "~/Dropbox/bibliography/notes.org")
-        ("journal" . "~/Dropbox/org-mode/journal.org")
-        ("tasks" . "~/Dropbox/org-mode/tasks.org")
-        ;; more here
-        ) )
-
-(defun my-open-file-fast (openCode)
-  "Prompt to open a file from a pre-defined set in `my-filelist."
-  (interactive
-   (list (ido-completing-read "Open:" (mapcar (lambda (x) (car x)) my-filelist))))
-  (find-file (cdr (assoc openCode my-filelist))))
-
-(global-set-key [f9] 'my-open-file-fast)
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;; You should not need to modify below here
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(yas-global-mode +1)
+(yas-load-directory (expand-file-name "snippets" starter-kit-dir))
+
 
 ;; we use our own org-mode
 ;; load my org-mode
 (add-to-list 'load-path (expand-file-name "org-mode/lisp" starter-kit-dir))
 (add-to-list 'load-path (expand-file-name "org-mode/contrib/lisp" starter-kit-dir))
-
 
 (add-to-list 'load-path user-dir)
 (when (file-exists-p user-dir)
@@ -147,6 +94,11 @@
 (load-theme 'my t) ; my old theme from grad school. it looks like xemacs.
 
 
+(setq abbrev-file-name (expand-file-name "user/abbrev_defs" starter-kit-dir))
+(setq save-abbrevs t) 
+(setq-default abbrev-mode t)
+
+
 ;; kill mail buffers when exiting
 (setq  message-kill-buffer-on-exit t)
 
@@ -200,7 +152,8 @@
 (global-set-key (kbd "<f6>") 'flyspell-check-next-highlighted-word)
 (global-set-key (kbd "C-<f6>") 'flyspell-check-previous-highlighted-word)
 
-
+;; automatically show completions for execute-extended-command
+(icomplete-mode 1)
 
 ;http://www.gnu.org/software/emacs/manual/html_node/elisp/File-Name-Expansion.html#File-Name-Expansion
 
@@ -307,41 +260,61 @@
 (require 'kitchingroup-mode)
 (kitchingroup-mode +1)
 
+(load-file (expand-file-name "email.el" starter-kit-dir))
+
+
+;; ;; synonyms
+;; requires libxml. does not work on windows
+;; (add-to-list 'load-path (expand-file-name "synosaurus" starter-kit-dir))
+;; (require 'synosaurus)
+;; (require 'synosaurus-openthesaurus) ; example backend
+;; (setq synosaurus-lookup-function 'openthesaurus-lookup)
+;; (global-set-key (kbd "C-c s l") 'synosaurus-lookup)
+;; (global-set-key (kbd "C-c s r") 'synosaurus-choose-and-replace)
+
+
+(setq synonyms-file        "mthesaurus/mthesaur.txt")
+(setq synonyms-cache-file  "mthesaurus/mthesaur.txt")
+(require 'synonyms)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;; bbdb setup
+;;;;;;; bbdb 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(setq bbdb-file (expand-file-name "user/bbdb" starter-kit-dir))
 
 (require 'bbdb)
 (bbdb-initialize 'gnus 'message)
-(bbdb-insinuate-message)
-(setq bbdb-file (expand-file-name "user/bbdb" starter-kit-dir))
- 
-(add-hook 'gnus-startup-hook 'bbdb-insinuate-gnus)
+
+
+;; This is not defined in my bbdb/icicles installation. This lets me use tab-completion.
+(defalias 'icicle-bbdb-complete-name 'bbdb-complete-mail) 
 
 ;; http://emacs-fu.blogspot.com/2009/08/managing-e-mail-addresses-with-bbdb.html
+;; these seem to be v2 variables.
+;; see http://www.emacswiki.org/emacs/UpgradeBBDB for new names
 (setq 
-    bbdb-offer-save 1                        ;; 1 means save-without-asking
-    bbdb-use-pop-up t                        ;; allow popups for addresses
-    bbdb-electric-p t                        ;; be disposable with SPC
-    bbdb-popup-target-lines  1               ;; very small
+;;    bbdb-offer-save 1                        ;; 1 means save-without-asking
+;;    bbdb-use-pop-up t                        ;; allow popups for addresses
+;;    bbdb-electric-p t                        ;; be disposable with SPC
+;;    bbdb-popup-target-lines  1               ;; very small
     
-    bbdb-dwim-net-address-allow-redundancy t ;; always use full name
-    bbdb-quiet-about-name-mismatches 2       ;; show name-mismatches 2 secs
+;;    bbdb-dwim-net-address-allow-redundancy t ;; always use full name
+;;    bbdb-quiet-about-name-mismatches 2       ;; show name-mismatches 2 secs
 
-    bbdb-always-add-address t                ;; add new addresses to existing...
+;;    bbdb-always-add-address t                ;; add new addresses to existing...
                                              ;; ...contacts automatically
-    bbdb-canonicalize-redundant-nets-p t     ;; x@foo.bar.cx => x@bar.cx
+;;    bbdb-canonicalize-redundant-nets-p t     ;; x@foo.bar.cx => x@bar.cx
 
-    bbdb-completion-type nil                 ;; complete on anything
+    bbdb-completion-list t                 ;; complete on anything
 
-    bbdb-complete-name-allow-cycling t       ;; cycle through matches
+;;    bbdb-complete-name-allow-cycling t       ;; cycle through matches
                                              ;; this only works partially
 
-    bbbd-message-caching-enabled t           ;; be fast
-    bbdb-use-alternate-names t               ;; use AKA
+;;    bbbd-message-caching-enabled t           ;; be fast
+;;    bbdb-use-alternate-names t               ;; use AKA
 
-    bbdb-elided-display t                    ;; single-line addresses
+;;    bbdb-elided-display t                    ;; single-line addresses
 )
 
 (require 'org)
