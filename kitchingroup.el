@@ -53,3 +53,23 @@
               (org-deadline-warning-days 30)
               (org-agenda-entry-types '(:deadline))))))
     (org-agenda "" "d" "<")))
+
+
+(defun lookup-word-definition ()
+  "Look up the current word's definition in a browser.
+If a region is active (a phrase), lookup that phrase."
+ (interactive)
+ (let (myWord myUrl)
+   (setq myWord
+         (if (region-active-p)
+             (buffer-substring-no-properties (region-beginning) (region-end))
+           (thing-at-point 'symbol)))
+
+  (setq myWord (replace-regexp-in-string " " "%20" myWord))
+  (setq myUrl (concat "http://www.answers.com/main/ntquery?s=" myWord))
+
+  (browse-url myUrl)
+  ;; (w3m-browse-url myUrl) ;; if you want to browse using w3m
+   ))
+
+(global-set-key (kbd "<f6>") 'lookup-word-definition)
