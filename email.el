@@ -1,0 +1,21 @@
+(defun email-region (start end)
+  (interactive "r")
+  (let ((content (buffer-substring start end)))
+    (compose-mail-other-frame)
+    (message-goto-body)
+    (insert content)
+    (message-goto-to)))
+
+(defun email-region-as-attachment (start end)
+  (interactive "r")
+  (save-restriction
+    (narrow-to-region start end)
+    (let ((cb (buffer-name)))
+      (compose-mail-other-frame)
+      (mml-attach-buffer cb)
+      (message-goto-to))))
+
+(defun email-heading ()
+  (interactive)
+  (org-mark-subtree)
+  (email-region (point) (mark)))
