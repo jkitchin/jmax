@@ -1,17 +1,17 @@
 #+TITLE: jmax - John's customizations to maximize Emacs
 
-Try it you will like it. These customizations have been compiled and derived from prelude and the emacs24-starterkit.
+Try it you might like it. These customizations have been compiled and derived from prelude and the emacs24-starterkit, and my own emacs hackery.
 
-Clone the git repository, change into the jmax directory, and run this command:
+To install this, clone the git repository, change into the jmax directory, and run this command:
 #+begin_src sh
 emacs -q -l init.el
 #+end_src
 
 This will load the emacs on your path, without using whatever you have defined in .emacs.d.
 
-The first time you run this, a lot of packages will be downloaded into the elpa folder. This takes a few minutes. 
+The first time you run this, a lot of packages will be downloaded into the elpa folder. This takes a few minutes. You might have to restart emacs.
 
-You should clone the org-mode repository, and run the make command to build the autoloads. I usually use =make up2= which updates the git repository. 
+I run a pretty modern org-mode. You should clone the org-mode repository, and run the make command to build the autoloads. I usually use =make up2= which updates the git repository. Here is what I do inside the jmax directory. 
 
 #+BEGIN_SRC sh
 git clone git://orgmode.org/org-mode.git
@@ -24,8 +24,31 @@ That is it.
 * Customization
 These files contain variables with paths specific to your computer. You probably need to change them.
 
-1. Check and modify the variables at the top of  [[./customization.el]]
-2. Check and modify the variables at the top of [[./user/personal-org.el]]
+To set the variables for our org-bibliography functionality you can run:
+M-x customize-group jorg-bib
+
+As an alternative, put these variables into a .el file in the user directory. You will want to modify them for your needs of course.
+
+#+BEGIN_SRC emacs-lisp
+(setq reftex-default-bibliography '("~/Dropbox/bibliography/references.bib"))
+
+;; see jorg-bib.el for use of these variables
+(setq jorg-bib-bibliography-notes "~/Dropbox/bibliography/notes.org"
+      jorg-bib-default-bibliography '("~/Dropbox/bibliography/references.bib")
+      jorg-bib-pdf-directory "~/Dropbox/bibliography/bibtex-pdfs/")
+
+;;Tell the program who you are and setup for email
+(setq user-full-name "John Kitchin"
+      andrewid "jkitchin"
+      user-mail-address "jkitchin@andrew.cmu.edu"
+      ;; specify how email is sent
+      send-mail-function 'smtpmail-send-it
+      ;; used in message mode
+      message-send-mail-function 'smtpmail-send-it
+      smtpmail-smtp-server "smtp.andrew.cmu.edu"
+      smtpmail-smtp-service 587)
+
+#+END_SRC
 
 * Project goal
 =jmax= is a customized version of emacs to facilitate authoring and consuming org-mode based technical documents.
@@ -35,3 +58,9 @@ All of the emacs customization is performed in an org-mode file.
 
 
 
+* Things TODO
+** ox-report
+Export an MS report to pdf
+
+** ox-memo
+** ox-dissertation
