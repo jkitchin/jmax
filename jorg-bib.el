@@ -8,11 +8,12 @@
   nil
   "filename to where you will put all your notes about an entry in
   the default bibliography."
+  :type 'list
   :group 'jorg-bib)
 
 (defcustom jorg-bib-default-bibliography
   nil
-  "list of bibtex files to search for."
+  "list of bibtex files to search for. You should use full-paths for each file."
   :group 'jorg-bib)
 
 (defcustom jorg-bib-pdf-directory
@@ -219,17 +220,11 @@ key author journal year volume pages doi url key jorg-bib-pdf-directory key ))))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;; ref and label links
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; TODO make this work with #+label: or \label
-
-
 
 (org-add-link-type
  "ref"
  (lambda (label)
    "on clicking goto the label. Navigate back with C-c &"
-   ;(let ((n (count-matches (format "\\label{%s}" label) (point-min) (point-max) t)))
-   ;  (if (< n 1) (error (format "no matching label found for \\label{%s}!" label)))
-   ;  (if (> n 1) (error (format "%d matches found for %s!" n label)))
    (org-mark-ring-push)
    ;; next search from beginning of the buffer
    (goto-char (point-min))
@@ -247,6 +242,25 @@ key author journal year volume pages doi url key jorg-bib-pdf-directory key ))))
     ((eq format 'html) (format "(<ref>%s</ref>)" path))
     ((eq format 'latex)
      (format "\\ref{%s}" keyword)))))
+
+
+(defun jorg-get-labels ()
+  "returns a list of labels in the buffer
+
+Used mostly for constructing ref links."
+  (interactive)
+  (save-excursion
+    (goto-char (point-min))
+    (let ((matches '()))
+      (while (re-search-forward "label:\\([a-zA-z0-9:-]*\\)" (point-max) t)
+	(add-to-list 'matches (match-string-no-properties 1) t))
+      matches)))
+
+(defun jorg-insert-ref-link (&optional arg)
+  "inserts a ref link with completion"
+  (interactive (list (completing-read "label: " (get-labels))))
+  (insert (format "ref:%s" arg)))
+
 
 (org-add-link-type
  "label"
