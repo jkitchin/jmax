@@ -16,6 +16,6 @@
 (add-to-list 'load-path user-dir)
 
 (require 'packages)
-(require 'customization)
+(require 'jmax)
 ;;; end init
 
