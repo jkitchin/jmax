@@ -62,7 +62,7 @@ Relies on the python script /upload_bibtex_citeulike.py being in the personal pr
     (let ((startpos (point-min))
           (endpos (point-max))
           (bibtex-string (buffer-string))
-          (script (concat "python " prelude-personal-dir "/upload_bibtex_citeulike.py&")))
+          (script (concat "python " starter-kit-dir "/upload_bibtex_citeulike.py&")))
       (with-temp-buffer (insert bibtex-string)
                         (shell-command-on-region (point-min) (point-max) script t nil nil t)))))
 
