@@ -216,8 +216,8 @@
    (process-buffer (python-shell-get-or-create-process))))
 
 
-(require 'kitchingroup-mode)
-(kitchingroup-mode +1)
+;(require 'kitchingroup-mode)
+;(kitchingroup-mode +1)
 
 (load-file (expand-file-name "email.el" starter-kit-dir))
 
