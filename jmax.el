@@ -1,9 +1,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;; You should not need to modify below here
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(yas-global-mode +1)
-(yas-load-directory (expand-file-name "snippets" starter-kit-dir))
-
 (require 'cl)           ;; common-lisp functions
 
 (require 'saveplace)     ;; When you visit a file, point goes to the
@@ -46,6 +43,7 @@
 ;; disable auto-fill
 (auto-fill-mode -1)
 
+
 (require 'ido)
 (require 'ido-ubiquitous)
 (require 'flx-ido)
@@ -73,6 +71,13 @@
 (global-set-key (kbd "M-x") 'smex)
 (global-set-key (kbd "M-X") 'smex-major-mode-commands)
 
+;; http://sachachua.com/blog/2014/03/emacs-basics-call-commands-name-m-x-tips-better-completion-using-ido-helm/
+(require 'ido-hacks nil t)
+(if (commandp 'ido-vertical-mode) 
+    (progn
+      (ido-vertical-mode 1)
+      (setq ido-vertical-define-keys 'C-n-C-p-up-down-left-right)))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;; personal preferences
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -83,11 +88,9 @@
 (add-to-list 'custom-theme-load-path (expand-file-name "themes" starter-kit-dir))
 (load-theme 'my t) ; my old theme from grad school. it looks like xemacs.
 
-
 (setq abbrev-file-name (expand-file-name "user/abbrev_defs" starter-kit-dir))
 (setq save-abbrevs t) 
 (setq-default abbrev-mode t)
-
 
 ;; kill mail buffers when exiting
 (setq  message-kill-buffer-on-exit t)
@@ -206,8 +209,11 @@
 (defun set-newline-and-indent ()
   "Map the return key with `newline-and-indent'"
   (local-set-key (kbd "RET") 'newline-and-indent))
+
 (add-hook 'python-mode-hook 'set-newline-and-indent)
 
+;; turn off yasnippets in python mode
+(add-hook 'python-mode-hook #'(lambda () (yas-global-mode -1)))
 
 ;; I want python to always show me the output. this advice makes that happen.
 (defadvice python-shell-send-buffer (before switch-to-python-output activate)
@@ -281,6 +287,7 @@
 ;;;;;;; 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (load-file (expand-file-name "jorg-bib.el" starter-kit-dir))
+(load-file (expand-file-name "jorg-manuscript.el" starter-kit-dir))
 
 ;; hide details in dired
 (require 'dired-details+)
@@ -290,13 +297,13 @@
 
 
 
-
+;; 2014-04-05 commentd out icicles. It does not do much and does not expand mail with bbdb correctly. 
 ;; icicles should supposedly be loaded last
-(require 'icicles)
+;; (require 'icicles)
 ;; reclaim C-c ' for org-mode
-(setq icicle-top-level-key-bindings
-      (remove '("'" icicle-occur t) icicle-top-level-key-bindings))
+;;(setq icicle-top-level-key-bindings
+;;      (remove '("'" icicle-occur t) icicle-top-level-key-bindings))
 
-(icy-mode 1)
+;; (icy-mode 1)
 
 (provide 'jmax)
