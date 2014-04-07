@@ -109,7 +109,7 @@ construct the heading by hand."
                (doi (reftex-get-bib-field "doi" entry))
                (url (reftex-get-bib-field "url" entry))
                )
-
+	  (save-buffer)
           ;; now look for entry
           (find-file jorg-bib-bibliography-notes)
 
@@ -129,7 +129,8 @@ construct the heading by hand."
   :URL: %s
  :END:
 [[cite:%s]] [[file:%s/%s.pdf][pdf]]\n\n"
-key author journal year volume pages doi url key jorg-bib-pdf-directory key )))))))
+key author journal year volume pages doi url key jorg-bib-pdf-directory key))
+(save-buffer))))))
 
 
 (defun jorg-bib-open-in-browser ()
