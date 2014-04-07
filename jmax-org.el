@@ -251,7 +251,7 @@
   )
 
 ;; open agenda after 15 minutes of idle time
-(run-with-idle-timer 900 t 'jump-to-org-agenda)
+;(run-with-idle-timer 900 t 'jump-to-org-agenda)
 
 ;; Customize generic export
 ;; I reset this variable to get my hyperref setup
