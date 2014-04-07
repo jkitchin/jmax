@@ -1,8 +1,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;; You should not need to modify below here
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(yas-global-mode +1)
-(yas-load-directory (expand-file-name "snippets" starter-kit-dir))
+;(yas-global-mode +1)
+;(yas-load-directory (expand-file-name "snippets" starter-kit-dir))
 
 (require 'cl)           ;; common-lisp functions
 

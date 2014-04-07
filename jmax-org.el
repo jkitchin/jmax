@@ -130,50 +130,50 @@
 (require 'reftex-cite)
 
 ;; I like a random bibtex entry in my agenda.
-(defun formatted-bibtex-entry ()
-  "return a bibtex entry as a formatted string. I hand-built the format.
+;(defun formatted-bibtex-entry ()
+;  "return a bibtex entry as a formatted string. I hand-built the format.
 
-this treats all entries as a journal article."
-  (interactive)
-  (bibtex-beginning-of-entry)
-  (let* ((bibtex-expand-strings t)
-         (entry (bibtex-parse-entry t))
-         (title (replace-regexp-in-string "\n\\|\t\\|\s+" " " (reftex-get-bib-field "title" entry)))
-         (year  (reftex-get-bib-field "year" entry))
-         (author (replace-regexp-in-string "\n\\|\t\\|\s+" " " (reftex-get-bib-field "author" entry)))
-         (key (reftex-get-bib-field "=key=" entry))
-         (journal (reftex-get-bib-field "journal" entry))
-         (volume (reftex-get-bib-field "volume" entry))
-         (issue (reftex-get-bib-field "issue" entry))
-         (pages (reftex-get-bib-field "pages" entry))
-         (doi (reftex-get-bib-field "doi" entry))
-         (output))
-    (concat (when author author) ", "
-                         (when title title) ", "
-                         (when journal journal) ", "
-                         (when volume volume)
-                         (if issue (format "(%s), " issue) ", ")
-                         (when pages pages) ", "
-                         (when year (format "(%s)." year))
-                         (when doi (format " http://dx.doi.org/%s" doi)))))
+;this treats all entries as a journal article."
+;  (interactive)
+;  (bibtex-beginning-of-entry)
+;  (let* ((bibtex-expand-strings t)
+;         (entry (bibtex-parse-entry t))
+;         (title (replace-regexp-in-string "\n\\|\t\\|\s+" " " (reftex-get-bib-field "title" entry)))
+;         (year  (reftex-get-bib-field "year" entry))
+;         (author (replace-regexp-in-string "\n\\|\t\\|\s+" " " (reftex-get-bib-field "author" entry)))
+;         (key (reftex-get-bib-field "=key=" entry))
+;         (journal (reftex-get-bib-field "journal" entry))
+;         (volume (reftex-get-bib-field "volume" entry))
+;         (issue (reftex-get-bib-field "issue" entry))
+;         (pages (reftex-get-bib-field "pages" entry))
+;         (doi (reftex-get-bib-field "doi" entry))
+;         (output))
+;    (concat (when author author) ", "
+;                         (when title title) ", "
+;                         (when journal journal) ", "
+;                         (when volume volume)
+;                         (if issue (format "(%s), " issue) ", ")
+;                         (when pages pages) ", "
+;                         (when year (format "(%s)." year))
+;                         (when doi (format " http://dx.doi.org/%s" doi)))))
 
 ;; this returns a string for my agenda.
-(defun get-random-bibtex-entry (&optional arg)
-  "for printing in my agenda"
-  (let ((keys) (lucky-key) (output))
-    (with-current-buffer
-	(find-file (car reftex-default-bibliography))
-      (setq keys (bibtex-parse-keys))
-      (setq lucky-key (car
-		       (nth
-			(random (safe-length keys)) keys)))
-      (goto-char (point-min))
-      (re-search-forward lucky-key)
-      (setq output (formatted-bibtex-entry))
-      (kill-buffer)
-      (format "%s\ncite:%s" output lucky-key))))
+;(defun get-random-bibtex-entry (&optional arg)
+;  "for printing in my agenda"
+;  (let ((keys) (lucky-key) (output))
+;    (with-current-buffer
+;	(find-file (car reftex-default-bibliography))
+;      (setq keys (bibtex-parse-keys))
+;      (setq lucky-key (car
+;		       (nth
+;			(random (safe-length keys)) keys)))
+;      (goto-char (point-min))
+;      (re-search-forward lucky-key)
+;      (setq output (formatted-bibtex-entry))
+;      (kill-buffer)
+;      (format "%s\ncite:%s" output lucky-key))))
 
-(setq initial-scratch-message (get-random-bibtex-entry))
+;(setq initial-scratch-message (get-random-bibtex-entry))
 ;; this only works on linux for some reason
 (setq initial-major-mode 'org-mode)
 
