@@ -1,5 +1,7 @@
-;; Lisp code to setup bibliographycite, ref and label org-mode links.
+;; Lisp code to setup bibliography  cite, ref and label org-mode links.
 ;; also sets up reftex for org-mode
+
+(require 'reftex-cite)
 
 (defgroup jorg-bib nil
   "customization group for jorg-bib")
@@ -54,7 +56,7 @@
 (defun jorg-bib/upload-bibtex-entry-to-citeulike ()
   "with point in  a bibtex entry get bibtex string and submit to citeulike.
 
-Relies on the python script /upload_bibtex_citeulike.py being in the personal prelude directory."
+Relies on the python script /upload_bibtex_citeulike.py being in the user directory."
   (interactive)
   (message "uploading to citeulike")
   (save-restriction
@@ -68,7 +70,7 @@ Relies on the python script /upload_bibtex_citeulike.py being in the personal pr
 
 (defun jorg-bib-open-bibtex-pdf ()
   "open pdf for a bibtex entry, if it exists. assumes point is in
-the entry of interest. but does not check that."
+the entry of interest in the bibfile. but does not check that."
   (interactive)
   (save-excursion
     (bibtex-beginning-of-entry)
@@ -80,8 +82,6 @@ the entry of interest. but does not check that."
       (if (file-exists-p pdf)
           (org-open-link-from-string (format "[[file:%s]]" pdf))
         (ding)))))
-
-(require 'reftex-cite)
 
 (defun jorg-bib-open-bibtex-notes ()
   "from a bibtex entry, open the notes if they exist, and create a heading if they do not.
@@ -246,9 +246,7 @@ key author journal year volume pages doi url key jorg-bib-pdf-directory key))
 
 
 (defun jorg-get-labels ()
-  "returns a list of labels in the buffer
-
-Used mostly for constructing ref links."
+  "returns a list of labels in the buffer. We only count label links. this is used to auto-complete ref links."
   (interactive)
   (save-excursion
     (goto-char (point-min))
@@ -259,7 +257,7 @@ Used mostly for constructing ref links."
 
 (defun jorg-insert-ref-link (&optional arg)
   "inserts a ref link with completion"
-  (interactive (list (completing-read "label: " (get-labels))))
+  (interactive (list (completing-read "label: " (jorg-get-labels))))
   (insert (format "ref:%s" arg)))
 
 
@@ -280,7 +278,7 @@ Used mostly for constructing ref links."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;; cite links
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; implemenation of cite:  to make bibtex citations that are also clickable.
+;; implementation of cite:  to make bibtex citations that are also clickable.
 (defun cite-find-bibliography ()
   "find the bibliography in the buffer.
 This function sets and returns cite-bibliography-files, which is a list of files
@@ -355,8 +353,91 @@ falling back to what the user has set in jorg-bib-default-bibliography
     (goto-char (point-min))
     (search-forward key nil t 1)))
 
+
+(defun get-bibtex-key-under-cursor ()
+  "returns key under the bibtex cursor. We search forward from
+point to get a comma, or the end of the link, and then backwards
+to get a comma, or the beginning of the link. that delimits the
+keyword we clicked on. We also strip the text properties.
+
+This code duplicates some code in cite-onclick. one day I will
+redesign all of this and clean it up. I wrote this to enable a
+tooltip."
+  (interactive)
+  (let* ((object (org-element-context))
+	 (link-string-beginning (org-element-property :begin object))
+	 (link-string-end (org-element-property :end object))
+	 (path (org-element-property :path object)))    
+    (when (and (equal (org-element-type object) 'link) 
+               (equal (org-element-property :type object) "cite"))
+      ;; The key is the text between commas, or the link boundaries
+      (save-excursion
+	(if (search-forward "," link-string-end t 1)
+	    (setq key-end (- (match-end 0) 1)) ; we found a match
+	  (setq key-end link-string-end))) ; no comma found so take the end
+      ;; and backward to previous comma from point which defines the start character
+      (save-excursion
+	(if (search-backward "," link-string-beginning 1 1)
+	    (setq key-beginning (+ (match-beginning 0) 1)) ; we found a match
+	  (setq key-beginning (+ link-string-beginning 5)))) ; no match found
+      ;; save the key we clicked on.
+      (setq bibtex-key (cite-strip-key (buffer-substring key-beginning key-end)))
+      (set-text-properties 0 (length bibtex-key) nil bibtex-key)
+      (message "you selected %s" bibtex-key)
+      bibtex-key
+      )))
+
+(defun get-bibtex-entry (key)
+  "Returns the bibtex entry associated with key"
+  (interactive)
+  (setq cite-bibliography-files (cite-find-bibliography))
+
+  ;; now find the first bib file containing the key if it is a file
+  (when (not (equal cite-bibliography-files "internal"))      
+      (setq bib-file 
+	    (loop for file in cite-bibliography-files do
+		  (if (cite-key-in-file-p bibtex-key file) 
+		      (return file)))))
+  ;; and finally, open the file at the key
+  (let ((bibkey))
+    (setq bibkey (with-temp-buffer 
+	       (insert-file-contents bib-file)
+	       (goto-char (point-min))
+	       (re-search-forward key)
+	       (bibtex-narrow-to-entry)
+	       (buffer-string)))
+    bibkey))
+
+(defun jorg-bib-tooltip ()
+  "display bibtex entry tooltip"
+  (interactive)
+  (popup-tip (get-bibtex-entry (cite-strip-key (get-bibtex-key-under-cursor)))))
+
+;; variable for the timer object
+(defvar idle-timer-bibtex-timer nil)
+
+;; start functions
+(defun idle-timer-bibtex-start ()
+  (interactive)
+  (when (timerp idle-timer-bibtex-timer)
+    (cancel-timer idle-timer-bibtex-timer))
+  (setq idle-timer-bibtex-timer
+          (run-with-timer 1 1 #'jorg-bib-tooltip)))
+
+;; stop function
+(defun idle-timer-bibtex-stop ()
+  (interactive)
+  (when (timerp idle-timer-bibtex-timer)
+    (cancel-timer idle-timer-bibtex-timer))
+  (setq idle-timer-bibtex-timer nil))
+
+(idle-timer-bibtex-start)
+
 (defun cite-onclick (link-string)
-  "this function executes when you click on cite link. It identifies the key you clicked on and opens the first bibliography file it finds containing the key."
+  "this function executes when you click on cite link. It identifies the key you clicked on and opens the first bibliography file it finds containing the key.
+
+A regular left-mouse click opens the entry in the bibtex file.
+A right-click opens the pdf associated with the entry, if it exists."
   ;; First we find the boundaries of the link you clicked on, then
   ;; identify the key you clicked on. First get boundaries of the link-string
   (message "\n\nyou clicked on %s" link-string)
