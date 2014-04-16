@@ -1,3 +1,4 @@
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;  You should not need to modify paths below here
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -200,27 +201,7 @@
     ;; return counter if found, otherwise return nil
     (if found i nil)))
 
-;; this is for code syntax highlighting in export
-(add-to-list 'org-latex-packages-alist '("" "minted"))
-(setq org-latex-listings 'minted)
-(setq org-latex-minted-options
-           '(("frame" "lines")
-             ("fontsize" "\\scriptsize")
-             ("linenos" "")))
 
-;; do not put in \hypersetup
-;; use your own \hypersetup{pdfkeywords={%s},\n  pdfsubject={%s},\n  pdfcreator={%s}
-(setq org-latex-with-hyperref nil)
-
-; for minted you must run latex with -shell-escape because it calls pygmentize as an external program
-(setq org-latex-pdf-process
-      '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-        "bibtex %f"
-        "makeindex %f"
-        "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-        "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
-
-;(setq org-latex-to-pdf-process '("texi2dvi --pdf --clean --verbose --batch"))
 
 ;; support for links to microsoft docx,pptx,xlsx files
 ;; standard org-mode opens these as zip-files
@@ -258,7 +239,5 @@ start  empty title path
                               (org-cycle)))
 
 (setq org-completion-use-ido t)
-
-
 
 (message "jmax-org.el loaded")
