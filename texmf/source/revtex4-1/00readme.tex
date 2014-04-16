@@ -1,0 +1,165 @@
+\title{%
+ The \classname{revtex4-1} document class of the American Physical Society%
+ \protect\thanks{Work under hire to The American Physical Society.}%
+}%
+\author{Arthur Ogawa%
+ \protect\thanks{First revision of REV\TeX4.0 (unreleased) by David Carlisle}%
+}%
+\date{Version \fileversion, dated \filedate}%
+\newcommand\revtex{REV\TeX}
+
+\maketitle
+
+This file embodies the implementation of the APS \revtex\ 4.1 document class
+for electronic submissions to journals.
+
+The distribution point for this work is
+\url{http://publish.aps.org/revtex4/},
+which contains fully unpacked, prebuilt runtime files and documentation.
+
+\tableofcontents
+
+\section{Using \protect\revtex}
+
+The file \file{README} has retrieval and installation information.
+
+User documentation is presented separately in \file{auguide.tex}.
+
+The file \file{template.aps} is a boilerplate file.
+
+\changes{4.0a}{1998/01/16}{Initial version}
+\changes{4.0a}{1998/01/31}{Move after process options, so \cs{clearpage} not in scope of twocolumn}
+\changes{4.0a}{1998/01/31}{Rearrange the ordering so numerical ones come first. AO: David, what does this mean?}
+\changes{4.0a}{1998/01/31}{use font-dependent spacing}
+\changes{4.0a}{1998/01/31}{4.0d had twoside option setting twoside switch to false}
+\changes{4.0a}{1998/01/31}{Move after process options, so the following test works}
+\changes{4.0a}{1998/01/31}{print homepage}
+\changes{4.0a}{1998/01/31}{protect against hyperref revtex kludges which are not needed now}
+\changes{4.0a}{1998/06/10}{multiple preprint commands}
+\changes{4.0a}{1998/06/10}{comma not space between email and homepage}
+\changes{4.0a}{1998/06/10}{single space footnotes}
+\changes{4.0b}{1999/06/20}{First modifications by Arthur Ogawa (mailto:arthur\_ogawa at sbcglobal dot net)}
+\changes{4.0b}{1999/06/20}{Added localization of \cs{figuresname}}
+\changes{4.0b}{1999/06/20}{Added localization of \cs{tablesname}}
+\changes{4.0b}{1999/06/20}{AO: all code for \protect\classoption{10pt} is in this module.}
+\changes{4.0b}{1999/06/20}{AO: all code for \protect\classoption{11pt} is in this module.}
+\changes{4.0b}{1999/06/20}{AO: all code for \protect\classoption{12pt} is in this module.}
+\changes{4.0b}{1999/06/20}{AO: made aps.rtx part of revtex4.dtx}
+\changes{4.0b}{1999/06/20}{AO: remove duplicates}
+\changes{4.0b}{1999/06/20}{call \cs{print@floats}}
+\changes{4.0b}{1999/06/20}{Defer assignment until \cs{AtBeginDocument} time.}
+\changes{4.0b}{1999/06/20}{Defer decision until \cs{AtBeginDocument} time}
+\changes{4.0b}{1999/06/20}{Define three separate environments, defer assignment to \cs{AtBeginDocument} time.}
+\changes{4.0b}{1999/06/20}{Frank Mittelbach, has stated in \protect\classname{multicol}: ``The kernel command \cs{@footnotetext} should not be modified.'' Thus, I have removed David Carlisle's redefinition of that command. Note, however, that later versions of \protect\classname{multicol} do not require this workaround. Belt and suspenders.}%
+\changes{4.0b}{1999/06/20}{Move this ``complex'' option to the front, where it can be overridden by ``simple'' options.}
+\changes{4.0b}{1999/06/20}{New option}
+\changes{4.0b}{1999/06/20}{One-line caption sets flush left.}
+\changes{4.0b}{1999/06/20}{only execute if appropriate}
+\changes{4.0b}{1999/06/20}{Processing delayed to \cs{AtBeginDocument} time}
+\changes{4.0b}{1999/06/20}{Removed invocation of nonexistent class option \protect\classoption{groupauthors} and all other class options that should only be invoked by the document. (Otherwise precedence of class options does not work.)}
+\changes{4.0b}{1999/06/20}{Restore all media size class option of \protect\file{classes.dtx}}
+\changes{4.0b}{1999/06/20}{Stack \cs{preprint} args flush right at right margin.}
+\changes{4.0c}{1999/11/13}{(AO, 115) If three or more preprints specified, set on single line, with commas.}
+\changes{4.0c}{1999/11/13}{(AO, 129) section* within appendix was producing appendixname}
+\changes{4.0c}{1999/11/13}{*-form mandates pagebreak}
+\changes{4.0c}{1999/11/13}{also spelled ``acknowledgements''.}
+\changes{4.0c}{1999/11/13}{Do not put by REVTeX in every page foot}
+\changes{4.0c}{1999/11/13}{grid changes via ltxgrid procedures}
+\changes{4.0c}{1999/11/13}{grid changes with ltxgrid}
+\changes{4.0c}{1999/11/13}{Insert procedure \cs{checkindate}}
+\changes{4.0c}{1999/11/13}{Lose compatability mode.}
+\changes{4.0c}{1999/11/13}{New ltxgrid-based  code, other bug fixes}
+\changes{4.0c}{1999/11/13}{New option ``checkin''}
+\changes{4.0c}{1999/11/13}{Prevent an inner footnote from performing twice}
+\changes{4.0d}{2000/04/10}{Also alter how lists get indented.}
+\changes{4.0d}{2000/04/10}{eprint takes an optional argument, syntactical only in this case.}
+\changes{4.0d}{2000/04/10}{New option}
+\changes{4.0d}{2000/05/10}{More features and bug fixes: compatability with longtable and array packages. Now certainly incompatible with multicol.}
+\changes{4.0d}{2000/05/17}{make longtable trigger the head, too}
+\changes{4.0d}{2000/05/18}{But alternative spelling is deprecated.}
+\changes{4.0e}{2000/09/20}{New option showkeys}
+\changes{4.0e}{2000/11/14}{Bug fixes and minor new features: title block affiliations can have ancillary data, just like authors; clearpage processing revamped, with floats staying in order; widetext ornaments.}
+\changes{4.0e}{2000/11/21}{adornments above and below.}
+\changes{4.0f}{2001/02/13}{Last bug fixes before release.}
+\changes{4.0rc1}{2001/06/17}{Running headers always as if two-sided}
+\changes{4.0rc1}{2001/06/18}{grid changes with push and pop}
+\changes{4.0rc1}{2001/06/18}{grid changes with push and pop}
+\changes{4.0rc4}{2001/07/23}{hyperref is no longer loaded via class option: use a usepackage statement instead}
+\changes{4.1a}{2008/01/18}{(AO, 457) Endnotes to be sorted in with numerical citations.}%
+\changes{4.1a}{2008/01/18}{(AO, 451) ``Cannot have more than 256 cites in a document''}%
+\changes{4.1a}{2008/01/18}{(AO, 457) Endnotes to be sorted in with numerical citations.}%
+\changes{4.1a}{2008/01/18}{(AO, 460) ``Proper style is "FIG. 1. ..." (no colon)''}%
+\changes{4.1a}{2008/01/18}{(AO, 478) \cs{ds@letterpaper}, so that ``letterpaper really is the default''}%
+\changes{4.1a}{2008/01/18}{(AO, 488) Change processing of options to allow an unused option to specify society and journal}%
+\changes{4.1a}{2008/01/19}{(AO, 461) Change the csname revtex uses from @dotsep to ltxu@dotsep. The former is understood in mu. (What we wanted was a dimension.)}%
+\changes{4.1a}{2008/01/19}{For natbib versions before 8.21, \cs{NAT@sort} was consulted only as natbib was being read in. Now it is fully dynamic.}
+\changes{4.1b}{2008/05/29}{The csname substyle@ext is now defined without a dot (.), to be compatible with \LaTeX usage (see @clsextension and @pkgextension).}
+\changes{4.1b}{2008/06/01}{(AO) Implement bibnotes through \cs{frontmatter@footnote@produce} instead of \cs{bibnotes@sw}}%
+\changes{4.1b}{2008/06/01}{Add option reprint, opposite of preprint, and preferred alternative to twocolumn}
+\changes{4.1b}{2008/06/29}{(AO, 455) Be nice to a list within the abstract (assign \cs{@totalleftmargin}).}
+\changes{4.1b}{2008/06/30}{(AO) Structure the Abstract using the \texttt{bibliography} environment}
+\changes{4.1b}{2008/07/01}{(AO) coordinate \cs{if@twoside} with \cs{twoside@sw}}
+\changes{4.1b}{2008/07/01}{(AO) make settings at class time instead of deferring them to later.}
+\changes{4.1b}{2008/07/01}{(AO) No longer need to test \cs{chapter} as of \texttt{natbib} version 8.2}
+\changes{4.1b}{2008/07/01}{(AO) No longer use \cs{secnumarabic@sw}, instead use \cs{setup@secnums}}
+\changes{4.1b}{2008/07/01}{(AO) Provide more diagnostics when \cs{@society} is assigned.}
+\changes{4.1b}{2008/07/01}{(AO) provide option longbibliography}
+\changes{4.1b}{2008/07/01}{Add \cs{@hangfroms@section}}
+\changes{4.1b}{2008/07/01}{Break out \cs{@caption@fignum@sep}}
+\changes{4.1b}{2008/07/01}{Class option galley sets \cs{preprintsty@sw} to false}
+\changes{4.1b}{2008/07/01}{Code relating to new syntax for frontmatter has been placed in \file{ltxfront.dtx}}
+\changes{4.1b}{2008/07/01}{Package textcase is now simply a required package}
+\changes{4.1b}{2008/07/01}{Procedures \cs{@parse@class@options@society} and \cs{@parse@class@options@journal} and friends}
+\changes{4.1b}{2008/07/01}{Read in all required packages together}
+\changes{4.1b}{2008/07/01}{Remove options newabstract and oldabstract}
+\changes{4.1b}{2008/08/01}{Section numbering via procedures \cs{secnums@rtx} and \cs{secnums@arabic}.}
+\changes{4.1b}{2008/08/04}{As with author formatting, rag the right more, and assign \cs{@totalleftmargin}. Also neutralize \cs{def@after@address}.}%
+\changes{4.1b}{2008/08/04}{Rag the right even more: .8\cs{hsize}. Also, assign \cs{@totalleftmargin}.}%
+\changes{4.1b}{2008/08/04}{The \texttt{rmp} journal substyle selects \texttt{groupedaddress} by default.}%
+\changes{4.1b}{2008/08/04}{Use \cs{setup@hook} to initialize all.}
+\changes{4.1c}{2008/08/15}{Document class option longbibliography via \cs{substyle@post}}
+\changes{4.1d}{2009/03/27}{Definition of \cs{ @fnsymbol} follows fixltx2e.sty}
+\changes{4.1e}{2008/06/29}{(AO, 455) be nice to a list within the abstract}
+\changes{4.1f}{2009/07/07}{(AO, 513) Add class option linenumbers: number the lines a la \classname{lineno}}
+\changes{4.1f}{2009/07/07}{(AO, 516) Merged references are separated with a semicolon}
+\changes{4.1f}{2009/07/10}{(AO, 520) Automatically produce \cs{bibliography} command when needed}%
+\changes{4.1f}{2009/07/11}{(AO, 521) Lonely bibliography head}%
+\changes{4.1f}{2009/07/11}{(AO, 522) Warn if software is expired}%
+\changes{4.1f}{2009/07/15}{(AO, 523) Add class option nomerge, to turn off new natbib 8.3 syntax}
+\changes{4.1f}{2009/07/20}{(AO, 524) Makes no sense if citations are superscript numbers and so are footnotes}
+\changes{4.1f}{2009/10/05}{(AO, 530) \cs{@fnsymbol}: Failed to import fixltx2e.sty technology. Return to LaTeX core.}
+\changes{4.1g}{2009/10/07}{(AO, 525) Remove phantom paragraph above display math that is given in vertical mode}%
+\changes{4.1g}{2009/10/07}{(AO, 538) \cs{MakeTextUppercase} inappropriately expands the double backslash}
+\changes{4.1h}{2009/10/09}{(AO) Remove expiry code in the release software}%
+\changes{4.1i}{2009/10/23}{(AO, 541) Defer assignment of \cs{cite} until after natbib loads}
+\changes{4.1j}{2009/10/24}{(AO, 549) Repairing natbib's \cs{BibitemShut} and \cs{bibAnnote}}
+\changes{4.1j}{2009/10/25}{(AO, 545) hypertext capabilities off by default; enable with \classoption{hypertext}}
+\changes{4.1j}{2009/10/25}{(AO, 552) Repair spacing in \cs{onlinecite}}
+\changes{4.1k}{2009/11/06}{(AO, 554) give the \cs{newlabel} command syntax appropriate to the hyperref package}
+\changes{4.1n}{2009/11/06}{(AO, 565) restore 4.0 behavior: invoking class option preprint implies class option preprintnumbers}
+\changes{4.1n}{2009/11/30}{(AO, 566) restore 4.0 behavior: flush column bottoms}
+\changes{4.1n}{2009/12/05}{(AO, 569) Use of \classname{hyperref} interferes with column balancing of last page}%
+\changes{4.1n}{2009/12/09}{(AO, 569) execute the after-last-shipout procedures from within the safety of the output routine}%
+\changes{4.1n}{2010/01/02}{(AO, 571) Interface \cs{set@footnotewidth} for determining the set width of footnotes}%
+\changes{4.1n}{2010/01/02}{(AO, 572) Independent footnote counter for title block. Abstract footnote counter shared with body.}%
+\changes{4.1n}{2009/12/13}{(AO, 573) arrange to load \classname{lineno} after any other packages.}%
+\changes{4.1n}{2010/01/04}{(AO, 575) the default for journal prstper is longbibliography}%
+\changes{4.1n}{2010/01/04}{(AO, 576) In .bst files, remove support for the annote field}%
+\changes{4.1n}{2010/01/02}{(AO) fine-tune spacing above and below widetext}%
+\changes{4.1n}{2010/01/02}{(AO, 571) class file must set \cs{splittopskip}; fine tune \cs{skip}\cs{footins}; \cs{footnoterule} defined in terms of \cs{skip}\cs{footins}}%
+\changes{4.1n}{2010/01/02}{(AO, 572) \cs{@makefntext} and \cs{frontmatter@makefntext} must be defined harmoniously}%
+\changes{4.1o}{2010/02/02}{(AO, 575) Automatically incorporate the (Bib\TeX-generated) .bbl into an explicit \env{thebibliography}}%
+\changes{4.1o}{2010/02/05}{(AO, 549) Remove patch to natbib, which is now at version 8.31a}
+\changes{4.1o}{2010/02/07}{(AO, 578) accommodate the possible space character preceding \cs{BibitemShut}.}
+\changes{4.1o}{2010/02/05}{(AO, 579) Endnote shall comprise their own Bib\TeX\ entry type: @FOOTNOTE.}
+\changes{4.1o}{2010/02/10}{(AO, 580) Provide a document class option to turn off production of eprint field in bibliography.}
+\changes{4.1o}{2010/02/12}{(AO, 580) Control .bst at run time.}%
+\changes{4.1o}{2010/02/09}{(AO, 581) Handle case: merged references, with first ending in a stop character.}
+\changes{4.1p}{2010/02/24}{(AO, 583) Provide interface to \classname{ltxgrid} \cs{onecolumn@grid@setup} and \cs{twocolumn@grid@setup}}
+\changes{4.1p}{2010/02/24}{(AO, 584) Per MD, remove trailing space character from each journal abbreviation: it had caused an extraneous space in the .bbl}
+\changes{4.1q}{2010/04/01}{(AO, 586) When .bbl is pasted into the document, prevent automatic bibliography inclusion.}%
+\changes{4.1q}{2010/04/13}{(AO, 588) Only write \revtex-specific BibTeX .bib data if the .bst style is set by REVTeX.}%
+\changes{4.1r}{2010/06/22}{(AO, 595) Provide \cs{lovname} along with other List of Videos definitions.}%
+
+\iffalse ltxdoc klootch
+This file has version number 4.1r, last revised 2010/07/25/20:33:00.\fi

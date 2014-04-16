@@ -1,0 +1,432 @@
+%merlin.mbs apsrev4-1.bst 2010-07-25 4.21a (PWD, AO, DPC) hacked
+%Control: key (0)
+%Control: author (8) initials jnrlst
+%Control: editor formatted (1) identically to author
+%Control: production of article title (-1) disabled
+%Control: page (0) single
+%Control: year (1) truncated
+%Control: production of eprint (0) enabled
+\providecommand{\noopsort}[1]{}\providecommand{\singleletter}[1]{#1}%
+\begin{thebibliography}{45}%
+\makeatletter
+\providecommand \@ifxundefined [1]{%
+ \@ifx{#1\undefined}
+}%
+\providecommand \@ifnum [1]{%
+ \ifnum #1\expandafter \@firstoftwo
+ \else \expandafter \@secondoftwo
+ \fi
+}%
+\providecommand \@ifx [1]{%
+ \ifx #1\expandafter \@firstoftwo
+ \else \expandafter \@secondoftwo
+ \fi
+}%
+\providecommand \natexlab [1]{#1}%
+\providecommand \enquote  [1]{``#1''}%
+\providecommand \bibnamefont  [1]{#1}%
+\providecommand \bibfnamefont [1]{#1}%
+\providecommand \citenamefont [1]{#1}%
+\providecommand \href@noop [0]{\@secondoftwo}%
+\providecommand \href [0]{\begingroup \@sanitize@url \@href}%
+\providecommand \@href[1]{\@@startlink{#1}\@@href}%
+\providecommand \@@href[1]{\endgroup#1\@@endlink}%
+\providecommand \@sanitize@url [0]{\catcode `\\12\catcode `\$12\catcode
+  `\&12\catcode `\#12\catcode `\^12\catcode `\_12\catcode `\%12\relax}%
+\providecommand \@@startlink[1]{}%
+\providecommand \@@endlink[0]{}%
+\providecommand \url  [0]{\begingroup\@sanitize@url \@url }%
+\providecommand \@url [1]{\endgroup\@href {#1}{\urlprefix }}%
+\providecommand \urlprefix  [0]{URL }%
+\providecommand \Eprint [0]{\href }%
+\providecommand \doibase [0]{http://dx.doi.org/}%
+\providecommand \selectlanguage [0]{\@gobble}%
+\providecommand \bibinfo  [0]{\@secondoftwo}%
+\providecommand \bibfield  [0]{\@secondoftwo}%
+\providecommand \translation [1]{[#1]}%
+\providecommand \BibitemOpen [0]{}%
+\providecommand \bibitemStop [0]{}%
+\providecommand \bibitemNoStop [0]{.\EOS\space}%
+\providecommand \EOS [0]{\spacefactor3000\relax}%
+\providecommand \BibitemShut  [1]{\csname bibitem#1\endcsname}%
+\let\auto@bib@innerbib\@empty
+%</preamble>
+\bibitem [{\citenamefont {Witten}(2001)}]{witten2001}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {E.}~\bibnamefont
+  {Witten}},\ }\href@noop {} {} (\bibinfo {year} {2001}),\ \Eprint
+  {http://arxiv.org/abs/hep-th/0106109} {hep-th/0106109} \BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Feynman}(1954)}]{feyn54}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {R.~P.}\ \bibnamefont
+  {Feynman}},\ }\href@noop {} {\bibfield  {journal} {\bibinfo  {journal}
+  {Phys.\ Rev.}\ }\textbf {\bibinfo {volume} {94}},\ \bibinfo {pages} {262}
+  (\bibinfo {year} {1954})}\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Einstein}\ \emph {et~al.}(1935)\citenamefont
+  {Einstein}, \citenamefont {Podolsky},\ and\ \citenamefont {Rosen}}]{epr}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {A.}~\bibnamefont
+  {Einstein}}, \bibinfo {author} {\bibfnamefont {{\relax Yu}.}~\bibnamefont
+  {Podolsky}}, \ and\ \bibinfo {author} {\bibfnamefont {N.}~\bibnamefont
+  {Rosen}} (\bibinfo {collaboration} {EPR}),\ }\href@noop {} {\bibfield
+  {journal} {\bibinfo  {journal} {Phys.\ Rev.}\ }\textbf {\bibinfo {volume}
+  {47}},\ \bibinfo {pages} {777} (\bibinfo {year} {1935})}\BibitemShut
+  {NoStop}%
+\bibitem [{\citenamefont {Beutler}(1994{\natexlab{a}})}]{Beutler1994}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {E.}~\bibnamefont
+  {Beutler}},\ }in\ \href@noop {} {\emph {\bibinfo {booktitle} {Williams
+  Hematology}}},\ Vol.~\bibinfo {volume} {2},\ \bibinfo {editor} {edited by\
+  \bibinfo {editor} {\bibfnamefont {E.}~\bibnamefont {Beutler}}, \bibinfo
+  {editor} {\bibfnamefont {M.~A.}\ \bibnamefont {Lichtman}}, \bibinfo {editor}
+  {\bibfnamefont {B.~W.}\ \bibnamefont {Coller}}, \ and\ \bibinfo {editor}
+  {\bibfnamefont {T.~S.}\ \bibnamefont {Kipps}}}\ (\bibinfo  {publisher}
+  {McGraw-Hill},\ \bibinfo {address} {New York},\ \bibinfo {year} {1994})\
+  Chap.~\bibinfo {chapter} {7}, pp.\ \bibinfo {pages} {654--662},\ \bibinfo
+  {edition} {5th}\ ed.\BibitemShut {Stop}%
+\bibitem [{\citenamefont {Birell}\ and\ \citenamefont {Davies}(1982)}]{Bire82}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {N.~D.}\ \bibnamefont
+  {Birell}}\ and\ \bibinfo {author} {\bibfnamefont {P.~C.~W.}\ \bibnamefont
+  {Davies}},\ }\href@noop {} {\emph {\bibinfo {title} {Quantum Fields in Curved
+  Space}}}\ (\bibinfo  {publisher} {Cambridge University Press},\ \bibinfo
+  {year} {1982})\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {G.~P.~Berman}\ and\ \citenamefont
+  {F.~M.~Izrailev}(1983)}]{Berman1983}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {J.}~\bibnamefont
+  {G.~P.~Berman}}\ and\ \bibinfo {author} {\bibfnamefont {J.}~\bibnamefont
+  {F.~M.~Izrailev}},\ }\href@noop {} {\bibfield  {journal} {\bibinfo  {journal}
+  {Physica D}\ }\textbf {\bibinfo {volume} {88}},\ \bibinfo {pages} {445}
+  (\bibinfo {year} {1983})}\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Davies}\ and\ \citenamefont
+  {Parns}(1988)}]{Davies1998}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {E.~B.}\ \bibnamefont
+  {Davies}}\ and\ \bibinfo {author} {\bibfnamefont {L.}~\bibnamefont {Parns}},\
+  }\href@noop {} {\bibfield  {journal} {\bibinfo  {journal} {Q. J. Mech. Appl.
+  Math.}\ }\textbf {\bibinfo {volume} {51}},\ \bibinfo {pages} {477} (\bibinfo
+  {year} {1988})}\BibitemShut {NoStop}%
+\bibitem [{Note1()}]{Note1}%
+  \BibitemOpen
+  \bibinfo {note} {Automatically placing footnotes into the bibliography
+  requires using BibTeX to compile the bibliography.}\BibitemShut {Stop}%
+\bibitem [{\citenamefont {Beutler}(1994{\natexlab{b}})}]{Beutler1994a}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {E.}~\bibnamefont
+  {Beutler}},\ }in\ \href@noop {} {\emph {\bibinfo {booktitle} {Williams
+  Hematology}}},\ Vol.~\bibinfo {volume} {2},\ \bibinfo {editor} {edited by\
+  \bibinfo {editor} {\bibfnamefont {E.}~\bibnamefont {Beutler}}, \bibinfo
+  {editor} {\bibfnamefont {M.~A.}\ \bibnamefont {Lichtman}}, \bibinfo {editor}
+  {\bibfnamefont {B.~W.}\ \bibnamefont {Coller}}, \ and\ \bibinfo {editor}
+  {\bibfnamefont {T.~S.}\ \bibnamefont {Kipps}}}\ (\bibinfo  {publisher}
+  {McGraw-Hill},\ \bibinfo {address} {New York},\ \bibinfo {year} {1994})\
+  \bibinfo {edition} {5th}\ ed.,\ Chap.~\bibinfo {chapter} {7}, pp.\ \bibinfo
+  {pages} {654--662}\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Knuth}(1973)}]{inbook-full}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {D.~E.}\ \bibnamefont
+  {Knuth}},\ }in\ \href@noop {} {\emph {\bibinfo {booktitle} {Fundamental
+  Algorithms}}},\ \bibinfo {series} {The Art of Computer Programming},
+  Vol.~\bibinfo {volume} {1}\ (\bibinfo  {publisher} {Addison-Wesley},\
+  \bibinfo {address} {Reading, Massachusetts},\ \bibinfo {year}
+  {\noopsort{1973b}1973})\ \bibinfo {type} {Section}\ \bibinfo {chapter} {1.2},
+  pp.\ \bibinfo {pages} {10--119},\ \bibinfo {edition} {2nd}\ ed.,\ \bibinfo
+  {note} {a full INBOOK entry}\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Smith}\ and\ \citenamefont
+  {Johnson}(2005)}]{Smith2005}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {J.~S.}\ \bibnamefont
+  {Smith}}\ and\ \bibinfo {author} {\bibfnamefont {G.~W.}\ \bibnamefont
+  {Johnson}},\ }\href@noop {} {\bibfield  {journal} {\bibinfo  {journal}
+  {Philos. Trans. R. Soc. London, Ser. B}\ }\textbf {\bibinfo {volume} {777}},\
+  \bibinfo {pages} {1395} (\bibinfo {year} {2005})}\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Smith}\ \emph
+  {et~al.}(2010{\natexlab{a}})\citenamefont {Smith}, \citenamefont {Johnson},\
+  and\ \citenamefont {Miller}}]{Smith2010}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {W.~J.}\ \bibnamefont
+  {Smith}}, \bibinfo {author} {\bibfnamefont {T.~J.}\ \bibnamefont {Johnson}},
+  \ and\ \bibinfo {author} {\bibfnamefont {B.~G.}\ \bibnamefont {Miller}},\
+  }\href@noop {} {\enquote {\bibinfo {title} {Surface chemistry and
+  preferential crystal orientation on a silicon surface},}\ } (\bibinfo {year}
+  {2010}{\natexlab{a}}),\ \bibinfo {note} {{J. Appl. Phys.}
+  (unpublished)}\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Smith}\ \emph
+  {et~al.}(2010{\natexlab{b}})\citenamefont {Smith}, \citenamefont {Johnson},\
+  and\ \citenamefont {Klein}}]{Smith2010a}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {V.~K.}\ \bibnamefont
+  {Smith}}, \bibinfo {author} {\bibfnamefont {K.}~\bibnamefont {Johnson}}, \
+  and\ \bibinfo {author} {\bibfnamefont {M.~O.}\ \bibnamefont {Klein}},\
+  }\href@noop {} {\enquote {\bibinfo {title} {Surface chemistry and
+  preferential crystal orientation on a silicon surface},}\ } (\bibinfo {year}
+  {2010}{\natexlab{b}}),\ \bibinfo {note} {{J. Appl. Phys.}
+  (submitted)}\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {{\"{U}}nderwood}\ \emph {et~al.}(1988)\citenamefont
+  {{\"{U}}nderwood}, \citenamefont {{\~N}et},\ and\ \citenamefont
+  {{\={P}}ot}}]{unpublished-full}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {U.}~\bibnamefont
+  {{\"{U}}nderwood}}, \bibinfo {author} {\bibfnamefont {N.}~\bibnamefont
+  {{\~N}et}}, \ and\ \bibinfo {author} {\bibfnamefont {P.}~\bibnamefont
+  {{\={P}}ot}},\ }\href@noop {} {\enquote {\bibinfo {title} {Lower bounds for
+  wishful research results},}\ } (\bibinfo {year} {1988}),\ \bibinfo {note}
+  {talk at Fanstord University (A full UNPUBLISHED entry)}\BibitemShut
+  {NoStop}%
+\bibitem [{\citenamefont {Johnson}\ \emph {et~al.}(2007)\citenamefont
+  {Johnson}, \citenamefont {Miller},\ and\ \citenamefont
+  {Smith}}]{JohnsonMillerSmith2007}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {M.~P.}\ \bibnamefont
+  {Johnson}}, \bibinfo {author} {\bibfnamefont {K.~L.}\ \bibnamefont {Miller}},
+  \ and\ \bibinfo {author} {\bibfnamefont {K.}~\bibnamefont {Smith}},\
+  }\href@noop {} {}\bibinfo {howpublished} {personal communication} (\bibinfo
+  {year} {2007})\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Smith}(2007{\natexlab{a}})}]{Smith2007}%
+  \BibitemOpen
+  \bibinfo {editor} {\bibfnamefont {J.}~\bibnamefont {Smith}},\ ed.,\
+  \href@noop {} {\emph {\bibinfo {title} {AIP Conf. Proc.}}},\ Vol.\ \bibinfo
+  {volume} {841}\ (\bibinfo {year} {2007})\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Oz}\ and\ \citenamefont
+  {Yannakakis}(1983)}]{proceedings-full}%
+  \BibitemOpen
+  \bibinfo {editor} {\bibfnamefont {W.~V.}\ \bibnamefont {Oz}}\ and\ \bibinfo
+  {editor} {\bibfnamefont {M.}~\bibnamefont {Yannakakis}},\ eds.,\ \href@noop
+  {} {\emph {\bibinfo {title} {Proc. Fifteenth Annual}}},\ \bibinfo {series}
+  {All ACM Conferences}\ No.~\bibinfo {number} {17},\ \bibinfo {organization}
+  {ACM}\ (\bibinfo  {publisher} {Academic Press},\ \bibinfo {address}
+  {Boston},\ \bibinfo {year} {1983})\ \bibinfo {note} {a full PROCEEDINGS
+  entry}\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Burstyn}(2004)}]{Burstyn2004}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {Y.}~\bibnamefont
+  {Burstyn}},\ }\href@noop {} {\enquote {\bibinfo {title} {{Proceedings of the
+  5th International Molecular Beam Epitaxy Conference, Santa Fe, NM}},}\ }
+  (\bibinfo {year} {2004}),\ \bibinfo {note} {(unpublished)}\BibitemShut
+  {NoStop}%
+\bibitem [{\citenamefont {Quinn}(2001)}]{Quinn2001}%
+  \BibitemOpen
+  \bibinfo {editor} {\bibfnamefont {B.}~\bibnamefont {Quinn}},\ ed.,\
+  \href@noop {} {\emph {\bibinfo {title} {{Proceedings of the 2003 Particle
+  Accelerator Conference, Portland, OR, 12-16 May 2005}}}}\ (\bibinfo
+  {publisher} {Wiley},\ \bibinfo {address} {New York},\ \bibinfo {year}
+  {2001})\ \bibinfo {note} {albeit the conference was held in 2005, it was the
+  2003 conference, and the proceedings were published in 2001; go
+  figure}\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Agarwal}(2001)}]{Agarwal2001}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {A.~G.}\ \bibnamefont
+  {Agarwal}},\ }\href@noop {} {\bibfield  {journal} {\bibinfo  {journal}
+  {Semiconductors}\ }\textbf {\bibinfo {volume} {66}},\ \bibinfo {pages} {1238}
+  (\bibinfo {year} {2001})}\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Smith}(2001)}]{SmithDA01}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {R.}~\bibnamefont
+  {Smith}},\ }\href@noop {} {\bibfield  {journal} {\bibinfo  {journal} {J.
+  Appl. Phys. (these proceedings)}\ } (\bibinfo {year} {2001})},\ \bibinfo
+  {note} {abstract No. DA-01}\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Smith}(2007{\natexlab{b}})}]{Smith2007a}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {J.}~\bibnamefont
+  {Smith}},\ }\href@noop {} {\bibfield  {journal} {\bibinfo  {journal} {Proc.
+  SPIE}\ }\textbf {\bibinfo {volume} {124}},\ \bibinfo {pages} {367} (\bibinfo
+  {year} {2007}{\natexlab{b}})},\ \bibinfo {note} {required title is
+  missing}\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {T{\'{e}}rrific}(1988)}]{techreport-full}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {T.}~\bibnamefont
+  {T{\'{e}}rrific}},\ }\href@noop {} {\emph {\bibinfo {title} {An {$O(n \log n
+  / \! \log\log n)$} Sorting Algorithm}}},\ \bibinfo {type} {Wishful Research
+  Result}\ \bibinfo {number} {7}\ (\bibinfo  {institution} {Fanstord
+  University},\ \bibinfo {address} {Computer Science Department, Fanstord,
+  California},\ \bibinfo {year} {1988})\ \bibinfo {note} {a full TECHREPORT
+  entry}\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Nelson}(1999{\natexlab{a}})}]{Nelson1999}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {J.}~\bibnamefont
+  {Nelson}},\ }\href@noop {} {}\bibinfo {type} {{TWI Report}}\ \bibinfo
+  {number} {666/1999}\ (\bibinfo {year} {Jan.~1999})\ \bibinfo {note} {required
+  institution missing}\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Fields}(2005)}]{Fields2005}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {W.~K.}\ \bibnamefont
+  {Fields}},\ }\href@noop {} {}\bibinfo {type} {{ECE Report No.}}\ \bibinfo
+  {number} {AL944}\ (\bibinfo {year} {2005})\ \bibinfo {note} {required
+  institution missing}\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Zalkins}(2008)}]{Zalkins2008}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {Y.~M.}\ \bibnamefont
+  {Zalkins}},\ }\href@noop {} {}\bibinfo {howpublished} {e-print
+  arXiv:cond-mat/040426} (\bibinfo {year} {2008})\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Nelson}(2005)}]{Nelson2005}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {J.}~\bibnamefont
+  {Nelson}},\ }\href@noop {} {}\bibinfo {howpublished} {{U.S. Patent No.}
+  5,693,000} (\bibinfo {year} {12~Dec.~2005})\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Nelson}(1999{\natexlab{b}})}]{Nelson1999a}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {J.~K.}\ \bibnamefont
+  {Nelson}},\ }\href@noop {} {\bibinfo {type} {M.{S}. thesis}},\ \bibinfo
+  {school} {New York University} (\bibinfo {year}
+  {1999}{\natexlab{b}})\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Masterly}(1988)}]{mastersthesis-full}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {{\'{E}}.}~\bibnamefont
+  {Masterly}},\ }\emph {\bibinfo {title} {Mastering Thesis Writing}},\
+  \href@noop {} {\bibinfo {type} {Master's project}},\ \bibinfo  {school}
+  {Stanford University}, \bibinfo {address} {English Department} (\bibinfo
+  {year} {1988}),\ \bibinfo {note} {a full MASTERSTHESIS entry}\BibitemShut
+  {NoStop}%
+\bibitem [{\citenamefont {Smith}(2003)}]{Smith2003}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {S.~M.}\ \bibnamefont
+  {Smith}},\ }\href@noop {} {\bibinfo {type} {{Ph.D.} thesis}},\ \bibinfo
+  {school} {Massachusetts Institute of Technology} (\bibinfo {year}
+  {2003})\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Kawa}\ and\ \citenamefont {Lin}(2003)}]{KawaLin2003}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {S.~R.}\ \bibnamefont
+  {Kawa}}\ and\ \bibinfo {author} {\bibfnamefont {S.-J.}\ \bibnamefont {Lin}},\
+  }\href@noop {} {\bibfield  {journal} {\bibinfo  {journal} {J. Geophys. Res.}\
+  }\textbf {\bibinfo {volume} {108}},\ \bibinfo {pages} {4201} (\bibinfo {year}
+  {2003})},\ \bibinfo {note} {{DOI:10.1029/2002JD002268}}\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Phony-Baloney}(1988)}]{phdthesis-full}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {F.~P.}\ \bibnamefont
+  {Phony-Baloney}},\ }\emph {\bibinfo {title} {Fighting Fire with Fire:
+  Festooning {F}rench Phrases}},\ \href@noop {} {\bibinfo {type} {{PhD}
+  dissertation}},\ \bibinfo  {school} {Fanstord University}, \bibinfo {address}
+  {Department of French} (\bibinfo {year} {1988}),\ \bibinfo {note} {a full
+  PHDTHESIS entry}\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Knuth}(1981)}]{book-full}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {D.~E.}\ \bibnamefont
+  {Knuth}},\ }\href@noop {} {\emph {\bibinfo {title} {Seminumerical
+  Algorithms}}},\ \bibinfo {edition} {2nd}\ ed.,\ \bibinfo {series} {The Art of
+  Computer Programming}, Vol.~\bibinfo {volume} {2}\ (\bibinfo  {publisher}
+  {Addison-Wesley},\ \bibinfo {address} {Reading, Massachusetts},\ \bibinfo
+  {year} {\noopsort{1973c}1981})\ \bibinfo {note} {a full BOOK
+  entry}\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Knvth}(1988)}]{booklet-full}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {J.~C.}\ \bibnamefont
+  {Knvth}},\ }\href@noop {} {\enquote {\bibinfo {title} {The programming of
+  computer art},}\ }\bibinfo {howpublished} {Vernier Art Center},\ \bibinfo
+  {address} {Stanford, California} (\bibinfo {year} {1988}),\ \bibinfo {note}
+  {a full BOOKLET entry}\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Ballagh}\ and\ \citenamefont
+  {Savage}(2000{\natexlab{a}})}]{ballagh2000}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {R.}~\bibnamefont
+  {Ballagh}}\ and\ \bibinfo {author} {\bibfnamefont {C.}~\bibnamefont
+  {Savage}},\ }\enquote {\bibinfo {title} {Bose-einstein condensation: from
+  atomic physics to quantum fluids, proceedings of the 13th physics summer
+  school},}\ \ (\bibinfo  {publisher} {World Scientific},\ \bibinfo {address}
+  {Singapore},\ \bibinfo {year} {2000})\ \Eprint
+  {http://arxiv.org/abs/cond-mat/0008070} {cond-mat/0008070} \BibitemShut
+  {NoStop}%
+\bibitem [{\citenamefont {Ballagh}\ and\ \citenamefont
+  {Savage}(2000{\natexlab{b}})}]{ballagh2000a}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {R.}~\bibnamefont
+  {Ballagh}}\ and\ \bibinfo {author} {\bibfnamefont {C.}~\bibnamefont
+  {Savage}},\ }in\ \href@noop {} {\emph {\bibinfo {booktitle} {Proceedings of
+  the 13th Physics Summer School}}},\ \bibinfo {editor} {edited by\ \bibinfo
+  {editor} {\bibfnamefont {C.}~\bibnamefont {Savage}}\ and\ \bibinfo {editor}
+  {\bibfnamefont {M.}~\bibnamefont {Das}}}\ (\bibinfo  {publisher} {World
+  Scientific},\ \bibinfo {address} {Singapore},\ \bibinfo {year} {2000})\
+  \Eprint {http://arxiv.org/abs/cond-mat/0008070} {cond-mat/0008070}
+  \BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Opechowski}\ and\ \citenamefont
+  {Guccione}(1965{\natexlab{a}})}]{Magnetism}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {W.}~\bibnamefont
+  {Opechowski}}\ and\ \bibinfo {author} {\bibfnamefont {R.}~\bibnamefont
+  {Guccione}},\ }\enquote {\bibinfo {title} {Introduction to the theory of
+  normal metals},}\ in\ \href@noop {} {\emph {\bibinfo {booktitle}
+  {Magnetism}}},\ Vol.\ \bibinfo {volume} {IIa},\ \bibinfo {editor} {edited by\
+  \bibinfo {editor} {\bibfnamefont {G.~T.}\ \bibnamefont {Rado}}\ and\ \bibinfo
+  {editor} {\bibfnamefont {H.}~\bibnamefont {Suhl}}}\ (\bibinfo  {publisher}
+  {Academic Press},\ \bibinfo {address} {New York},\ \bibinfo {year} {1965})\
+  p.\ \bibinfo {pages} {105}\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Opechowski}\ and\ \citenamefont
+  {Guccione}(1965{\natexlab{b}})}]{Magnetisma}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {W.}~\bibnamefont
+  {Opechowski}}\ and\ \bibinfo {author} {\bibfnamefont {R.}~\bibnamefont
+  {Guccione}},\ }in\ \href@noop {} {\emph {\bibinfo {booktitle} {Magnetism}}},\
+  Vol.\ \bibinfo {volume} {IIa},\ \bibinfo {editor} {edited by\ \bibinfo
+  {editor} {\bibfnamefont {G.~T.}\ \bibnamefont {Rado}}\ and\ \bibinfo {editor}
+  {\bibfnamefont {H.}~\bibnamefont {Suhl}}}\ (\bibinfo  {publisher} {Academic
+  Press},\ \bibinfo {address} {New York},\ \bibinfo {year} {1965})\ p.\
+  \bibinfo {pages} {105}\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Opechowski}\ and\ \citenamefont
+  {Guccione}(1965{\natexlab{c}})}]{Magnetismb}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {W.}~\bibnamefont
+  {Opechowski}}\ and\ \bibinfo {author} {\bibfnamefont {R.}~\bibnamefont
+  {Guccione}},\ }in\ \href@noop {} {\emph {\bibinfo {booktitle} {Magnetism}}},\
+  Vol.\ \bibinfo {volume} {IIa},\ \bibinfo {editor} {edited by\ \bibinfo
+  {editor} {\bibfnamefont {G.~T.}\ \bibnamefont {Rado}}\ and\ \bibinfo {editor}
+  {\bibfnamefont {H.}~\bibnamefont {Suhl}}}\ (\bibinfo  {publisher} {Academic
+  Press},\ \bibinfo {address} {New York},\ \bibinfo {year} {1965})\ p.\
+  \bibinfo {pages} {105}\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Smith}(1980{\natexlab{a}})}]{Smith80}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {J.~M.}\ \bibnamefont
+  {Smith}},\ }\enquote {\bibinfo {title} {Molecular dynamics},}\ \ (\bibinfo
+  {publisher} {Academic},\ \bibinfo {address} {New York},\ \bibinfo {year}
+  {1980})\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Zakharov}\ and\ \citenamefont {Shabat}(1971)}]{ZS71}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {V.~E.}\ \bibnamefont
+  {Zakharov}}\ and\ \bibinfo {author} {\bibfnamefont {A.~B.}\ \bibnamefont
+  {Shabat}},\ }\href@noop {} {\bibfield  {journal} {\bibinfo  {journal} {Zh.
+  Eksp. Teor. Fiz.}\ }\textbf {\bibinfo {volume} {61}},\ \bibinfo {pages} {118}
+  (\bibinfo {year} {1971})},\ \translation{Sov. Phys. JETP \textbf{34}, 62
+  (1972)}\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Smith}(1980{\natexlab{b}})}]{Smith80a}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {J.~M.}\ \bibnamefont
+  {Smith}},\ }in\ \href@noop {} {\emph {\bibinfo {booktitle} {Molecular
+  Dynamics}}},\ \bibinfo {editor} {edited by\ \bibinfo {editor} {\bibfnamefont
+  {C.}~\bibnamefont {Brown}}}\ (\bibinfo  {publisher} {Academic},\ \bibinfo
+  {address} {New York},\ \bibinfo {year} {1980})\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Lincoll}(1977)}]{incollection-full}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {D.~D.}\ \bibnamefont
+  {Lincoll}},\ }in\ \href@noop {} {\emph {\bibinfo {booktitle} {High Speed
+  Computer and Algorithm Organization}}},\ \bibinfo {series and number}
+  {\bibinfo {series} {Fast Computers}\ No.~\bibinfo {number} {23}},\ \bibinfo
+  {editor} {edited by\ \bibinfo {editor} {\bibfnamefont {D.~J.}\ \bibnamefont
+  {Lipcoll}}, \bibinfo {editor} {\bibfnamefont {D.~H.}\ \bibnamefont {Lawrie}},
+  \ and\ \bibinfo {editor} {\bibfnamefont {A.~H.}\ \bibnamefont {Sameh}}}\
+  (\bibinfo  {publisher} {Academic Press},\ \bibinfo {address} {New York},\
+  \bibinfo {year} {1977})\ \bibinfo {edition} {3rd}\ ed.,\ \bibinfo {type}
+  {Part}~\bibinfo {chapter} {3}, pp.\ \bibinfo {pages} {179--183},\ \bibinfo
+  {note} {a full INCOLLECTION entry}\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Oaho}\ \emph {et~al.}(1983)\citenamefont {Oaho},
+  \citenamefont {Ullman},\ and\ \citenamefont
+  {Yannakakis}}]{inproceedings-full}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {A.~V.}\ \bibnamefont
+  {Oaho}}, \bibinfo {author} {\bibfnamefont {J.~D.}\ \bibnamefont {Ullman}}, \
+  and\ \bibinfo {author} {\bibfnamefont {M.}~\bibnamefont {Yannakakis}},\ }in\
+  \href@noop {} {\emph {\bibinfo {booktitle} {Proc. Fifteenth Annual ACM}}},\
+  \bibinfo {address} {Boston, 1982},\ \bibinfo {series and number} {\bibinfo
+  {series} {All ACM Conferences}\ No.~\bibinfo {number} {17}},\ \bibinfo
+  {editor} {edited by\ \bibinfo {editor} {\bibfnamefont {W.~V.}\ \bibnamefont
+  {Oz}}\ and\ \bibinfo {editor} {\bibfnamefont {M.}~\bibnamefont
+  {Yannakakis}}},\ \bibinfo {organization} {ACM}\ (\bibinfo  {publisher}
+  {Academic Press},\ \bibinfo {address} {New York},\ \bibinfo {year} {1983})\
+  pp.\ \bibinfo {pages} {133--139},\ \bibinfo {note} {a full INPROCEDINGS
+  entry}\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Manmaker}(1986)}]{manual-full}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {L.}~\bibnamefont
+  {Manmaker}},\ }\href@noop {} {\emph {\bibinfo {title} {The Definitive
+  Computer Manual}}},\ \bibinfo {organization} {Chips-R-Us},\ \bibinfo
+  {address} {Silicon Valley},\ \bibinfo {edition} {silver}\ ed. (\bibinfo
+  {year} {1986}),\ \bibinfo {note} {a full MANUAL entry}\BibitemShut {NoStop}%
+\end{thebibliography}%

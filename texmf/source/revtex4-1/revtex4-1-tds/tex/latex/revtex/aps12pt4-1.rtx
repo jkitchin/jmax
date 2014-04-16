@@ -1,0 +1,169 @@
+%%
+%% This is file `aps12pt4-1.rtx',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% revtex4-1.dtx  (with options: `12pt')
+%% 
+%% This file is part of the APS files in the REVTeX 4 distribution.
+%% For the version number, search on the string 
+%% Original version by David Carlisle
+%% Modified by Arthur Ogawa (mailto:arthur_ogawa at sbcglobal dot net)
+%% 
+%% Copyright (c) 2009 The American Physical Society.
+%% http://publish.aps.org/revtex4/
+%% mailto:revtex4@aps.org
+%% 
+%% See the REVTeX 4 README file for restrictions and more information.
+%% 
+\ProvidesFile{aps12pt4-1}
+ [2010/07/25/20:33:00 4.1r (http://publish.aps.org/revtex4/ for documentation)]% \fileversion
+\ifx\undefined\substyle@ext
+ \def\@tempa{%
+  \endinput
+  \GenericWarning{I must be read in by REVTeX! (Bailing out)}%
+ }%
+ \expandafter\else
+  \def\@tempa{}%
+ \expandafter\fi\@tempa
+ \class@info{RevTeX pointsize 12pt selected}%
+\def\normalsize{%
+  \@setfontsize\normalsize\@xiipt{14pt}%
+  \abovedisplayskip 12\p@ \@plus3\p@ \@minus7\p@
+  \belowdisplayskip \abovedisplayskip
+  \abovedisplayshortskip  \z@ plus3\p@
+  \belowdisplayshortskip  6.5\p@ \@plus3.5\p@ \@minus3\p@
+  \let\@listi\@listI
+}%
+ \def\small{%
+  \@setfontsize\small\@xipt{14.5pt}%
+  \abovedisplayskip 8\p@ \@plus3\p@ \@minus6\p@
+  \belowdisplayskip \abovedisplayskip
+  \abovedisplayshortskip \z@ \@plus3\p@
+  \belowdisplayshortskip 6.5\p@ \@plus3.5\p@ \@minus3\p@
+  \def\@listi{%
+    \leftmargin\leftmargini
+    \topsep 9\p@ \@plus3\p@ \@minus5\p@
+    \parsep 4.5\p@ \@plus2\p@ \@minus\p@
+    \itemsep \parsep
+  }%
+}%
+ \def\footnotesize{%
+  \@setfontsize\footnotesize\@xpt{14.5pt}%
+  \abovedisplayskip 10\p@ \@plus2\p@ \@minus5\p@
+  \belowdisplayskip \abovedisplayskip
+  \abovedisplayshortskip \z@ \@plus3\p@
+  \belowdisplayshortskip 6\p@ \@plus3\p@ \@minus3\p@
+  \def\@listi{%
+    \leftmargin\leftmargini
+    \topsep 6\p@ \@plus2\p@ \@minus2\p@
+    \parsep 3\p@ \@plus2\p@ \@minus\p@
+    \itemsep \parsep
+  }%
+}%
+\def\scriptsize{%
+  \@setfontsize\scriptsize\@viiipt{9.5pt}%
+}%
+\def\tiny{%
+  \@setfontsize\tiny\@vipt{7pt}%
+}%
+\def\large{%
+  \@setfontsize\large\@xivpt{18pt}%
+}%
+\def\Large{%
+  \@setfontsize\Large\@xviipt{22pt}%
+}%
+\def\LARGE{%
+  \@setfontsize\LARGE\@xxpt{25pt}%
+}%
+\def\huge{%
+    \@setfontsize\huge\@xxvpt{30pt}%
+}%
+\let\Huge=\huge
+\appdef\setup@hook{%
+ \twoside@sw{%
+  \oddsidemargin   0pt
+  \evensidemargin  0pt
+  \marginparwidth 60pt
+ }{%
+  \oddsidemargin 0pt
+  \evensidemargin 0pt
+  \marginparwidth 44pt
+ }%
+}%
+\marginparsep 10pt
+\topmargin -37pt
+\headheight 12pt
+\headsep 25pt
+\topskip 10pt
+\splittopskip\topskip
+\footskip 30pt
+\textheight=665.5\p@
+\appdef\setup@hook{%
+ \tightenlines@sw{%
+  \def\baselinestretch{1}%
+ }{%
+  \def\baselinestretch{1.5}%
+ }%
+}%
+\textwidth 468pt
+\columnsep 10pt
+\columnseprule 0pt
+\footnotesep 1pt
+\skip\footins 25.25pt plus 4pt minus 12pt
+\def\footnoterule{%
+ \dimen@\skip\footins\divide\dimen@\f@ur
+ \kern-\dimen@\hrule width.5in\kern\dimen@
+}%
+\floatsep        14pt plus 2pt minus 4pt
+\textfloatsep    20pt plus 2pt minus 4pt
+\intextsep       14pt plus 4pt minus 4pt
+\dblfloatsep     14pt plus 2pt minus 4pt
+\dbltextfloatsep 20pt plus 2pt minus 4pt
+\@fptop 0pt plus 1fil
+\@fpsep 10pt plus 2fil
+\@fpbot 0pt plus 1fil
+\@dblfptop 0pt plus 1fil
+\@dblfpsep 10pt plus 2fil%
+\@dblfpbot 0pt plus 1fil
+\marginparpush 7pt
+\parskip 0pt plus 1pt
+\parindent 15pt
+\emergencystretch8\p@
+\partopsep 3pt plus 2pt minus 2pt
+\leftmargini   30pt
+\leftmarginii  26pt
+\leftmarginiii 22pt
+\leftmarginiv  20pt
+\leftmarginv   12pt
+\leftmarginvi  12pt
+\def\@listI{\leftmargin\leftmargini \parsep 5\p@ plus2.5\p@ minus\p@
+  \topsep 10\p@ plus4\p@ minus6\p@
+  \itemsep 5\p@ plus2.5\p@ minus\p@
+}%
+\labelsep 6pt
+\def\@listii{\leftmargin\leftmarginii
+  \labelwidth\leftmarginii\advance\labelwidth-\labelsep
+  \topsep 5\p@ plus2.5\p@ minus\p@
+  \parsep 2.5\p@ plus\p@ minus\p@
+  \itemsep \parsep
+}%
+\def\@listiii{\leftmargin\leftmarginiii
+  \labelwidth\leftmarginiii\advance\labelwidth-\labelsep
+  \topsep 2.5\p@ plus\p@ minus\p@
+  \parsep \z@ \partopsep \p@ plus\z@ minus\p@
+  \itemsep \topsep
+}%
+\def\@listiv{\leftmargin\leftmarginiv
+  \labelwidth\leftmarginiv\advance\labelwidth-\labelsep
+}%
+\def\@listv{\leftmargin\leftmarginv
+  \labelwidth\leftmarginv\advance\labelwidth-\labelsep
+}%
+\def\@listvi{\leftmargin\leftmarginvi
+  \labelwidth\leftmarginvi\advance\labelwidth-\labelsep
+}%
+\endinput
+%%
+%% End of file `aps12pt4-1.rtx'.

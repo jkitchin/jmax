@@ -1,0 +1,129 @@
+% authguide.rty - macros for processing revguide.tex under \documentclass{revtex4}
+% Text entities
+\DeclareRobustCommand\SNG{\emph{Physical Review Style and Notation Guide}}
+\DeclareRobustCommand\LUG{\emph{\LaTeX{} User's Guide \& Reference Manual}}
+\DeclareRobustCommand\revtex{REV\TeX}
+\DeclareRobustCommand\marglat{\marginpar[\textbf{2e}]{\textbf{2e}}} 
+\DeclareRobustCommand\margrev{\marginpar[\textbf{4}]{\textbf{4}}} 
+\DeclareRobustCommand\AmS{%
+ {\protect\the\textfont\tw@ A\kern-.1667em\lower.5ex\hbox{M}\kern-.125emS}%
+}%
+\DeclareRobustCommand\AmSLaTeX{\AmS-\LaTeX}
+\DeclareRobustCommand\BibTeX{{\rm B}{\sc ib}\TeX}
+%
+% Various forms of self-indexing commands:
+%    \begin{macrocode}
+\DeclareRobustCommand{\m}[1]{%
+ \meta{#1}%
+ \index{#1=\string\meta{#1} placeholder}\index{placeholder>#1=\string\meta{#1}}%
+}%
+\DeclareRobustCommand\meta[1]{%
+ \mbox{\m@th\LANGLE\itshape#1\/\RANGLE}%
+}%
+\def\LANGLE{$\langle$}%
+\def\RANGLE{$\rangle$}%
+\DeclareRobustCommand{\marg}[1]{%
+ {\ttfamily\string{}\meta{#1}{\ttfamily\string}}%
+ \index{#1=\string\ttt{#1}, argument}\index{argument>#1=\string\ttt{#1}}%
+}%
+\DeclareRobustCommand{\aarg}[1]{%
+ {\ttfamily\string{}#1{\ttfamily\string}}%
+}%
+\let\oarg\undefined
+\DeclareRobustCommand{\oarg}[1]{%
+ {\ttfamily[%]
+  }\meta{#1}{\ttfamily%[
+ ]}%
+ \index{#1=\string\ttt{#1}, optional argument}%
+ \index{argument, optional>#1=\string\ttt{#1}}%
+}%
+\DeclareRobustCommand\cmd{\begingroup\makeatletter\@cmd}%
+\long\def\@cmd#1{%
+ \endgroup
+ \cs{\expandafter\cmd@to@cs\string#1}%
+ \expandafter\cmd@to@index\string#1\@nil
+}%
+\def\cmd@to@cs#1#2{\char\number`#2\relax}%
+\def\cmd@to@index#1#2\@nil{%
+ \index{#2=\string\cmd#1#2}%\index{command>#2=\string\cmd#1#2}%
+}%
+\DeclareRobustCommand\cs[1]{{\ttfamily\char`\\#1}}%
+\def\scmd#1{%
+ \cs{\expandafter\cmd@to@cs\string#1}%
+ \expandafter\scmd@to@index\string#1\@nil
+}%
+\def\scmd@to@index#1#2\@nil#3{%
+ \index{\string$#3=\string\cmd#1#2---#3}%
+%\index{command>\string$#3=\string\cmd#1#2---#3}%
+}%
+\DeclareRobustCommand\env{\name@idx{environment}}%
+\DeclareRobustCommand\envb[1]{%
+ {\ttfamily\string\begin\string{}\env{#1}{\ttfamily\string}}%
+}%
+\DeclareRobustCommand\enve[1]{{\ttfamily\string\end\string{}\env{#1}{\ttfamily\string}}}%
+\DeclareRobustCommand*{\file}[1]{%
+ {\ttfamily#1}%
+ \index{#1=\string\ttt{#1}}\index{file>#1=\string\ttt{#1}}%
+}%
+\DeclareRobustCommand\substyle{\name@idx{document substyle}}%
+\DeclareRobustCommand\classoption{\name@idx{document class option}}%
+\DeclareRobustCommand\classname{\name@idx{document class}}%
+\def\name@idx#1#2{%
+ {\ttfamily#2}%
+ \index{#2\space#1=\string\ttt{#2}\space#1}\index{#1>#2=\string\ttt{#2}}%
+}%
+%
+% Needed for index:
+%
+\def\ttt{\texttt}%
+\def\pfill{\ }%
+\def\efill{\ }%
+\let\scan@allowedfalse\relax
+%\makeindex
+\AtEndDocument{\@input@{\jobname.ind}\null}%
+%
+% Processing options
+%
+%
+% Layout: override revtex4|aps
+\c@secnumdepth2
+\prepdef\@verbatim{\topsep.5\baselineskip}%
+\renewenvironment{quotation}{%
+ \list{}{%
+    \listparindent 10\p@
+    \itemindent\listparindent
+    \leftmargin10\p@
+    \rightmargin\leftmargin
+    \parsep \z@ \@plus\p@
+    \small
+ }%
+ \item[]%
+}{%
+ \endlist
+}%
+\renewenvironment{quote}{%
+ \list{}{%
+  \leftmargin\z@
+  \rightmargin\leftmargin
+ }\item[]%
+}{%
+ \endlist
+}%
+\leftmargini\parindent
+\def\descriptionlabel#1{%
+  \hspace\labelsep\ignorespaces
+  #1\unskip
+}%
+\def\toprule{\hline\hline\frstrut}%
+\def\colrule{\hline\frstrut}%
+\def\frstrut{\vrule height2.5ex width\z@ depth\z@\relax}%
+\def\lrstrut{\vrule height\z@ width\z@ depth.5ex\relax}%
+%
+% Klootches
+%
+\let\savenofiles\nofiles
+%
+% Patches:
+%
+%
+\endinput

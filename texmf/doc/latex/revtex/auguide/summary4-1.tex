@@ -1,0 +1,370 @@
+%% ****** Start of file summary4-1.tex ****** %
+%%
+%%   This file is part of the APS files in the REVTeX 4 distribution.
+%%   Version 4.1r of REVTeX, August, 2010
+%%
+%%   Copyright (c) 2000, 2001, 2009, 2010 The American Physical Society.
+%%
+%%   See the REVTeX 4.1 README file for restrictions and more information.
+%%
+\listfiles
+\documentclass[%
+twocolumn,secnumarabic,amssymb, amsmath, nofootinbib,tightenlines,
+nobibnotes, aps, 
+prl,
+%outputdebug,
+]{revtex4-1}
+%\usepackage{amsmath}%
+\usepackage{longtable}%
+\usepackage{bm}%
+\usepackage{docs}
+%\usepackage[colorlinks=true,linkcolor=blue]{hyperref}%
+%\nofiles
+\expandafter\ifx\csname package@font\endcsname\relax\else
+ \expandafter\expandafter
+ \expandafter\usepackage
+ \expandafter\expandafter
+ \expandafter{\csname package@font\endcsname}%
+\fi
+
+\begin{document}
+
+\title[Command Option Summary]{\revtex~4.1 Command and Options Summary}%
+
+\author{American Physical Society}%
+\email{revtex4@aps.org}
+\affiliation{One Research Road, Ridge, NY 11961}
+\date{August 2010}%
+\maketitle
+
+This is the \textit{\revtex~4.1 Command and Options Summary}. It details
+usage for many of the new commands and options that are available in
+\revtex~4. Please see the \textit{\revtex~4.1 Author's Guide} for
+complete information on how to use \revtex~4.1.  Class options for the
+\verb+\documentclass+ line are marked with square
+brackets. Environments are indicated by \verb+\begin{<env>}+ and always
+require a matching \verb+\end{<env>}+.
+
+\setlength\LTleft{0pt}
+\setlength\LTright{0pt}
+%
+\begin{longtable*}{@{\extracolsep{0in}}p{3in}p{4in}}
+\caption{\label{tab:summary}\revtex~4.1 Command Summary}\\*
+%
+\noalign{\vspace{3pt}}%
+\toprule\rule{0pt}{12pt}
+\textbf{\revtex~4/\LaTeXe\ Markup}&\textbf{Details and Usage}\\*[3pt]
+\endfirsthead
+%
+\multicolumn{2}{c}{TABLE~\ref{tab:summary} (continued): \revtex~4.1 Command Summary}%
+\rule{0pt}{12pt}\\[3pt]
+\colrule\rule{0pt}{12pt}
+\textbf{\revtex~4/\LaTeXe\ Markup}&\textbf{Details and Usage}\\*[3pt]
+\endhead
+%
+\noalign{\nobreak\vspace{3pt}}%
+\colrule
+\endfoot
+%
+\noalign{\nobreak\vspace{3pt}}%
+\botrule
+\endlastfoot
+%
+\multicolumn{2}{c}{\textsc{Frequently Used Class Options}\rule[-6pt]{0pt}{18pt}}\\*
+\verb+[aps]+ & \textit{American Physical Society} styling. Default.\\
+\verb+[aip]+ & \textit{American Institute of Physics} styling.\\
+\verb+[prl]+, \verb+[pra]+, \verb+[prb]+, \verb+[prc]+, \verb+[prd]+, \verb+[pre]+, \verb+[prstab]+, \verb+[prstper]+, \verb+[rmp]+& Further customize \verb+[aps]+ styling for APS journals.\\
+\verb+[apl]+, \verb+[bmf]+, \verb+[cha]+, \verb+[jap]+, \verb+[jcp]+, \verb+[jmp]+, \verb+[rse]+, \verb+[pof]+, \verb+[pop]+, \verb+[rsi]+& Further customize \verb+[aip]+ styling for AIP journals.\\
+%\verb+[rmp]+ & Further customize \verb+[aps]+ styling for \textit{Reviews of Modern Physics}.\\
+\verb+[twocolumn]+ & Two-column formatting.\\
+\verb+[onecolumn]+ & Single-column formatting.\\
+\verb+[preprint]+ & Single-column formatting with increased interline spacing.\\
+\verb+[reprint]+ & Closely approximate a given journal's style. Can be either single or two-column formatting depending on the journal.\\
+\verb+[10pt]+, \verb+[11pt]+, \verb+[12pt]+ & Set font size. \verb+[preprint]+ gives \verb+[12pt]+, \verb+[twocolumn]+ gives
+\verb+[10pt]+ by default.\\
+\verb+[groupedaddress]+ & Group authors with same affiliations together. Default. \\
+\verb+[superscriptaddress]+ & Associate authors with affiliations via superscript numbers. Appropriate for collaborations or if several authors share some, but not all, affiliations.\\
+\verb+[draft]+ & Mark overfull lines.\\
+\verb+[linenumbers]+ & Number lines (requires lineno.sty).\\
+\verb+[longbibliography]+ & Use alternative Bib\TeX\ style files that show journal article titles in the bibliography.\\
+\verb+[amsfonts]+, \verb+[noamsfonts]+ & Load (don't load)
+\verb+amsfonts+ package. Adds AMS font support.\\
+\verb+[amssymb]+, \verb+[noamssymb]+ & Load (don't load)
+\verb+amssymb+ package. Adds additional AMS symbols.\\
+\verb+[amsmath]+, \verb+[noamsmath]+ & Load (don't load)
+\verb+amsmath+ package. Adds AMS-\LaTeX\ features.\\
+%
+\multicolumn{2}{c}{\textsc{Other Class Options}\rule[-6pt]{0pt}{18pt}}\\*
+\verb+[preprintnumbers]+, \verb+[nopreprintnumbers]+ & Control display of preprint numbers given by \verb+\preprint+ command. \verb+[preprintnumbers]+ is default for \verb+[preprint]+; otherwise \verb+[nopreprintnumbers]+ is default.\\
+\verb+[floatfix]+ & Invoke emergency processing to avoid the \LaTeX\ error \verb+``Too many unprocessed floats''+ or all subsequent floats being moved to the end of the job. \revtex~4 will display a message recommending this option if warranted.\\
+\verb+[bibnotes]+, \verb+[nobibnotes]+ & Control location of author footnotes. Default varies with journal style.\\
+\verb+[footinbib]+, \verb+[nofootinbib]+ & Control location of footnotes. Default varies with journal style.\\
+\verb+[altaffilletter]+, \verb+[altaffillsymbol]+ & Use letters or symbols for
+\verb+\altaffiliation+ superscripts. \verb+[altaffillsymbol]+ is default.\\
+\verb+[unsortedaddress]+ & Like \verb+[groupedaddress]+, but doesn't combine authors together who share the same affiliations.\\
+\verb+[runinaddress]+ & Like \verb+[groupedaddress]+, but joins multiple affiliations together into a single sequence separated by commas.\\
+\verb+[showpacs]+, \verb+[noshowpacs]+ & Control display of PACS: line.\\
+\verb+[showkeys]+, \verb+[noshowkeyws]+ & Control display of Keywords: line.\\
+\verb+[tightenlines]+ & Single space manuscript (for use with \verb+[preprint]+).\\
+\verb+[floats]+ & Position floats near call outs. Default.\\
+\verb+[endfloats]+ & Move all floats to the end of the document.\\
+\verb+[endfloats*]+ &  Move all floats to the end of the document and put each on a separate page.\\
+\verb+[titlepage]+, \verb+[notitlepage]+ & Control appearance of title page.\\
+\verb+[final]+ & Don't mark overfull lines. Default.\\
+\verb+[letterpaper]+, \verb+[a4paper]+, \verb+[a5paper]+ & Select paper size. \verb+[letterpaper]+ is default.\\
+\verb+[oneside]+, \verb+[twoside]+ & Control book syle layout. \verb+[oneside]+ is default.\\
+\verb+[fleqn]+ & Flush displayed equations left. \\
+\verb+[eqsecnum]+ & Number equations by section.\\
+\verb+[balancelastpage]+, \verb+[nobalancelastpage]+ & Control
+\verb+[twocolumn]+ balancing on last page. \verb+[balancelastpage]+ is default.\\
+\verb+[raggedbottom]+, \verb+[flushbottom]+ & Control \verb+[twocolumn]+ balancing. \verb+[flushbottom]+ is default.\\
+\verb+[raggedfooter]+, \verb+[noraggedfooter]+ & Control positioning of footer. \verb+[noraggedfooter]+ is default.\\
+\verb+[byrevtex]+ & Display ``Typeset by \revtex~4''.\\
+\verb+[citeautoscript]+ & Fix up spacing and punctuation when switching from non-superscript style citations to superscript citation styles. \verb+\cite+ commands and associated spacing and punctuation should be as for the non-superscript style.\\
+\verb+[galley]+ & Typeset in a single narrow column.\\
+\verb+[nomerge]+ & Allows processing of legacy documents that use square brackets as part of the key in a \verb+cite+ command.\\
+%
+\multicolumn{2}{c}{\textsc{Frontmatter Commands}\rule[-6pt]{0pt}{18pt}}\\*
+\verb+\title{<title>}+ & The manuscript title.\\
+\verb+\author{One Author}+ & Specify one author's name.\\
+\verb+\surname{Lloyd Weber}+, \verb+\surname{Mao}+ & Indicate which part of a name within
+\verb+\author+ should be used for alphabetizing and indexing.\\
+\verb+\email[<optional text>]{author@any.edu}+& Specify an e-mail address for an author.\\
+\verb+\homepage[<optional text>]+ \verb+    {http://any.edu/homepage/}+& Specify a URL for an author's web site.\\
+\verb+\altaffiliation[optional text]+ \verb+    {affiliation information}+&Specify an alternate or temporary address for an author.\\
+\verb+\thanks{text}+& Additional information about an author not covered by the more specific macros above.\\
+\verb+\collaboration{<The Collaboration>}+ & Specify a collaboration name for a group of authors. Should be placed after the authors. \\
+\verb+\affiliation{text}+ & Specify a single affiliation. Applies to all previous authors without a specified affiliation.\\
+\verb+\noaffiliation+ & For an author or collaboration without an affiliation.\\
+\verb+\date{<date>}+ &  Show the date on the manuscript. \verb+\date{\today}+ gives the current date.\\
+\verb+\begin{abstract}+ & Start the manuscript's abstract. Must appear before \verb+\maketitle+ command.\\
+\verb+\pacs{<pacs codes>}+& PACS codes for manuscript. Multiple PACS codes should be specified together in a single \verb+\pacs+ macro.\\
+\verb+\keywords{<keywords>}+ & Suggested keywords for indexing.\\
+\verb+\preprint{<report number>}+ & Specify an institutional report number to appear in the upper-righthand corner of the first page. Multiple 
+\verb+\preprint+ macros may be supplied, but space may limit how many can appear.\\
+\verb+\maketitle+ & Typeset the title/author/abstract block.\\
+%
+\multicolumn{2}{c}{\textsc{Sectioning Commands}\rule[-6pt]{0pt}{18pt}}\\*
+\verb+\section{<heading>}, \subsection{<heading>}+,
+\verb+\subsubsection{<heading>}+ & Start a new section or subsection.\\
+\verb+\section*{<heading>}+ & Start a new section without a number.\\
+\verb+\appendix+ & Makes all following sections appendices.\\
+\verb+\appendix*+ & Signifies there is a single appendix section to follow.\\
+\verb+\begin{acknowledgments}+ & Start an Acknowledgments section. Note spelling.\\
+\verb+\lowercase{<text>}+ & Escape a letter or word from being uppercased in a top-level \verb+\section+ heading.\\
+%
+\multicolumn{2}{c}{\textsc{Citation, Footnote, and Cross-referencing Commands}\rule[-6pt]{0pt}{18pt}}\\*
+\verb+\bibliography{<bib file basename>}+ & Specify a list of .bib
+files in which to find references. Read in the resulting .bbl file.  For use with Bib\TeX\ . \\
+\verb+\bibliographystyle{<bst stylefile>}+ & Specify a Bib\TeX\ (.bst) style file to use. APS journal options select the proper default (\texttt{apsrev} or \texttt{apsrmp}).\\
+\verb+\begin{thebibliography}+ & Start the reference section (when not using Bib\TeX). \\
+\verb+\bibitem[<optional text>]{<key>}+ & Specify a single reference.\\
+\verb+\cite{<list of keys>}+ & Cite one or more references. \verb+<key>+ is same as that of \verb+\bibitem+. Prepend a * in front of a key to merge the reference with the previous one in the bibliography.\\
+\verb+\cite{*[{<prepended>}][{<appended>}]{<keys>}+  & Prepend and/or append text to a bibliography entry. Note use of curly braces within the square brackets.\\
+\verb+\onlinecite{<key>}+ & For superscript style citations, place the corresponding number on the baseline rather than as a superscript.\\
+\verb+\bibinfo[<tag>]{<text>}+ & A pure markup macro that adds tagging information to the components of a reference. \revtex~4 Bib\TeX\ style files automatically add them appropriately. Doesn't affect the typesetting.\\
+\verb+\url{<url>}+ & Typeset a URL (\revtex~4 automatically loads \texttt{url.sty}).Bib\TeX\ styles automatically add this markup.\\
+\verb+\eprint{<e-print id>}+ & Typeset an e-print identifier. Bib\TeX\ styles automatically add this markup.\\
+\verb+\footnote{<text>}+ & Create a footnote or endnote in bibliography depending on class options. \verb+\footnote+ within a table will create a footnote attached to the table.\\
+\verb+\footnotemark{<key>}+, \verb+\footnotetext[<key>]{<text>}+ & In a table, allows for multiple items to share the note. \\
+\verb+\label{<key>}+ & Label an item for cross-referencing. \verb+\label+ should appear within the argument of the cross-referenced item (e.g., \verb+\section{\label{<key>}...}+ or \verb+\caption{\label{<key>}...}+.\\
+\verb+\ref{<key>}+ & Refer to an item labeled by \verb+\label{<key>}+.\\
+\verb+\pageref{<key>}+ & Refer to the page on which an item labeled by \verb+\label{<key>}+ appears.\\
+%
+\multicolumn{2}{c}{\textsc{Math and Equation Commands}\rule[-6pt]{0pt}{18pt}}\\*
+\verb+$+ & Inline math delimiter.\\
+\verb+\begin{equation}+ & Display numbered one-line equation.\\
+\verb+\[+, \verb+\]+ & Display unnumbered one-line equation.\\
+\verb+\begin{eqnarray}+ & Display multiple equations together or a
+long equation that requires multiple lines. Use \verb+widetext+
+environment for an equation that must span the page in two-column formatting.\\
+\verb+\nonumber+ & Suppress numbering of an equation with
+\verb+eqnarray+.\\
+\verb+\begin{eqnarray*}+ & Display multiple equations with no equation
+numbering at all.\\
+\verb+&+ & Alignment character for equations within \verb+eqnarray+.\\
+\verb+\\+ & End a row in \verb+eqnarray+.\\
+\verb+\\*+ & Prevent a page break at this point in an
+\verb+eqnarray+.\\
+\verb+\label{<key>}+ & Label an equation or group of equations for
+cross-referencing.\\
+\verb+\ref{<key>}+ & Refer to an equation by its label (e.g.,
+\verb+Eq~(ref{<key>})+).\\
+\verb+\tag{<key}}+ & Specify an alternative labeling separate from the
+automatic numbering of equations. Requires \verb+[amsmath]+.\\
+\verb+\text{<text>}+ & Non-italicized text within a math
+context. Requires \verb+[amsmath]+. Do not use \verb+\rm+,
+\verb+\textrm+, or \verb+\mbox+.\\
+%
+\multicolumn{2}{c}{\textsc{Some} AMS-\LaTeX\ \textsc{Commands}\rule[-6pt]{0pt}{18pt}}\\*
+\verb+\begin{split}+ & Split equations with alignment.\\
+\verb+\begin{multline}+ & Split equations without alignment.\\
+\verb+\begin{align}+ & Equation groups with alignment.\\
+\verb+\begin{gather}+ & Equation groups without alignment.\\
+\verb+\begin{subequations}+ & Create an equation array in which each
+equation is individually numbered (4a, 4b, 4c, etc.) as part of a
+single group of equations that can be referenced as a whole.\\
+\verb+\intertext+ & Textual interjections witin a display equation.\\
+\verb+\usepackage{amscd}+ & Create commutative diagrams.\\
+\verb+\begin{pmatrix}+ & Matrices with parentheses as delimiters.\\
+\verb+\begin{bmatrix}+ & Matrices with square brackets as delimiters.\\
+\verb+\begin{Bmatrix}+ & Matrices with curly braces as delimiters.\\
+\verb+\begin{vmatrix}+ & Matrices with vertical bars as delimiters.\\
+\verb+\begin{Vmatrix}+ & Matrices with double vertical bars as
+delimiters.\\
+\verb+\hdotsfor+ & Row of dots in a matrix.\\
+\verb+\Hat+ & Alternative \verb+\hat+ accent for stacking.\\
+\verb+\Check+ & Alternative \verb+\check+ accent for stacking.\\
+\verb+\Tilde+ & Alternative \verb+\tilde+ accent for stacking.\\
+\verb+\Acute+ & Alternative \verb+\acute+ accent for stacking.\\
+\verb+\Grave+ & Alternative \verb+\grave+ accent for stacking.\\
+\verb+\Dot+ & Alternative \verb+\dot+ accent for stacking.\\
+\verb+\Ddot+ & Alternative \verb+\ddot+ accent for stacking.\\
+\verb+\Breve+ & Alternative \verb+\breve+ accent for stacking.\\
+\verb+\Vec+ & Alternative \verb+\vec+ accent for stacking.\\
+\verb+\xleftarrow+ & Extensible left arrow.\\
+\verb+\xrightarrow+ & Extensible right arrow.\\
+\verb+\overset+ & Place a symbol over another.\\
+\verb+\underset+ & Place a symbol under another.\\
+\verb+\lvert+ & Vertical bar with spacing rules appropriate for use as
+a left delimiter.\\
+\verb+\rvert+ & Vertical bar with spacing rules appropriate for use as
+a right delimiter.\\
+\verb+\lVert+ & Double vertical bar with spacing rules appropriate for use as
+a left delimiter.\\
+\verb+\rVert+ & Double vertical bar with spacing rules appropriate for use as
+a right delimiter.\\
+\verb+\DeclareMathOperator+ & Declare a new math operator so that
+spacing and font is correct.\\
+\verb+\text+ & Words and phrases in display math.\\
+\verb+\boldsymbol+ & Make symbol bold. Also available in bm.sty.\\
+\verb+\sideset+ & Sets subscripts and superscripts at the corners of a
+summation or product.\\
+\verb+\substack+ & Create a stack of subexpressions (for example,
+stacked summation limits).\\
+\verb+\begin{subarray}+ & Like \verb+\substack+, but allows finer
+control of subexpression alignment.\\
+\verb+\mathfrak+ & Replaces \verb+\frak+.\\
+\verb+\mathbb+ & Replaces \verb+\Bbb+.\\
+%
+\multicolumn{2}{c}{\textsc{Font Commands}\rule[-6pt]{0pt}{18pt}}\\*
+\verb+\textbf{<text>}+ & Text boldface font.\\
+\verb+\textit{<text>}+ & Text italicixed font.\\
+\verb+\textrm{<text>}+ & Text Roman font.\\
+\verb+\textsl{<text>}+ & Text Slanted font.\\
+\verb+\textsc{<text>}+ & Text Small Caps font.\\
+\verb+\textsf{<text>}+ & Text Sans Serif font.\\
+\verb+\textmd{<text>}+ & Text Medium Series font.\\
+\verb+\textnormal{<text>}+ & Text Normal Series font.\\
+\verb+\textup{<text>}+ & Text Upright Series font.\\
+\verb+\texttt{<text>}+ & Text Typewriter font.\\
+\verb+\mathit{<text>}+ & Math italics font. \\
+\verb+\mathbf{<text>}+ & Math boldface font.\\
+\verb+\mathtt{<text>}+ & Math typewriter font.\\
+\verb+\mathsf{<text>}+ & Math sans serif font.\\
+\verb+\mathcal{<text>}+ & Math calligraphic font. \\
+\verb+\mathfrak{<text>}+ & Math fraktur font. Requires
+\verb+[amsfonts]+ or \verb+[amssymb]+.\\
+\verb+\mathbb{<text>}+ & Math blackboard bold font. Requires
+\verb+[amsfonts]+ or \verb+[amssymb]+.\\
+\verb+\bm{<text>}+ & Bold math symbols (Greek and other symbols). Requires \verb+\usepackage{bm}+.\\
+%
+\multicolumn{2}{c}{\textsc{Table Commands}\rule[-6pt]{0pt}{18pt}}\\*
+\verb+\begin{table}[<placement>]+ & Start a table float environment set to the
+current column width. The
+placement options may be any combination of h, t, b, p, or ! signifying
+here, top, bottom, page, and ``as soon as possible'',
+respectively. A placement option of H will allow a long table to break
+across pages. \LaTeX\ may not be able to honor placement
+requests.\\
+\verb+\begin{table*}+ & Start a non-floating table environment set to the
+current page width. Will be deferred to the following page.\\
+\verb+\begin{ruledtabular}+ & Adds \textit{Physical Review} style double
+(Scotch) rules around a table and adjusts the intercolumn spacing.\\
+\verb+\begin{tabular}[<position>]{<column specs>}+ & The
+\verb+\tabular+ envrionment sets the positions and the  number of
+columns (as well as alignment) in the table.\\
+\verb+\begin{tabular*}{<width>}[<pos>]{<col specs>}+ & Like
+\verb+tabular+, but with a set width.\\
+\verb+\squeezetable+ & Set table in a smaller font smaller. Place this
+macro before the \verb+\begin{table}+ line and sandwich everything
+between \verb+\begingroup+ and \verb+\endgroup+.\\
+\verb+\begin{longtable}{<column specs>}+ & Create a table set to the current column
+width that spans more than one
+page or column. \verb+\usepackage{longtable}+ required.\\
+\verb+\begin{longtable*}{<column specs>}+ & Create a table set to the
+current page width that spans more than one page. \verb+\usepackage{longtable}+ required.\\
+\verb+\caption{<text>}+ & Adds a caption for the table.\\
+\verb+\printtables+ & With \verb+[endfloats]+, control where the
+held back tables actually appear.\\
+\verb+\begin{turnpage}+ & Rotate a table or figure by 90 degrees
+(landscape mode). Will put figure or table on a page by
+itself. Requires \verb+\graphics+ package.\\
+%
+\multicolumn{2}{c}{\textsc{Graphics Commands}\rule[-6pt]{0pt}{18pt}}\\*
+\verb+\begin{figure}[<placement>]+ & Start a figure float environment
+set to the current column width.
+The placement options may be any combination of h, t, b, p, or ! signifying
+here, top, bottom, page, and ``as soon as possible'',
+respectively.  A placement option of H will allow a long table to break
+across pages. \LaTeX\ may not be able to honor placement
+requests.\\
+\verb+\begin{figure*}+ & Start a non-floating figure environment set
+to the current page width. Will be deferred to the following page.\\
+\verb+\includegraphics[<scale,rotation>]+\verb+{fig file}+& Defined
+by invoking either \verb+\usepackage{graphics}+ or
+\verb+\usepackage{graphicx}+, the standard \LaTeXe\ packages for calling
+in figures. \verb+graphicx+ is the same as \verb+graphics+, but uses
+key-value pairs for optional arguments.\\
+\verb+\usepackage{epsfig}+ & Provides an alternative interface to the
+\verb+graphics+ package similar to the epsf class option in \revtex~3.\\
+\verb+\printfigures+ &  With \verb+[endfloats]+, control where the
+held back figures actually appear.\\
+%
+\multicolumn{2}{c}{\textsc{Miscellaneous Commands}\rule[-6pt]{0pt}{18pt}}\\*
+\verb+\begin{widetext}+ & Change column width to be the page
+width. Will add guiding rules.\\
+\verb+\twocolumngrid+ & Low-level switch to a two column layout.\\
+\verb+\onecolumngrid+ & Low-level switch to a single page-wide column layout.\\
+\verb+\protect+ & Protect a fragile command within a macro with a
+``moving'' argument. \verb+\caption+ and \verb+\footnote+ are common
+macros that have moving arguments.\\
+\verb+\frac{numerator}{denominator}+ & Create a fraction. Use in place of \verb+\over+.\\
+%
+\multicolumn{2}{c}{\textsc{\revtex~4 and Miscellaneous Symbols}\rule[-6pt]{0pt}{18pt}}\\*
+\verb+\textemdash+ & \textemdash\\
+\verb+\textendash+ & \textendash\\
+\verb+\textexclamdown+ & \textexclamdown\\
+\verb+\textquestiondown+ & \textquestiondown\\
+\verb+\textquotedblleft+ & \textquotedblleft\\
+\verb+\textquotedblright+ & \textquotedblright\\
+\verb+\textquoteleft+ & \textquoteleft\\
+\verb+\textquoteright+ & \textquoteright\\
+\verb+\textbullet+ & \textbullet\\
+\verb+\textperiodcentered+ & \textperiodcentered\\
+\verb+\textvisiblespace+ & \textvisiblespace\\
+\verb+\textcompworkmark+ & Break a ligature.\\ % ``fluffier''
+%vs. ``f\textcompworkmark luf\textcompworkmark fier''.\\
+\verb+\textcircled{<char>}+ & Circle a character. \textcircled{e}.\\
+\verb+\lambdabar+ & $\lambdabar$ \\
+\cmd\openone & $\openone$\\
+\cmd\altsuccsim & $\altsuccsim$ \\
+\cmd\altprecsim & $\altprecsim$ \\
+\cmd\alt & $\alt$ \\
+\cmd\agt & $\agt$ \\
+\cmd\tensor\ x & $\tensor x$ \\
+\cmd\overstar\ x & $\overstar x$ \\
+\cmd\loarrow\ x & $\loarrow x$ \\
+\cmd\roarrow\ x & $\roarrow x$  \\
+\verb+\mathring{x}+ & $\mathring{x}$ (Replaces
+\verb+\overcir+). Standard \LaTeXe\ . \\
+\verb+\dddot{x}+ & $\dddot{x}$ (Replaces \verb+\overdots+). Requires \verb+[amsmath]+.\\
+\verb+\triangleq+ & $\triangleq$ (Replaces
+\verb+\corresponds+). Requires \verb+[amssymb]+.\\
+\cmd\biglb\ ( \cmd\bigrb ) & $\biglb( \bigrb)$ \\
+\cmd\Biglb\ ( \cmd\Bigrb ) & $\Biglb( \Bigrb)$ \\
+\cmd\bigglb\ ( \cmd\biggrb ) & $\bigglb( \biggrb)$ \\
+\cmd\Bigglb\ ( \cmd\Biggrb\ ) & $\Bigglb( \Biggrb)$ 
+\end{longtable*}
+
+\end{document}

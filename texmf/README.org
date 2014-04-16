@@ -1,0 +1,42 @@
+This directory contains files needed for LaTeX.
+
+* Installation
+This directory is part of jmax. You need to alert your LaTeX distribution of its location.
+
+#+BEGIN_SRC emacs-lisp
+;; returns this directory name
+(file-name-directory (or load-file-name buffer-file-name))
+#+END_SRC
+
+#+RESULTS:
+: c:/Users/jkitchin/Dropbox/kitchingroup/jmax/texmf/
+
+** Windows
+Assuming you have MikTeX 2.9 installed, go to the Start -> MikTex -> Maintenance (Admin) -> Settings (Admin) and add the directory above as a root directory.
+
+** Linux
+
+* Supported classes
+
+** cmu-article
+
+** revtex4-1
+APS journals
+
+** TODO achemso
+ACS journals
+
+** TODO elsarticle
+Elsevier journals
+
+** TODO svjour
+Springer journals
+
+** TODO cmu-letterhead
+
+** TODO cmu-memo
+
+** TODO cmu-ms-report
+
+** TODO cmu-phd-dissertation
+

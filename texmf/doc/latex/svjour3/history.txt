@@ -1,0 +1,24 @@
+Version history for the SVJour3 LaTeX2e package
+
+date      filename   version  action/reason/acknowledgements
+-----------------------------------------------------------------
+ 1.03.06  svjour3.cls   3.0   first official release, version number 3.0
+
+15.03.06  svjour3.cls   3.1   introducing 3rd journal format "smallextended"
+
+08.05.07  svjour3.cls   3.2   alias for option "onecolumn": "smallcondensed"
+
+18.12.09  svglov3.clo   3.2   allowed half-integral font sizes, made option
+                              "runningheads" default, fixes Underfull \hbox-es
+                              bug reported by Tobias Bruell (TU Berlin)
+
+18.12.09  template.tex   -    added \usepackage{fix-cm} to cure Font Warning
+
+02.06.10  template.tex   -    added two more exemplary \documentclass lines,
+                              variants of options
+
+16.09.10  template.tex   -    added one more \documentclass offering to suit
+                              the instructions
+
+25.11.10  svjour3.cls   3.3   \subclass(name) modified to emit:
+                              "Mathematics Subject Classification (2010)"

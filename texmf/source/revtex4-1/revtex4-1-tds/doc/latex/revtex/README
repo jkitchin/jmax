@@ -1,0 +1,212 @@
+%% ****** Start of file README ****** %
+%%
+%%   This file is part of the APS files in the REVTeX 4 distribution.
+%%   Version 4.1r of REVTeX, August 2010.
+%%
+%%   Copyright (c) 1999, 2000, 2001, 2009, 2010 The American Physical Society.
+%%
+
+Last updated 09 August 2010
+
+This file describes the contents of this distribution of REVTeX 4.1.
+The definitive source of information about REVTeX 4 is the APS web
+page http://authors.aps.org/revtex4/.
+
+User queries should be directed to revtex@aps.org.
+
+Manifest
+--------
+
+All files in this release are contained within the compressed archive
+revtex4-1.zip. For installation instructions, see below.
+
+NOTE: The only files necessary for running REVTeX 4.1 are those under 
+tex/latex/revtex and bibtex/bst/revtex, but it is a good idea to install
+the entire distribution, especially the documentation.
+
+TeX inputs:          tex/latex/revtex/
+                     -----------------  
+revtex4-1.cls     - The REVTeX 4.1 class file
+aps4-1.rtx        - APS-specific customizations for REVTeX 4.1
+aip4-1.rtx        - AIP-specific customizations for REVTeX 4.1
+apsrmp4-1.rtx     - APS-specific customizations for REVTeX 4.1,
+                    specifically for Rev. Mod. Phys.
+aps10pt4-1.rtx    - 10-point size class option file for REVTeX.
+aps11pt4-1.rtx    - 11-point size class option file for REVTeX.
+aps12pt4-1.rtx    - 12-point size class option file for REVTeX.
+revsymb4-1.sty    - A collection of common symbols for use outside of REVTeX.
+
+ltxdocext.sty     - Part of ltxgrid package used for page layout in REVTeX.
+ltxfront.sty      - Part of ltxgrid package used for page layout in REVTeX.
+ltxgrid.sty       - Part of ltxgrid package used for page layout in REVTeX.
+ltxutil.sty       - Part of ltxgrid package used for page layout in REVTeX.
+  
+BibTeX inputs:       bibtex/bst/revtex/
+                     ------------------ 
+apsrev4-1.bst     - BibTeX styles for use for Phys. Rev. journals
+apsrmp4-1.bst     - BibTeX styles for use for Rev. Mod. Phys.
+aipauth4-1.bst    - BibTeX styles for AIP journals with author/year style citations
+aipnum4-1.bst     - BibTeX styles for AIP journals with numerical style citations
+
+
+Documentation:       doc/latex/revtex/
+                     -----------------
+README       - How to get started
+DOWNLOAD     - How to download REVTeX4.1
+
+Author guide:           doc/latex/revtex/auguide/
+                        ------
+auguide4-1.tex (pdf)  - REVTeX 4.1 Author's Guide
+whatsnew4-1.tex (pdf) - What's New in REVTeX 4.1
+summary.tex (pdf)     - REVTeX 4.1 Command and Options Summary
+docs.sty              - Package used by REVTeX documentation
+
+APS guide:              doc/latex/revtex/aps
+                        ------
+apsguide4-1.tex (pdf) - APS Author Guide for REVTeX 4.1
+
+AIP guide:              doc/latex/revtex/aip
+                        ------
+aipguide4-1.tex (pdf) - Author's Guide to AIP Substyles for REVTeX 4.1
+
+APS Sample document:    doc/latex/revtex/sample/aps
+                        -------
+apssamp.tex (pdf)  - A sample file showing most common features of an APS
+                     REVTeX 4.1 document
+fig_1.eps          - sample figure for apssamp.tex
+fig_2.eps          - sample wide figure for apssamp.tex
+vid_1a.eps         - sample figure for apssamp.tex
+vid_1b.eps         - sample figure for apssamp.tex
+apssamp.bib        - sample BibTeX source file for apssamp.tex
+apstemplate.tex    - A template for APS authors to follow
+
+AIP Sample document:    doc/latex/revtex/sample/aip
+                        -------
+aipsamp.tex (pdf)  - A sample file showing most common features of an AIP
+                     REVTeX 4.1 document
+fig_1.eps          - sample figure for apssamp.tex
+fig_2.eps          - sample wide figure for apssamp.tex
+aipsamp.bib        - sample BibTeX source file for apssamp.tex
+aiptemplate.tex    - A template for APS authors to follow
+
+
+Programmer's docs:      doc/latex/revtex/source/
+                        -------
+ltxdocext.pdf - Programmer's documentation for the ltxdocext package
+ltxfront.pdf  - Programmer's documentation for the ltxfront  package
+ltxgrid.pdf   - Programmer's documentation for the ltxgrid   package
+ltxutil.pdf   - Programmer's documentation for the ltxutil   package
+revtex4-1.pdf - Programmer's documentation for the revtex4-1 document class
+aip.pdf       - Programmer's documentation for the AIP journal styles
+
+Source files:        source/latex/revtex
+                     -------------------
+ltxdocext.dtx - The source file for the ltxdocext package
+ltxfront.dtx  - The source file for the ltxfront package
+ltxgrid.dtx   - The source file for the ltxgrid package
+ltxutil.dtx   - The source file for the ltxutil package
+revtex4-1.dtx - The source file for revtex4.cls and revsymb.sty.
+aip.dtx       - The source file for AIP journal styles
+
+Not Included   
+------------
+The following packages are required by REVTeX but are not
+included in this distribution. Please obtain from CTAN
+(Comprehensive TeX Archive Network), e.g. <http://www.ctan.org/>. Direct
+links to the necessary files can be found at <http://authors.aps.org/revtex4/>.
+
+natbib.dtx   - Version 8.31a or later; found in latex/contrib/natbib on CTAN
+natbib.ins   - LaTeX this to create natbib.sty and natbib
+               documentation from natbib.dtx
+bm.dtx       - Bold math style - part of (current!) standard LaTeX2e tools
+bm.sty       - generated from bm.dtx by running tools.ins
+textcase.dtx - Found in latex/contrib/textcase on CTAN
+textcase.ins - LaTeX this to generate textcase.sty from textcase.dtx
+url.sty      - Found in latex/contrib/misc on CTAN
+
+An up-to-date installation of AMS-LaTeX is also required for certain
+documentclass options. Version 2.0 or higher is needed. It is
+available from <http://www.ams.org/tex/>.
+
+Recommended styles and packages
+--------------------------
+With REVTeX implemented as a native LaTeX2e document class, users can 
+take advantage of many of the well-supported LaTeX2e packages available.
+Here are some that are particularly useful and recommended.
+
+longtable.sty for tables running to multiple pages - part of a
+standard LaTeX2e distribution.
+
+hyperref.sty for hyperlinking - should work well with REVTeX 4.1.
+
+graphics.sty and graphicx.sty for figure inclusion - part of LaTeX2e's
+standard distribution.
+
+Installation
+------------
+You already started the installation process by unzipping revtex4-1.zip.
+As you will have seen, it created a directory revtex4.1 containing
+this file README, the file DOWNLOAD, and the file revtex4-1-tds.zip, which
+contains the bulk of the installation.
+
+To install this software into a TDS-compliant TeX installation, like
+TeX Live, working as root, issue a shell command like
+
+  unzip revtex4-1-tds.zip -d /usr/local/texlive/texmf-local/
+  
+where the destination for the unzipped files is, in this example, 
+appropriate for a local modificaton of a sufficiently recent distribution
+of TeX Live. You may of course choose a different destination depending 
+on your particular requirements. 
+
+After installation, files will be located as per the Manifest above.
+
+Run the appropriate update command (mktexlsr, initexmf -u, etc.); under
+TeX Live that would be (as root)
+
+   mktexlsr /usr/local/texlive/texmf-local
+
+Install required packages (AMS-LaTeX, natbib, textcase, and bm). 
+Please consult the documentaton for your local TeX package for more information. 
+MikTeX users should use a recent version (see http://miktex.org/) and consult
+the documentation there. There are several steps you will have to do. Please
+note that the steps given here may change with future versions of MikTeX, but
+the basic steps should be quite similar.
+  1) Create a texmf-local directory if needed. For example, you might create
+     a directory such as C:\local\miktex\texmf-local.
+  2) Tell MikTeX where your texmf-local directory is. Find the MikTeX Options
+     window and look for the "Roots" tab. If your texmf-local directory
+     is not listed, click "Add" and add it.
+  3) Unzip the revtex4-1-tds.zip (part of the REVTeX distribtution) in your
+     texmf-local directory.
+  4) Update the "File Name Database (FNDB)." This step is essential and
+     it registers all of the files in your texmf-local directory with MikTeX.
+     Do this by clicking on "Refresh FNDB" in the General tab of the MikTeX
+     Options window.
+     
+MikTex also comes with a package manager. This can be an easier way to maintain
+the packages installed on your system. However, please note that the packages
+available may not be the most current version of the packages.
+
+Credits
+-------
+David Carlisle created the first draft of REVTeX 4; Arthur Ogawa has 
+supported the TeX development since. Patrick Daly was so kind as to 
+incorporate needed changes into natbib and custom-bib. All worked under 
+commission from the APS. Mark Doyle, APS Assistant Director, Journal
+Information Systems coordinated the effort, which was partly underwritten
+by the American Institute of Physics. The APS is the maintainer of REVTeX,
+and all bugs are our responsibility. Please e-mail feedback to revtex@aps.org.
+
+Backwards compatibility
+-----------------------
+The REVTeX 4.1 class file has been named revtex4-1.cls to distinguish it
+from its predecessors. If the class file is copied to revtex4.cls,
+files created with earlier versions of REVTeX 4 should still work.
+
+LaTeX2e requirements
+--------------------
+REVTeX 4 requires: 
+LaTeX2e [1996/06/01],
+natbib  [2009/11/07]
+textcase
