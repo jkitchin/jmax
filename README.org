@@ -58,9 +58,3 @@ All of the emacs customization is performed in an org-mode file.
 
 
 
-* Things TODO
-** ox-report
-Export an MS report to pdf
-
-** ox-memo
-** ox-dissertation

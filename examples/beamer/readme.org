@@ -1,0 +1,1 @@
+See https://github.com/jkitchin/scipy2013 for a working example of making a beamer presentation.
