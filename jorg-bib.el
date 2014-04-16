@@ -110,7 +110,13 @@ construct the heading by hand."
                (url (reftex-get-bib-field "url" entry))
                )
 	  (save-buffer)
-          ;; now look for entry
+
+	  ;; save key to clipboard to make saving pdf later easier by pasting.
+	  (with-temp-buffer
+	    (insert key)
+	    (kill-ring-save (point-min) (point-max)))
+
+          ;; now look for entry in the notes file
           (find-file jorg-bib-bibliography-notes)
 
           (goto-char (point-min))
