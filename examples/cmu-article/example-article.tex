@@ -1,0 +1,69 @@
+% Created 2014-04-09 Wed 12:54
+\documentclass[12pt]{article}
+\usepackage[top=1in, bottom=1.in, left=1in, right=1in]{geometry}
+\usepackage{minted}
+\usepackage{setspace}
+\doublespacing
+
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{fixltx2e}
+\usepackage{natbib}
+\usepackage{url}
+\usepackage[version=3]{mhchem}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{underscore}
+\usepackage{amsmath}
+\usepackage[linktocpage,pdfstartview=FitH,colorlinks,linkcolor=blue,anchorcolor=blue,citecolor=blue,filecolor=blue,menucolor=blue,urlcolor=blue]{hyperref}
+\author{John Kitchin}
+\date{\today}
+\title{Example of a cmu article}
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+This is a basic \LaTeX{} article, with margins set to one inch on all sides.
+
+\section{Options}
+\label{sec-1}
+
+\subsection{Table of contents}
+\label{sec-1-1}
+
+To get a table of contents, use this in the header
+
+\begin{verbatim}
+#+OPTIONS: toc:t
+\end{verbatim}
+
+To suppress the table of contents, use:
+
+\begin{verbatim}
+#+OPTIONS: toc:nil
+\end{verbatim}
+\subsection{Font size}
+\label{sec-1-2}
+Add this line at the top to get 12 point font.
+
+\begin{verbatim}
+#+LATEX_CLASS_OPTIONS: 12pt
+\end{verbatim}
+\subsection{Line spacing}
+\label{sec-1-3}
+
+The default is single line spacing. You can get double spacing by putting these lines at the top of your document.
+
+\begin{verbatim}
+#+LATEX_HEADER: \usepackage{setspace}
+#+LATEX_HEADER: \doublespacing
+\end{verbatim}
+\section{Getting your pdf}
+\label{sec-2}
+
+Type C-c C-e l o
+% Emacs 24.3.1 (Org mode 8.2.5h)
+\end{document}

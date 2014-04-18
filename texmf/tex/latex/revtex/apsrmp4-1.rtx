@@ -1,0 +1,274 @@
+%%
+%% This is file `apsrmp4-1.rtx',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% revtex4-1.dtx  (with options: `rmp')
+%% 
+%% This file is part of the APS files in the REVTeX 4 distribution.
+%% For the version number, search on the string 
+%% Original version by David Carlisle
+%% Modified by Arthur Ogawa (mailto:arthur_ogawa at sbcglobal dot net)
+%% 
+%% Copyright (c) 2009 The American Physical Society.
+%% http://publish.aps.org/revtex4/
+%% mailto:revtex4@aps.org
+%% 
+%% See the REVTeX 4 README file for restrictions and more information.
+%% 
+\NeedsTeXFormat{LaTeX2e}[1996/12/01]%
+\ProvidesFile{apsrmp4-1}
+ [2010/07/25/20:33:00 4.1r (http://publish.aps.org/revtex4/ for documentation)]% \fileversion
+\ifx\undefined\substyle@ext
+ \def\@tempa{%
+  \endinput
+  \GenericWarning{I must be read in by REVTeX! (Bailing out)}%
+ }%
+ \expandafter\else
+  \def\@tempa{}%
+ \expandafter\fi\@tempa
+\@ifxundefined\@journal{%
+ \class@warn{Please specify the REVTeX options [aps,rmp]!}%
+ \@@end
+}{}%
+ \class@info{APS journal RMP selected}%
+\clo@groupedaddress
+\def\frontmatter@setup{%
+ \normalfont\sffamily\raggedright
+}%
+\def\PACS@warn{RMP documents do not display PACS. Your \string\pacs\space will be ignored}%
+\def\frontmatter@title@above{}%
+\def\frontmatter@title@format{\Large\bfseries\raggedright}% HelveticaNeue-Medium(Italic) 14pt.
+\def\frontmatter@title@below{\addvspace{12\p@}}% 24pt b-b down to first author
+\def\frontmatter@authorformat{%
+ \preprintsty@sw{\vskip0.5pc\relax}{}%
+ \@tempskipa\@flushglue
+ \@flushglue\z@ plus.8\hsize
+ \raggedright\advance\leftskip.5in\relax
+ \@flushglue\@tempskipa
+ \parskip\z@skip
+ \@totalleftmargin\leftskip
+}%
+\def\frontmatter@affiliationfont{% Helvetica 9/10.2
+ \small\slshape\selectfont\baselineskip10.5\p@\relax
+ \@tempskipa\@flushglue
+ \@flushglue\z@ plus.8\hsize
+ \raggedright\advance\leftskip.5in\relax
+ \@flushglue\@tempskipa
+ \@totalleftmargin\leftskip
+ \let\def@after@address\def@after@address@empty
+}%
+\def\frontmatter@above@affilgroup{\addvspace{7.2\p@}}% additional leading above an author
+\def\frontmatter@above@affiliation{\addvspace{5.3\p@}}%
+\def\frontmatter@above@affiliation@script{}%
+\clo@groupedaddress
+\def\frontmatter@RRAP@format{%
+  \addvspace{7.3\p@}%
+  \small
+  \raggedright\advance\leftskip.5in\relax
+ \@totalleftmargin\leftskip
+}%
+\def\produce@RRAP#1{%
+  \@if@empty{#1}{}{%
+   \@ifvmode{\leavevmode}{}%
+   \unskip(\ignorespaces#1\unskip)\quad
+  }%
+}%
+\def\frontmatter@abstractheading{%
+ \preprintsty@sw{%
+  \begingroup
+   \centering\large
+   \abstractname
+   \par
+  \endgroup
+  \vspace{.5pc}%
+ }{}%
+}%
+\def\frontmatter@abstractfont{%
+ \footnotesize
+ \hsize360\p@
+ \leftskip=0.5in
+ \parindent\z@
+ \@totalleftmargin\leftskip
+}%
+\def\frontmatter@preabstractspace{7.7\p@}%
+\def\frontmatter@postabstractspace{24.6\p@}%
+ \appdef\setup@hook{%
+  \preprintsty@sw{}{%
+   \def\normalsize{%
+    \@setsize\normalsize{12pt}\xpt\@xpt
+    \abovedisplayskip 10\p@ plus2\p@ minus5\p@
+    \belowdisplayskip \abovedisplayskip
+    \abovedisplayshortskip  \abovedisplayskip
+    \belowdisplayshortskip \abovedisplayskip
+    \let\@listi\@listI
+   }%
+  }%
+ }%
+ \footnotesep 9.25pt
+ \skip\footins 36pt plus 4pt minus 12pt
+ \def\footnoterule{%
+  \dimen@\skip\footins\divide\dimen@\thr@@
+  \kern-\dimen@\hrule width.5in\kern\dimen@
+ }%
+\def\secnums@rtx{%
+ \@ifxundefined\thepart{%
+  \def\thepart{\Roman{part}}%
+ }{}%
+ \@ifxundefined\thesection{%
+  \def\thesection       {\Roman{section}}%
+  \def\p@section        {}%
+ }{}%
+ \@ifxundefined\thesubsection{%
+  \def\thesubsection    {\Alph{subsection}}%
+  \def\p@subsection     {\thesection.}%
+ }{}%
+ \@ifxundefined\thesubsubsection{%
+  \def\thesubsubsection {\arabic{subsubsection}}%
+  \def\p@subsubsection  {\thesection.\thesubsection.}%
+ }{}%
+ \@ifxundefined\theparagraph{%
+  \def\theparagraph     {\alph{paragraph}}%
+  \def\p@paragraph      {\thesection.\thesubsection.\thesubsubsection.}%
+ }{}%
+ \@ifxundefined\thesubparagraph{%
+  \def\thesubparagraph  {\arabic{subparagraph}}%
+  \def\p@subparagraph   {\thesection.\thesubsection.\thesubsubsection.\theparagraph.}%
+ }{}%
+}%
+\def\@seccntformat#1{\csname the#1\endcsname.\hskip0.5em\relax}%
+ \def\section{%
+  \@startsection{section}{1}{\z@}{0.8cm plus1ex minus.2ex}{0.4cm}%
+  {%
+   \small\sffamily\bfseries\selectfont
+   \raggedright
+   \parindent\z@
+  }%
+ }%
+ \def\@hangfrom@section#1#2#3{\@hangfrom{#1#2}\MakeTextUppercase{#3}}%
+ \def\@hangfroms@section#1#2{#1\MakeTextUppercase{#2}}%
+ \def\subsection{%
+  \@startsection{subsection}{2}{\z@}{0.8cm plus1ex minus.2ex}{0.4cm}%
+  {%
+   \small\sffamily\bfseries
+   \raggedright
+   \parindent\z@
+  }%
+ }%
+ \def\subsubsection{%
+  \@startsection{subsubsection}{3}{\z@}{.8cm plus1ex minus.2ex}{0.4cm}%
+  {%
+   \small\sffamily\selectfont
+   \raggedright
+   \parindent\z@
+  }%
+ }%
+ \def\paragraph{%
+  \@startsection{paragraph}{4}{\z@}{.8cm plus1ex minus.2ex}{-1em}%
+  {%
+   \small\slshape\selectfont
+   \raggedright
+   \parindent\z@
+  }%
+ }%
+ \def\subparagraph{%
+  \@startsection{subparagraph}{4}{\parindent}{3.25ex plus1ex minus.2ex}{-1em}%
+  {\normalsize\bfseries\selectfont}%
+ }%
+ \setcounter{tocdepth}{4}% FIXME: has no effect
+\appdef\appendix{%
+ \let\@hangfrom@section\@hangfrom@appendix
+ \let\@sectioncntformat\@appendixcntformat
+}%
+\def\@hangfrom@appendix#1#2#3{%
+ #1%
+ \@if@empty{#2}{%
+  #3%
+ }{%
+  #2\@if@empty{#3}{}{:\ #3}%
+ }%
+}%
+\def\@hangfroms@appendix#1#2{%
+ #1\appendixname\@if@empty{#2}{}{:\ #2}%
+}%
+\def\@appendixcntformat#1{\appendixname\ \csname the#1\endcsname}%
+\setlength\belowcaptionskip{2\p@}
+\long\def\@makecaption#1#2{%
+  \vskip\abovecaptionskip
+  \vbox{%
+   \flushing
+   \small\rmfamily
+   \noindent
+   #1\@caption@fignum@sep#2\par
+  }%
+  \vskip\belowcaptionskip
+}%
+\def\@caption@fignum@sep{\nobreak\hskip.5em plus.2em\ignorespaces}%
+\def\@bibstyle{apsrmp\substyle@post}%
+\@booleantrue\authoryear@sw
+\def\@bibdataout@aps{%
+ \immediate\write\@bibdataout{%
+  @CONTROL{%
+   apsrmp41Control%
+   \longbibliography@sw{%
+    ,author="03",editor="0",pages="1",title="0",year="0"%
+   }{%
+    ,author="0B",editor="0",pages="0",title="",year="1"%
+   }%
+  }%
+ }%
+ \if@filesw
+  \immediate\write\@auxout{\string\citation{apsrmp41Control}}%
+ \fi
+}%
+\appdef\setup@hook{%
+ \bibpunct{(%)
+ }{%(
+ )}{;}{a}{,}{,}%
+ \def\bibsection{%
+  \expandafter\section\expandafter*\expandafter{\refname}%
+  \@nobreaktrue
+ }%
+ \let\bibpreamble\@empty
+ \def\newblock{\ }%
+ \bibhang10\p@
+ \bibsep\z@
+ \let\cite\citep
+}%
+\@booleanfalse\footinbib@sw
+\appdef\setup@hook{%
+ \footinbib@sw{%
+  \class@warn{%
+   Footnotes in bibliography are incompatible with RMP.^^J%
+   Undoing the footinbib option.
+  }%
+  \@booleanfalse\footinbib@sw
+ }{}%
+ \@ifnum{\NAT@merge>\@ne}{\let\NAT@merge\@ne}{}%
+ \def\NAT@cmprs{\z@}%
+}%
+\def\eprint#1{eprint #1}%
+\def\toc@@font{%
+ \footnotesize\rmfamily
+ \def\\{\space\ignorespaces}%
+}%
+\def\ltxu@dotsep{5.5pt}%
+\def\tocleft@{\z@}%
+\def\tocdim@min{5\p@}%
+\def\l@section{%
+ \l@@sections{}{section}% Implicit #3#4
+}%
+\def\l@subsection{%
+ \l@@sections{section}{subsection}% Implicit #3#4
+}%
+\def\l@subsubsection{%
+ \l@@sections{subsection}{subsubsection}% Implicit #3#4
+}%
+\def\l@paragraph#1#2{}%
+\def\l@subparagraph#1#2{}%
+\let\toc@pre\toc@pre@auto
+\let\toc@post\toc@post@auto
+\endinput
+%%
+%% End of file `apsrmp4-1.rtx'.

@@ -1,0 +1,95 @@
+% Created 2014-04-16 Wed 18:27
+\documentclass[journal=iecred,manuscript=article]{achemso}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{fixltx2e}
+\usepackage{natbib}
+\usepackage{url}
+\usepackage[version=3]{mhchem}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{underscore}
+\usepackage{amsmath}
+\usepackage[linktocpage,pdfstartview=FitH,colorlinks,linkcolor=blue,anchorcolor=blue,citecolor=blue,filecolor=blue,menucolor=blue,urlcolor=blue]{hyperref}
+\setkeys{acs}{biblabel=brackets,super=true}
+\author{Alexander P. Hallenbeck}
+\author{John R. Kitchin}
+\email{jkitchin@cmu.edu}
+\affiliation[National Energy Technology Laboratory-Regional University Alliance (NETL-RUA)]{National Energy Technology Laboratory-Regional University Alliance (NETL-RUA), Pittsburgh, Pennsylvania 15236}
+\alsoaffiliation[Carnegie Mellon University]{Department of Chemical Engineering, Carnegie Mellon University, 5000 Forbes, Ave, Pittsburgh, PA 15213}
+\date{}
+\title{Effects of \ce{O_2} and \ce{SO_2} on the capture capacity of a primary-amine based polymeric \ce{CO_2} sorbent}
+\begin{document}
+
+\begin{abstract}
+Post combustion \ce{CO_2} capture is most commonly carried out using an amine solution that results in a high parasitic energy cost in the stripper unit due to the need to heat the water which comprises a majority of the amine solution. It is also well known that amine solvents suffer from stability issues due to amine leaching and poisoning by flue gas impurities.
+ Solid sorbents provide an alternative to solvent systems that would potentially reduce the energy penalty of carbon capture. However, the cost of using a particular sorbent is greatly affected by the usable lifetime of the sorbent. This work investigated the stability of a primary amine-functionalized ion exchange resin in the presence of \ce{O_2} and \ce{SO_2}, both of which are constituents of flue gas that have been shown to cause degradation of various amines in solvent processes. The \ce{CO_2} capture capacity was measured over multiple capture cycles under continuous exposure to two simulated flue gas streams, one containing 12 vol\% \ce{CO_2}, 4\% \ce{O_2}, 84\% \ce{N_2}, and the other containing 12.5 vol\% \ce{CO_2}, 4\% \ce{O_2}, 431 ppm \ce{SO_2}, balance \ce{N_2} using a custom-built packed bed reactor. The resin maintained its \ce{CO_2} capture capacity of 1.31 mol/kg over 17 capture cycles in the presence of \ce{O_2} without \ce{SO_2}. However, the \ce{CO_2} capture capacity of the resin decreased rapidly under exposure to \ce{SO_2} by an amount of 1.3 mol/kg over 9 capture cycles. Elemental analysis revealed the resin adsorbed 1.0 mol/kg of \ce{SO_2}. Thermal regeneration was determined to not be possible. The poisoned resin was, however, partially regenerated with exposure to 1.5M NaOH for 3 days resulting in a 43\% removal of sulfur, determined through elemental analysis, and a 35\% recovery of \ce{CO_2} capture capacity. Evidence was also found for amine loss upon prolonged (7 days) continuous exposure to high temperatures (120 \textdegree{}C) in air. It is concluded that desulfurization of the flue gas stream prior to \ce{CO_2} capture will greatly improve the economic viability of using this solid sorbent in a post-combustion \ce{CO_2} capture process.  
+\end{abstract}
+
+\section{Introduction}
+\label{sec-1}
+It is widely agreed upon that anthropogenic \ce{CO_2} emissions are a contributing factor to global climate change \cite{working05:ipcc}.  The combustion of fossil fuels such as coal, oil, and natural gas for energy is responsible for a significant fraction of \ce{CO_2} emissions \cite{agency12:co-emiss-fuel-combus}.  Specifically, 39\% of the total U.S. \ce{CO_2} emissions in 2009 were due to electricity generation \cite{epa-inventory}.   One potential approach to mitigating the impact of these emissions on climate change is post combustion carbon capture and sequestration, which would allow the current energy infrastructure to remain largely intact while continued research into alternative fuels and energy production is done.
+\section{Methods}
+\label{sec-2}
+The \ce{CO_2}  capture capacity of OC 1065 was measured under a variety of controlled conditions in a custom-built packed bed reactor apparatus \cite{doi:10.1021/ie300452c}. The apparatus is equipped to control, and measure key variables such as reactor temperature, flow rate, \ce{CO_2}  concentration, and pressure drop via a Labview acquisition module. The \ce{CO_2}  concentration in the reactor effluent is measured simultaneously using both a (Valtronics 2015SP3) OEM \ce{CO_2}  analyzer and a high resolution mass spectrometer (Hiden HPR-20). Quantitative measurement of the \ce{CO_2}  concentration from the mass spectrometer intensity is done through a calibration procedure done prior to every experiment with 3 gases of known concentrations, typically 0\%, 100\% \ce{CO_2}  as well as the test gas, typically either 10 or 12 vol\% \ce{CO_2}. 
+
+
+\begin{equation}
+V_{CO_2} = \int (Qb_{CO_2} - Q(t) \cdot C_{CO_2}(t)) dt \label{eq:vco2}
+\end{equation}
+
+\section{Results and Discussion}
+\label{sec-3}
+\subsection{Estimating available amine sites}
+\label{sec-3-1}
+
+In our previous work the maximum theoretical amine loading was deduced from energy-dispersive x-ray spectroscopy measurements to be 6.7 mol N/kg \cite{doi:10.1021/ie300452c}. However, elemental analysis provides another, complementary estimate of the amine loading of the resin. In this work the value of 7.9\% N averaged over 4 measurements (Table \ref{tab:ea1}) represents an amine loading of 5.9 \textpm{} 0.1 mol N/kg. However, since only a fraction of the total amine sites are accessible to reaction with \ce{CO_2}, the more critical value is the number of accessible amine sites. This value can be estimated from the sulfate loading on the resin following saturation with sulfuric acid which based on the average of 3 measurements (Table \ref{tab:ea2}) was 2.7 mol H$_{\text{2}}$SO$_{\text{4}}$/kg. Assuming a 1:1 molar stoichiometry the amine loading available to reaction is 2.7 mol/kg. This suggests that the measured \ce{CO_2} capture capacity of the resin at 50 \{\}C from a pure \ce{CO_2} stream, 2.5 mol/kg, is approaching the capacity limit of this sorbent.
+
+\begin{table}[htb]
+\caption{Mass-based Elemental analysis of OC 1065 as received and dried (precision: \textpm{} 0.30\%). \label{tab:ea1}}
+\centering
+\begin{tabular}{rrrrrr}
+Sample & \%C & \%H & \%N & \%O & \%S\\
+\hline
+1 & 81.79 & 8.25 & 8.00 & 3.48 & 0.00\\
+2 & 82.09 & 8.36 & 7.97 & 4.13 & 0.00\\
+3 & 81.11 & 8.26 & 7.94 & 4.19 & 0.00\\
+4 & 81.28 & 7.85 & 7.77 & 3.15 & 0.00\\
+\end{tabular}
+\end{table}
+
+
+
+\begin{table}[htb]
+\caption{Mass-based Elemental analysis of OC 1065 following saturation with 1.5M \ce{H_2SO_4} aqueous solution (precision:  \textpm{} 0.30\%). \label{tab:ea2}}
+\centering
+\begin{tabular}{rrrrrr}
+Sample & \%C & \%H & \%N & \%O & \%S\\
+\hline
+1 & 64.31 & 7.12 & 6.03 & 15.22 & 6.59\\
+2 & 63.66 & 7.08 & 6.08 & 16.60 & 7.00\\
+3 & 63.15 & 6.87 & 6.13 & 15.16 & 6.47\\
+\end{tabular}
+\end{table}
+\subsection{Effect of O$_{\text{2}}$ in flue gas on OC 1065}
+\label{sec-3-2}
+The tolerance of OC 1065 to \ce{O_2}  was studied by conducting 17 continuous cycles of adsorption and desorption with a test gas of 12 vol\% \ce{CO_2}, 4\% \ce{O_2}, 84\% \ce{N_2}. This gas was passed continuously through the loaded reactor during the entire course of the experiment and adsorption and desorption occurred via a thermal swing between 50 \textdegree{}C and 127 \textdegree{}C. Each cycle lasted 2 hours and 12 minutes. All capacity calculations are calculated using the baseline concentration of 12\% \ce{CO_2} for the entire experiment. 
+
+
+\section{Conclusions}
+\label{sec-4}
+The tolerance of a primary amine-functionalized ion exchange resin (OC 1065) to \ce{O_2}  and \ce{SO_2}  was evaluated in this work. The \ce{CO_2}  capture capacity remained stable over 17 capture cycles under continuous exposure to a 12\% \ce{CO_2}, 4\% \ce{O_2}, 84\% \ce{N_2}  gas stream indicating that irreversible oxidation did not significantly occur over this timescale. The resin was, however, poisoned quickly by continuous exposure to a 12.5\% \ce{CO_2}, 4\% \ce{O_2}, 431 ppm \ce{SO_2}, 84\% \ce{N_2} gas stream resulting in an adsorption of 0.98 mol/kg of \ce{SO_2}  and a decrease in \ce{CO_2}  capture capacity of 1.31 mol/kg after only 9 temperature swing regeneration cycles. The poisoned resin was not thermally regenerable. Treating the poisoned resin with NaOH resulted in a 43\% \ce{SO_2}  removal and 35\% reclamation of \ce{CO_2}  capture capacity under 10 vol\% \ce{CO_2}  and 50 \textdegree{}C capture conditions. The difficulty in fully regenerating the poisoned resin is most likely due to an irreversible reaction between \ce{SO_2}  and the amine due to the stronger acidity of \ce{SO_2}  in comparison with \ce{CO_2}. That the poisoned resin is partially regenerable could indicate that \ce{SO_2} is adsorbing on the resin through more than one mechanism, one of which, is reversible. Additionally evidence was found for amine oxidation during extended exposure to a hot (120 \textdegree{}C)  oxygen-rich environment.
+
+
+\begin{acknowledgement}
+We gratefully acknowledge Lanxess for providing us with the samples of OC 1065 used in this work. As part of the National Energy Technology Laboratory's Regional University Alliance (NETL-RUA), a collaborative initiative of the 
+NETL, this technical effort was performed under the RES contract DE-FE0004000. 
+\end{acknowledgement}
+
+
+Supporting Information Available: All of the data files used in this work, including the representative data of the total volumetric flowrate and the data used in the BET analysis, as well as all of the analysis used in generating the figures is available in the Supporting Information.  This information is available free of charge via the Internet at \url{http://pubs.acs.org}.
+
+\bibliography{references}
+% Emacs 24.3.1 (Org mode 8.2.5h)
+\end{document}

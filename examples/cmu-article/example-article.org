@@ -1,0 +1,46 @@
+#+LATEX_CLASS: cmu-article
+#+LATEX_CLASS_OPTIONS: [12pt]
+#+LATEX_HEADER: \usepackage{setspace}
+#+LATEX_HEADER: \doublespacing
+
+#+OPTIONS: toc:t
+#+TITLE: Example of a cmu article
+#+AUTHOR: John Kitchin
+
+This is a basic LaTeX article, with margins set to one inch on all sides.
+
+* Options
+
+** Table of contents
+
+To get a table of contents, use this in the header
+
+#+BEGIN_EXAMPLE
+#+OPTIONS: toc:t
+#+END_EXAMPLE
+
+To suppress the table of contents, use:
+
+#+BEGIN_EXAMPLE
+#+OPTIONS: toc:nil
+#+END_EXAMPLE
+
+** Font size
+Add this line at the top to get 12 point font.
+
+#+BEGIN_EXAMPLE
+#+LATEX_CLASS_OPTIONS: 12pt
+#+END_EXAMPLE
+
+** Line spacing
+
+The default is single line spacing. You can get double spacing by putting these lines at the top of your document.
+
+#+BEGIN_EXAMPLE
+#+LATEX_HEADER: \usepackage{setspace}
+#+LATEX_HEADER: \doublespacing
+#+END_EXAMPLE
+
+* Getting your pdf
+
+Type C-c C-e l o

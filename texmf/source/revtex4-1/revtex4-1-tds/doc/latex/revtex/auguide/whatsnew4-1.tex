@@ -1,0 +1,166 @@
+%% ****** Start of file whatsnew4-1.tex ****** %
+%%
+%%   This file is part of the APS files in the REVTeX 4 distribution.
+%%   Version 4.1r of REVTeX, August, 2010
+%%
+%%   Copyright (c) 2009, 2010 The American Physical Society.
+%%
+%%   See the REVTeX 4.1 README file for restrictions and more information.
+%%
+\documentclass[%
+%prl%
+%,preprint%
+,twocolumn%
+,secnumarabic%
+%,tightenlines%
+,amssymb,aps,pra,nobibnotes]{revtex4-1}
+\usepackage{docs}
+%\usepackage{acrofont}%NOTE: Comment out this line for the release version!
+%\usepackage[colorlinks=true,linkcolor=blue]{hyperref}%
+%\nofiles
+\expandafter\ifx\csname package@font\endcsname\relax\else
+ \expandafter\expandafter
+ \expandafter\usepackage
+ \expandafter\expandafter
+ \expandafter{\csname package@font\endcsname}%
+\fi
+\DeclareRobustCommand\substyle{\name@idx{document substyle}}%
+\DeclareRobustCommand\classoption{\name@idx{document class option}}%
+\DeclareRobustCommand\classname{\name@idx{document class}}%
+\def\name@idx#1#2{%
+ {\ttfamily#2}%
+ \index{#2\space#1=\string\ttt{#2}\space#1}\index{#1>#2=\string\ttt{#2}}%
+}%
+
+\DeclareRobustCommand\revtex{REV\TeX}
+\begin{document}
+\title{What's New in  \revtex~4.1}%
+\author{American Physical Society}%
+%\email{revtex4@aps.org}
+\affiliation{1 Research Road, Ridge, NY 11961}
+\date{August 2010}%
+
+%\tableofcontents
+
+\begin{abstract}
+This document gives a brief summary of what's new in  \revtex~4.1. The changes include bug fixes, improved functionality, and support for a wider range of journals, including those of the American Institute of Physics (AIP). \revtex~4.1 was developed jointly by APS, AIP, and Arthur Ogawa. Additional work was done by Patrick Daly to incorporate our suggested improvements into \texttt{natbib 8.3} to address many new features concerning bibliographies. \texttt{natbib 8.31a} or later is required to run \revtex~4.1.
+\end{abstract}
+\maketitle
+
+\section{New Syntax and Features in \revtex~4.1}
+\revtex~4.1 introduces support for more journals, several new commands, and some new syntax. This section outlines these changes. \textbf{A document using these new features will not process under \revtex~4}. See Sec.~\ref{sec:additional} for more details about these items.
+
+\begin{itemize}
+\item \textbf{Added support for APS journal \textit{Physical Review Special Topics -- Physics Education Research}}.
+\item \textbf{Added support for AIP journals.} There is now an explicit \texttt{aip} society option along with support for AIP journals. Please see the \textit{Author's Guide to AIP Substyles for \revtex~4.1}. In addition, \revtex~4.1 provides an extensible system for the easy addition of new collections of journals.
+\item \textbf{Endnotes now ordered correctly.} Endnotes in the bibliography now appear in the correct order, interleaved with citations.
+\item \textbf{Multiple references in a single citation supported using a special starred (*) argument to the \cmd\cite\ command.} One of the major new features in 4.1 made possible by the joint work on \texttt{natbib 8.3}. Multiple Bib\TeX\ entries can be combined into a single \cmd\bibitem\ command.
+\item \textbf{Bib\TeX\ style files can now display journal article titles in the bibliography.} Use the \texttt{longbibliography} class option.
+\item \textbf{Free form text can be prepended and appended to a bibliographic entry using the special starred (*) argument to the \cmd\cite\ command.} Often a citation in the bibliography will have explanatory text such as \textit{See also} or \textit{and references therein} before and after the actual citation. The new \revtex~4.1 \cmd\cite\ command allows the specification of both text to precede and follow a citation.
+\item \textbf{Structured Abstracts.} Use of the \texttt{description} environment in abstracts now provides for ``structured" abstracts.
+\item \textbf{Figures referring to videos now supported.} A ``figure" may now be labeled as a \textbf{Video} by using the \texttt{video} environment. A frame from the video may be included in the figure and a URL to link the caption's label to the online video also may be included. There is also a \cmd\listofvideos\ command.
+\item \textbf{Better support for arXiv.org in Bib\TeX\ } Three more Bib\TeX\ fields have been added: \texttt{SLACcitation}, \texttt{archivePrefix}, and \texttt{primaryClass} in addition to the existing field \texttt{eprint}. 
+\end{itemize}
+
+\section{Bug Fixes in \revtex~4.1}
+One of the main goals of \revtex~4.1 is, of course, to fix the bugs that were released in \revtex~4. The following is a list of bugs that have been fixed.
+
+\begin{itemize}
+\item \textbf{Improved Bib\TeX\ \texttt{bst} files.} In addition to the new features above, numerous other improvements to the APS \texttt{bst} files have been made, including support for displaying journal article titles and many fixes for \textit{Reviews of Modern Physics}. Also, long author lists are no longer automatically truncated.
+\item \textbf{\cmd\footnote\ in \cmd\widetext\ and \texttt{table*} environments improved.} \cmd\footnote\relax s in  the \cmd\widetext\ or \texttt{table*} environments are now correctly placed and formatted.
+\item \textbf{Email addresses no longer print twice on papers less than one page long.}
+\item \textbf{\texttt{eqnarray} alignment improved.}
+\item \textbf{\cmd\collaboration\ can be used with the \texttt{groupedaddress} option now.}
+\item \textbf{\texttt{letterpaper} now ensured as default paper size.} 
+\item \textbf{Table of Contents formatting improved.}
+\item \textbf{Support for \texttt{longtable} and \texttt{lscape} packages improved.}
+\item \textbf{\texttt{reftest} restored.}
+\item \textbf{Compatibility with the \texttt{geometry, lineno,} and \texttt{colortbl} packages improved.} For line numbering, rather than using \texttt{lineno.sty} directly, the \texttt{linenumbers} class option should be used (this will call in \texttt{lineno.sty} with a proper set of default parameters).
+\item \texttt{hyperref} \textbf{fixes}. Improved compatibility between footnotes and the \texttt{hyperref} package. In particular, table footnotes were fixed. More anchors for \texttt{hyperref} were also added (titlepage, abstract, and acknowledgements).
+\item \textbf{Documents can have more than 256 \cmd\cite\ commands now.}
+\item \textbf{\cmd\listoffigures\ and \cmd\listoftables\ fixed.}
+\item \textbf{Figure and table labels in captions now reflect proper APS style.}
+\item \textbf{RMP style files conform better to RMP style guidelines.}
+\item \textbf{Section heading upper-casing improved.}
+\item \textbf{Repeated characters at start of affiliation no longer disappear when using \texttt{groupedaddress} option.}
+\item \textbf{There have been many other bug fixes and improvements to the internal \texttt{ltxgrid} package as well.}
+\end{itemize}
+
+\section{\revtex~4 Backwards Compatibility}
+The vast majority of documents prepared under \revtex~4 should process correctly under \revtex~4.1. However, the formatting of the pages and, if using Bib\TeX, the references may change. Also, the behavior of some macros may be different. For instance, the \texttt{title} macro now requires the use of \texttt{protect} for fragile arguments. This may cause some documents prepared under \revtex~4 to fail under 4.1. Some macro packages that depend on the internals of \revtex~4 may also no longer work.  Documents using those packages will, of course, also will not process under 4.1.
+
+\section{\label{sec:additional}Additional Details}
+
+\subsection{Multiple references in a single bibliography entry}
+One of the most frequently requested features since the release of \revtex~4 has been to allow more than one reference to appear in a single bibliography entry when using Bib\TeX. This can now be done in \revtex~4.1 by using a starred (*) argument to the \cmd\cite\ command. This requires the latest version of \texttt{natbib}, developed in conjunction with \revtex~4.1, and the new \texttt{bst} files that come with \revtex~4.1. To combine multiple references into a single \cmd\bibitem, precede the second, third, etc. citation keys in the \cmd\cite\ command with an asterisk (*). For example \verb+\cite{bethe, *feynman, *bohr}+ will combine the \cmd\bibitem\relax s with keys \texttt{bethe}, \texttt{feynman}, and \texttt{bohr} into a single entry in the bibliography separated by semicolons.
+
+\subsection{Prepending and/or appending text to a citation}
+The expanded syntax for the  \cmd\cite\ command argument  can also be used to specify text before and/or after a citation. For instance, a citation such as:
+\begin{verbatim}
+[19] A similar expression was derived in
+A. V. Andreev, Phys. Rev. Lett. 99, 247204
+(2007) in the context of carbon nanotube
+p-n junctions. The only difference is that no
+integration over ky is present there.
+\end{verbatim}
+may be created by the following \cmd\cite\ command:
+\begin{verbatim}
+\cite{*[{A similar expression was derived
+in }] [{ in the context of carbon nanotube
+p-n junctions. The only difference is that no
+integration over ky is present there.}]andreev2007]
+\end{verbatim}
+Please note the use of curly braces to enclose the text within the square brackets.
+\subsection{Structured Abstracts}
+A ``structured" abstract is an abstract divided into labeled sections. For instance, \textit{Physical Review C} would like authors to provide abstracts with sections summarizing the paper's  \textbf{Background}, \textbf{Purpose}, \textbf{Method}, \textbf{Results}, and \textbf{Conclusions}. This can be accomplished by using the \texttt{description} environment within the \texttt{abstract} environment.  For example:
+\begin{verbatim}
+\begin{abstract}
+\begin{description}
+\item[Background] This part would describe the
+context needed to understand what the paper
+is about.
+\item[Purpose] This part would state the purpose
+of the present paper.
+\item[Method] This part describe the methods
+used in the paper.
+\item[Results] This part would summarize the
+results.
+\item[Conclusions] This part would state the
+conclusions of the paper.
+\end{description}
+\end{abstract}
+\end{verbatim}
+
+\subsection{Video Environment}
+Papers often refer to multimedia videos. The \texttt{video} environment is identical to the \texttt{figure} environment, but the caption will be labeled as a \textbf{Video} (with its own counter independent of figures). A URL can also be specified so that the caption label can be linked to the online video (if using the \texttt{hyperref} package). The included graphic (using \cmd\includegraphics\ from the \texttt{graphics} or \texttt{graphicx} package) would be a representation frame from the video. A \texttt{\cmd\listofvideos} is also provided.  For example:
+\begin{verbatim}
+\begin{video}
+\includegraphics{videoframe.jpg}
+\setfloatlink{http://some.video.com/fun.mov}
+\caption{\label{vid:interest}This is a video of
+something fun.}
+\end{video}
+\end{verbatim}
+
+\subsection{Better arXiv.org support in Bib\TeX\ }
+
+
+There have been substantial improvements in the \revtex\ Bib\TeX\ style files. For instance, the \texttt{.bib} entry
+\begin{verbatim}
+@Unpublished{Ginsparg:1988ui,
+     author    = "Ginsparg, Paul H.",
+     title     = "{APPLIED CONFORMAL FIELD THEORY}",
+     year      = "1988",
+     eprint    = "hep-th/9108028",
+     archivePrefix = "arXiv",
+     SLACcitation  = "%%CITATION = HEP-TH/9108028;%%"
+}
+\end{verbatim}
+will include the arXiv.org e-print identifier as \texttt{arXiv:hep-th/9108028} and hyperlink it (if using \texttt{hyperref}). The newer format for arXiv identifiers with primary classificiations will produce output such as \texttt{arXiv:0905.1949 [hep-ph]}.
+
+
+\begin{acknowledgments}
+The development of  \revtex~4.1 was managed by Mark Doyle (APS). The development of the new AIP style files and their accompanying documentation was managed by Susan Joy (AIP) with the help of Chris McMahon (AIP) and Rich O'Keeffe (AIP). Testing and  evaluation were done by Michele Hake (APS), Liz Belmont (AIP), Brian Goss (AIP), Alison Waldron (AIP),  and Phil Robertson (AIP). Additional detailed testing and feedback were provided by Lev Bishop (Yale).
+\end{acknowledgments}
+
+\end{document}

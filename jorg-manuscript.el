@@ -1,5 +1,60 @@
 (require 'ox-publish)
 
+(setq org-latex-default-packages-alist 
+      '(("utf8" "inputenc" nil)
+	("T1" "fontenc" nil)
+	("" "fixltx2e" nil)
+	("" "natbib" t)
+	("" "url" t)
+	("version=3" "mhchem" t)
+	("" "float" t)
+	("" "graphicx" t)
+	("" "textcomp" t)
+	("" "underscore" t)
+	("" "amsmath" t)
+	;("" "attachfile" nil)
+	;("" "minted" nil)
+	("linktocpage,pdfstartview=FitH,colorlinks,linkcolor=blue,anchorcolor=blue,citecolor=blue,filecolor=blue,menucolor=blue,urlcolor=blue"
+	 "hyperref" nil)))
+
+;; do not put in \hypersetup
+;; use your own \hypersetup{pdfkeywords={%s},\n  pdfsubject={%s},\n  pdfcreator={%s}
+(setq org-latex-with-hyperref nil)
+
+;; this is for code syntax highlighting in export
+(setq org-latex-listings 'minted)
+(setq org-latex-minted-options
+           '(("frame" "lines")
+             ("fontsize" "\\scriptsize")
+             ("linenos" "")))
+
+;; for minted you must run latex with -shell-escape because it calls pygmentize as an external program
+(setq org-latex-pdf-process
+      '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %b"
+        "bibtex %b"
+        "makeindex %b"
+        "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %b"
+        "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %b"))
+
+;; I have not had good luck with this on windows
+;(setq org-latex-to-pdf-process '("texi2dvi --pdf --clean --verbose --batch"))
+	
+
+
+;; customized article. better margins
+(add-to-list 'org-latex-classes
+	     '("cmu-article"                          ;class-name
+	       "\\documentclass{article}
+\\usepackage[top=1in, bottom=1.in, left=1in, right=1in]{geometry}
+[PACKAGES]
+[EXTRA]" ;;header-string
+	       ("\\section{%s}" . "\\section*{%s}")
+	       ("\\subsection{%s}" . "\\subsection*a{%s}")
+	       ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+	       ("\\paragraph{%s}" . "\\paragraph*{%s}")
+	       ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+
+
 ;; ACS journals
 (add-to-list 'org-latex-classes
 	     '("achemso"                          ;class-name
@@ -23,14 +78,16 @@
 				   ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
 
 ;; Springer journals
-(add-to-list 'org-latex-classes '("svjour"
-				  "\\documentclass{svjour3}"
+(add-to-list 'org-latex-classes '("svjour3"
+				  "\\documentclass{svjour3}
+				   [NO-DEFAULT-PACKAGES]
+				   [EXTRA]
+				   [PACKAGES]"
 				  ("\\section{%s}" . "\\section*{%s}")
 				  ("\\subsection{%s}" . "\\subsection*{%s}")
 				  ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
 				  ("\\paragraph{%s}" . "\\paragraph*{%s}")
 				  ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
-
 
 ;; Elsevier journals
 (add-to-list 'org-latex-classes '("elsarticle"
@@ -46,18 +103,6 @@
   (interactive)
   (let ((org-latex-title-command "") ; avoids getting \maketitle right after begin{document}
       ;; these packages are loaded in the latex file
-      (org-latex-default-packages-alist
-       '(("utf8" "inputenc" nil)
-	 ("T1" "fontenc" nil)
-	 ("" "fixltx2e" nil)
-	 ("" "natbib" t)
-	 ("" "url" t)
-	 ("version=3" "mhchem" t)
-	 ("" "float" t)
-	 ("" "graphicx" t)
-         ("" "textcomp" t)
-         ("" "underscore" t)
-	 ("" "amsmath" t)))
       (async nil)
       (subtreep nil)
       (visible-only nil)

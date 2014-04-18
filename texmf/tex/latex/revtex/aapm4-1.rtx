@@ -1,0 +1,669 @@
+%%
+%% This is file `aapm4-1.rtx',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% revtex4-1.dtx  (with options: `aapm, mph')
+%% 
+%% This file is part of the AAPM files in the REVTeX 4-1 distribution.
+%% Original version by David Carlisle
+%% Modified by Arthur Ogawa (mailto:arthur_ogawa at sbcglobal dot net)
+%% 
+%% Further modified by Ms. Sehar Tahir (Aptara Inc.) for AAPM society
+%% 
+%% Copyright (c) 2012 American Association of Physicists in Medicine.
+%% 
+%% Maintained by Sehar Tahir (Aptara Inc.)
+%% under contract to American Association of Physicists in Medicine.
+%% 
+%% See the REVTeX 4-1 README file for restrictions and more information.
+%%
+\NeedsTeXFormat{LaTeX2e}[1996/12/01]%
+\ProvidesFile{aapm4-1.rtx}%
+ [2012/02/03 4.1r AAPM substyle for REVTeX]% \fileversion
+\ifx\undefined\substyle@ext
+ \def\@tempa{%
+  \endinput
+  \GenericWarning{I must be read in by REVTeX! (Bailing out)}%
+ }%
+ \expandafter\else
+  \def\@tempa{}%
+ \expandafter\fi\@tempa
+ \class@info{RevTeX society AAPM selected}%
+\DeclareOption{mph}{\change@journal{mph}}%
+%\DeclareOption{fleqn}{%
+% \input{fleqn.clo}%
+% \PassOptionsToPackage{fleqn}{amsmath}
+% \AtBeginDocument{\mathindent12pt\relax}
+%}%
+\@booleantrue\longbibliography@sw
+\@booleanfalse\authoryear@sw
+\def\@bibstyle{aapmrev\substyle@post}%
+\appdef\@bibdataout@rev{\@bibdataout@aapm}%
+\def\@bibdataout@aapm{%
+ \immediate\write\@bibdataout{%
+  @CONTROL{%
+   aapm41Control%
+   \longbibliography@sw{%
+    ,pages="1",title="0"%
+   }{%
+    ,pages="0",title=""%
+   }%
+  }%
+ }%
+ \if@filesw
+  \immediate\write\@auxout{\string\citation{aapm41Control}}%
+ \fi
+}%
+\appdef\setup@hook{%
+ \lengthcheck@sw{%
+    \RequirePackage{times}%
+	\frenchspacing%
+   }{}%
+}
+\@booleantrue\preprintsty@sw
+\@booleantrue\showPACS@sw
+\@booleantrue\showKEYS@sw
+\appdef\setup@hook{%
+ \preprintsty@sw{}{%
+  \let\refname\@empty
+ }%
+}%
+\appdef\setup@hook{%
+ \preprintsty@sw{%
+  \ps@preprint
+ }{%
+  \ps@article
+ }%
+}%
+\def\ps@preprint{%
+  \def\@oddhead{\@runningtitle\hfil}%
+  \def\@evenhead{\@runningtitle\hfil}%
+  \def\@oddfoot{\hfil\thepage\quad\checkindate\hfil}%
+  \def\@evenfoot{\hfil\thepage\quad\checkindate\hfil}%
+  \let\@mkboth\@gobbletwo
+  \let\sectionmark\@gobble
+  \let\subsectionmark\@gobble
+}%
+\def\ps@article{%
+  \def\@evenhead{\let\\\heading@cr\thepage\quad\checkindate\hfil\@runningtitle}%
+  \def\@oddhead{\let\\\heading@cr\@runningtitle\hfil\checkindate\quad\thepage}%
+  \def\@oddfoot{}%
+  \def\@evenfoot{}%
+  \let\@mkboth\@gobbletwo
+  \let\sectionmark\@gobble
+  \let\subsectionmark\@gobble
+}%
+\def\@runningtitle{\@shorttitle}%
+\renewenvironment{titlepage}{%
+  \let\wastwocol@sw\twocolumn@sw
+  \onecolumngrid
+  \newpage
+  \thispagestyle{titlepage}%
+  \c@page\z@% article sets this to one not zero???
+}{%
+  \wastwocol@sw{\twocolumngrid}{\newpage}%
+}%
+\let\@fnsymbol@latex\@fnsymbol
+\let\@fnsymbol\@alph
+\def\adjust@abstractwidth{%
+ \parindent1em\relax
+ \advance\leftskip.5in\relax
+ \@totalleftmargin\leftskip
+ \preprintsty@sw{}{\rightskip.14\hsize\relax}
+ \@afterheading\@afterindentfalse
+}%
+\def\frontmatter@abstractheading{}%
+\def\frontmatter@abstractfont{%
+ \adjust@abstractwidth
+}%
+\def\frontmatter@postabstractspace{1\baselineskip}
+\def\frontmatter@finalspace{\addvspace{28\p@}}
+\appdef\setup@hook{%
+ \preprintsty@sw{%
+  \@booleantrue\titlepage@sw
+  \let\section\section@preprintsty
+  \let\subsection\subsection@preprintsty
+  \let\subsubsection\subsubsection@preprintsty
+ }{}%
+}%
+\def\frontmatter@@indent{%
+ \skip@\@flushglue
+ \preprintsty@sw{\@flushglue\z@ plus.3\hsize\relax}%
+	{\@flushglue.14\hsize\relax}
+ \raggedright
+ \advance\leftskip.5in\relax
+ \@totalleftmargin\leftskip
+ \@flushglue\skip@
+}%
+\def\frontmatter@authorformat{%
+ \frontmatter@@indent
+ \sffamily
+}%
+\renewcommand*\email[1][Electronic mail: ]{\begingroup\sanitize@url\@email{#1}}%
+\def\frontmatter@above@affilgroup{\par\addvspace{6\p@}%
+}%
+\def\frontmatter@above@affiliation@script{%
+ \frontmatter@@indent
+}%
+\def\frontmatter@above@affiliation{%
+}%
+\def\frontmatter@affiliationfont{%
+ \frontmatter@@indent
+ \preprintsty@sw{}{\small}%
+ \it
+}%
+\def\frontmatter@collaboration@above{%
+}%
+\def\frontmatter@setup{%
+ \normalfont
+}%
+\def\frontmatter@title@above{\addvspace{6\p@}}%
+\def\frontmatter@title@format{%
+ \preprintsty@sw{}{\Large}%
+ \sffamily
+ \bfseries
+ \raggedright
+ \parskip\z@skip
+}%
+\def\frontmatter@title@below{\addvspace{7.5\p@}}%
+\def\@author@parskip{3\p@}%
+\@booleanfalse\altaffilletter@sw
+\def\frontmatter@makefnmark{%
+ \@textsuperscript{%
+  \normalfont\@thefnmark%(
+  )%
+ }%
+}%
+\def\frontmatter@authorbelow{%
+\addvspace{3\p@}%
+}%
+\let\affil@cutoff\tw@
+\def\frontmatter@RRAP@format{%
+  \addvspace{2\p@}%
+  \raggedright
+  \advance\leftskip.5in\relax
+  \@totalleftmargin\leftskip
+  \preprintsty@sw{}{\advance\rightskip.14\hsize\relax}
+  \everypar{%
+   \hbox\bgroup(\@gobble@leavemode@uppercase%)
+  }%
+  \def\par{%
+   \@ifvmode{}{%(
+    \unskip)\egroup\@@par
+   }%
+  }%
+}%
+\def\punct@RRAP{;\egroup\ \hbox\bgroup}%
+\def\@gobble@leavemode@uppercase#1#2{\expandafter\MakeTextUppercase}%
+\def\frontmatter@PACS@format{%
+   \addvspace{11\p@}%
+   \adjust@abstractwidth
+   \parskip\z@skip
+   \samepage
+}%
+\def\frontmatter@keys@format{%
+   \adjust@abstractwidth
+   \samepage
+}%
+\def\ps@titlepage{%
+  \def\@oddhead{%
+   \@runningtitle
+   \hfill
+   \produce@preprints\@preprint
+  }%
+  \let\@evenhead\@oddhead
+  \def\@oddfoot{%
+   \hb@xt@\z@{\byrevtex\hss}%
+   \hfil
+   \preprintsty@sw{\thepage}{}%
+   \quad\checkindate
+   \hfil
+  }%
+  \let\@evenfoot\@oddfoot
+}%
+\def\byrevtex{\byrevtex@sw{Typeset by REV\TeX and AAPM}{}}%
+\def\produce@preprints#1{%
+ \preprint@sw{%
+  \vtop to \z@{%
+   \def\baselinestretch{1}%
+   \small
+   \let\preprint\preprint@count
+   \count@\z@#1\@ifnum{\count@>\tw@}{%
+    \hbox{%
+     \let\preprint\preprint@hlist
+     #1\setbox\z@\lastbox
+    }%
+   }{%
+    \let\preprint\preprint@cr
+    \halign{\hfil##\cr#1\crcr}%
+    \par
+    \vss
+   }%
+  }%
+ }{}%
+}%
+\def\preprint@cr#1{#1\cr}%
+\def\preprint@count#1{\advance\count@\@ne}%
+\def\preprint@hlist#1{#1\hbox{, }}%
+\newenvironment{Lead@inParagraph}{%
+ \par
+ \bfseries
+ \@afterheading\@afterindentfalse
+}{%
+ \par
+ \hb@xt@\hsize{\hfil\leaders\hrule\hfil\leaders\hrule\hfil\hfil}%
+}%
+\appdef\frontmatter@init{%
+ \let@environment{quotation@ltx}{quotation}%
+ \let@environment{quotation}{Lead@inParagraph}%
+}%
+\appdef\@startsection@hook{%
+ \let@environment{quotation}{quotation@ltx}%
+}%
+\def\secnums@rtx{%
+ \@ifxundefined\thepart{%
+  \def\thepart          {\Roman{part}}%
+ }{}%
+ \@ifxundefined\thesection{%
+  \def\thesection       {\Roman{section}}%
+  \def\p@section        {}%
+ }{}%
+ \@ifxundefined\thesubsection{%
+  \def\thesubsection    {\thesection.\Alph{subsection}}%
+  \def\p@subsection     {}%
+ }{}%
+ \@ifxundefined\thesubsubsection{%
+  \def\thesubsubsection {\thesubsection.\arabic{subsubsection}}%
+  \def\p@subsubsection  {}%
+ }{}%
+ \@ifxundefined\theparagraph{%
+  \def\theparagraph     {\thesubsubsection.\alph{paragraph}}%
+  \def\p@paragraph      {}%
+ }{}%
+ \@ifxundefined\thesubparagraph{%
+  \def\thesubparagraph  {\theparagraph.\arabic{subparagraph}}%
+  \def\p@subparagraph   {}%
+ }{}%
+}%
+\def\@seccntformat#1{\csname the#1\endcsname.\hskip0.5em\relax}%
+\def\@hang@from#1#2#3{#1#2#3}%
+\def\section{%
+  \@startsection
+    {section}%
+    {1}%
+    {\z@}%
+    {1.5\baselineskip \@plus1ex \@minus .2ex}%
+    {.5\baselineskip}%
+    {%
+     \normalfont
+     \sffamily
+     \bfseries
+     \raggedright
+    }%
+}%
+\def\@hangfrom@section#1#2#3{\@hangfrom{#1#2}\MakeTextUppercase{#3}}%
+\def\@hangfroms@section#1#2{#1\MakeTextUppercase{#2}}%
+\def\subsection{%
+  \@startsection
+    {subsection}%
+    {2}%
+    {\z@}%
+    {1.5\baselineskip \@plus1ex \@minus .2ex}%
+    {.5\baselineskip}%
+    {%
+     \normalfont
+     \fontsize{9.5}{12}
+     \sffamily
+     \bfseries
+     \raggedright
+	 }%
+}%
+\def\subsubsection{%
+  \@startsection
+    {subsubsection}%
+    {3}%
+    {\z@}%
+    {1.5\baselineskip \@plus1ex \@minus .2ex}%
+    {.5\baselineskip}%
+    {%
+     \normalfont
+     \fontsize{9.5}{12}
+     \sffamily
+     \bfseries
+     \itshape
+     \raggedright
+    }%
+}%
+\def\paragraph{%
+  \@startsection
+    {paragraph}%
+    {4}%
+    {\parindent}%
+    {\z@}%
+    {-1em}%
+    {\normalfont\normalsize\itshape}%
+}%
+\def\subparagraph{%
+  \@startsection
+    {subparagraph}%
+    {5}%
+    {\parindent}%
+    {3.25ex \@plus1ex \@minus .2ex}%
+    {-1em}%
+    {\normalfont\normalsize\bfseries}%
+}%
+\def\section@preprintsty{%
+  \@startsection
+    {section}%
+    {1}%
+    {\z@}%
+    {0.8cm \@plus1ex \@minus .2ex}%
+    {0.5cm}%
+    {%
+     \normalfont
+     \bfseries
+     \raggedright
+    }%
+}%
+\def\subsection@preprintsty{%
+  \@startsection
+    {subsection}%
+    {2}%
+    {\z@}%
+    {.8cm \@plus1ex \@minus .2ex}%
+    {.5cm}%
+    {%
+     \normalfont
+     \bfseries
+     \raggedright
+    }%
+}%
+\def\subsubsection@preprintsty{%
+  \@startsection
+    {subsubsection}%
+    {3}%
+    {\z@}%
+    {.8cm \@plus1ex \@minus .2ex}%
+    {.5cm}%
+    {%
+     \normalfont
+     \itshape\bfseries
+     \raggedright
+    }%
+}%
+\let\frontmatter@footnote@produce\frontmatter@footnote@produce@endnote
+\def\@pnumwidth{1.55em}
+\def\@tocrmarg {2.55em}
+\def\@dotsep{2}
+\def\ltxu@dotsep{4.5pt}
+\setcounter{tocdepth}{3}
+\def\tableofcontents{%
+ \addtocontents{toc}{\string\tocdepth@munge}%
+ \print@toc{toc}%
+ \addtocontents{toc}{\string\tocdepth@restore}%
+}%
+\def\tocdepth@munge{%
+  \let\l@section@saved\l@section
+  \let\l@section\@gobble@tw@
+}%
+\def\@gobble@tw@#1#2{}%
+\def\tocdepth@restore{%
+  \let\l@section\l@section@saved
+}%
+\def\l@part#1#2{\addpenalty{\@secpenalty}%
+ \begingroup
+  \set@tocdim@pagenum{#2}%
+  \parindent \z@
+  \rightskip\tocleft@pagenum plus 1fil\relax
+  \skip@\parfillskip\parfillskip\z@
+  \addvspace{2.25em plus\p@}%
+  \large \bf %
+  \leavevmode\ignorespaces#1\unskip\nobreak\hskip\skip@
+  \hb@xt@\rightskip{\hfil\unhbox\z@}\hskip-\rightskip\hskip\z@skip
+  \par
+  \nobreak %
+ \endgroup
+}%
+\def\tocleft@{\z@}%
+\def\tocdim@min{5\p@}%
+\def\l@section{%
+ \l@@sections{}{section}% Implicit #3#4
+}%
+\def\l@f@section{%
+ \addpenalty{\@secpenalty}%
+ \addvspace{1.0em plus\p@}%
+ \bf
+}%
+\def\l@subsection{%
+ \l@@sections{section}{subsection}% Implicit #3#4
+}%
+\def\l@subsubsection{%
+ \l@@sections{subsection}{subsubsection}% Implicit #3#4
+}%
+\def\l@paragraph#1#2{}%
+\def\l@subparagraph#1#2{}%
+\let\toc@pre\toc@pre@auto
+\let\toc@post\toc@post@auto
+\def\listoffigures{\print@toc{lof}}%
+\def\l@figure{\@dottedtocline{1}{1.5em}{2.3em}}
+\def\listoftables{\print@toc{lot}}%
+\let\l@table\l@figure
+\def\figurename{\textsc{Fig.}}
+\def\tablename{\textsc{Table}}
+\long\def\@makecaption#1#2{%
+  \par
+  \vskip\abovecaptionskip
+  \begingroup
+   \preprintsty@sw{\small}{\footnotesize}\rmfamily
+   \sbox\@tempboxa{%
+    \let\\\heading@cr
+    \@make@capt@title{#1}{#2}%
+   }%
+   \@ifdim{\wd\@tempboxa >\hsize}{%
+    \begingroup
+     \samepage
+     \flushing
+     \let\footnote\@footnotemark@gobble
+     \@make@capt@title{#1}{#2}\par
+    \endgroup
+   }{%
+     \global \@minipagefalse
+     \hb@xt@\hsize{\hfil\unhbox\@tempboxa\hfil}%
+   }%
+  \endgroup
+  \vskip\belowcaptionskip
+}%
+\def\@caption@fignum@sep{\nobreak\hskip.5em plus.2em\ignorespaces}%
+\@booleanfalse\raggedcolumn@sw
+\def\table@hook{\preprintsty@sw{\small}{\footnotesize}}%
+\def\tableft@skip@float{\z@ plus\hsize}%
+\def\tabmid@skip@float{\@flushglue}%
+\def\tabright@skip@float{\z@ plus\hsize}%
+\def\array@row@pre@float{\hline\hline\noalign{\vskip\doublerulesep}}%
+\def\array@row@pst@float{\noalign{\vskip\doublerulesep}\hline\hline}%
+\def\@makefntext#1{%
+ \def\baselinestretch{1}%
+ \leftskip1em%
+ \parindent1em%
+ \noindent
+ \nobreak\hskip-\leftskip
+ \hb@xt@\leftskip{%
+  \hss\@makefnmark\ %
+ }%
+ #1%
+ \par
+}%
+\prepdef\appendix{%
+ \par
+ \let\@hangfrom@section\@hangfrom@appendix
+ \let\@sectioncntformat\@appendixcntformat
+}%
+\def\@hangfrom@appendix#1#2#3{%
+ #1%
+ \@if@empty{#2}{%
+  #3%
+ }{%
+  #2\@if@empty{#3}{}{:\ #3}%
+ }%
+}%
+\def\@hangfroms@appendix#1#2{%
+ #1#2%
+}%
+\def\@appendixcntformat#1{\appendixname\ \csname the#1\endcsname}%
+ \def\pre@bibdata{\jobname\bibdata@app}%
+\def\refname{References}%
+\def\rtx@bibsection{%
+ \@ifx@empty\refname{%
+  \par\vspace{6\p@ plus 6\p@}%
+ }{%
+  \expandafter\section\expandafter*\expandafter{\refname}%
+  \@nobreaktrue
+ }%
+}%
+\let\bibpreamble\@empty
+\appdef\setup@hook{%
+ \bibsep\z@\relax
+}%
+\def\newblock{\ }%
+\appdef\setup@hook{%
+ \def\bibfont{%
+  \preprintsty@sw{}{\footnotesize}%
+  \@clubpenalty\clubpenalty
+  \labelsep\z@
+ }%
+}%
+\let\place@bibnumber\place@bibnumber@sup
+\newenvironment{theindex}{%
+ \columnseprule \z@
+ \columnsep 35\p@
+ \c@secnumdepth-\maxdimen
+ \onecolumngrid@push
+ \section{\indexname}%
+ \thispagestyle{plain}%
+ \parindent\z@
+ \parskip\z@ plus.3\p@\relax
+ \let\item\@idxitem
+ \onecolumngrid@pop
+}{%
+}%
+\def\@idxitem{\par\hangindent 40\p@}
+\def\subitem{\par\hangindent 40\p@ \hspace*{20\p@}}
+\def\subsubitem{\par\hangindent 40\p@ \hspace*{30\p@}}
+\def\indexspace{\par \vskip 10\p@ plus5\p@ minus3\p@\relax}
+\expandafter\def\csname rtx@aapm10pt\endcsname{%
+ \let\@currname@class\@currname
+ \def\@currname{aps10pt\substyle@post}%
+ \class@info{Reading file \@currname.\substyle@ext}%
+ \input{\@currname.\substyle@ext}%
+ \let\@currname\@currname@class
+ \class@info{Overriding 10pt}%
+ \aapmreprint
+}%
+\expandafter\def\csname rtx@aapm11pt\endcsname{\csname rtx@aapm12pt\endcsname}%
+\expandafter\def\csname rtx@aapm12pt\endcsname{%
+ \let\@currname@class\@currname
+ \def\@currname{aps12pt\substyle@post}%
+ \class@info{Reading file \@currname.\substyle@ext}%
+ \input{\@currname.\substyle@ext}%
+ \let\@currname\@currname@class
+ \class@info{Overriding 12pt}%
+ \aapmpreprint
+}%
+\def\today{%
+  \number\day\space
+  \ifcase\month
+   \or January\or February\or March\or     April\or   May\or      June%
+   \or July\or    August\or   September\or October\or November\or December%
+  \fi\space
+  \number\year
+}%
+\@booleantrue\groupauthors@sw
+\@booleanfalse\@affils@sw
+\@booleantrue\runinaddress@sw
+\def\@journal@default{mph}%
+\def\@pointsize@default{12}%
+ \appdef\setup@hook{%
+  \preprintsty@sw{}{%
+   \def\normalsize{%
+    \@setfontsize\normalsize\@xpt{12}%
+    \abovedisplayskip 6\p@ plus2\p@ minus5\p@
+    \belowdisplayskip \abovedisplayskip
+    \abovedisplayshortskip  \abovedisplayskip
+    \belowdisplayshortskip \abovedisplayskip
+    \let\@listi\@listI
+   }%
+   \def\small{%
+    \@setfontsize\small\@ixpt{11}%
+	\abovedisplayskip 8.5\p@ \@plus3\p@ \@minus4\p@
+	\belowdisplayskip \abovedisplayskip
+	\abovedisplayshortskip \z@ \@plus2\p@
+	\belowdisplayshortskip 4\p@ \@plus2\p@ \@minus2\p@
+	\def\@listi{%
+	   \leftmargin\leftmargini
+	   \topsep 4\p@ \@plus2\p@ \@minus2\p@
+	   \parsep 2\p@ \@plus\p@ \@minus\p@
+	   \itemsep \parsep
+	  }%
+   }%
+   \def\Large{%
+     \@setfontsize\Large\@xivpt{16pt}%
+   }%
+   \def\@listI{%
+	  \leftmargin\leftmargini
+	  \parsep 4\p@ plus2\p@ minus\p@
+	  \topsep 8\p@ plus2\p@ minus4\p@
+	  \itemsep\z@
+   }%
+   \textheight = 694.0\p@
+  }%
+ }%
+\def\rtx@aapmmph{%
+ \typeout{Using journal substyle \@journal.}%
+ \@booleanfalse\authoryear@sw%
+ \input{fleqn.clo}%
+ \PassOptionsToPackage{fleqn}{amsmath}%
+ \AtBeginDocument{\mathindent12pt\relax}%
+}%
+\appdef\setup@hook{%
+  \bibpunct{}{}{,}{s}{}{\textsuperscript{,}}%
+  \let\onlinecite\rev@citealpnum
+}%
+\@booleantrue\footinbib@sw
+\let\place@bibnumber\place@bibnumber@sup
+\appdef\setup@hook{%
+ \footinbib@sw{}{%
+  \class@warn{Citations are superscript numbers: footnotes must be endnotes; changing to that configuration}%
+  \@booleantrue\footinbib@sw
+ }%
+}%
+\def\present@bibnote#1#2{%
+ \item[%
+  \textsuperscript{%
+   \normalfont%
+   \Hy@raisedlink{\hyper@anchorstart{frontmatter.#1}\hyper@anchorend}%
+   \begingroup%
+    \csname c@\@mpfn\endcsname#1\relax%
+    \frontmatter@thefootnote%
+   )\endgroup%
+  }%
+ ]#2\par%
+}%
+\def\make@footnote@endnote{%
+ \footinbib@sw{%
+   \ltx@footnote@push
+   \def\thempfn{Note\thefootnote}%
+   \let\ltx@footmark\rev@citemark
+   \let\ltx@foottext\rev@endtext
+   \appdef\class@enddocumenthook{\auto@bib}%
+   \let\printendnotes\relax
+ }{}%
+}%
+\def\aapmreprint{%
+}%
+\def\aapmpreprint{%
+}%
+\endinput
+%%
+%% End of file `aapm4-1.rtx'.

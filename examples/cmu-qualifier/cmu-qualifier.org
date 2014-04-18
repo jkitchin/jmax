@@ -1,0 +1,52 @@
+#+LATEX_CLASS: revtex4-1
+#+LATEX_CLASS_OPTIONS: [aps,prb,citeautoscript,preprint,citeautoscript,showkeys]
+#+EXPORT_EXCLUDE_TAGS: noexport
+
+# here is where you include the relevant packages. These are pretty
+# common ones. You may add additional ones. Note that the order of the
+# packages is significant. If you are not careful, your file will not
+# build into a pdf.
+
+#+LATEX_HEADER: \usepackage[utf8]{inputenc}
+#+LATEX_HEADER: \usepackage[T1]{fontenc}
+#+LATEX_HEADER: \usepackage{fixltx2e}
+#+LATEX_HEADER: \usepackage{natbib}
+#+LATEX_HEADER: \usepackage{url}
+#+LATEX_HEADER: \usepackage{minted}  % for source code
+#+LATEX_HEADER: \usepackage{graphicx}
+#+LATEX_HEADER: \usepackage{textcomp}
+#+LATEX_HEADER: \usepackage{amsmath}
+#+LATEX_HEADER: \usepackage{pdfpages}
+#+LATEX_HEADER: \usepackage[version=3]{mhchem}
+#+LATEX_HEADER: \usepackage[linktocpage, pdfstartview=FitH, colorlinks, linkcolor=blue, anchorcolor=blue, citecolor=blue,  filecolor=blue,  menucolor=blue,  urlcolor=blue]{hyperref}
+
+#+TITLE: Your amazing title
+
+#+AUTHOR: John Kitchin
+
+#+ABSTRACT: put one paragraph abstract here. in proper LaTeX, all in one line.
+
+* Introduction
+Use citations cite:chretien-density-2006. Always put punctuation to the right in org-mode. natbib will sort it out in the export correctly.
+
+* Methods
+Describe the relevant methods for your work here.
+
+* Results and Discussion
+Here is where the results and discussion go.
+
+* Conclusions
+
+Summarize the main conclusions here.
+
+
+# Put your references into a file called references.bib
+# here we have journal titles defined in a separate file, with aliases in references.bib
+bibliography:longtitles.bib,references.bib
+
+* build								   :noexport:
+
+[[elisp:(cmu-qualifier-export-to-pdf-and-open)]]
+
+
+

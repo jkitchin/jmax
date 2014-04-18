@@ -1,0 +1,494 @@
+This is XeTeX, Version 3.1415926-2.4-0.9998 (MiKTeX 2.9 64-bit) (preloaded format=xelatex 2013.6.6)  25 JUN 2013 14:57
+entering extended mode
+**apssamp.tex
+
+("C:\Users\jkitchin\Dropbox\latex\revtex4-1\revtex4-1-tds\doc\latex\revtex\samp
+le\aps - Copy\apssamp.tex"
+LaTeX2e <2011/06/27>
+Babel <v3.8m> and hyphenation patterns for english, afrikaans, ancientgreek, ar
+abic, armenian, assamese, basque, bengali, bokmal, bulgarian, catalan, coptic, 
+croatian, czech, danish, dutch, esperanto, estonian, farsi, finnish, french, ga
+lician, german, german-x-2012-05-30, greek, gujarati, hindi, hungarian, iceland
+ic, indonesian, interlingua, irish, italian, kannada, kurmanji, latin, latvian,
+ lithuanian, malayalam, marathi, mongolian, mongolianlmc, monogreek, ngerman, n
+german-x-2012-05-30, nynorsk, oriya, panjabi, pinyin, polish, portuguese, roman
+ian, russian, sanskrit, serbian, slovak, slovenian, spanish, swedish, swissgerm
+an, tamil, telugu, turkish, turkmen, ukenglish, ukrainian, uppersorbian, usengl
+ishmax, welsh, loaded.
+("C:\Program Files\MiKTeX 2.9\tex\latex\revtex\revtex4-1.cls"
+Document Class: revtex4-1 2010/07/25/20:33:00 4.1r (http://publish.aps.org/revt
+ex4/ for documentation)
+ Copyright (c) 2009 The American Physical Society.
+ mailto:revtex@aps.org
+ Licensed under the LPPL:
+http://www.ctan.org/tex-archive/macros/latex/base/lppl.txt
+ Arthur Ogawa <arthur_ogawa at sbcglobal dot net>
+ Based on work by David Carlisle <david at dcarlisle.demon.co.uk>.
+ltxutil[2010/07/25/20:33:00 4.1r utilities package (portions licensed from W. E
+. Baxter web at superscript.com)]
+LaTeX Info: Redefining \@centercr on input line 308.
+Class revtex4-1 Info: Repairing broken LaTeX eqnarray on input line 358.
+\eqncolsep=\skip41
+Class revtex4-1 Info: Repairing hyperref-unfriendly LaTeX definition of \mpfoot
+note on input line 433.
+Class revtex4-1 Info: Repairing broken LateX \@sect on input line 755.
+\intertabularlinepenalty=\count80
+\@tbpen=\count81
+\@arstrutbox@hline=\box26
+Class revtex4-1 Info: Repairing broken LaTeX \@xbitor on input line 1786.
+Class revtex4-1 Info: Making \typeout \long on input line 2046.
+ltxfront[2010/07/25/20:33:00 4.1r frontmatter package (AO,DPC)]
+\c@affil=\count82
+\c@collab=\count83
+\absbox=\box27
+ltxgrid[2010/07/25/20:33:00 4.1r page grid package (portions licensed from W. E
+. Baxter web at superscript.com)]
+\c@linecount=\count84
+\output@latex=\toks14
+\box@size@1=\box28
+\box@size@2=\box29
+\@protection@box=\box30
+\@topmark@saved=\toks15
+\footins@saved=\box31
+\footins@recovered=\box32
+\column@recovered=\box33
+\pagesofar=\box34
+\footsofar=\box35
+\pagegrid@col=\count85
+Class revtex4-1 Info: Overriding \@vspace, \@vspacer, \@no@pgbk, \@newline, and
+ \\  on input line 5578.
+\c@part=\count86
+\c@section=\count87
+\c@subsection=\count88
+\c@subsubsection=\count89
+\c@paragraph=\count90
+\c@subparagraph=\count91
+\abovecaptionskip=\skip42
+\belowcaptionskip=\skip43
+\c@figure=\count92
+\fbox@1=\box36
+\c@table=\count93
+\fbox@2=\box37
+\c@video=\count94
+\fbox@4=\box38
+\@bibdataout=\write3
+\widetext@top=\box39
+\widetext@bot=\box40
+Class revtex4-1 Info: Selecting society aps on input line 7542.
+("C:\Program Files\MiKTeX 2.9\tex\latex\revtex\aps4-1.rtx"
+File: aps4-1 2010/07/25/20:33:00 4.1r (http://publish.aps.org/revtex4/ for docu
+mentation)
+Class revtex4-1 Info: RevTeX society APS selected on input line 31.
+)
+
+Class revtex4-1 Warning: No journal specified, using default pra.
+
+Class revtex4-1 Info: APS journal PRA selected on input line 7545.
+("C:\Program Files\MiKTeX 2.9\tex\latex\revtex\aps10pt4-1.rtx"
+File: aps10pt4-1 2010/07/25/20:33:00 4.1r (http://publish.aps.org/revtex4/ for 
+documentation)
+Class revtex4-1 Info: RevTeX pointsize 10pt selected on input line 30.
+)
+("C:\Program Files\MiKTeX 2.9\tex\latex\textcase\textcase.sty"
+Package: textcase 2004/10/07 v0.07 Text only upper/lower case changing (DPC)
+)
+("C:\Program Files\MiKTeX 2.9\tex\latex\amsfonts\amssymb.sty"
+Package: amssymb 2009/06/22 v3.00
+
+("C:\Program Files\MiKTeX 2.9\tex\latex\amsfonts\amsfonts.sty"
+Package: amsfonts 2009/06/22 v3.00 Basic AMSFonts support
+\@emptytoks=\toks16
+\symAMSa=\mathgroup4
+\symAMSb=\mathgroup5
+LaTeX Font Info:    Overwriting math alphabet `\mathfrak' in version `bold'
+(Font)                  U/euf/m/n --> U/euf/b/n on input line 96.
+))
+("C:\Program Files\MiKTeX 2.9\tex\latex\ams\math\amsmath.sty"
+Package: amsmath 2000/07/18 v2.13 AMS math features
+\@mathmargin=\skip44
+
+For additional information on amsmath, use the `?' option.
+("C:\Program Files\MiKTeX 2.9\tex\latex\ams\math\amstext.sty"
+Package: amstext 2000/06/29 v2.01
+
+("C:\Program Files\MiKTeX 2.9\tex\latex\ams\math\amsgen.sty"
+File: amsgen.sty 1999/11/30 v2.0
+\@emptytoks=\toks17
+\ex@=\dimen102
+)
+LaTeX Info: Redefining \text on input line 53.
+)
+("C:\Program Files\MiKTeX 2.9\tex\latex\ams\math\amsbsy.sty"
+Package: amsbsy 1999/11/29 v1.2d
+\pmbraise@=\dimen103
+)
+("C:\Program Files\MiKTeX 2.9\tex\latex\ams\math\amsopn.sty"
+Package: amsopn 1999/12/14 v2.01 operator names
+)
+\inf@bad=\count95
+LaTeX Info: Redefining \frac on input line 211.
+\uproot@=\count96
+\leftroot@=\count97
+LaTeX Info: Redefining \overline on input line 307.
+\classnum@=\count98
+\DOTSCASE@=\count99
+LaTeX Info: Redefining \ldots on input line 379.
+LaTeX Info: Redefining \dots on input line 382.
+LaTeX Info: Redefining \cdots on input line 467.
+\Mathstrutbox@=\box41
+\strutbox@=\box42
+\big@size=\dimen104
+LaTeX Font Info:    Redeclaring font encoding OML on input line 567.
+LaTeX Font Info:    Redeclaring font encoding OMS on input line 568.
+\macc@depth=\count100
+\c@MaxMatrixCols=\count101
+\dotsspace@=\muskip10
+\c@parentequation=\count102
+\dspbrk@lvl=\count103
+\tag@help=\toks18
+\row@=\count104
+\column@=\count105
+\maxfields@=\count106
+\andhelp@=\toks19
+\eqnshift@=\dimen105
+\alignsep@=\dimen106
+\tagshift@=\dimen107
+\tagwidth@=\dimen108
+\totwidth@=\dimen109
+\lineht@=\dimen110
+\@envbody=\toks20
+\multlinegap=\skip45
+\multlinetaggap=\skip46
+\mathdisplay@stack=\toks21
+LaTeX Info: Redefining \[ on input line 2666.
+LaTeX Info: Redefining \] on input line 2667.
+)
+("C:\Program Files\MiKTeX 2.9\tex\xelatex\xetexurl\url.sty"
+\Urlmuskip=\muskip11
+Package: url 2004/03/15  ver 3.1  Verb mode for urls, etc.
+)
+("C:\Program Files\MiKTeX 2.9\tex\latex\natbib\natbib.sty"
+Package: natbib 2010/09/13 8.31b (PWD, AO)
+\bibhang=\skip47
+\bibsep=\skip48
+LaTeX Info: Redefining \cite on input line 694.
+\c@NAT@ctr=\count107
+)
+Class revtex4-1 Info: Repairing natbib's \BibitemShut on input line 7549.
+
+("C:\Program Files\MiKTeX 2.9\tex\latex\revtex\revsymb4-1.sty"
+Package: revsymb4-1 2010/07/25/20:33:00 4.1r (http://publish.aps.org/revtex4/ f
+or documentation)
+LaTeX Info: Redefining \frak on input line 95.
+LaTeX Info: Redefining \Bbb on input line 111.
+LaTeX Info: Redefining \REV@mathfrak on input line 119.
+))
+("C:\Program Files\MiKTeX 2.9\tex\latex\graphics\graphicx.sty"
+Package: graphicx 1999/02/16 v1.0f Enhanced LaTeX Graphics (DPC,SPQR)
+
+("C:\Program Files\MiKTeX 2.9\tex\latex\graphics\keyval.sty"
+Package: keyval 1999/03/16 v1.13 key=value parser (DPC)
+\KV@toks@=\toks22
+)
+("C:\Program Files\MiKTeX 2.9\tex\latex\graphics\graphics.sty"
+Package: graphics 2009/02/05 v1.0o Standard LaTeX Graphics (DPC,SPQR)
+
+("C:\Program Files\MiKTeX 2.9\tex\latex\graphics\trig.sty"
+Package: trig 1999/03/16 v1.09 sin cos tan (DPC)
+)
+("C:\Program Files\MiKTeX 2.9\tex\latex\00miktex\graphics.cfg"
+File: graphics.cfg 2007/01/18 v1.5 graphics configuration of teTeX/TeXLive
+)
+Package graphics Info: Driver file: xetex.def on input line 91.
+
+("C:\Program Files\MiKTeX 2.9\tex\xelatex\xetex-def\xetex.def"
+File: xetex.def 2009/11/22 v0.94 LaTeX color/graphics driver for XeTeX (RRM/JK)
+
+))
+\Gin@req@height=\dimen111
+\Gin@req@width=\dimen112
+)
+("C:\Program Files\MiKTeX 2.9\tex\latex\tools\dcolumn.sty"
+Package: dcolumn 2001/05/28 v1.06 decimal alignment package (DPC)
+
+("C:\Program Files\MiKTeX 2.9\tex\latex\tools\array.sty"
+Package: array 2008/09/09 v2.4c Tabular extension package (FMi)
+\col@sep=\dimen113
+\extrarowheight=\dimen114
+\NC@list=\toks23
+\extratabsurround=\skip49
+\backup@length=\skip50
+))
+("C:\Program Files\MiKTeX 2.9\tex\latex\tools\bm.sty"
+Package: bm 2004/02/26 v1.1c Bold Symbol Support (DPC/FMi)
+\symboldoperators=\mathgroup6
+\symboldletters=\mathgroup7
+\symboldsymbols=\mathgroup8
+LaTeX Font Info:    Redeclaring math alphabet \mathbf on input line 138.
+LaTeX Info: Redefining \bm on input line 204.
+)
+Class revtex4-1 Info: Patching array package. on input line 58.
+Class revtex4-1 Info: Robustifying \LaTeX's \boldmath command on input line 58.
+
+Class revtex4-1 Info: cite was not loaded (OK!) on input line 58.
+Class revtex4-1 Info: mcite was not loaded (OK!) on input line 58.
+Class revtex4-1 Info: multicol was not loaded (OK!) on input line 58.
+
+("C:\Users\jkitchin\Dropbox\latex\revtex4-1\revtex4-1-tds\doc\latex\revtex\samp
+le\aps - Copy\apssamp.aux")
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 58.
+LaTeX Font Info:    ... okay on input line 58.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 58.
+LaTeX Font Info:    ... okay on input line 58.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 58.
+LaTeX Font Info:    ... okay on input line 58.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 58.
+LaTeX Font Info:    ... okay on input line 58.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 58.
+LaTeX Font Info:    ... okay on input line 58.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 58.
+LaTeX Font Info:    ... okay on input line 58.
+Requested font "cmr9" at 9.0pt
+ -> cmr9
+Requested font "cmbx9" at 9.0pt
+ -> cmbx9
+Requested font "cmtt9" at 9.0pt
+ -> cmtt9
+
+
+Class revtex4-1 Warning: Assuming \noaffiliation for collaboration.
+
+Requested font "cmr12" at 12.0pt
+ -> cmr12
+Requested font "cmbx12" at 12.0pt
+ -> cmbx12
+Requested font "cmr8" at 8.0pt
+ -> cmr8
+Requested font "cmr6" at 6.0pt
+ -> cmr6
+Requested font "cmmi12" at 12.0pt
+ -> cmmi12
+Requested font "cmmi8" at 8.0pt
+ -> cmmi8
+Requested font "cmmi6" at 6.0pt
+ -> cmmi6
+Requested font "cmsy10" at 12.0pt
+ -> cmsy10
+Requested font "cmsy8" at 8.0pt
+ -> cmsy8
+Requested font "cmsy6" at 6.0pt
+ -> cmsy6
+Requested font "cmex10" at 12.0pt
+ -> cmex10
+Requested font "cmex8" at 8.0pt
+ -> cmex8
+Requested font "cmex7" at 6.0pt
+ -> cmex7
+LaTeX Font Info:    Try loading font information for U+msa on input line 114.
+("C:\Program Files\MiKTeX 2.9\tex\latex\amsfonts\umsa.fd"
+File: umsa.fd 2009/06/22 v3.00 AMS symbols A
+)
+Requested font "msam10" at 12.0pt
+ -> msam10
+Requested font "msam10" at 8.0pt
+ -> msam10
+Requested font "msam7" at 6.0pt
+ -> msam7
+LaTeX Font Info:    Try loading font information for U+msb on input line 114.
+
+("C:\Program Files\MiKTeX 2.9\tex\latex\amsfonts\umsb.fd"
+File: umsb.fd 2009/06/22 v3.00 AMS symbols B
+)
+Requested font "msbm10" at 12.0pt
+ -> msbm10
+Requested font "msbm10" at 8.0pt
+ -> msbm10
+Requested font "msbm7" at 6.0pt
+ -> msbm7
+Requested font "cmbx8" at 8.0pt
+ -> cmbx8
+Requested font "cmbx6" at 6.0pt
+ -> cmbx6
+Requested font "cmmib10" at 12.0pt
+ -> cmmib10
+Requested font "cmmib8" at 8.0pt
+ -> cmmib8
+Requested font "cmmib6" at 6.0pt
+ -> cmmib6
+Requested font "cmbsy10" at 12.0pt
+ -> cmbsy10
+Requested font "cmbsy8" at 8.0pt
+ -> cmbsy8
+Requested font "cmbsy6" at 6.0pt
+ -> cmbsy6
+Requested font "cmex7" at 5.0pt
+ -> cmex7
+Requested font "msam5" at 5.0pt
+ -> msam5
+Requested font "msbm5" at 5.0pt
+ -> msbm5
+Requested font "cmbx5" at 5.0pt
+ -> cmbx5
+Requested font "cmmib5" at 5.0pt
+ -> cmmib5
+Requested font "cmbsy5" at 5.0pt
+ -> cmbsy5
+Requested font "cmex7" at 7.0pt
+ -> cmex7
+Requested font "msam10" at 10.0pt
+ -> msam10
+Requested font "msam7" at 7.0pt
+ -> msam7
+Requested font "msbm10" at 10.0pt
+ -> msbm10
+Requested font "msbm7" at 7.0pt
+ -> msbm7
+Requested font "cmbx10" at 10.0pt
+ -> cmbx10
+Requested font "cmbx7" at 7.0pt
+ -> cmbx7
+Requested font "cmmib10" at 10.0pt
+ -> cmmib10
+Requested font "cmmib7" at 7.0pt
+ -> cmmib7
+Requested font "cmbsy10" at 10.0pt
+ -> cmbsy10
+Requested font "cmbsy7" at 7.0pt
+ -> cmbsy7
+Requested font "cmti9" at 9.0pt
+ -> cmti9
+LaTeX Font Info:    Try loading font information for OMS+cmr on input line 114.
+
+
+("C:\Program Files\MiKTeX 2.9\tex\latex\base\omscmr.fd"
+File: omscmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
+)
+LaTeX Font Info:    Font shape `OMS/cmr/m/it' in size <9> not available
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 114.
+Requested font "cmsy9" at 9.0pt
+ -> cmsy9
+
+
+Class revtex4-1 Warning: If you want your PACS to appear in your output, use do
+cument class option showpacs.
+
+LaTeX Font Info:    Font shape `OMS/cmr/bx/n' in size <9> not available
+(Font)              Font shape `OMS/cmsy/b/n' tried instead on input line 119.
+Requested font "cmbsy9" at 9.0pt
+ -> cmbsy9
+Requested font "cmtt10" at 10.0pt
+ -> cmtt10
+LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10> not available
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 136.
+Requested font "cmti10" at 10.0pt
+ -> cmti10
+[1]
+Underfull \hbox (badness 1062) in paragraph at lines 256--267
+\OT1/cmr/m/n/10 BibT[]X (one of these should be by arXiv con-ven-
+ []
+
+
+Underfull \hbox (badness 1205) in paragraph at lines 256--267
+\OT1/cmr/m/n/10 tion \OT1/cmtt/m/n/10 apssamp.bib\OT1/cmr/m/n/10 ). Run-ning Bi
+bT[]X (via \OT1/cmtt/m/n/10 bibtex
+ []
+
+
+Underfull \hbox (badness 1215) in paragraph at lines 256--267
+\OT1/cmr/m/n/10 If not us-ing BibT[]X, you will have to cre-ate the
+ []
+
+[2]
+LaTeX Font Info:    Try loading font information for U+euf on input line 290.
+ ("C:\Program Files\MiKTeX 2.9\tex\latex\amsfonts\ueuf.fd"
+File: ueuf.fd 2009/06/22 v3.00 Euler Fraktur
+)
+Requested font "eufm10" at 10.0pt
+ -> eufm10
+Requested font "eufm7" at 7.0pt
+ -> eufm7
+Requested font "eufm5" at 5.0pt
+ -> eufm5
+
+Underfull \hbox (badness 4819) in paragraph at lines 338--341
+[]\OT1/cmr/m/n/10 Multiline equa-tions are ob-tained by us-ing the
+ []
+
+Requested font "cmitt10" at 10.0pt
+ -> cmitt10
+
+Underfull \hbox (badness 1152) in paragraph at lines 385--396
+ \OT1/cmr/m/it/10 a. A few notes on \OT1/cmtt/m/it/10 tag\OT1/cmr/m/it/10 s[] [
+]\OT1/cmtt/m/n/10 \tag{#1} \OT1/cmr/m/n/10 re-quires the
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 397--406
+[]\OT1/cmr/m/n/10 Enclosing dis-play math within
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 397--406
+[]\OT1/cmtt/m/n/10 \begin{subequations} \OT1/cmr/m/n/10 and []\OT1/cmtt/m/n/10 
+\end{subequations}
+ []
+
+[3]
+Underfull \hbox (badness 2626) in paragraph at lines 417--423
+\OT1/cmr/m/n/10 Giving a []\OT1/cmtt/m/n/10 \label{#1} \OT1/cmr/m/n/10 com-mand
+ di-rectly af-ter the
+ []
+
+Requested font "cmmi9" at 9.0pt
+ -> cmmi9
+Requested font "cmex9" at 9.0pt
+ -> cmex9
+Requested font "msam10" at 9.0pt
+ -> msam10
+Requested font "msbm10" at 9.0pt
+ -> msbm10
+Requested font "eufm10" at 9.0pt
+ -> eufm10
+Requested font "eufm7" at 6.0pt
+ -> eufm7
+Requested font "cmmib9" at 9.0pt
+ -> cmmib9
+Requested font "eufm10" at 8.0pt
+ -> eufm10
+File: fig_1.eps Graphic file (type eps)
+<fig_1.eps>
+File: fig_2.eps Graphic file (type eps)
+ <fig_2.eps>
+LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <9> not available
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 514.
+ [4] [5]
+File: vid_1a.eps Graphic file (type eps)
+ <vid_1a.eps>
+File: vid_1b.eps Graphic file (type eps)
+ <vid_1b.eps>
+Underfull \hbox (badness 7595) in paragraph at lines 659--680
+[]\OT1/cmr/m/n/10 Video 1[] il-lus-trates sev-eral fea-tures new with
+ []
+
+
+("C:\Users\jkitchin\Dropbox\latex\revtex4-1\revtex4-1-tds\doc\latex\revtex\samp
+le\aps - Copy\apssamp.bbl"
+Overfull \vbox (8.7273pt too high) has occurred while \output is active []
+
+
+Overfull \vbox (8.7273pt too high) has occurred while \output is active []
+
+
+[6]) [7]
+("C:\Users\jkitchin\Dropbox\latex\revtex4-1\revtex4-1-tds\doc\latex\revtex\samp
+le\aps - Copy\apssamp.aux") ) 
+Here is how much of TeX's memory you used:
+ 3876 strings out of 429035
+ 47735 string characters out of 3167910
+ 148334 words of memory out of 3000000
+ 7082 multiletter control sequences out of 15000+200000
+ 20586 words of font info for 78 fonts, out of 3000000 for 9000
+ 912 hyphenation exceptions out of 8191
+ 34i,15n,31p,625b,421s stack positions out of 5000i,500n,10000p,200000b,50000s
+
+Output written on apssamp.pdf (7 pages).

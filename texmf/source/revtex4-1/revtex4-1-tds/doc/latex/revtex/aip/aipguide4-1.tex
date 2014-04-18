@@ -1,0 +1,428 @@
+%% ****** Start of file auguide.tex ****** %
+%%
+%%   This file is part of the AIP distribution of substyles for REVTeX 4.1
+%%   For version 4.1r of REVTeX, August 2010
+%%
+%%   Copyright (c) 2009,2010 American Institute of Physics
+%%
+\listfiles
+\documentclass[%
+ reprint,%
+%secnumarabic,%
+ amssymb, amsmath,%
+ aip,cha,%
+%groupedaddress,%
+%frontmatterverbose,
+]{revtex4-1}
+
+\usepackage{docs}%
+\usepackage{bm}%
+\usepackage[colorlinks=true,linkcolor=blue]{hyperref}%
+%\nofiles
+\expandafter\ifx\csname package@font\endcsname\relax\else
+ \expandafter\expandafter
+ \expandafter\usepackage
+ \expandafter\expandafter
+ \expandafter{\csname package@font\endcsname}%
+\fi
+\hyphenation{title}
+
+\begin{document}
+
+\title{Author's Guide to AIP Substyles for \revtex~4.1}%
+
+\author{AIP Journal Program}%
+\email{tex@aip.org}
+\affiliation{American Institute of Physics\\Suite 1NO1, 2 Huntington Quadrangle\\Melville, New York 11747-4502, USA}%
+
+\date{March 2010}%
+\revised{August 2010}%
+
+\maketitle
+
+\tableofcontents
+
+\section{Introduction}
+
+This is the author's guide to the AIP substyles for \revtex~4.1, 
+providing a useful formatting tool 
+for \LaTeX\ users submitting papers to journals 
+published by the American Institute of Physics.
+This guide is intended as an adjunct to the documentation for \revtex\ itself 
+(published by the American Physical Society), 
+so information contained therein is not repeated here, 
+except as it bears on the specific features of the AIP substyles.
+
+
+\subsection{Prerequisite Documentation}
+
+The following documentation should be considered your first source of information 
+on how to prepare your document for use with this format; 
+they are to be found within the APS \revtex~4.1 distribution. 
+Updated versions of these are maintained at
+the \revtex~4.1 homepage located at \url{http://authors.aps.org/revtex4/},
+are also available at the Comprehensive \TeX\ Archive Network (CTAN, see \url{http://www.ctan.org/}), 
+and form part of the \TeX Live distribution of \TeX.
+\begin{itemize}
+\item \textit{Author's Guide to \revtex~4.1}
+\item \textit{\revtex~4.1 Command and Options Summary}
+\item \textit{What's New in \revtex~4.1}
+\end{itemize}
+The present guide builds upon these documents, with which you should already be familiar.
+
+The AIP substyles distribution for \revtex~4.1 includes 
+a sample document (\file{aipsamp.tex}), 
+a good starting point for 
+the manuscript you are preparing for submission to an AIP journal.
+
+By using \revtex's \textit{Author's Guide to \revtex~4.1}, you can develop your
+document until it contains all of the content you desire.
+This guide informs you on document class options, commands, and 
+markup guidelines specific to AIP journals. 
+
+\subsection{Software Requirements}
+
+This guide assumes a working \revtex~4.1 installation including the AIP substyles. 
+Please see the installation guide included with the distribution.\cite{Note1}
+
+Please note that the AIP substyles work {\it only} with \revtex~4.1: 
+the original \revtex~4.0 release does {\it not} make the AIP substyle available, nor is it compatible with them. 
+
+For your computer to run \revtex~4.1 with the AIP substyles, the following are required:
+\begin{itemize}
+\item
+a working installation of \LaTeX\,
+\item
+\revtex~4.1 and all packages it requires,
+\item
+the AIP substyles for \revtex~4.1, and
+\item
+any further \LaTeX\ packages used in your document. 
+\end{itemize}
+
+The easiest way to obtain all of the needed software is to install an up-to-date distribution of \TeX,
+like \TeX Live, available on CTAN.
+
+To obtain the most up-to-date version of this software, please see \url{http://www.aip.org/pubservs/compuscript.html}.
+
+
+\subsection{Submitting to AIP Journals}
+
+Authors preparing a manuscript for submission to
+AIP journals should consult the Information for Contributors for the applicable journal,
+available through links at \url{http://journals.aip.org/}. 
+These requirements are not covered systematically in this author's guide; 
+you are responsible for understanding the requirements of the particular journal to which
+you will submit your article.
+
+For further information about journal requirements, contact the Editorial
+Office of the appropriate journal. (Follow links at \url{http://journals.aip.org/}.)
+
+\subsection{Contact Information}\label{sec:resources}%
+Any bugs, problems, or inconsistencies concerning the AIP journal substyles
+should be reported to AIP support at \href{mailto:tex@aip.org}{tex@aip.org}. 
+Reports should include information on the error and a 
+\textit{small} sample document that manifests the problem, if possible. 
+(Please don't send large files!) 
+
+Feedback concerning \revtex~4.1 itself should be sent, as usual, 
+to the American Physical Society at\\ \href{mailto:revtex@aps.org}{revtex@aps.org}. 
+
+To determine if the problem you are experiencing belongs to \revtex\ or is specific to the
+AIP substyles, simply remove \texttt{aip} from your document class options and rerun 
+your document. If the problem goes away, you may assume that it is due to the AIP substyles;
+if not, it belongs to \revtex.
+
+\section{Sample \LaTeXe\ Document}
+As the \revtex\ documentation makes clear, your document employs a \LaTeXe\ document class
+(specifically \texttt{revtex4-1.cls}), so you should use 
+the \LaTeXe\ commands and environments familiar to you with, say, the
+standard article class \texttt{revtex4-1.cls}, and you will be able to 
+employ many of the packages you are used to using with \LaTeXe.
+
+Using \texttt{aipsamp.tex} as an example, 
+your document will start with the usual \revtex\ \cmd\documentclass\ statement, but with
+a particular document class option \texttt{aip} that specifies the AIP substyle:
+\begin{verbatim}
+\documentclass[aip]{revtex4-1}
+\end{verbatim}
+You will then invoke the \LaTeXe\-compatible packages your document requires, say:
+\begin{verbatim}
+\usepackage{graphicx}%
+\usepackage{dcolumn}%
+\usepackage{bm}%
+\end{verbatim}
+follow up with your document content:
+\begin{verbatim}
+\begin{document}
+...
+\end{verbatim}
+and finish with a statement specifying your Bib\TeX\ database:
+\begin{verbatim}
+\bibliography{aipsamp}
+\end{document}
+\end{verbatim}
+
+The books
+in the bibliography of this guide provide extensive coverage of all topics
+pertaining to preparing documents under \LaTeXe\; they are highly recommended. 
+
+\section{\revtex\ Class Options Specific to AIP}
+
+\subsection{Journal Substyle}
+To access particular features of the AIP substyle, you will specify an additional document class option: the journal substyle, e.g.,
+\begin{verbatim}
+\documentclass[aip,jcp]{revtex4-1}
+\end{verbatim}
+in this case, \textit{J. Chem. Phys.}, the default. 
+A complete list of AIP journals with the corresponding journal substyle appears in Table~\ref{tab:journals}.
+\begin{table}
+\caption{\label{tab:journals}AIP journal substyles}
+\begin{ruledtabular}
+\begin{tabular}{ll}
+\textbf{Journal} & \textbf{class option} \\
+\itshape Appl. Phys. Lett. &\texttt{apl}\\
+\itshape Biomicrofluidics  &\texttt{bmf}\\
+\itshape Chaos             &\texttt{cha}\\
+\itshape J. Appl. Phys.    &\texttt{jap}\\
+\itshape J. Chem. Phys.    &\texttt{jcp}\footnotemark[1]\\
+\itshape J. Math. Phys.    &\texttt{jmp}\\
+\itshape J. Renewable Sustainable Energy&\texttt{rse}\\
+\itshape Phys. Fluids      &\texttt{pof}\\
+\itshape Phys. Plasmas     &\texttt{pop}\\
+\itshape Rev. Sci. Instrum.&\texttt{rsi}\\
+\end{tabular}
+\end{ruledtabular}
+\footnotetext[1]{Default journal substyle.}
+\end{table}
+
+\subsection{Options for Citations and Bibliography}
+The citation style for AIP journals is:
+\begin{itemize}
+\item 
+numerical (default style), 
+\item
+author-year, and
+\item
+numerical author-year,
+\end{itemize}
+the latter two styles being only allowed for \textit{Chaos} or \textit{J. Math. Phys.}
+
+The familiar numerical citations and numbered bibliography are the default for most journals: 
+citations are superscript numbers, and the (numbered) bibliographic entries appear in the order cited. 
+
+Author-year citations are only allowed for 
+\textit{Chaos} or \textit{J. Math. Phys.}, with citations given in author-and-year format. 
+Bibliographic entries are sorted by alphabetical order of first author's surname, then by year. 
+
+Numerical author-year citations 
+(only allowed for \textit{Chaos} or \textit{J. Math. Phys.}) 
+are superscript numbers, just like numerical citations, 
+but the bibliographic entries are sorted like the author-year entries and are numbered. 
+This means that the first citation will not necessarily be~1.
+
+To obtain the numerical style, simply accept the default, or supply a class option of \texttt{numerical}:
+\begin{verbatim}
+\documentclass[aip,numerical]{revtex4-1}
+\end{verbatim}
+For author-year citations for \textit{Chaos} or \textit{J. Math. Phys.}, 
+you may specify the \texttt{author-year} option:
+\begin{verbatim}
+\documentclass[aip,author-year]{revtex4-1}
+\end{verbatim}
+Each of the above two options are part of standard \revtex.
+
+To obtain numerical author-year citations 
+for \textit{Chaos} or \textit{J. Math. Phys.}, 
+give the author-numerical option:
+\begin{verbatim}
+\documentclass[aip,author-numerical]{revtex4-1}
+\end{verbatim}
+Note that the \texttt{author-numerical} option is not part of standard \revtex\, so use of it
+outside of the AIP substyles may not have any effect. 
+
+\subsection{Formatting Options}
+There are two commonly used formats for an article you may write. 
+One will comply with the manuscript submission formatting requirements of the editorial office of the journal you are submitting to.
+The other will emulate the format of your article in the published journal itself. 
+
+For journal submission, accept the default, or you may specify the \texttt{preprint} option:
+\begin{verbatim}
+\documentclass[aip,preprint]{revtex4-1}
+\end{verbatim}
+To emulate the formatting of the journal, specify the \texttt{reprint} option:
+\begin{verbatim}
+\documentclass[aip,reprint]{revtex4-1}
+\end{verbatim}
+Note that emulation is not by any means complete: the fonts used will differ, and therefore
+the length of the article will not represent an accurate estimate. 
+Other details may also differ. 
+
+A summary of class options of interest to AIP authors appears in Table~\ref{tab:options}.
+\begin{table}
+\caption{\label{tab:options}Other class options}
+\begin{ruledtabular}
+\begin{tabular}{ll}
+\textbf{Function} & \textbf{class option} \\
+\multicolumn{2}{l}{\textit{Citation and References}}\\
+superscript numbered&\texttt{numerical}\footnotemark[1]\textsuperscript{,}\footnotemark[2]\\
+author-year&\texttt{author-year}\footnotemark[3]\\
+numbered author-year&\texttt{author-numerical}\footnotemark[3]\\
+%
+\multicolumn{2}{l}{\textit{Format}}\\
+journal submission&\texttt{preprint}\footnotemark[1]\\
+journal emulation&\texttt{reprint}\\
+\end{tabular}
+\end{ruledtabular}
+\footnotetext[1]{Default option.}%
+\footnotetext[2]{Standard}%
+\footnotetext[3]{Only allowed for \textit{Chaos} or \textit{J. Math. Phys.}}%
+\end{table}
+
+\section{Useful \LaTeXe\ Markup}
+\LaTeXe\ markup is the preferred way to structure your file. 
+In general, the use of low-level commands like \TeX\ primitives or Plain \TeX\ macros 
+is less preferable. 
+Please see the \revtex\ User's Guide,\cite{Note2} 
+the \LaTeX\ manual,\cite{LaTeXman} 
+and the \LaTeXe\ book\cite{Compan} 
+for further details. 
+
+\subsection{Title and Front Matter}\label{sec:front}
+
+The \revtex\ User's Guide has complete information on using \revtex's special markup for your
+article's title, author list, abstract, and other front matter elements. 
+Note that class option \texttt{superscriptaddress} is the default for the AIP substyles, 
+as required by all AIP journals. 
+
+\subsection{Lead Paragraph}
+One AIP journal, \textit{Chaos}, requires a paragraph of text to precede the first
+\cmd\section\ of the article; 
+this is known as a lead paragraph and is formatted boldface. 
+To give your article a lead paragraph, 
+include a quotation environment ahead of the first \cmd\section\ command:
+\begin{verbatim}
+\documentclass[aip]{revtex4-1}
+\begin{document}
+ \begin{quotation}
+  Here is my lead paragraph!
+ \end{quotation}
+ \section{Introduction}
+...
+\end{verbatim}
+
+The \texttt{quotation} environment functions normally after the first \cmd\section\ command in the document.
+
+\section{Body}
+
+For general information on commands used in the body of the document, see the \revtex\ User's Guide.
+Herein are some features specific to the AIP author.
+
+\subsection{Footnotes}
+
+If you are using numbered citations (numerical or numbered author-year), 
+footnotes are by default incorporated into the reference section 
+along with your bibliographic entries. 
+This automated feature is only effective if you use Bib\TeX\ to prepare your
+bibliography. 
+
+Author-year style bibliography does not lend itself to such a treatment, 
+so by default footnotes appear in text as is usual. 
+However, be advised that, if your article is accepted for publication,
+footnotes may be incorporated into text during the production process.
+
+\section{Citations and References}\label{sec:endnotes}
+
+The preparation of your bibliography ``by hand'' is possible; 
+however, if you do so, 
+you will be entirely responsible 
+for compliance with submission requirements for your bibliographic entries, 
+for incorporating any text footnotes into the references, 
+and for checking bibliographic entries. 
+(In this connection, you may find useful the file \texttt{reftest.tex}, distributed with \revtex.)
+
+There are numerous reasons to use Bib\TeX, not least because it automates the first and second of the above checks. 
+
+\subsection{\label{sec:use-bib}Using Bib\protect\TeX}
+
+Refer to the \revtex\ User's Guide, the \LaTeX\ manual, and the Bib\TeX\ manual
+for full information about using Bib\TeX. 
+
+When using Bib\TeX\, keep in mind that changing your bibliography style or citation style
+(via the document class options described above) will require you to rerun Bib\TeX.
+The standard litany (using \texttt{aipsamp.tex} as an example) for this is:
+\begin{verbatim}
+> latex aipsamp
+> bibtex aipsamp
+> latex aipsamp
+> latex aipsamp
+\end{verbatim}
+Here, the first invocation of \texttt{latex} has the effect of rewriting the
+\texttt{aipsamp.aux} file,
+and the invocation of \texttt{bibtex} creates a new \texttt{aipsamp.bbl} file. 
+The next two runs of \texttt{latex} are then required: 
+the first to update the \texttt{aipsamp.aux} file reflecting the new values of your citations
+and the second to employ those citations correctly. 
+Be sure to check the end of the \texttt{aipsamp.log} file for any message advising you to 
+rerun \texttt{latex}. 
+
+\subsection{Multiple References per Citation}
+In an article using numerical citations, 
+it is not uncommon to encounter the need for a citation 
+that refers to more than one article or other reference. 
+To accommodate such a case, \revtex~4.1 implements markup similar to that of the 
+\texttt{mcite} package for \LaTeXe. 
+
+Let's say that two citation keys \texttt{able} and \texttt{baker} 
+need to be combined into a single reference.
+The syntax for the \cmd\cite\ command is:
+\begin{verbatim}
+word\cite{able,*baker} further text
+\end{verbatim}
+When you run Bib\TeX\, the resulting bibliography will contain the two entries, but run together
+as a single numbered reference.
+In the \cmd\cite\ command argument, any cite key that starts with the * character
+signifies that its bibliographic entry is to be joined together with the one preceding it;
+the \texttt{*} may join together any number of entries into a single reference.
+
+\begin{thebibliography}{9}\label{sec:TeXbooks}%
+\bibitem{Note1}
+For help regarding the installation of this software and its use, please send email to \href{mailto:tex@aip.org}{tex@aip.org}.
+%
+\bibitem{Note2}
+Available with the \revtex\ distribution, see \url{http://authors.aps.org/revtex4/}.
+%
+\bibitem[Lamport(1996)]{LaTeXman} 
+L. Lamport, 
+\emph{\LaTeX\, a Document Preparation System} 
+(Addison-Wesley, Reading, MA, 1996).
+%
+\bibitem[Goossens(1994)]{Compan} 
+M. Goosens, F. Mittelbach, and A. Samarin, 
+\emph{The \LaTeX\ Companion} 
+(Addison-Wesley, Reading, MA, 1994).
+%
+\bibitem[Knuth(1986)]{TeXbook} 
+D. E. Knuth, 
+\emph{The \TeX book} 
+(Addison-Wesley, Reading, MA, 1986). 
+%
+\bibitem[Kopka(1995)]{Guide} 
+H. Kopka and P. Daly, 
+\emph{A Guide to \LaTeXe} 
+(Addison-Wesley, Reading, MA, 1995).
+%
+\bibitem[Goossens(1997)]{CompanG} 
+M. Goossens, S. Rahtz, and F. Mittelbach, 
+\emph{The \LaTeX\ Graphics Companion} 
+(Addison-Wesley, Reading, MA, 1997).
+%
+\bibitem[Rahtz(1999)]{CompanW} 
+S. Rahtz, M. Goossens \emph{et al.},
+\emph{The \LaTeX\ Web Companion} 
+(Addison-Wesley, Reading, MA, 1999).
+%
+\end{thebibliography}
+
+\end{document}
+
