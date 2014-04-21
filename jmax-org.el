@@ -240,4 +240,82 @@ start  empty title path
 
 (setq org-completion-use-ido t)
 
+
+(setq org-latex-default-packages-alist 
+      '(("AUTO" "inputenc" t)
+	("T1" "fontenc" t)
+	("" "fixltx2e" nil)
+	("" "graphicx" t)
+	("" "longtable" nil)
+	("" "float" nil)
+	("" "wrapfig" nil)
+	("" "rotating" nil)
+	("normalem" "ulem" t)
+	("" "amsmath" t)
+	("" "textcomp" t)
+	("" "marvosym" t)
+	("" "wasysym" t)
+	("" "amssymb" t)
+	("version=3" "mhchem" t)
+	("" "natbib" t)
+	("" "url" t)
+	("" "minted" nil)
+	("" "underscore" t)	
+	("linktocpage,pdfstartview=FitH,colorlinks,
+linkcolor=blue,anchorcolor=blue,
+citecolor=blue,filecolor=blue,menucolor=blue,urlcolor=blue"
+	 "hyperref" nil)
+	("" "attachfile" nil)))
+
+;; do not put in \hypersetup use your own
+;; \hypersetup{pdfkeywords={%s},\n pdfsubject={%s},\n pdfcreator={%s}
+(setq org-latex-with-hyperref nil)
+
+;; this is for code syntax highlighting in export
+(setq org-latex-listings 'minted)
+(setq org-latex-minted-options
+           '(("frame" "lines")
+             ("fontsize" "\\scriptsize")
+             ("linenos" "")))
+
+;; for minted you must run latex with -shell-escape because it calls pygmentize as an external program
+(setq org-latex-pdf-process
+      '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %b"
+        "bibtex %b"
+        "makeindex %b"
+        "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %b"
+        "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %b"))
+
+;; I have not had good luck with this on windows
+;(setq org-latex-to-pdf-process '("texi2dvi --pdf --clean --verbose --batch"))
+	
+;; avoid getting \maketitle right after begin{document}
+;; you should put \maketitle if and where you want it.
+(setq org-latex-title-command "") 
+
+
+
+
+;; customized article. better margins
+(add-to-list 'org-latex-classes
+	     '("cmu-article"                          ;class-name
+	       "\\documentclass{article}
+                \\usepackage[top=1in, bottom=1.in, left=1in, right=1in]{geometry}
+                [PACKAGES]
+                [EXTRA]" ;;header-string
+	       ("\\section{%s}" . "\\section*{%s}")
+	       ("\\subsection{%s}" . "\\subsection*a{%s}")
+	       ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+	       ("\\paragraph{%s}" . "\\paragraph*{%s}")
+	       ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+
+
+
+;; these install the new exports
+(require 'ox-cmu-qualifier)
+(require 'ox-cmu-ms-report)
+(require 'ox-manuscript)
+
+(load-file (expand-file-name "jorg-bib.el" starter-kit-dir))
+
 (message "jmax-org.el loaded")
