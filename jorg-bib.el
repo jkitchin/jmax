@@ -1,6 +1,11 @@
 ;; Lisp code to setup bibliography  cite, ref and label org-mode links.
 ;; also sets up reftex for org-mode
 
+;; [[bibliography]]
+;; [[ref link]]
+;; [[label link]]
+;; [[cite links]]
+
 (require 'reftex-cite)
 
 (defgroup jorg-bib nil
@@ -164,7 +169,7 @@ key author journal year volume pages doi url key jorg-bib-pdf-directory key))
 (global-set-key [f12] 'jorg-bib-open-in-browser)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;; bibliography and bibliography style code
+;;;;;;; bibliography and bibliography style code <<bibliography>>
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; link to hold a bibliography bibtex file(s). Mostly so I can click on
@@ -225,7 +230,7 @@ key author journal year volume pages doi url key jorg-bib-pdf-directory key))
 		       (format "\\bibliographystyle{%s}" keyword)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;; ref and label links
+;;;;;; ref and label links <<ref link>>
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (org-add-link-type
@@ -242,7 +247,7 @@ key author journal year volume pages doi url key jorg-bib-pdf-directory key))
 	   (re-search-forward (format "^#\\+tblname:\\s-*\\(%s\\)\\b" label) nil t))
      (org-mark-ring-goto)
      (error "%s not found" label))
-   (message "go back with `C-c &`"))
+   (message "go back with (org-mark-ring-goto) `C-c &`"))
  ;formatting
  (lambda (keyword desc format)
    (cond
@@ -261,11 +266,11 @@ key author journal year volume pages doi url key jorg-bib-pdf-directory key))
 	(add-to-list 'matches (match-string-no-properties 1) t))
       matches)))
 
-(defun jorg-insert-ref-link (&optional arg)
-  "inserts a ref link with completion"
+
+(defun org-insert-ref-link (&optional arg)
   (interactive (list (completing-read "label: " (jorg-get-labels))))
   (insert (format "ref:%s" arg)))
-
+;; <<label link>>
 
 (org-add-link-type
  "label"
@@ -281,8 +286,10 @@ key author journal year volume pages doi url key jorg-bib-pdf-directory key))
     ((eq format 'latex)
      (format "\\label{%s}" keyword)))))
 
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;; cite links
+;;;;;;; <<cite links>>
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; implementation of cite:  to make bibtex citations that are also clickable.
 (defun cite-find-bibliography ()
@@ -300,8 +307,10 @@ falling back to what the user has set in jorg-bib-default-bibliography
     ;;  look for a bibliography link
     (re-search-forward "bibliography:\\([^\]\|\n]+\\)" nil t)
     (if (match-string 1) ; we found a link
-	(setq cite-bibliography-files
-	      (mapcar 'cite-strip-key (split-string (match-string 1) ",")))
+	(progn
+	  (setq cite-bibliography-files
+		(mapcar 'cite-strip-key (split-string (match-string 1) ",")))
+	  (message "cite-bibliography-files = %s from %s" cite-bibliography-files (match-string 1)))
       (progn ;we did not find a bibliography link. now look for \bibliography
 	(message "no bibliography link found")
 	(goto-char (point-min))
