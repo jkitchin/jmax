@@ -238,7 +238,7 @@
 
 
 ;; This is not defined in my bbdb/icicles installation. This lets me use tab-completion.
-(defalias 'icicle-bbdb-complete-name 'bbdb-complete-mail) 
+;;(defalias 'icicle-bbdb-complete-name 'bbdb-complete-mail) 
 
 ;; http://emacs-fu.blogspot.com/2009/08/managing-e-mail-addresses-with-bbdb.html
 ;; these seem to be v2 variables.
@@ -273,6 +273,9 @@
 (add-to-list 'load-path (expand-file-name "org-mode/contrib/lisp" starter-kit-dir))
 (require 'org)
 
+(add-to-list 'load-path (expand-file-name "matlab" starter-kit-dir))
+ (load-library "matlab-load")
+
 
 ;; We load all .el files in the user directory. No order is guaranteed.
 (add-to-list 'load-path user-dir)
@@ -286,8 +289,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;; 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(load-file (expand-file-name "jorg-bib.el" starter-kit-dir))
-(load-file (expand-file-name "jorg-manuscript.el" starter-kit-dir))
+
+
 
 ;; hide details in dired
 (require 'dired-details+)
