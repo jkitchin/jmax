@@ -318,4 +318,14 @@ citecolor=blue,filecolor=blue,menucolor=blue,urlcolor=blue"
 
 (load-file (expand-file-name "jorg-bib.el" starter-kit-dir))
 
+;; add a chemical element link
+(org-add-link-type
+ "ce"
+ nil
+ (lambda (keyword desc format)
+   (cond
+    ((eq format 'html) (format "(<label>%s</label>)" path))
+    ((eq format 'latex)
+     (format "\\ce{%s}" keyword)))))
+
 (message "jmax-org.el loaded")
