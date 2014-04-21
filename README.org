@@ -50,10 +50,7 @@ As an alternative, put these variables into a .el file in the user directory. Yo
 
 #+END_SRC
 
-* Project goal
-=jmax= is a customized version of emacs to facilitate authoring and consuming org-mode based technical documents.
 
-All of the emacs customization is performed in an org-mode file.
 
 
 
