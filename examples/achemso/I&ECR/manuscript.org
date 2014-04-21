@@ -3,6 +3,19 @@
 #+Latex_class: achemso
 #+Latex_class_options: [journal=iecred,manuscript=article]
 #+latex_header: \setkeys{acs}{biblabel=brackets,super=true}
+#+latex_header: \usepackage[utf8]{inputenc}
+#+latex_header: \usepackage{fixltx2e}
+#+latex_header: \usepackage{url}
+#+latex_header: \usepackage{mhchem}
+#+latex_header: \usepackage{graphicx}
+#+latex_header: \usepackage{color}
+#+latex_header: \usepackage{amsmath}
+#+latex_header: \usepackage{textcomp}
+#+latex_header: \usepackage{wasysym}
+#+latex_header: \usepackage{latexsym}
+#+latex_header: \usepackage{amssymb}
+#+latex_header: \usepackage[linktocpage, pdfstartview=FitH, colorlinks, linkcolor=blue, anchorcolor=blue, citecolor=blue, filecolor=blue, menucolor=blue, urlcolor=blue]{hyperref}
+
 
 #+latex_header: \author{Alexander P. Hallenbeck}
 #+latex_header: \author{John R. Kitchin}
