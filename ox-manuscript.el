@@ -172,21 +172,22 @@ We assume there is a bibliography and style defined if a cite is found. no check
   "build manuscript. This is done manually here for building the submission manuscript pdf"
   (interactive)
 
-  (ox-manuscript-pdflatex)
+  (let* ((org-file (file-name-nondirectory (buffer-file-name)))
+         (pdf-file (replace-regexp-in-string "org$" "pdf" org-file)))
+    (ox-manuscript-pdflatex)
 
-  (when (ox-manuscript-run-bibtex-p)
-    (ox-manuscript-bibtex))
+    (when (ox-manuscript-run-bibtex-p)
+      (ox-manuscript-bibtex))
 
-  (ox-manuscript-pdflatex)
-  (ox-manuscript-pdflatex)
+    (ox-manuscript-pdflatex)
+    (ox-manuscript-pdflatex)
   
 
-  (kg-manuscript-cleanup)
-  (format "Manuscript built on %s with org-mode %s" (current-time-string) (org-version))
+    (ox-manuscript-cleanup)
+    (format "Manuscript built on %s with org-mode %s" (current-time-string) (org-version))
 
-  ;; return pdf name
-  (concat basename ".pdf")
-  )
+    ;; return pdf name
+    pdf-file))
 
 (defun ox-manuscript-build-submission-manuscript (&optional async subtreep visible-only body-only options)
   "create manuscript for submission. This removes the .png extensions from graphics, and replaces the bibliography with the contents of the bbl file. the result is a single, standalone tex-file, and the corresponding pdf. You must have built the manuscript with bibtex first."
@@ -196,8 +197,7 @@ We assume there is a bibliography and style defined if a cite is found. no check
   (ox-manuscript-remove-image-extensions)
   (ox-manuscript-bibliography-to-bbl)
   (let ((pdf))
-    (setq pdf (ox-manuscript-export-and-build async subtreep visible-only body-only options))
-    (ox-manuscript-cleanup)
+    (setq pdf (ox-manuscript-build))
     (format "Manuscript built on %s with org-mode %s" (current-time-string) (org-version))
     pdf))
 
@@ -214,7 +214,7 @@ We assume there is a bibliography and style defined if a cite is found. no check
 	(?l "As LaTeX file" org-latex-export-to-latex)
 	(?p "As manuscript PDF file" ox-manuscript-export-and-build)
 	(?o "As manuscript PDF and open" ox-manuscript-export-and-build-and-open)
-	(?m "As submission manuscript" ox-manuscript-build-submission-manuscript)
-	(?M "As submission manuscript and open" ox-manuscript-build-submission-manuscript-and-open))))
+	(?M "As submission manuscript" ox-manuscript-build-submission-manuscript)
+	(?m "As submission manuscript and open" ox-manuscript-build-submission-manuscript-and-open))))
 
 (provide 'ox-manuscript)
