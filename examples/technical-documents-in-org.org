@@ -11,6 +11,11 @@
 
 Org-mode is a simple, structured markup for information. You should keep it simple. If you find yourself writing a lot of LaTeX, you are probably doing something wrong, or using the wrong tool.
 
+Our aim is to write technical documentation in org-mode, which can be exported to LaTeX for conversion to PDF. This is a conversion process. It is not a perfect process, so we will try to keep things as simple as possible.
+
+Although org-mode is not LaTeX, you will find it helpful to be familiar with LaTeX. A pretty good reference is here http://en.wikibooks.org/wiki/LaTeX.
+
+It is not necessary to learn very many keyboard shortcuts to use org-mode. These only make you more efficient when you use org-mode a lot.
 
 * Basic markup
 ** Basics
@@ -97,7 +102,26 @@ To make references to equations, you must label them. This can only be done by u
 e^x = 4 \label{eq:1}
 \end{equation}
 
-The ref link is clickable, and clicking on it moves the cursor to the corresponding label.
+The ref link is clickable, and clicking on it moves the cursor to the corresponding label. You may prefer eqref:eq:1. This will render the number in parentheses.
+
+** Multiline formulas
+If you have very long formulas that need to be broken over several lines, use the flalign environment.
+
+
+\begin{flalign}
+&OVac\_FormE(cID) \rightarrow OVac\_FormE(mID, mag, num\_atoms, \\
+&orientation, correction, calc\_quantity, \\
+&calculator, figure) 
+\end{flalign}
+
+If you do not like the numbers use flalign*:
+
+\begin{flalign*}
+&OVac\_FormE(cID) \rightarrow OVac\_FormE(mID, mag, num\_atoms, \\
+&orientation, correction, calc\_quantity, \\
+&calculator, figure) 
+\end{flalign*}
+
 * Source code
 One of the main reasons to use org-mode is the integration of source code. 
 
@@ -214,6 +238,21 @@ You can see the result in Table ref:tab:example2.
 
 
 * Including LaTeX environments
+
+You can include almost arbitrary environments from LaTeX, such as an array:
+
+\begin{array}{llcr}
+a & 9 & \sin (12x) & c \\
+a + b & \cos (x) & 7 & d
+\end{array}
+
+or a verbatim environment:
+
+\begin{verbatim}
+some verbatim text
+\end{verbatim}.
+
+Just because you can does not mean you should...
 * Miscellaneous document features
 ** Table of contents
 You can add a table of contents with =\tableofcontents=.
@@ -232,6 +271,9 @@ You can mark some headings with a tag that is listed in
 to mark it for noexport. Put your cursor on the headline, type C-c C-c and type in the tag name. 
 
 *** Heading marked for noexport					   :noexport:
+
+** Attaching files to a pdf
+You can use the attachfile package to embed files in a PDF. Like this: \attachfile{technical-documents-in-org.org}.
 
 * Exporting to LaTeX and PDF
 org-mode is not LaTeX, and it cannot do everything LaTeX does. It can do a lot though. To get LaTeX, we have to provide org-mode with the required packages, and tell it what kind of document to export. The default type is an article. We provide some additional document types:
@@ -266,6 +308,18 @@ The order of these is important, and changing it can result in LaTeX errors. If 
 #+BEGIN_EXAMPLE
 #+LATEX_HEADER: \usepackage[options]{xyz}
 #+END_EXAMPLE
+
+*** Exporting to a PDF
+You can type C-c C-e j o to build and open a pdf file. This is most often what you want to do, if you just need a pdf.
+
+M-x ox-manuscript-export-and-build-and-open
+
+*** Exporting a manuscript for submission
+Most journals do not want your bibtex file, nor do they use pdflatex. They want a standalone LaTeX file that contains the bibliography and which typically uses eps graphics. We create that file from the org-file with C-c C-e j m. 
+
+M-x ox-manuscript-build-submission-manuscript-and-open
+
+The resulting tex file will have no extensions on the included graphics, so that LaTeX can choose the appropriate file. You need to provide the eps or pdf graphics. The bibliography will be embedded at the end of the file. 
 
 ** CMU Qualifier
 see [[file:cmu-qualifier/cmu-qualifier.org]]
