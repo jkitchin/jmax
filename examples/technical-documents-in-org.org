@@ -1,0 +1,265 @@
+#+TITLE: Writing technical documents in org-mode
+#+AUTHOR: John Kitchin
+#+LATEX_CLASS: cmu-article
+#+OPTIONS: ^:{} toc:nil title:t author:t
+
+\maketitle
+
+* Basic principles
+
+Org-mode is a simple, structured markup for information. You should keep it simple. If you find yourself writing a lot of LaTeX, you are probably doing something wrong, or using the wrong tool.
+
+
+* Basic markup
+** Basics
+You can mark text as *bold*, /italic/, _underlined_, +struck-through+, =verbatim=, and ~code~.
+
+Paragraphs are separated by blank lines. 
+
+** Subscripts and superscripts
+
+Usually you use ^ for superscripts and _ for subscripts. Here are some examples: N_{A} is Avogadro's number. U_{3d} is the U parameter on the 3d orbitals.  You should explicitly mark the content to be super or subscripted with curly brackets. This is controlled by this line:
+
+#+BEGIN_EXAMPLE
+#+OPTIONS: ^:{}
+#+END_EXAMPLE
+
+** Symbols
+Org-mode recognizes many different symbols, including the greek letters, e.g. \alpha, and \Omega. You can make \deg symbol and an \AA symbol. These do not need to be contained in math environments. Some more of my favorites include \times, and  \rightarrow.
+
+** Chemical formulas
+You should always enter chemical formulas like this: ce:NH_3. No other way is good.  Here are some example formulas: ce:CH_4, You may need to enclose the link in double square brackets like this =[[ce:ABO_{3-\delta}]]=, if the last character is a curly bracket, e.g.  [[ce:ABO_{3-\delta}]], [[ce:FeO^{+1}]], \ce{H_2SO_4}, \ce{Ca(NO_3)_2}.
+
+
+
+You need to make sure to have a line like this for export in a manuscript.
+
+#+BEGIN_EXAMPLE
+#+LATEX_HEADER: \usepackage[version=3]{mhchem}
+#+END_EXAMPLE
+
+This is a default package for everything else.
+
+
+You need to make sure to have a line like this for export in a manuscript.
+
+#+BEGIN_EXAMPLE
+#+LATEX_HEADER: \usepackage[version=3]{mhchem}
+#+END_EXAMPLE
+
+This is a default package for everything else.
+
+** References to document sections
+
+You are safest using a link like this. See section [[*Chemical formulas]]. 
+
+It is possible to create a "label" to a section. You must set a CUSTOM_ID property on the headline. You then refer to that section with this kine of link: see section [[#sec:headline-label]].
+
+#+BEGIN_EXAMPLE
+*** A headline with a custom id property
+    :PROPERTIES:
+    :CUSTOM_ID: sec:headline-label
+#+END_EXAMPLE
+
+*** A headline with a custom id property
+    :PROPERTIES:
+    :CUSTOM_ID: sec:headline-label
+    :END:
+* Bibliography and citations
+** Specifying the bibliography files where citations come from
+
+You specify the bibtex file(s) you will use with a [[bibliography]] link. This link should be where you want the bibliography to appear in the exported PDF, e.g. usually at the end of the document. Here is what the link looks like. The bibtex file should be in the same directory as your manuscript file.
+These links are clickable, and when you click on them, the file under your cursor should be opened.
+
+** Bibliography style
+Depending on the type of document you are creating, you may need to specify a bibliography style. Use a [[bibliographystyle]] link for this. Some documents provide their own styles, others require you to specify them. See the examples.
+
+** Citing references
+We use cite links to indicate a reference to an entry in the bibliography. Here is an example cite:akhade2012:surface. These links are clickable too. If everything is setup correctly, clicking on the link should open the bibliography at the entry you clicked on. When your cursor is on a link, a tooltip will popup with some details of the citation. If you have sections of your document collapsed, you may see funny stuff in the tooltip.
+
+You can insert citation links by pressing C-c ]. Press enter to accept the default citation type, and then type a few letters to search for what you want. Press enter to get a list of matches. Select the entries you want with m, and then press enter again. The link will be automatically entered. Multiple citations are separated by commas. If you need to add citations to an existing citation, the best thing is to repeat the process just described, and manually delete the extra cite links and join the citations by commas. 
+
+
+
+* Equations
+
+There are a few ways to enter equations. If your equation should be inline, e.g. \(e^x = 4\) use this format. 
+
+An alternative format that displays the equation on its own line is this: \[e^x = 4\]
+
+You can also use the older LaTeX markup like this $e^x = 4$ for inline equations, or $$e^x=4$$ for display equations. These notations are more compact, but also more fragile when they are embedded in text.
+
+
+** References to equations
+
+To make references to equations, you must label them. This can only be done by using a LaTeX equation environment. The label command must go at the end of the equation. Then you can use a ref link like this to refer to Equation ref:eq:1. Note you should write Equation before the link, so it will be clear what you refer to in the exported document.
+
+\begin{equation}
+e^x = 4 \label{eq:1}
+\end{equation}
+
+The ref link is clickable, and clicking on it moves the cursor to the corresponding label.
+* Source code
+One of the main reasons to use org-mode is the integration of source code. 
+
+#+BEGIN_SRC python
+import matplotlib.pyplot as plt
+plt.plot([1,4,7,9])
+plt.savefig('fig1.png')
+#+END_SRC
+
+#+RESULTS:
+
+By default all blocks will be rendered and included in the exported document. You control this in the source block header. Here is a block that is not exported, nor are the results.
+
+#+BEGIN_SRC python :exports none
+print 'hello world'
+#+END_SRC
+
+#+RESULTS:
+: hello world
+
+* Figures
+Figures in org-mode are straightforward. You simply create a link to a figure that Emacs can render, and that can be included in a PDF file. That is usually a png file. You can, and should add captions and labels to the figure. Captions are descriptive, and labels allow you to refer to the figure in your document.
+
+
+Good practice for the label is prefix it with fig: so that later you can easily spot figure labels from table and equation labels.
+#+caption: A descriptive sentence about the figure. label:test-label
+#+label: fig:test-label
+[[./fig1.png]]
+
+The default export behavior is not that nice at setting the width. You can set that the way you want like this:
+
+#+attr_latex: :width 3in
+#+caption: A descriptive sentence about the figure. label:test-label
+#+label: fig:test-label2
+[[./fig1.png]]
+
+
+
+** References to figures
+Later, I can refer to Figure ref:test-label. Figures tend to float around in LaTeX. Do not worry about it.
+
+If you want help inserting the references, type M-x org-insert-ref-link, and press tab. This should show you a list of labels in your document. It only shows labels defined as a link.
+
+* Tables
+
+Tables are one of org-mode's best features. They are easy to create, and customize. Consider this table:
+
+#+BEGIN_EXAMPLE
+#+caption: The simplest kind of table.
+#+tblname: tab:example1
+| heading1 | heading2 |
+|----------+----------|
+|        1 |        8 |
+|        4 |        5 |
+#+END_EXAMPLE
+
+#+caption: The simplest kind of table.
+#+tblname: tab:example1
+| heading1 | heading2 |
+|----------+----------|
+|        1 |        8 |
+|        4 |        5 |
+
+We use =#+tblname:= to give the table a name we can reference later. Table ref:tab:example1 shows a simple table. We can add vertical lines by setting a LaTeX attribute :align; this attribute also specifies the alignment of each cell. In the next example, we specify vertical lines with |, make the first column centered, and the second column left aligned. You have to put a horizontal line everywhere you want it. We will also specify that the table be placed "Here".
+
+#+BEGIN_EXAMPLE
+#+attr_latex: :placement [H] :align | c | l |
+#+caption: The second simplest kind of table.
+#+tblname: tab:example2
+|----------+----------|
+| heading1 | heading2 |
+|----------+----------|
+|        1 |        8 |
+|----------+----------|
+|        4 |        5 |
+|----------+----------|
+
+#+END_EXAMPLE
+
+#+attr_latex: :placement [H] :align | c | l |
+#+caption: The second simplest kind of table.
+#+tblname: tab:example2
+|----------+----------|
+| heading1 | heading2 |
+|----------+----------|
+|        1 |        8 |
+|----------+----------|
+|        4 |        5 |
+|----------+----------|
+
+You can see the result in Table ref:tab:example2.
+
+
+* Including LaTeX environments
+* Miscellaneous document features
+** Table of contents
+** Preventing export of some headings
+** Controlling placement of floats
+
+* Exporting to LaTeX and PDF
+org-mode is not LaTeX, and it cannot do everything LaTeX does. It can do a lot though. To get LaTeX, we have to provide org-mode with the required packages, and tell it what kind of document to export. The default type is an article. We provide some additional document types:
+- cmu-article is like an article, but with one-inch margins
+
+Those types use what we define as the default LaTeX packages to include. These are:
+- [AUTO] inputenc
+- [T1] fontenc 
+- fixltx2e 
+- graphicx
+- longtable 
+- float 
+- wrapfig 
+- rotating 
+- [normalem] ulem 
+- amsmath 
+- textcomp 
+- marvosym 
+- wasysym 
+- amssymb 
+- [version=3] mhchem 
+- natbib 
+- url 
+- minted 
+- underscore 	
+- [linktocpage,pdfstartview=FitH,colorlinks,linkcolor=blue,anchorcolor=blue,
+citecolor=blue,filecolor=blue,menucolor=blue,urlcolor=blue] hyperref
+- attachfile
+
+The order of these is important, and changing it can result in LaTeX errors. If you need additional packages for your document, you need to tell org-mode about them like this:
+
+#+BEGIN_EXAMPLE
+#+LATEX_HEADER: \usepackage[options]{xyz}
+#+END_EXAMPLE
+
+** CMU Qualifier
+see [[file:cmu-qualifier/cmu-qualifier.org]]
+
+** CMU MS report
+see [[file:cmu-ms-report/project-report.org]]
+
+** ACS journals
+*** I&ECR
+see [[file:achemso/I&ECR/manuscript.org]]. This was published cite:hallenbeck-2013-effec-o2.
+
+*** Applied Interfaces and Materials
+see [[file:achemso/aamick/manuscript.org]]
+
+*** TODO Analytical Chemistry
+
+** APS journals
+*** Physical Review Letters
+See [[file:revtex4-1/PRL/manuscript.org]].
+*** Physical Review B
+See [[file:revtex4-1/PRB/manuscript.org]].
+
+** Elsevier journals
+see [[file:elsarticle/manuscript.org]]
+** TODO Springer journals
+* Bibliography
+
+# <<bibliographystyle>>
+bibliographystyle:unsrt
+
+# <<bibliography>>
+bibliography:kitchin.bib
