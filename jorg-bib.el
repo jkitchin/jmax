@@ -241,10 +241,16 @@ key author journal year volume pages doi url key jorg-bib-pdf-directory key))
    ;; next search from beginning of the buffer
    (goto-char (point-min))
    (unless
-       (or (re-search-forward (format "label:%s" label) nil t)
-	   (re-search-forward (format "\\label{%s}" label) nil t)
-	   (re-search-forward (format "^#\\+label:\\s-*\\(%s\\)\\b" label) nil t)
-	   (re-search-forward (format "^#\\+tblname:\\s-*\\(%s\\)\\b" label) nil t))
+       (or
+	;; search forward for the first match
+	;; our label links
+	(re-search-forward (format "label:%s" label) nil t)
+	;; a latex label
+	(re-search-forward (format "\\label{%s}" label) nil t)
+	;; #+label: name  org-definition
+	(re-search-forward (format "^#\\+label:\\s-*\\(%s\\)\\b" label) nil t)
+	;; org tblname
+	(re-search-forward (format "^#\\+tblname:\\s-*\\(%s\\)\\b" label) nil t))
      (org-mark-ring-goto)
      (error "%s not found" label))
    (message "go back with (org-mark-ring-goto) `C-c &`"))
@@ -270,6 +276,8 @@ key author journal year volume pages doi url key jorg-bib-pdf-directory key))
 (defun org-insert-ref-link (&optional arg)
   (interactive (list (completing-read "label: " (jorg-get-labels))))
   (insert (format "ref:%s" arg)))
+
+
 ;; <<label link>>
 
 (org-add-link-type
