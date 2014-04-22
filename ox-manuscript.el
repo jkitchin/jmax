@@ -209,7 +209,7 @@ We assume there is a bibliography and style defined if a cite is found. no check
 
 (org-export-define-derived-backend 'cmu-manuscript 'latex
   :menu-entry
-  '(?C "Export with cmu-manuscript"
+  '(?j "Export with cmu-manuscript"
        ((?L "As LaTeX buffer" org-latex-export-as-latex)
 	(?l "As LaTeX file" org-latex-export-to-latex)
 	(?p "As manuscript PDF file" ox-manuscript-export-and-build)
