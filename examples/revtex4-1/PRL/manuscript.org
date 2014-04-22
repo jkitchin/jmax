@@ -1,0 +1,73 @@
+
+#+LATEX_CLASS: revtex4-1
+#+LATEX_CLASS_OPTIONS: [aps,prl,citeautoscript,preprint,citeautoscript,showkeys,floatfix]
+#+OPTIONS: toc:nil author:nil ^:{}
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+LATEX_HEADER: \usepackage{natbib}
+#+LATEX_HEADER: \usepackage{graphicx}
+#+LATEX_HEADER: \usepackage{float}
+#+LATEX_HEADER: \usepackage{amsmath}
+#+LATEX_HEADER: \usepackage{textcomp}
+#+LATEX_HEADER: \usepackage[version=3]{mhchem}
+#+LATEX_HEADER: \usepackage[linktocpage,pdfstartview=FitH,colorlinks,linkcolor=blue,anchorcolor=blue,citecolor=blue,filecolor=blue,menucolor=blue,urlcolor=blue]{hyperref}
+
+\title{Your high-impact title}
+
+\author{Student T}
+\affiliation{Department of Chemical Engineering, Carnegie Mellon University, 5000 Forbes Ave, Pittsburgh, PA 15213}
+
+\author{John R. Kitchin}
+\email{jkitchin@andrew.cmu.edu}
+\affiliation{Department of Chemical Engineering, Carnegie Mellon University, 5000 Forbes Ave, Pittsburgh, PA 15213}
+
+\date{\today}
+
+#+begin_abstract
+Ultrahigh impact article
+#+end_abstract
+
+\pacs{}
+\keywords{DFT+U, transition metal oxides, oxidation energy}
+\maketitle
+
+Transition metal oxides (TMOs) have broad applications in heterogeneous catalysis, electrochemistry, photocatalysis, and sensors cite:Weaver2013,Doyle2013,Gouma2011. Standard exchange correlation functionals (LDA and GGA) in density functional theory (DFT) often fail to calculate accurate thermodynamic properties of TMOs, which hinders our ability to discover new TMOs for these applications. This failure has been partially attributed to a lack of cancellation of the self-interaction error cite:Cohen2008,PhysRevB.73.195107o,Franchini2007. 
+
+
+\begin{equation} 
+\Delta E = \int_{\text{\textbf{V}}} \frac{dE}{d\textbf{\text{V}}} = \int_{\text{\textbf{V}}} \left( \frac{\partial E}{\partial\text{\textbf{V}}} + \frac{\partial E}{\partial U} \frac{dU}{d\text{\textbf{V}}} \right) d\text{\textbf{V}}.
+\label{dftuv-full}
+\end{equation}
+
+\noindent Because $E$ depends on both $\textbf{V}$ and $U$, the total derivative contains changes in the total energy produced by both changes in $\textbf{V}$ $\left(\frac{\partial E}{\partial\text{\textbf{V}}}\right)$ and changes in $U$ $\left(\frac{\partial E}{\partial U} \frac{dU}{d\text{\textbf{V}}}\right)$. Note, this derivation implies some $U(\textrm{\textbf{V}})$ relationship. If we assume that $E$ is continuous with respect to $U$ and $\textbf{V}$, the entire integral is path independent, but the contributions of each differential are not path independent. 
+
+
+\begin{align}
+\Delta H_{rxn}& = E_{\mathrm{MO_y}}^{U=b} - E_{\mathrm{MO_x}}^{U=a} - \frac{y-x}{2} E_{\mathrm{O_2}}\label{derivation1}\\
+\Delta H_{rxn}& = (E_{\mathrm{MO_y}}^{U=b} - E_{\mathrm{M_{atom}}}^{U=0} - \frac{y}{2}E_{\mathrm{O_2}}) - (E_{\mathrm{MO_x}}^{U=a} - E_{\mathrm{M_{atom}}}^{U=0} - \frac{y}{2}E_{\mathrm{O_2}}) - \frac{y-x}{2} E_{\mathrm{O_2}}\label{derivation2}\\
+\Delta H_{rxn}& = (E_{\mathrm{MO_y}}^{U=b} - E_{\mathrm{M_{atom}}}^{U=0} - \frac{y}{2}E_{\mathrm{O_2}}) - (E_{\mathrm{MO_x}}^{U=a} - E_{\mathrm{M_{atom}}}^{U=0} - \frac{x}{2}E_{\mathrm{O_2}})\label{derivation3}\\
+\Delta H_{rxn}& = \Delta E_{\mathrm{DFT}+U(\mathrm{\mathbf{V}}),\mathrm{MO_y}} - \Delta E_{\mathrm{DFT}+U(\mathrm{\mathbf{V}}),\mathrm{MO_x}} \label{derivation4}
+\end{align}
+
+
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas at sapien non risus volutpat laoreet nec eu urna. Morbi viverra, erat ut sodales bibendum, libero augue viverra augue, varius congue ipsum purus eget lacus. Suspendisse sagittis elit vel volutpat consectetur. Vestibulum in sagittis massa, sit amet porta elit. Donec id sodales libero. Interdum et malesuada fames ac ante ipsum primis in faucibus. Pellentesque venenatis quam nec dui suscipit tempus semper quis lacus.
+
+Pellentesque lobortis dolor quis massa consequat, sed sollicitudin metus pellentesque. Sed pharetra magna id aliquam accumsan. Duis consectetur dui a nulla elementum mollis. Suspendisse ullamcorper urna ac mauris rutrum, porttitor cursus libero interdum. Proin sed porta augue. Etiam ornare dignissim justo, aliquam adipiscing ante laoreet vitae. Donec ullamcorper ut est scelerisque ultrices. Vivamus eleifend nunc at magna imperdiet, ut semper dolor sodales. Proin vulputate ullamcorper urna faucibus viverra. Aliquam vestibulum dui ut convallis tristique. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+
+Curabitur ac est orci. Sed venenatis facilisis fringilla. Nunc orci augue, scelerisque ut augue sit amet, euismod ultricies urna. Donec et magna laoreet, malesuada nibh at, consequat justo. Quisque blandit purus congue tortor cursus, eget ornare elit blandit. Integer sagittis laoreet ligula, id semper dui accumsan ac. Proin ullamcorper, lorem in posuere placerat, nunc arcu feugiat leo, quis semper risus purus at tortor. Sed rutrum molestie rutrum.
+
+Maecenas magna nibh, ullamcorper ut mauris nec, imperdiet dignissim dolor. Aenean et sapien nisi. Curabitur fermentum orci sit amet tellus dictum vehicula. Quisque ut tortor lobortis, convallis massa quis, facilisis enim. Fusce lacus massa, imperdiet vel augue id, auctor ullamcorper mi. Mauris eu massa nec eros placerat euismod. Vestibulum mollis imperdiet mi, ut suscipit mauris accumsan non. Praesent porttitor quis mi eu feugiat. Etiam eu sem leo. Nulla rhoncus enim nec purus vehicula, et molestie neque elementum.
+
+Praesent fermentum neque sit amet magna porttitor porttitor. Proin in ligula sed erat suscipit blandit. Maecenas ut adipiscing dolor. Pellentesque ipsum diam, dapibus ac nisi semper, iaculis interdum quam. Fusce consequat adipiscing tincidunt. Cras sagittis aliquam magna, id facilisis neque sagittis eu. Ut in lacus blandit nunc aliquam mattis. Nulla justo sem, vulputate at enim vitae, dapibus interdum lacus. Donec id accumsan lorem. Aliquam lobortis, massa at facilisis porttitor, neque tellus tincidunt eros, quis lobortis urna ligula in magna. Duis at neque at leo dapibus rutrum. 
+
+\begin{acknowledgments}
+J.R.K. gratefully acknowledges support from the U.S. Department of Energy (DOE) Office of Science, Early Career Research Program (DESC0004031).
+\end{acknowledgments}
+
+bibliographystyle:unsrt
+bibliography:references.bib
+
+* build                               :noexport:
+
+
+
