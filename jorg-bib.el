@@ -232,6 +232,31 @@ key author journal year volume pages doi url key jorg-bib-pdf-directory key))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;; ref and label links <<ref link>>
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(org-add-link-type
+ "eqref"
+ (lambda (label)
+   "on clicking goto the label. Navigate back with C-c &"
+   (org-mark-ring-push)
+   ;; next search from beginning of the buffer
+   (goto-char (point-min))
+   (unless
+       (or
+	;; search forward for the first match
+	;; our label links
+	(re-search-forward (format "label:%s" label) nil t)
+	;; a latex label
+	(re-search-forward (format "\\label{%s}" label) nil t)
+	;; #+label: name  org-definition
+	(re-search-forward (format "^#\\+label:\\s-*\\(%s\\)\\b" label) nil t))
+     (org-mark-ring-goto)
+     (error "%s not found" label))
+   (message "go back with (org-mark-ring-goto) `C-c &`"))
+ ;formatting
+ (lambda (keyword desc format)
+   (cond
+    ((eq format 'html) (format "(<eqref>%s</eqref>)" path))
+    ((eq format 'latex)
+     (format "\\eqref{%s}" keyword)))))
 
 (org-add-link-type
  "ref"
@@ -454,7 +479,7 @@ tooltip."
     (cancel-timer idle-timer-bibtex-timer))
   (setq idle-timer-bibtex-timer nil))
 
-(idle-timer-bibtex-start)
+;; (idle-timer-bibtex-start)
 
 (defun cite-onclick (link-string)
   "this function executes when you click on cite link. It identifies the key you clicked on and opens the first bibliography file it finds containing the key.
