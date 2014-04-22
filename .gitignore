@@ -30,4 +30,9 @@ user/News
 /examples/cmu-ms-report/project-report.tex
 /examples/technical-documents-in-org.bbl
 /examples/technical-documents-in-org.blg
-/examples/technical-documents-in-org.pdf
+*.bbl
+*.blg
+*Notes.bib
+*.pyg
+*.tex
+*.aux
