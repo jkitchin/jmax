@@ -1,0 +1,69 @@
+#+LATEX_CLASS: elsarticle
+#+LATEX_CLASS_OPTIONS: [review]
+
+#+OPTIONS:   H:4 num:t toc:nil \n:nil @:t ::t |:t ^:t -:t f:t *:t <:t
+#+OPTIONS:   TeX:t LaTeX:t skip:nil d:nil todo:nil pri:nil tags:not-in-toc
+#+OPTIONS: author:nil
+#+latex_header: \usepackage[utf8]{inputenc}
+#+latex_header: \usepackage{fixltx2e}
+#+latex_header: \usepackage{url}
+#+latex_header: \usepackage{mhchem}
+#+latex_header: \usepackage{graphicx}
+#+latex_header: \usepackage{color}
+#+latex_header: \usepackage{amsmath}
+#+latex_header: \usepackage{textcomp}
+#+latex_header: \usepackage{wasysym}
+#+latex_header: \usepackage{latexsym}
+#+latex_header: \usepackage{amssymb}
+#+latex_header: \usepackage[linktocpage, pdfstartview=FitH, colorlinks, linkcolor=blue, anchorcolor=blue, citecolor=blue, filecolor=blue, menucolor=blue, urlcolor=blue]{hyperref}
+
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+DRAWERS: NOTES
+
+
+\begin{frontmatter}
+\title{Relating the Electronic Structure and Reactivity of the 3d Transition Metal Monoxide Surfaces}
+
+\author[cmu]{Zhongnan Xu}
+\author[cmu]{John R. Kitchin\corref{cor}}
+\ead{jkitchin@andrew.cmu.edu}
+
+\address[cmu]{Department of Chemical Engineering, Carnegie Mellon University, Pittsburgh, PA 15213}
+
+\cortext[cor]{Corresponding author}
+\begin{abstract} We performed a series of density functional theory calculations of dissociative oxygen adsorption on fcc metals and their corresponding rocksalt monoxides to elucidate the relationship between the oxide electronic structure and its corresponding reactivity. We decomposed the dissociative adsorption energy of oxygen on an oxide surface into a sum of the adsorption energy on the metal and a change in adsorption energy caused by both expanding and oxidizing the lattice. We were able to identify the key features of the electronic structure that explains the trends in adsorption energies on 3$d$ transition metal monoxide surfaces.
+\end{abstract}
+
+\begin{keyword}
+oxide reactivity \sep density functional theory \sep transition metals \sep electronic structure
+\end{keyword}
+
+\end{frontmatter}
+
+* Introduction
+In the past decade, the use of density functional theory (DFT) has accelerated materials discovery of new metal alloys for numerous catalysis applications cite:Inoglu2011,Xin2012,Greeley2006,Andersson2006,Jacobsen2001. One recent strategy developed to lower computational costs is to create predictive models that connect the known chemical properties of metals to the electronic structure through the use of DFT calculations cite:Inoglu2010. This allows us to perform a coarse screening of hundreds of alloy systems for desirable properties cite:Inoglu2011,Xin2012. The physical accuracy of these models is based on the ability to connect the electronic structure and reactivity through simple descriptors such as the /d/-band width and center, which we can connect to known chemical properties of the metal cite:Inoglu2010,Kitchin2004a. We propose a similar strategy should also accelerate computational materials design of metal oxides as well, but there still lacks transparent and useful electronic descriptors that have the same predictive power that the /d/-band center and width do for metals. However, recent work on transition metal oxides suggest these descriptors should exist. Linear scaling relationships of adsorption energies on transition metal oxides suggests that some electronic structure feature is parametric within these relationships cite:Fernandez2008,Man2011. The discovery of simple electron counting rules for adsorption energies on oxides also suggest a hidden electronic structure correlation cite:Koper2012. Finally, a few studies have been able to directly relate properties of the oxygen /p/-band cite:Lee2011,Suntivich2011 and bulk transition metal $e_{g}$ and /d/-band to reactivity on perovskites cite:Akhade2011a,Akhade2012.
+
+
+
+* Methods
+A complete log of the bulk calculations and their corresponding discussion can be found in the supporting information. Briefly, all calculations were performed with the Vienna Ab-initio Simulation Package (VASP) cite:Kresse1996a,Kresse1996. The core electrons were described by the projector-augmented wave (PAW) method cite:bloechl1994,Kresse1999 and the exchange correlation functional used was the Perdew-Burke-Ernzerhof (PBE) cite:Perdew1996,Perdew1997a generalized gradient approximation (GGA). The Kohn-Sham orbitals were expanded with plane-waves up to a 520 eV cutoff. All /k/-points were represented on Monkhorst-Pack grids cite:Monkhorst1976}. For bulk calculations, an 8 \times 8 \times 8 grid /k/-point grid was used for metals and a 7 \times 7 \times 7 for the expanded metals and oxides. Calculations of adsorption energies on all surfaces were done with a 7 \times 7 \times 1 /k/-point grid with 10 \AA of vacuum, and the density of states (DOS) analysis on surfaces were done with a higher (12 \times 12 \times 1) /k/-point grid to ensure a fine quality DOS. Surface /d/ and /p/ band centers ($E_d$) were done via the first moment of the projected DOS about the Fermi level ($E_f$) and is expressed as
+
+\begin{equation} 
+E_d = \frac{\displaystyle \int \rho EdE}{\displaystyle \int \rho dE}
+\end{equation}
+
+
+* Results and Discussion
+
+Following expansion, the lattice goes through oxidation, which is an insertion of an interpenetrating fcc oxygen lattice and the formation of six metal-oxygen bonds per metal. This bonding is apparent through the hybridization of the lattice oxygen /p/-states with the metal /d/-states to create hybridized states at lower energies. The position of these new hybridized states indicates how much energy can be gained by an oxygen bonding to an under-coordinated surface. In addition, the adsorbate bonding states are shifted up in energy with respect to their energies on the expanded lattice. We observed that whenever the energy of the adsorbate bonding states on the expanded lattice are degenerate in energy with the new hybridized lattice metal-oxygen states, the surface-adsorbate bond is strengthened through additional hybridization between adsorbate /p/-states and surface /d/-states. This is most prominent for mid and late transition metal oxides, f). Furthermore, as one goes from mid to late transition metal oxides, these new hybridized bonding states move up in energy, thereby lowering the amount the surface-adsorbate bond can be strengthened through oxidizing the lattice. In contrast to mid and late transition metal oxides, the early transition metal oxide hybridized states are deeper in energy than the adsorbate bonding states, which led to little hybridization between the adsorbate bonding states and surface states. The lack of hybridization in addition to the upshift in energy of the adsorbate states led to an overall increase (weakening) of the adsorption energy on early transition metal oxides. 
+
+
+* Conclusions
+We identified key features of oxide electronic structure that determine the strength of the dissociative adsorption energy of oxygen. We did this by performing structural perturbations to transform a fcc metal into a rocksalt monoxide, tracking changes in both the adsorption energy and electronic structure and how they relate to changes in the surface atomic structure and composition. We found that expanding the metal lattice narrowed and produced shifts in the /d/-band, and the effect on the adsorption energy depended on both the magnitude of the volume expansion and the position of the metal on the periodic table. We also found that oxidizing the lattice allows the surface to form stronger bonds with the adsorbate if the energies of the bulk bonding /d/-band states created through hybridization with bulk oxygen /p/-states are degenerate with the adsorbate /p/-band states. The position of the bulk bonding /d/-states formed through oxidizing the lattice also determines the strength of this effect. To interpret these relationships between the electronic structure and adsorption energy, we found a common correlation between the energies of the adsorbate /p/-bands and adsorption energy for both metals and oxides. These results elucidate the mechanism of adsorption and provide insight into the relationship between electronic structure and reactivity on oxide surfaces.
+
+\section*{Acknowledgement}
+We gratefully acknowledge support from the DOE Office of Science Early Career Research program (DE-SC0004031).
+
+bibliographystyle:elsarticle-num
+bibliography:references.bib
+
