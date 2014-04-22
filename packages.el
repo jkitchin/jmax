@@ -5,9 +5,9 @@
 (require 'package)
 
 (setq package-archives
-      '(("gnu"         . "http://elpa.gnu.org/packages/")
-;	("original"    . "http://tromey.com/elpa/")
-	("org"         . "http://orgmode.org/elpa/")
+      '(("org"         . "http://orgmode.org/elpa/")
+	("gnu"         . "http://elpa.gnu.org/packages/")
+;	("original"    . "http://tromey.com/elpa/")	
 	("melpa" . "http://melpa.milkbox.net/packages/")
 ;	("marmalade"   . "http://marmalade-repo.org/packages/")
 	))
@@ -24,7 +24,8 @@
         'auctex 'reftex
         'undo-tree
 	'diminish
-	'icicles
+	;'icicles
+	'org
 	'elpy
         'rainbow-mode)
   "Libraries that should be installed by default.")
