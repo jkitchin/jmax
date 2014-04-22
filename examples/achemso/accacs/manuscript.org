@@ -1,0 +1,99 @@
+#+TITLE: Estimating bulk composition dependent H_{2} dissociative adsorption energies on Cu_{x}Pd_{1-x} alloy (111) surfaces
+#+LATEX_CLASS: achemso
+#+LATEX_CLASS_OPTIONS: [journal=accacs,manuscript=article,email=true]
+#+latex_header: \setkeys{acs}{biblabel=brackets,super=true,articletitle=true}
+#+latex_header: \SectionNumbersOn
+
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+OPTIONS: author:nil date:nil
+
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+OPTIONS: author:nil date:nil toc:nil
+
+#+latex_header: \usepackage[utf8]{inputenc}
+#+latex_header: \usepackage{fixltx2e}
+#+latex_header: \usepackage{url}
+#+latex_header: \usepackage{mhchem}
+#+latex_header: \usepackage{graphicx}
+#+latex_header: \usepackage{color}
+#+latex_header: \usepackage{amsmath}
+#+latex_header: \usepackage{textcomp}
+#+latex_header: \usepackage{wasysym}
+#+latex_header: \usepackage{latexsym}
+#+latex_header: \usepackage{amssymb}
+
+
+#+latex_header: \usepackage[linktocpage, pdfstartview=FitH, colorlinks, linkcolor=black, anchorcolor=black, citecolor=black, filecolor=black, menucolor=black, urlcolor=black]{hyperref}
+
+
+#+latex_header: \author{Jacob R. Boes}
+#+latex_header: \author{Gamze Gumuslu}
+#+latex_header: \author{James B. Miller}
+#+latex_header: \author{Andrew J. Gellman}
+#+latex_header: \author{John R. Kitchin}
+#+latex_header: \email{jkitchin@andrew.cmu.edu}
+#+latex_header: \affiliation{Department of Chemical Engineering, Carnegie Mellon University, 5000 Forbes Ave, Pittsburgh, PA 15213}
+
+
+#+latex_header: \keywords{density functional theory, copper,  palladium, adsorption,  alloy , hydrogen}
+
+#+begin_abstract
+The bulk composition dependent dissociative adsorption energy of hydrogen on CuPd alloys has been measured experimentally and modeled using density functional theory. The hydrogen adsorption energy cannot be simply defined by a single reactive site, or as a composition weighted average of the pure metal components. We developed a modeling approach that uses a basis of active sites to estimate a bulk composition dependent adsorption energy, weighted by the site probability distribution. With this method we can explain the composition dependent adsorption energy on Cu-rich alloy surfaces. In Pd-rich alloys, a Pd-hydride phase forms which results in deviations from adsorption on the metallic alloy surface.
+#+end_abstract
+
+* Introduction
+Alloys are frequently used as catalysts because they can be designed with superior properties than those of their parent materials cite:yu-2012-review-pt. Computational catalysis has made many contributions to understanding the reactivity of alloy active sites for designing such superior catalysts. However, computational methods can only be incorporated to this end when the structure and composition of the sites are known cite:kitchin-2008-densit. Under these circumstances, we can readily estimate the reactivity of a site cite:Greeley2005,Inoglu2010. However, several significant challenges remain when modeling alloy catalysts. A real alloy surface will have a distribution of sites with different compositions and possible structures, each of which have their own properties. Also, the composition of an alloy surface is not likely to be the same as the bulk alloy due to segregation cite:Dowben1990. The surface composition may depend on the gas-phase environment cite:Kitchin2008 as well. Thus, although we can model the properties of a single site, identifying /what/ site to model remains a challenge. Furthermore, if there are multiple sites, it is challenging to determine the properties of the ensemble of sites.
+
+
+* Methods
+** Experimental methods
+We measured H$_{\text{2}}$-D$_{\text{2}}$ exchange kinetics across $\text{Cu}_{x}\text{Pd}_{\text{1-}x}$ composition space using Composition Spread Alloy Film (CSAF) combinatorial materials libraries. CSAFs are thin alloy films with continuously variable lateral composition that are deposited onto compact substrates. We previously reported the preparation and characterization of the $\text{Cu}\text{Pd}$ CSAFs used in this work cite:Gumuslu2014. Briefly, we used an offset filament source cite:Priyadarshini2011,Priyadarshini2012 to deposit films of \ce{CuPd} that are approximately 100 nm thick, with composition ranging from $x_{Cu} = 0.3-1.0$, onto the surfaces of 14mm \times 14mm \times 2mm polycrystalline Mo substrates.
+
+** Computational methods
+All calculations were performed using the Vienna ab-initio simulation package  (VASP) cite:Kresse1996a,Kresse1996 with the Perdew-Burke-Ernzerhof generalized gradient approximation (GGA-PBE) cite:Perdew1996,Perdew1997a exchange-correlation functional. Core electrons were described using the projector augmented wave function (PAW) cite:Bloechl1994,Kresse1999. /k/-points were represented using Monkhorst-Pack grids cite:Monkhorst1976 and the Kohn-Sham orbitals were expanded up to energy cutoffs of 425 eV for CuPd alloy models and 450 eV for PdH models. The Methfessel-Paxton scheme was used with a smearing parameter of 0.4 eV cite:Methfessel1989. All calculations involving relaxations were completed with a force criteria \textless $\; 0.05$ eV/\AA. Pure component lattice constants were determined using bulk calculations with $12 \times 12 \times 12$ /k/-point grids. Hydride bulk calculations were performed with $8 \times 8 \times 8$ /k/-point grids. Convergence studies of hydrogen adsorption with these parameters suggest the results are converged within \pm 0.02 eV.
+
+* Results and Discussion
+** Active site probabilities and effective adsorption
+To determine the effective adsorption energy, we need the active site distribution. The probability of finding each of the four active sites is determined by the surface composition and its ordering. The CuPd system forms a disordered fcc bulk alloy, so we assume the surface is also randomly ordered. This means the probability of finding a site is simply related to the composition of the site. Figure ref:fig-rnd shows this random distribution profile for the CuPd system as a function of surface composition.
+
+
+\begin{eqnarray}
+\Delta E_{eff}(y_{Cu},x_{Cu}) = \sum\limits_i^n R_{i} P_{i}(y_{Cu}) \Delta E_{i,ads}(x_{Cu})
+\label{eqn-effective}
+\end{eqnarray}
+
+\noindent
+where $R_{i}$ is the number of configurations identical to configuration $i$, $P_{i}$ is the probability of slab configuration $i$, and $y_{M}$ is the surface composition of metal $M$. In the absence of strong segregation $y_{Cu} \approx x_{Cu}$ and this equation becomes a descriptor of the observed adsorption energy on the surface as a function of the bulk composition of the alloy. However, segregation will only be negligible for systems with similar parent metals and adsorbates which do not interact strongly with the surface. Since most systems of interest do not fit these criteria we next develop a means of estimating the surface composition under reaction conditions.
+
+** Estimating surface composition under reaction conditions
+Segregation is a phenomena that reduces surface free energy. In vacuum, it is generally observed that less reactive metals segregate to the surface cite:Ruban1999,Ruban2007. The Langmuir-McLean (Equation ref:eqn-LM) description of segregation relates the  surface and bulk compositions to the Gibbs free energy of segregation cite:Miller2008.
+
+\begin{eqnarray}
+\frac{y_{Cu}}{y_{Pd}} = \frac{x_{Cu}}{x_{Pd}} \exp{\left(\frac{-\Delta G_{seg}}{kT}\right)}
+\label{eqn-LM}
+\end{eqnarray}
+
+\noindent
+Figure ref:fig:exp-seg shows the segregation profiles resulting from Equation ref:eqn-LM at 800 and 900K using the experimental segregation energies cite:Priyadarshini2011. The data shown in this figure was collected using low energy ion scattering spectroscopy (LEISS) which samples only the top layer concentration of an alloy with a predetermined bulk composition. Figure ref:fig:exp-seg shows that under ultra-high vacuum conditions the concentration of Cu at the topmost layer of the CuPd alloy will always be greater than the concentration in the bulk. This segregation is shown to increase as temperature drops until \approx 700K, below which the surface may not be at equilibrium due to slow diffusion of metal atoms cite:Miller2008.
+
+* Conclusions
+We have shown that the reactivity of a CuPd alloy cannot be explained simply by a single site, nor as a simple linear average of the pure metal components. The reactivity is determined by the distribution of active sites, which depends on the surface composition. The surface composition, in turn, depends on the bulk composition /and/ the reaction conditions.
+
+* DISCLAIMER
+This project was funded by the Department of Energy, National Energy Technology Laboratory, an agency of the United States Government through a support contract with URS Energy & Construction Inc.  Neither the United States Government nor any agency thereof, nor any of their employees, nor URS Energy & Construction, Inc., nor any of their employees, makes any warranty, expressed or implied, or assumes any legal liability or responsibility for the accuracy, completeness, or usefulness of any information, apparatus, product, or process disclosed, or represents that its use would not infringe privately owned rights.  Reference herein to any specific commercial product, process, or service by trade name, trademark, manufacturer, or otherwise, does not necessarily constitute or imply its endorsement, recommendation, or favoring by the United States Government or any agency thereof.  The views and opinions of authors expressed herein do not necessarily state or reflect those of the United States Government or any agency thereof.
+
+\begin{acknowledgement}
+As part of the National Energy Technology Laboratory's Regional University Alliance (NETL-RUA), a collaborative initiative of the NETL, this technical effort was performed under the RES contract DE-FE0004000. The authors also acknowledge support from NSF-CBET grant 1033804. JRK gratefully acknowledges partial support from the DOE Office of Science Early Career Research program (DE-SC0004031).
+\end{acknowledgement}
+
+\begin{suppinfo}
+Full details of the calculations and analysis.
+\end{suppinfo}
+
+bibliography:references
+
+\newpage
+*Graphical TOC Entry*
+
+\includegraphics{toc-entry-graphic}
+
