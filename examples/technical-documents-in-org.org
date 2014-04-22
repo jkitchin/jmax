@@ -1,9 +1,11 @@
 #+TITLE: Writing technical documents in org-mode
 #+AUTHOR: John Kitchin
 #+LATEX_CLASS: cmu-article
-#+OPTIONS: ^:{} toc:nil title:t author:t
+#+OPTIONS: ^:{}  author:t toc:nil
+#+EXPORT_EXCLUDE_TAGS: noexport
 
 \maketitle
+\tableofcontents
 
 * Basic principles
 
@@ -18,7 +20,7 @@ Paragraphs are separated by blank lines.
 
 ** Subscripts and superscripts
 
-Usually you use ^ for superscripts and _ for subscripts. Here are some examples: N_{A} is Avogadro's number. U_{3d} is the U parameter on the 3d orbitals.  You should explicitly mark the content to be super or subscripted with curly brackets. This is controlled by this line:
+Usually you use ^ for superscripts and _ for subscripts. The things super or subscripted should be in curly brackets. Here are some examples: N_{A} is Avogadro's number. U_{3d} is the U parameter on the 3d orbitals.  You should explicitly mark the content to be super or subscripted with curly brackets. This is controlled by this line:
 
 #+BEGIN_EXAMPLE
 #+OPTIONS: ^:{}
@@ -28,35 +30,18 @@ Usually you use ^ for superscripts and _ for subscripts. Here are some examples:
 Org-mode recognizes many different symbols, including the greek letters, e.g. \alpha, and \Omega. You can make \deg symbol and an \AA symbol. These do not need to be contained in math environments. Some more of my favorites include \times, and  \rightarrow.
 
 ** Chemical formulas
-You should always enter chemical formulas like this: ce:NH_3. No other way is good.  Here are some example formulas: ce:CH_4, You may need to enclose the link in double square brackets like this =[[ce:ABO_{3-\delta}]]=, if the last character is a curly bracket, e.g.  [[ce:ABO_{3-\delta}]], [[ce:FeO^{+1}]], \ce{H_2SO_4}, \ce{Ca(NO_3)_2}.
+You should always enter chemical formulas like this: NH_{3}. No other way is good.  Here are some example formulas: CH_4, ABO_{3-\delta}, FeO^{+1}, H_{2}SO_{4}, Ca(NO_{3})_{2}.
 
-
-
-You need to make sure to have a line like this for export in a manuscript.
-
-#+BEGIN_EXAMPLE
-#+LATEX_HEADER: \usepackage[version=3]{mhchem}
-#+END_EXAMPLE
-
-This is a default package for everything else.
-
-
-You need to make sure to have a line like this for export in a manuscript.
-
-#+BEGIN_EXAMPLE
-#+LATEX_HEADER: \usepackage[version=3]{mhchem}
-#+END_EXAMPLE
-
-This is a default package for everything else.
+Note this is org syntax /not/ LaTeX syntax. You do not need the math-mode you need in LaTeX. Keep your org syntax clean and do not use math-mode like you do in LaTeX.
 
 ** References to document sections
 
 You are safest using a link like this. See section [[*Chemical formulas]]. 
 
-It is possible to create a "label" to a section. You must set a CUSTOM_ID property on the headline. You then refer to that section with this kine of link: see section [[#sec:headline-label]].
+It is possible to create a "label" to a section. You must set a CUSTOM_ID property on the headline. You then refer to that section with this kind of link: see section [[#sec:headline-label]].
 
 #+BEGIN_EXAMPLE
-*** A headline with a custom id property
+,*** A headline with a custom id property
     :PROPERTIES:
     :CUSTOM_ID: sec:headline-label
 #+END_EXAMPLE
@@ -65,6 +50,20 @@ It is possible to create a "label" to a section. You must set a CUSTOM_ID proper
     :PROPERTIES:
     :CUSTOM_ID: sec:headline-label
     :END:
+This section is intentionally empty.
+*** An empty section \label{sec:not-recommended}
+
+If you are used to section labels in LaTeX, you might put the label directly in the heading. This works, but is not recommended because it seems ugly.
+Nothing to see here in Section ref:sec:not-recommended. It does work though. For now.
+
+** Line spacing
+The default is single spacing. It you want the document to come out double-spaced, use this
+
+#+BEGIN_EXAMPLE
+#+LATEX_HEADER: \usepackage{setspace}
+\doublespace
+#+END_EXAMPLE
+
 * Bibliography and citations
 ** Specifying the bibliography files where citations come from
 
@@ -124,23 +123,45 @@ Figures in org-mode are straightforward. You simply create a link to a figure th
 
 
 Good practice for the label is prefix it with fig: so that later you can easily spot figure labels from table and equation labels.
-#+caption: A descriptive sentence about the figure. label:test-label
+#+caption: A descriptive sentence about the figure. 
 #+label: fig:test-label
 [[./fig1.png]]
 
 The default export behavior is not that nice at setting the width. You can set that the way you want like this:
 
-#+attr_latex: :width 3in
-#+caption: A descriptive sentence about the figure. label:test-label
+#+attr_latex: :width 3in :placement [H]
+#+caption: A descriptive sentence about the figure. 
 #+label: fig:test-label2
 [[./fig1.png]]
 
 
 
 ** References to figures
-Later, I can refer to Figure ref:test-label. Figures tend to float around in LaTeX. Do not worry about it.
+Later, I can refer to Figure ref:fig:test-label. Figures tend to float around in LaTeX. Do not worry about it.
 
 If you want help inserting the references, type M-x org-insert-ref-link, and press tab. This should show you a list of labels in your document. It only shows labels defined as a link.
+
+** Controlling placement of floats
+
+If it is essential to you to have a float in a specific place, you can set a LaTeX attribute that will probably make that happen. Here is an example.
+
+#+ATTR_LATEX: :placement [H]
+
+** Wrapping text around figures
+You may be constrained for space and want your text to wrap around figures. You can use the wrapfig package and some attributes to make this happen. See http://orgmode.org/manual/LaTeX-specific-attributes.html.
+
+#+LATEX_HEADER: \usepackage{wrapfig}
+
+ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec non elit purus. Maecenas id lectus luctus, ornare libero et, laoreet purus. In placerat, lectus eget rutrum vehicula, tortor odio tempor leo, eu pulvinar dolor ante vitae dui. Vivamus convallis interdum enim gravida molestie. Cras vulputate at neque at mollis. Curabitur lobortis gravida tellus, vitae sagittis nisl tempor ac. Cras vel porta urna. Pellentesque auctor, urna at vehicula rutrum, metus nunc dictum dui, at interdum diam libero vel ipsum. Donec euismod, felis nec dictum mattis, odio lorem tristique orci, in commodo purus nulla sed est. Nam quis molestie mauris. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.
+
+Fusce bibendum sem turpis, at venenatis magna laoreet in. Sed convallis pretium leo, in aliquam massa lobortis quis. Fusce nec ornare mi. Nulla rutrum, tellus quis pretium varius, neque ligula facilisis urna, sit amet accumsan sem neque sit amet arcu. Aenean augue lacus, sodales a sem vitae, tincidunt rhoncus nibh. Donec venenatis dolor ut nulla bibendum tincidunt. Suspendisse facilisis, eros sed pharetra posuere, sem arcu viverra risus, eu aliquet orci est vitae ipsum. Integer scelerisque nisl et quam dapibus consequat. Integer pretium pharetra nisi, id consectetur dui ultricies ac. Vestibulum fermentum vulputate mauris nec tincidunt. Maecenas velit turpis, tempor porta tincidunt ac, venenatis eget tortor. Duis egestas odio venenatis adipiscing mattis.
+
+#+ATTR_LATEX: :float wrap :width 2in :placement {r}{0.33\textwidth}
+#+caption: A wrapped figure that takes up 1/3 of the text, on the right.
+[[./fig1.png]]
+
+Mauris placerat faucibus scelerisque. Nunc interdum egestas nunc ut vestibulum. Maecenas commodo justo sit amet scelerisque auctor. Morbi lacinia sem sit amet lectus vehicula porttitor. Pellentesque at dictum metus, quis ornare arcu. Integer tellus turpis, rhoncus nec accumsan in, posuere sit amet arcu. Nullam tempus neque vel condimentum porttitor. Nullam vitae tincidunt felis. Nunc egestas, nunc sit amet tristique adipiscing, ante nulla imperdiet nisi, nec eleifend enim felis et urna. Sed sit amet erat scelerisque, sollicitudin nibh vitae, varius nunc. Mauris posuere scelerisque augue nec placerat. Morbi in elementum risus. Fusce quis condimentum turpis. Sed eleifend libero et diam consectetur, a rhoncus purus porta. Nulla consectetur blandit porta. 
+
 
 * Tables
 
@@ -195,8 +216,22 @@ You can see the result in Table ref:tab:example2.
 * Including LaTeX environments
 * Miscellaneous document features
 ** Table of contents
+You can add a table of contents with =\tableofcontents=.
+
+This is controlled by this option line:
+#+BEGIN_EXAMPLE
+#+OPTION: toc:nil
+#+END_EXAMPLE
 ** Preventing export of some headings
-** Controlling placement of floats
+You can mark some headings with a tag that is listed in 
+
+#+BEGIN_EXAMPLE
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+END_EXAMPLE
+
+to mark it for noexport. Put your cursor on the headline, type C-c C-c and type in the tag name. 
+
+*** Heading marked for noexport					   :noexport:
 
 * Exporting to LaTeX and PDF
 org-mode is not LaTeX, and it cannot do everything LaTeX does. It can do a lot though. To get LaTeX, we have to provide org-mode with the required packages, and tell it what kind of document to export. The default type is an article. We provide some additional document types:
@@ -239,23 +274,40 @@ see [[file:cmu-qualifier/cmu-qualifier.org]]
 see [[file:cmu-ms-report/project-report.org]]
 
 ** ACS journals
+The achemso LaTeX package is used. See the documentation here:
+
+ [[../texmf/doc/latex/achemso/achemso.pdf]]
 *** I&ECR
-see [[file:achemso/I&ECR/manuscript.org]]. This was published cite:hallenbeck-2013-effec-o2.
+see [[./achemso/I&ECR/manuscript.org]]
 
 *** Applied Interfaces and Materials
 see [[file:achemso/aamick/manuscript.org]]
 
+*** ACS Catalysis
+see [[./achemso/accacs/manuscript.org]]
+
 *** TODO Analytical Chemistry
 
 ** APS journals
+The revtex4-1 package is used. See the documentation here:
+
+ file:../texmf/doc/latex/revtex/auguide/auguide4-1.pdf
 *** Physical Review Letters
 See [[file:revtex4-1/PRL/manuscript.org]].
 *** Physical Review B
 See [[file:revtex4-1/PRB/manuscript.org]].
 
 ** Elsevier journals
-see [[file:elsarticle/manuscript.org]]
-** TODO Springer journals
+
+documentation
+
+ file:../texmf/doc/latex/elsarticle/elsdoc.pdf
+
+see [[file:elsarticle/manuscript.org]] for an example.
+
+** Springer journals
+see [[./svjour3/manuscript.org]]
+
 * Bibliography
 
 # <<bibliographystyle>>
