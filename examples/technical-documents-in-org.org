@@ -87,7 +87,6 @@ We use cite links to indicate a reference to an entry in the bibliography. Here 
 
 You can insert citation links by pressing C-c ]. Press enter to accept the default citation type, and then type a few letters to search for what you want. Press enter to get a list of matches. Select the entries you want with m, and then press enter again. The link will be automatically entered. Multiple citations are separated by commas. If you need to add citations to an existing citation, the best thing is to repeat the process just described, and manually delete the extra cite links and join the citations by commas. 
 
-
 * Equations
 
 There are a few ways to enter equations. If your equation should be inline, e.g. \(e^x = 4\) use this format. 
