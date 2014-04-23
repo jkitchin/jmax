@@ -25,7 +25,7 @@
         'undo-tree
 	'diminish
 	;'icicles
-	'org
+	'org 'org-plus-contrib
 	'elpy
         'rainbow-mode)
   "Libraries that should be installed by default.")
