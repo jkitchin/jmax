@@ -1,7 +1,8 @@
 #+TITLE: Writing technical documents in org-mode
 #+AUTHOR: John Kitchin
 #+LATEX_CLASS: cmu-article
-#+OPTIONS: ^:{}  author:t toc:nil
+#+OPTIONS: ^:{} # make super/subscripts only when wrapped in {}
+#+OPTIONS: toc:nil # suppress toc, so we can put it where we want
 #+EXPORT_EXCLUDE_TAGS: noexport
 
 \maketitle
@@ -13,9 +14,11 @@ Org-mode is a simple, structured markup for information. You should keep it simp
 
 Our aim is to write technical documentation in org-mode, which can be exported to LaTeX for conversion to PDF. This is a conversion process. It is not a perfect process, so we will try to keep things as simple as possible.
 
-Although org-mode is not LaTeX, you will find it helpful to be familiar with LaTeX. A pretty good reference is here http://en.wikibooks.org/wiki/LaTeX.
+Although org-mode is not LaTeX, you will find it helpful to be familiar with LaTeX. A pretty good reference is here http://en.wikibooks.org/wiki/LaTeX, especially for learning about equations.
 
 It is not necessary to learn very many keyboard shortcuts to use org-mode. These only make you more efficient when you use org-mode a lot.
+
+You can learn a lot about org-mode by reading the [[info:org#Top][manual]]. There is a lot more there than needed for writing basic technical documents. This guide is not comprehensive, but rather designed to get you started quickly.
 
 * Basic markup
 ** Basics
@@ -41,7 +44,7 @@ Note this is org syntax /not/ LaTeX syntax. You do not need the math-mode you ne
 
 ** References to document sections
 
-You are safest using a link like this. See section [[*Chemical formulas]]. 
+You are safest using a link to the headlin text like this. See section [[*Chemical formulas]]. Note the * in the link, and the missing space
 
 It is possible to create a "label" to a section. You must set a CUSTOM_ID property on the headline. You then refer to that section with this kind of link: see section [[#sec:headline-label]].
 
@@ -49,6 +52,7 @@ It is possible to create a "label" to a section. You must set a CUSTOM_ID proper
 ,*** A headline with a custom id property
     :PROPERTIES:
     :CUSTOM_ID: sec:headline-label
+    :END:
 #+END_EXAMPLE
 
 *** A headline with a custom id property
@@ -82,7 +86,6 @@ Depending on the type of document you are creating, you may need to specify a bi
 We use cite links to indicate a reference to an entry in the bibliography. Here is an example cite:akhade2012:surface. These links are clickable too. If everything is setup correctly, clicking on the link should open the bibliography at the entry you clicked on. When your cursor is on a link, a tooltip will popup with some details of the citation. If you have sections of your document collapsed, you may see funny stuff in the tooltip.
 
 You can insert citation links by pressing C-c ]. Press enter to accept the default citation type, and then type a few letters to search for what you want. Press enter to get a list of matches. Select the entries you want with m, and then press enter again. The link will be automatically entered. Multiple citations are separated by commas. If you need to add citations to an existing citation, the best thing is to repeat the process just described, and manually delete the extra cite links and join the citations by commas. 
-
 
 
 * Equations
@@ -158,7 +161,7 @@ The default export behavior is not that nice at setting the width. You can set t
 #+label: fig:test-label2
 [[./fig1.png]]
 
-
+For more details on exporting, see [[info:org#Images%20in%20LaTeX%20export][info:org#Images in LaTeX export]].
 
 ** References to figures
 Later, I can refer to Figure ref:fig:test-label. Figures tend to float around in LaTeX. Do not worry about it.
@@ -186,10 +189,9 @@ Fusce bibendum sem turpis, at venenatis magna laoreet in. Sed convallis pretium 
 
 Mauris placerat faucibus scelerisque. Nunc interdum egestas nunc ut vestibulum. Maecenas commodo justo sit amet scelerisque auctor. Morbi lacinia sem sit amet lectus vehicula porttitor. Pellentesque at dictum metus, quis ornare arcu. Integer tellus turpis, rhoncus nec accumsan in, posuere sit amet arcu. Nullam tempus neque vel condimentum porttitor. Nullam vitae tincidunt felis. Nunc egestas, nunc sit amet tristique adipiscing, ante nulla imperdiet nisi, nec eleifend enim felis et urna. Sed sit amet erat scelerisque, sollicitudin nibh vitae, varius nunc. Mauris posuere scelerisque augue nec placerat. Morbi in elementum risus. Fusce quis condimentum turpis. Sed eleifend libero et diam consectetur, a rhoncus purus porta. Nulla consectetur blandit porta. 
 
-
 * Tables
 
-Tables are one of org-mode's best features. They are easy to create, and customize. Consider this table:
+Tables are one of org-mode's best features. They are easy to create, and customize. Read about them here [[info:org#Tables]]. Consider this table:
 
 #+BEGIN_EXAMPLE
 #+caption: The simplest kind of table.
@@ -199,6 +201,8 @@ Tables are one of org-mode's best features. They are easy to create, and customi
 |        1 |        8 |
 |        4 |        5 |
 #+END_EXAMPLE
+
+The example above is a literal example so you can compare the table syntax with what is exported in LaTeX. Here is the actual table.
 
 #+caption: The simplest kind of table.
 #+tblname: tab:example1
@@ -236,7 +240,7 @@ We use =#+tblname:= to give the table a name we can reference later. Table ref:t
 
 You can see the result in Table ref:tab:example2.
 
-
+For more details on exporting, see [[info:org#Tables%20in%20LaTeX%20export][info:org#Tables in LaTeX export]].
 * Including LaTeX environments
 
 You can include almost arbitrary environments from LaTeX, such as an array:
@@ -279,35 +283,121 @@ You can use the attachfile package to embed files in a PDF. Like this: \attachfi
 org-mode is not LaTeX, and it cannot do everything LaTeX does. It can do a lot though. To get LaTeX, we have to provide org-mode with the required packages, and tell it what kind of document to export. The default type is an article. We provide some additional document types:
 - cmu-article is like an article, but with one-inch margins
 
-Those types use what we define as the default LaTeX packages to include. These are:
-- [AUTO] inputenc
-- [T1] fontenc 
-- fixltx2e 
-- graphicx
-- longtable 
-- float 
-- wrapfig 
-- rotating 
-- [normalem] ulem 
-- amsmath 
-- textcomp 
-- marvosym 
-- wasysym 
-- amssymb 
-- [version=3] mhchem 
-- natbib 
-- url 
-- minted 
-- underscore 	
-- [linktocpage,pdfstartview=FitH,colorlinks,linkcolor=blue,anchorcolor=blue,
-citecolor=blue,filecolor=blue,menucolor=blue,urlcolor=blue] hyperref
-- attachfile
-
+Those types use what we define as the default LaTeX packages to include. 
 The order of these is important, and changing it can result in LaTeX errors. If you need additional packages for your document, you need to tell org-mode about them like this:
 
 #+BEGIN_EXAMPLE
 #+LATEX_HEADER: \usepackage[options]{xyz}
 #+END_EXAMPLE
+
+You can learn more about exporting here [[info:org#Exporting]], and about LaTeX and PDF exporting here [[info:org#LaTeX%20and%20PDF%20export][info:org#LaTeX and PDF export]].
+
+Here is a brief description of these packages (Thanks to Jake Boes).
+*** [AUTO] inputenc
+This package translates various standard and other input-encodings into a 'LaTeX internal language'. i.e. typing in non-ASCII characters into the document will be translated into a character number '228'.The character number that inputenc assigns is specified by the editor setup 'AUTO'. TeX then reads the character number and inputenc returns a properly formatted LaTeX string '\"a' for character number '228'. This package is often used in conjunction with fontenc. 
+
+http://www.ctan.org/pkg/inputenc
+
+*** [T1] fontenc
+This package contains information regarding know latex functions such as '\"' and knows to turn these commands into the appropriate accent over a proceeding character.i.e. '\"a' would be represented as an a with a double dot accent above.fontenc then translates this into a statement like 'print character 228' where editor setup 'T1' determines the character number to be printed.
+
+http://www.ctan.org/pkg/fontenc
+
+*** fixltx2e
+LaTeX tries to keep things the same between updates so that older documents won't have their typesettings altered when you update to a newer version of LaTeX. The fixltx2e package contains patches that alter some of these typesettings in favor of fixing certain bugs. This way LaTeX updates remain backwards compatible and bugs can be patched as well. A full list of correction can be found at the following link:
+
+http://www.ctan.org/pkg/fixltx2e
+
+*** graphicx
+This package provides an extension to the regular set of graphics commands provided in LaTeX. A more detailed outline of what can be done with this graphics tool is outlined here:http://ctan.mirrors.hoobly.com/macros/latex/required/graphics/grfguide.pdf
+
+http://ctan.org/pkg/graphicx
+
+*** longtable
+Allows for tables to continue onto the next page of a document. The widths of this table will be kept constant between pages.
+
+http://www.ctan.org/pkg/longtable
+
+*** float
+This package provides LaTeX with the concept of a floating figure or table. Such floating objects can be placed moved about to make appropriate spacing for text and other obstructions. This package also allows for the [H] setting to be used which dictates that the figure or table be positioned exactly where you specified in the text.
+
+http://www.ctan.org/pkg/float
+
+*** wrapfig
+This package allows text to wrap around figures and tables. This is useful for inserting smaller images into large paragraphs.
+
+http://www.ctan.org/pkg/wrapfig
+
+*** rotating
+The rotating package will rotate complete sets of figures and table any way you choose.
+
+http://www.ctan.org/pkg/rotating
+
+*** [normalem] ulem
+This is a fancy underlining package which will underline through word breaks, unlike the standard method. [normalem] prevents ulem from replacing italics with underlines when using the \emph command.
+
+http://www.ctan.org/pkg/ulem
+
+*** amsmath
+amsmath is the recommended package for serious mathematical typesetting in LaTeX. This package unlocks a plethora of functionality which is documented here: http://ctan.sharelatex.com/tex-archive/macros/latex/required/amslatex/math/amsldoc.pdf
+
+http://www.ctan.org/pkg/amsmath
+
+*** textcomp
+textcomp provides support for many miscellaneous font symbols.
+
+http://www.ctan.org/pkg/textcomp
+
+*** marvosym
+The Martin Vogel's symbols package contains support for an unusual list of symbols as well as some potentially useful mathematically notations. The full list of provided fonts can be found here: http://mirror.utexas.edu/ctan/fonts/marvosym/doc/fonts/marvosym/marvodoc.pdf
+
+http://www.ctan.org/pkg/marvosym
+
+*** wasysym
+More support for various symbols including integrals which look useful for engineering documentation. A full list of symbols can be found here: http://ctan.mirrors.hoobly.com/macros/latex/contrib/wasysym/wasysym.pdf
+
+http://www.ctan.org/pkg/wasysym
+
+*** amssymb
+Support for symbols used by the American Mathematical Society. A complete list of symbols can be found here: http://www.rpi.edu/dept/arc/training/latex/amssymblist.pdf
+
+http://www.ctan.org/tex-archive/fonts/amsfonts
+
+*** [version=3] mhchem
+A typeset package for chemical formulae and equations. More information on proper implementation can be found here: http://ctan.mirrorcatalogs.com/macros/latex/contrib/mhchem/mhchem.pdf
+
+http://www.ctan.org/pkg/mhchem
+
+*** natbib
+A package which provides basic bibliography support. This package includes author-year and numbered references and support for a large variety of different bibliography formats.
+
+http://www.ctan.org/pkg/natbib
+
+*** url
+Allows for the incorporation of URLs into TeX documentation. These URLs are interactive so that users can follow the links in the TeX document.
+
+http://www.ctan.org/pkg/url
+
+*** minted
+This package provides formatting for source code in LaTeX from multiple different programming languages. This package is useful for representing source code as one would expect to see it in its typical format. There is also support for numbering lines of code and many other useful tricks. A full description of the uses can be found here: http://bay.uchicago.edu/tex-archive/macros/latex/contrib/minted/minted.pdf
+
+http://www.ctan.org/pkg/minted
+
+*** underscore
+This package controls some aspects of how inserting underscores work i.e. '\_'. Normally connecting two words with and underscore prevents automatic hyphenation of the word. More importantly, this package also prevents the underscore command from interfering in mathematical notation.
+
+http://www.ctan.org/pkg/underscore
+
+*** [linktocpage,pdfstartview=FitH,colorlinks,linkcolor=blue,anchorcolor=blue,citecolor=blue,filecolor=blue,menucolor=blue,urlcolor=blue] hyperref
+This package controls all aspects of cross-reference commands and how they are exported to PDF. This includes, but is not limited to, all of the bookmarks, links in table of contents, and URLs used in the document. [linktocpage] sets the page number as the link on the table of contents as opposed to the text. [pdfstartview=FitH] specifies that the PDF should open in the fit to screen view. [colorlinks] colors all of the links as specified in the following commands above.
+
+http://www.ctan.org/pkg/hyperref
+
+*** attachfile
+This package allows files to be attached an arbitrary file into an exported PDF. This file is embedded into the PDF so that is can be easily transported along with the document.
+
+http://www.ctan.org/pkg/attachfile
+
 
 *** Exporting to a PDF
 You can type C-c C-e j o to build and open a pdf file. This is most often what you want to do, if you just need a pdf.
@@ -320,6 +410,7 @@ Most journals do not want your bibtex file, nor do they use pdflatex. They want 
 M-x ox-manuscript-build-submission-manuscript-and-open
 
 The resulting tex file will have no extensions on the included graphics, so that LaTeX can choose the appropriate file. You need to provide the eps or pdf graphics. The bibliography will be embedded at the end of the file. 
+
 
 ** CMU Qualifier
 see [[file:cmu-qualifier/cmu-qualifier.org]]
