@@ -192,14 +192,18 @@ We assume there is a bibliography and style defined if a cite is found. no check
 (defun ox-manuscript-build-submission-manuscript (&optional async subtreep visible-only body-only options)
   "create manuscript for submission. This removes the .png extensions from graphics, and replaces the bibliography with the contents of the bbl file. the result is a single, standalone tex-file, and the corresponding pdf. You must have built the manuscript with bibtex first."
   (interactive)
-  (ox-manuscript-cleanup 'deep)
-  (org-latex-export-to-latex async subtreep visible-only body-only options)
-  (ox-manuscript-remove-image-extensions)
-  (ox-manuscript-bibliography-to-bbl)
-  (let ((pdf))
-    (setq pdf (ox-manuscript-build))
+  (let* ((org-file (file-name-nondirectory (buffer-file-name)))
+         (pdf-file (replace-regexp-in-string "org$" "pdf" org-file)))
+    (ox-manuscript-cleanup 'deep)
+    (org-latex-export-to-latex async subtreep visible-only body-only options)
+    (ox-manuscript-remove-image-extensions)
+    (ox-manuscript-bibliography-to-bbl)
+    
+    (ox-manuscript-pdflatex)
+    (ox-manuscript-pdflatex)
+
     (format "Manuscript built on %s with org-mode %s" (current-time-string) (org-version))
-    pdf))
+    pdf-file))
 
 (defun ox-manuscript-build-submission-manuscript-and-open (&optional async subtreep visible-only body-only options)
   "create manuscript for submission. This removes the .png extensions from graphics, and replaces the bibliography with the contents of the bbl file. the result is a single, standalone tex-file, and the corresponding pdf. You must have built the manuscript with bibtex first."
