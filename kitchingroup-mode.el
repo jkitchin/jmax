@@ -11,12 +11,7 @@
 
 (defvar kitchingroup-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "C-c e") '(lambda () (ding)))
-    (define-key map (kbd "s-m m") 'magit-status)
-    (define-key map (kbd "s-m l") 'magit-log)
-    (define-key map (kbd "s-m f") 'magit-file-log)
-    (define-key map (kbd "s-m b") 'magit-blame-mode)
-
+    (define-key map (kbd "C-c e") 'email-region)
     map)
   "Keymap for kitchingroup mode.")
 
@@ -35,7 +30,8 @@ you have to define `my-kitchingroup-org-file' in your init files"
   '("KitchinGroup"
     ("email"
     ["email region" email-region t]
-    ["email org-mode heading" email-heading t])
+    ["email org-mode heading" email-heading t]
+    ["email org-archive" ox-archive-create-and-mail t])
     ("org-mode"
      ("export"
       ["manuscript PDF" ox-manuscript-export-and-build-and-open t]
