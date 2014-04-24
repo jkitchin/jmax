@@ -297,8 +297,8 @@
 (setq dired-details-hidden-string "")
 
 
-
-
+(require 'kitchingroup-mode)
+(kitchingroup-mode)
 
 ;; 2014-04-05 commentd out icicles. It does not do much and does not expand mail with bbdb correctly. 
 ;; icicles should supposedly be loaded last
