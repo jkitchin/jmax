@@ -210,6 +210,17 @@ We assume there is a bibliography and style defined if a cite is found. no check
   (interactive)
   (org-open-file (ox-manuscript-build-submission-manuscript async subtreep visible-only body-only options)))
 
+(defun ox-manuscript-export-and-build-and-email (&optional async subtreep visible-only body-only options)
+  "create manuscript for submission. This removes the .png extensions from graphics, and replaces the bibliography with the contents of the bbl file. the result is a single, standalone tex-file, and the corresponding pdf. You must have built the manuscript with bibtex first."
+  (interactive)
+  (let ((pdf (ox-manuscript-export-and-build async subtreep visible-only body-only options)))
+	(org-open-file pdf)
+	(message-mail)
+	(mml-attach-file pdf)
+	(message-goto-to)
+
+  ))
+
 
 (org-export-define-derived-backend 'cmu-manuscript 'latex
   :menu-entry
@@ -218,6 +229,7 @@ We assume there is a bibliography and style defined if a cite is found. no check
 	(?l "As LaTeX file" org-latex-export-to-latex)
 	(?p "As manuscript PDF file" ox-manuscript-export-and-build)
 	(?o "As manuscript PDF and open" ox-manuscript-export-and-build-and-open)
+	(?e "As PDF and email" ox-manuscript-export-and-build-and-email)
 	(?M "As submission manuscript" ox-manuscript-build-submission-manuscript)
 	(?m "As submission manuscript and open" ox-manuscript-build-submission-manuscript-and-open))))
 
