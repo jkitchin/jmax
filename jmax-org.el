@@ -315,17 +315,10 @@ citecolor=blue,filecolor=blue,menucolor=blue,urlcolor=blue"
 (require 'ox-cmu-qualifier)
 (require 'ox-cmu-ms-report)
 (require 'ox-manuscript)
+(require 'ox-archive)
 
 (load-file (expand-file-name "jorg-bib.el" starter-kit-dir))
 
-;; add a chemical element link
-(org-add-link-type
- "ce"
- nil
- (lambda (keyword desc format)
-   (cond
-    ((eq format 'html) (format "(<label>%s</label>)" path))
-    ((eq format 'latex)
-     (format "\\ce{%s}" keyword)))))
+
 
 (message "jmax-org.el loaded")
