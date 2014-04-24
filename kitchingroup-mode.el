@@ -31,6 +31,7 @@ you have to define `my-kitchingroup-org-file' in your init files"
     ("email"
     ["email region" email-region t]
     ["email org-mode heading" email-heading t]
+    ["email org-mode as PDF" ox-manuscript-export-and-build-and-email t]
     ["email org-archive" ox-archive-create-and-mail t])
     ("org-mode"
      ("export"
@@ -50,6 +51,7 @@ you have to define `my-kitchingroup-org-file' in your init files"
 
 \\{kitchingroup-mode-map}"
   :lighter " KG"
+  :global t
   :keymap kitchingroup-mode-map)
 
 (provide 'kitchingroup-mode)
