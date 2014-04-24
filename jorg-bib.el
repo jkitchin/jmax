@@ -658,12 +658,13 @@ A right-click opens the pdf associated with the entry, if it exists."
      (format "\\index{%s}" keyword)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defun build-full-bibliography ()
+(defun jb-build-full-bibliography ()
   "build pdf of all bibtex entries"
   (interactive)
   (let* ((bibfile (file-name-nondirectory (buffer-file-name)))
 	(bib-base (file-name-sans-extension bibfile))
-	(texfile (concat bib-base ".tex")))
+	(texfile (concat bib-base ".tex"))
+	(pdffile (concat bib-base ".pdf")))
     (find-file texfile)
     (erase-buffer)
     (insert (format "\\documentclass[12pt]{article}
@@ -674,7 +675,7 @@ A right-click opens the pdf associated with the entry, if it exists."
 \\usepackage{doi}
 \\begin{document}
 \\nocite{*}
-\\bibliographystyle{plainnat}
+\\bibliographystyle{unsrtnat}
 \\bibliography{%s}
 \\end{document}" bib-base))
     (save-buffer)
@@ -682,9 +683,10 @@ A right-click opens the pdf associated with the entry, if it exists."
     (shell-command (concat "bibtex " bib-base))
     (shell-command (concat "pdflatex " bib-base))
     (shell-command (concat "pdflatex " bib-base))
-     (kill-buffer texfile)
-     ) 
-)
+    (kill-buffer texfile)
+    (org-open-file pdffile)
+    )) 
+
     
 
 (defun jb-extract-bibtex ()
