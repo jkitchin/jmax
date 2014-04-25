@@ -3,7 +3,13 @@
 ;;
 ;; A guiding principle here is that nothing is used by default. You should specify it all in the org file.
 
+;; important functions
+;; ox-manuscript-export-and-build
+;; ox-manuscript-export-and-build-and-open
+;; ox-manuscript-build-submission-manuscript
 
+
+;; ox-manuscript-build-submission-manuscript-and-open
 (require 'ox)
 (require 'ox-publish)
 
@@ -79,12 +85,16 @@
 
 (defun ox-manuscript-export-and-build (&optional async subtreep visible-only body-only options)
   "cleans up, then exports the latex and builds using the org-mode machinery"
+  (interactive)
   (ox-manuscript-cleanup 'deep)
-  (org-latex-export-to-pdf async subtreep visible-only body-only options))
+  (prog1
+      (org-latex-export-to-pdf async subtreep visible-only body-only options)
+    (ox-manuscript-cleanup)))
 
 
 (defun ox-manuscript-export-and-build-and-open (&optional async subtreep visible-only body-only options)	      
   "cleanup, export, build and open pdf"
+  (interactive)
   (org-open-file (ox-manuscript-export-and-build  async subtreep visible-only body-only options)))
 
 
@@ -197,10 +207,10 @@ We assume there is a bibliography and style defined if a cite is found. no check
     (ox-manuscript-cleanup 'deep)
     (org-latex-export-to-latex async subtreep visible-only body-only options)
     (ox-manuscript-remove-image-extensions)
-    (ox-manuscript-bibliography-to-bbl)
-    
+    (ox-manuscript-bibliography-to-bbl)    
     (ox-manuscript-pdflatex)
     (ox-manuscript-pdflatex)
+    (ox-manuscript-cleanup)
 
     (format "Manuscript built on %s with org-mode %s" (current-time-string) (org-version))
     pdf-file))
