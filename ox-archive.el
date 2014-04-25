@@ -32,10 +32,9 @@
 ;;  
 ;; (ox-archive-create-and-mail) creates the zip file and attaches it
 ;; to an email.
-
-(defun test (name)
-(interactive "st: ")
-(message "%s" (if (string= name "") "tet" name)))
+;;
+;; This is very slow on windows. I am not sure why. It is blazing fast
+;; on Linux.
 
 (defun ox-archive-create-zip (&optional zip-base-name)
   "create a zip archive from the current org-file. You provide the basename for the zip file (do not includ the extension).
