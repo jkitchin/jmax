@@ -222,9 +222,6 @@
    (process-buffer (python-shell-get-or-create-process))))
 
 
-;(require 'kitchingroup-mode)
-;(kitchingroup-mode +1)
-
 (load-file (expand-file-name "email.el" starter-kit-dir))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -234,7 +231,7 @@
 (setq bbdb-file (expand-file-name "user/bbdb" starter-kit-dir))
 
 (require 'bbdb)
-(bbdb-initialize 'gnus 'message)
+(bbdb-initialize 'gnus 'message 'rmail)
 
 
 ;; This is not defined in my bbdb/icicles installation. This lets me use tab-completion.
@@ -267,12 +264,8 @@
 ;;    bbdb-elided-display t                    ;; single-line addresses
 )
 
-;; we use our own org-mode
-;; load my org-mode
-(add-to-list 'load-path (expand-file-name "org-mode/lisp" starter-kit-dir))
-(add-to-list 'load-path (expand-file-name "org-mode/contrib/lisp" starter-kit-dir))
-(require 'org)
 
+;; add matlab
 (add-to-list 'load-path (expand-file-name "matlab" starter-kit-dir))
  (load-library "matlab-load")
 
@@ -290,8 +283,6 @@
 ;;;;;;; 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-
-
 ;; hide details in dired
 (require 'dired-details+)
 (setq dired-details-hidden-string "")
@@ -300,13 +291,5 @@
 (require 'kitchingroup-mode)
 (kitchingroup-mode)
 
-;; 2014-04-05 commentd out icicles. It does not do much and does not expand mail with bbdb correctly. 
-;; icicles should supposedly be loaded last
-;; (require 'icicles)
-;; reclaim C-c ' for org-mode
-;;(setq icicle-top-level-key-bindings
-;;      (remove '("'" icicle-occur t) icicle-top-level-key-bindings))
-
-;; (icy-mode 1)
 
 (provide 'jmax)
