@@ -31,7 +31,7 @@
 ;; ox-manuscript-export-and-build-and-open
 ;; ox-manuscript-build-submission-manuscript
 ;; ox-manuscript-build-submission-manuscript-and-open
-
+;; ox-manuscript-export-and-build-and-email
 
 (require 'ox)
 (require 'ox-publish)
@@ -223,7 +223,7 @@ We assume there is a bibliography and style defined if a cite is found. no check
     pdf-file))
 
 (defun ox-manuscript-build-submission-manuscript (&optional async subtreep visible-only body-only options)
-  "create manuscript for submission. This removes the .png extensions from graphics, and replaces the bibliography with the contents of the bbl file. the result is a single, standalone tex-file, and the corresponding pdf. You must have built the manuscript with bibtex first."
+  "create manuscript for submission. This removes the .png extensions from graphics, and replaces the bibliography with the contents of the bbl file. the result is a single, standalone tex-file, and the corresponding pdf."
   (interactive)
   (let* ((org-file (file-name-nondirectory (buffer-file-name)))
          (pdf-file (replace-regexp-in-string "org$" "pdf" org-file)))
@@ -239,20 +239,18 @@ We assume there is a bibliography and style defined if a cite is found. no check
     pdf-file))
 
 (defun ox-manuscript-build-submission-manuscript-and-open (&optional async subtreep visible-only body-only options)
-  "create manuscript for submission. This removes the .png extensions from graphics, and replaces the bibliography with the contents of the bbl file. the result is a single, standalone tex-file, and the corresponding pdf. You must have built the manuscript with bibtex first."
+  "build manuscript for submission and open the pdf. This removes the .png extensions from graphics, and replaces the bibliography with the contents of the bbl file. the result is a single, standalone tex-file, and the corresponding pdf."
   (interactive)
   (org-open-file (ox-manuscript-build-submission-manuscript async subtreep visible-only body-only options)))
 
 (defun ox-manuscript-export-and-build-and-email (&optional async subtreep visible-only body-only options)
-  "create manuscript for submission. This removes the .png extensions from graphics, and replaces the bibliography with the contents of the bbl file. the result is a single, standalone tex-file, and the corresponding pdf. You must have built the manuscript with bibtex first."
+  "build the manuscript and attach the pdf to an email buffer."
   (interactive)
   (let ((pdf (ox-manuscript-export-and-build async subtreep visible-only body-only options)))
 	(org-open-file pdf)
 	(message-mail)
 	(mml-attach-file pdf)
-	(message-goto-to)
-
-  ))
+	(message-goto-to)))
 
 
 (org-export-define-derived-backend 'cmu-manuscript 'latex
