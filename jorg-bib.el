@@ -884,5 +884,12 @@ If no bibliography is in the buffer the `reftex-default-bibliography' is used."
     ((eq format 'latex)
      (format "\\listoftables")))))
 
+
+(defun find-non-ascii-characters ()
+  "finds non-ascii characters in the buffer. Useful for cleaning up bibtex files"
+  (interactive)
+  (occur "[^[:ascii:]]"))
+
+
 (provide 'jorg-bib)
 ;;; jorg-bib.el ends here
