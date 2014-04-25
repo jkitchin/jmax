@@ -1,10 +1,59 @@
-;; Lisp code to setup bibliography  cite, ref and label org-mode links.
-;; also sets up reftex for org-mode
+;;; jorg-bib.el --- setup bibliography  cite, ref and label org-mode links.
 
-;; [[bibliography]]
+;; Copyright(C) 2014 John Kitchin
+
+;; Author: John Kitchin <jkitchin@andrew.cmu.edu>
+;; This file is not currently part of GNU Emacs.
+
+;; This program is free software; you can redistribute it and/or
+;; modify it under the terms of the GNU General Public License as
+;; published by the Free Software Foundation; either version 2, or (at
+;; your option) any later version.
+
+;; This program is distributed in the hope that it will be useful, but
+;; WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+;; General Public License for more details.
+
+;; You should have received a copy of the GNU General Public License
+;; along with this program ; see the file COPYING.  If not, write to
+;; the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+;; Boston, MA 02111-1307, USA.
+
+;;; Commentary:
+;;
+;; Lisp code to setup bibliography cite, ref and label org-mode links.
+;; also sets up reftex for org-mode. The links are clickable and do
+;; things that are useful.
+
+;; [[bibliography]] C-c o will take you to these sections
+;; bibliographystyle:style to indicate the style
+;; bibliography:file1.bib,file2.bib clicking on this link will open
+;; the bib-file you clicked on.
+;;
 ;; [[ref link]]
-;; [[label link]]
-;; [[cite links]]
+;; ref:label  Clicking on this link will go to the label
+;;
+;; [[label link]] 
+;; label:label Clicking on this link will check the
+;; file for uniqueness of the label
+;;
+;; [[cite links]] cite:bibtex-key1,bibtex-key2 Clicking on this link
+;; will open the bibfile at the key clicked on.
+;;
+;; Helpful functions
+;;
+;; jorg-bib-tooltip displays a tooltip for the citation at point
+;;
+;; jb-extract-bibtex extract the bibtex entries referred to by cite
+;; links into a block at the end of the buffer.
+;;
+;; jb-build-full-bibliography converts a bibtex file into a hyperlinked bibliography
+;;
+;; jorg-list-of-figures makes a buffer with a list of figures
+;; jorg-list-of-tables makes a buffer with a list of tables
+
+
 
 (require 'reftex-cite)
 
