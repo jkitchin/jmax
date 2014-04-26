@@ -1,3 +1,9 @@
+
+;; this provides gnus-dired-attach which allows you to mark files and
+;; attach them to an email
+
+(require 'gnus-dired)
+
 (defun email-region (start end)
   "Send region as the body of an email"
   (interactive "r")
