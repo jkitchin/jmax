@@ -66,8 +66,8 @@ See this example for the basics [[file:examples/technical-documents-in-org.org]]
 
 If you are a student at CMU, you may appreciate:
 - Writing your MS report in org-mode [[file:ox-cmu-ms-report.el]]
-- Writing your PhD qualifier in org-mode file:ox-cmu-qualifier.el
-- one day writing your proposal and dissertation in org-mode
+- Writing your PhD qualifier or proposal in org-mode file:ox-cmu-qualifier.el
+- Writing your PhD dissertation in org-mode [[file:ox-cmu-dissertation.el]]
 
 ** Create standalone org-archives
 Ever wanted to package up an org-file and all the figures, files and directories it references so you can email it to someone? Check out [[file:ox-archive.el]].
