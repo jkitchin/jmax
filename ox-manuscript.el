@@ -36,6 +36,20 @@
 (require 'ox)
 (require 'ox-publish)
 
+
+(defgroup ox-manuscript nil
+  "customization group for ox-manuscript")
+
+(defcustom ox-manuscript-latex-command
+  "pdflatex -shell-escape "
+  "Command to run latex. Make sure to have a trailing space at the end."
+  :group 'ox-manuscript)
+
+(defcustom ox-manuscript-bibtex-command
+  "bibtex8 "
+  "Command to run bibtex. Make sure to have a trailing space at the end."
+  :group 'ox-manuscript)
+
 ;; <<ACS journals>>
 (add-to-list 'org-latex-classes
 	     '("achemso"                          ;class-name
@@ -137,7 +151,7 @@ Run this from an org-buffer after you have exported it to a LaTeX file"
                                       "\\1{\\3}"  tex-contents)))))
 
 (defun ox-manuscript-pdflatex ()
-  "run pdflatex on the tex file corresponding to an exported org file."
+  "run `ox-manuscript-latex-command' on the tex file corresponding to an exported org file."
   (interactive)
   (let* ((org-file (file-name-nondirectory (buffer-file-name)))
 	 (tex-file (replace-regexp-in-string "org$" "tex" org-file)))
@@ -147,21 +161,21 @@ Run this from an org-buffer after you have exported it to a LaTeX file"
 	(progn
 	  (message (format "running pdflatex on %s" tex-file))
 	  (unless (eq 0 (shell-command 
-			 (concat "pdflatex -shell-escape " tex-file)))
+			 (concat ox-manuscript-latex-command tex-file)))
 	    (switch-to-buffer "*Shell Command Output*")
 	    (end-of-buffer)
 	    (error "pdflatex  failed to build")))
       (error "no tex file found"))))
 
 (defun ox-manuscript-bibtex ()
-  "run bibtex"
+  "run bibtex. You can customize the bibtex command with the variable `ox-manuscript-bibtex-command'."
   (interactive)
   (let* ((org-file (file-name-nondirectory (buffer-file-name)))
          (tex-file (replace-regexp-in-string "org$" "tex" org-file))
 	 (bib-file (file-name-sans-extension tex-file)))
     (message (format "running bibtex on %s" bib-file))
     (unless (eq 0 (shell-command 
-		     (concat "bibtex " bib-file)))
+		     (concat ox-manuscript-bibtex-command bib-file)))
 	(switch-to-buffer "*Shell Command Output*")
 	(end-of-buffer)
 	(error "bibtex failed to build"))))
@@ -222,6 +236,18 @@ We assume there is a bibliography and style defined if a cite is found. no check
     ;; return pdf name
     pdf-file))
 
+(defun ox-manuscript-export-submission-manuscript (&optional async subtreep visible-only body-only options)
+  "create manuscript for submission. This removes the .png extensions from graphics, and replaces the bibliography with the contents of the bbl file. the result is a single, standalone tex-file."
+  (interactive)
+  (let* ((org-file (file-name-nondirectory (buffer-file-name)))
+         (tex-file (replace-regexp-in-string "org$" "tex" org-file)))
+    (ox-manuscript-cleanup 'deep)
+    (org-latex-export-to-latex async subtreep visible-only body-only options)
+    (ox-manuscript-remove-image-extensions)
+    (ox-manuscript-bibliography-to-bbl)
+    (ox-manuscript-cleanup)
+    tex-file))
+
 (defun ox-manuscript-build-submission-manuscript (&optional async subtreep visible-only body-only options)
   "create manuscript for submission. This removes the .png extensions from graphics, and replaces the bibliography with the contents of the bbl file. the result is a single, standalone tex-file, and the corresponding pdf."
   (interactive)
@@ -261,7 +287,8 @@ We assume there is a bibliography and style defined if a cite is found. no check
 	(?p "As manuscript PDF file" ox-manuscript-export-and-build)
 	(?o "As manuscript PDF and open" ox-manuscript-export-and-build-and-open)
 	(?e "As PDF and email" ox-manuscript-export-and-build-and-email)
-	(?M "As submission manuscript" ox-manuscript-build-submission-manuscript)
-	(?m "As submission manuscript and open" ox-manuscript-build-submission-manuscript-and-open))))
+	(?s "As submission manuscript tex" ox-manuscript-export-submission-manuscript)
+	(?M "As submission manuscript pdf" ox-manuscript-build-submission-manuscript)
+	(?m "As submission manuscript pdf and open" ox-manuscript-build-submission-manuscript-and-open))))
 
 (provide 'ox-manuscript)
