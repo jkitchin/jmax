@@ -162,7 +162,7 @@ All references to files will be copied to the archive. Directories are not copie
 
 (defun ox-archive-create-and-mail (&optional tag)
   "create a zip file from current org-file and attach it to an email"
-  (interactive)
+  (interactive "sZip basename (no extension): ")
   (let ((zip (ox-archive-create-zip tag)))
     (message-mail)
     (mml-attach-file zip)
