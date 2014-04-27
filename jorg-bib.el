@@ -723,6 +723,16 @@ A right-click opens the pdf associated with the entry, if it exists."
     ((eq format 'latex)
   (concat "\\nocite{" (mapconcat (lambda (key) key) (cite-split-keys keyword) ",") "}")))))
 
+(org-add-link-type
+ "citetext"
+ nil ;; clicking does not make sense
+ ;; formatting
+ (lambda (keyword desc format)
+   (cond
+((eq format 'html) (format "(<cite>%s</cite>)" path))
+    ((eq format 'latex)
+  (concat "\\citetext{" path "}")))))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;; index links
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
