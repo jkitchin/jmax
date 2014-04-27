@@ -70,6 +70,9 @@
 	 (cc (plist-get info :cc)))     
      (concat "
 \\usepackage[color-logo]{cmuugmemo}
+\\usepackage{charter}
+\\newcommand{\\section}[1]{{{\\bfseries #1}: }}
+
 
 \\begin{document}
 \\begin{letter}{}
