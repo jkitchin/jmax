@@ -33,6 +33,7 @@
 ;;
 ;; [[ref link]]
 ;; ref:label  Clicking on this link will go to the label
+;; org-insert-ref-link uses completion to insert a ref link to a label.
 ;;
 ;; [[label link]] 
 ;; label:label Clicking on this link will check the
@@ -42,6 +43,11 @@
 ;; will open the bibfile at the key clicked on.
 ;;
 ;; Helpful functions
+;;
+;; jorg-insert-cite-link uses reftex to insert a citation link.
+;; jorg-bib-open-bibtex-notes
+;; jorg-bib-open-bibtex-pdf
+;; jorg-bib-open-in-browser
 ;;
 ;; jorg-bib-tooltip displays a tooltip for the citation at point
 ;;
@@ -97,15 +103,33 @@
          (reftex-parse-all))
     (make-local-variable 'reftex-cite-format)
     (setq reftex-cite-format 'org)
-    (define-key org-mode-map (kbd "C-c ]") 'reftex-citation))
+    (define-key org-mode-map (kbd "C-c ]") 'jorg-insert-cite-link))
 
 (add-hook 'org-mode-hook 'org-mode-reftex-setup)
+
+(defun jorg-insert-cite-link ()
+  "Insert a citation link using reftex. If you are on a link, it
+appends to the end of the link, otherwise, a new link is
+inserted"
+  (interactive)
+  (let* ((object (org-element-context))
+	 (link-string-beginning (org-element-property :begin object))
+	 (link-string-end (org-element-property :end object))
+	 (path (org-element-property :path object)))    
+    (if (and (equal (org-element-type object) 'link) 
+               (equal (org-element-property :type object) "cite"))
+	(progn
+	  (goto-char link-string-end)
+	  (insert (concat "," (mapconcat 'identity (reftex-citation t ?a) ","))))
+      (insert (concat "cite:" (mapconcat 'identity (reftex-citation t) ",")))
+      )))
 
 (eval-after-load 'reftex-vars
   '(progn
       (add-to-list 'reftex-cite-format-builtin
                    '(org "Org-mode citation"
-                         ((?\C-m . "cite:%l"))))))
+                         ((?\C-m . "cite:%l")
+			  (?a . ",%l"))))))
 
 (defun jorg-bib/upload-bibtex-entry-to-citeulike ()
   "with point in  a bibtex entry get bibtex string and submit to citeulike.
@@ -347,10 +371,11 @@ key author journal year volume pages doi url key jorg-bib-pdf-directory key))
       matches)))
 
 
-(defun org-insert-ref-link (&optional arg)
-  (interactive (list (completing-read "label: " (jorg-get-labels))))
-  (insert (format "ref:%s" arg)))
-
+(defun org-ref-complete-link (&optional arg)
+  "Completion function for ref links"
+  (let ((label))
+    (setq label (completing-read "label: " (jorg-get-labels)))
+    (format "ref:%s" label)))
 
 ;; <<label link>>
 
