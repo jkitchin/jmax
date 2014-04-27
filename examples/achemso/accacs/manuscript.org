@@ -95,5 +95,5 @@ bibliography:references
 \newpage
 *Graphical TOC Entry*
 
-\includegraphics{toc-entry-graphic}
+# \includegraphics{toc-entry-graphic}
 

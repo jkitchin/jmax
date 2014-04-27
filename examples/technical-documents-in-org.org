@@ -3,6 +3,7 @@
 #+LATEX_CLASS: cmu-article
 #+OPTIONS: ^:{} # make super/subscripts only when wrapped in {}
 #+OPTIONS: toc:nil # suppress toc, so we can put it where we want
+#+OPTIONS: tex:t
 #+EXPORT_EXCLUDE_TAGS: noexport
 
 \maketitle
@@ -41,6 +42,10 @@ Org-mode recognizes many different symbols, including the greek letters, e.g. \a
 You should always enter chemical formulas like this: NH_{3}. No other way is good.  Here are some example formulas: CH_4, ABO_{3-\delta}, FeO^{+1}, H_{2}SO_{4}, Ca(NO_{3})_{2}.
 
 Note this is org syntax /not/ LaTeX syntax. You do not need the math-mode you need in LaTeX. Keep your org syntax clean and do not use math-mode like you do in LaTeX.
+
+\(\ce{ABO_{3-\delta}}\)
+
+\ce{ABO_{3-\delta}}
 
 ** References to document sections
 
@@ -289,7 +294,7 @@ The order of these is important, and changing it can result in LaTeX errors. If 
 #+LATEX_HEADER: \usepackage[options]{xyz}
 #+END_EXAMPLE
 
-You can learn more about exporting here [[info:org#Exporting]], and about LaTeX and PDF exporting here [[info:org#LaTeX%20and%20PDF%20export][info:org#LaTeX and PDF export]].
+You can learn more about exporting here [[info:org#Exporting]], and about LaTeX and PDF exporting here [[info:org#LaTeX%20and%20PDF%20export][info:org#LaTeX and PDF export]]. There are many settings you may one day need to modify. Learn about them here [[info:org#Export%20settings][info:org#Export settings]].
 
 Here is a brief description of these packages (Thanks to Jake Boes).
 *** [AUTO] inputenc
