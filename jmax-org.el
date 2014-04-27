@@ -243,8 +243,11 @@ start  empty title path
 
 (setq org-latex-default-packages-alist 
       '(("AUTO" "inputenc" t)
+	("" "lmodern" nil)
 	("T1" "fontenc" t)
-	("" "fixltx2e" nil)
+	("" "fixltx2e" nil)	
+;	("" "charter" nil) ;; a decent font
+;	("expert" "mathdesign" nil)
 	("" "graphicx" t)
 	("" "longtable" nil)
 	("" "float" nil)
