@@ -475,7 +475,6 @@ falling back to what the user has set in jorg-bib-default-bibliography
     (goto-char (point-min))
     (search-forward key nil t 1)))
 
-
 (defun get-bibtex-key-under-cursor ()
   "returns key under the bibtex cursor. We search forward from
 point to get a comma, or the end of the link, and then backwards
@@ -624,6 +623,12 @@ A right-click opens the pdf associated with the entry, if it exists."
      (concat "\\cite{"
 	     (mapconcat (lambda (key) key) (cite-split-keys keyword) ",")
 	     "}")))))
+
+(defun org-cite-complete-link (&optional arg)
+  "Completion function for cite links"
+  (format "cite:%s" (completing-read "bibtex key: " (let ((bibtex-files (cite-find-bibliography)))
+						      (bibtex-global-key-alist)))))
+
 
 (org-add-link-type
  "citealp"
