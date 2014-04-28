@@ -605,7 +605,7 @@ tooltip."
   (let* ((results (get-bibtex-key-and-file))
 	 (key (car results))
          (pdf-file (format (concat jorg-bib-pdf-directory "%s.pdf") key)))
-    (if(file-exists-p pdf-file)
+    (if (file-exists-p pdf-file)
 	(org-open-file pdf-file)
 (message "no pdf found for %s" key))))
 
@@ -618,10 +618,10 @@ tooltip."
 	 (key (car results))
 	 (bibfile (cdr results)))
     (save-excursion
-	   (find-file bibfile)
-	   (bibtex-search-entry key)
-	   (bibtex-url))
-	 (switch-to-buffer cb)))
+      (set-buffer (find-file-noselect bibfile))
+      (bibtex-search-entry key)
+      (bibtex-url))
+    (set-buffer cb)))
 
 
 (defun jorg-bib-open-notes-at-point ()
@@ -651,29 +651,20 @@ we check to see if there is pdf, and if the key actually exists in the bibliogra
     (setq m1 (if
 		 (progn
 		   (let ((cb (current-buffer)) result)					  
-		     (find-file bibfile)
+		     (set-buffer (find-file-noselect bibfile))
 		     (setq result (bibtex-search-entry key))
-		     (switch-to-buffer cb)
+		     (set-buffer cb)
 		     result))
-		 (format "(o)pen" key bibfile)
+		 "(o)pen (c)itation"
 	       "(No key found)"))
 
-    (setq m2 (if 
-		 (progn
-		   (let ((cb (current-buffer)) result)					
-		     (find-file bibfile)
-		     (setq result (bibtex-search-entry key))
-		     (switch-to-buffer cb)
-		     result))
-		 "(c)itation"
-	       "(No key found)"))
     (setq m3 (if (file-exists-p pdf-file)
-		       (format "(p)df" key)
+		 "(p)df"
 		     "(No pdf found)"))
 
     (setq m4 "(u)rl")
     (setq m5 "(n)otes")
-    (mapconcat 'identity (list m1 m2 m3 m4 m5) "  ")))
+    (mapconcat 'identity (list m1 m3 m4 m5) "  ")))
 
 (defun jorg-bib-cite-onclick-minibuffer-menu (&optional link-string)
   "use a minibuffer to select options for the citation under point.
@@ -698,10 +689,11 @@ you select your option with a single key press."
      ;; cite
      ((= choice 99)
       (let ((cb (current-buffer)))	
-	(message "%s" (save-excursion (find-file bibfile)
-				      (bibtex-search-entry key)  
-				      (jorg-bib-citation)))
-	(switch-to-buffer cb)))
+	(message "%s" (progn
+			(set-buffer (find-file-noselect bibfile))
+			(bibtex-search-entry key)  
+			(jorg-bib-citation)))
+	(set-buffer cb)))
 
      ;; pdf
      ((= choice 112)
