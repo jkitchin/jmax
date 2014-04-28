@@ -24,10 +24,9 @@
 
 (require 'easymenu)
 
-
 (defvar kitchingroup-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "C-c e") 'email-region)
+    (define-key map (kbd "\C-e e") 'email-region)
     map)
   "Keymap for kitchingroup mode.")
 
@@ -39,16 +38,24 @@
     ["email org-mode as PDF" ox-manuscript-export-and-build-and-email t]
     ["email org-archive" ox-archive-create-and-mail t])
     ("org-mode"
+     ("editing"
+      ["Insert citation" jorg-insert-cite-link t]
+      ["Insert ref link" org-insert-ref-link t]
+      ["Open notes at point" jorg-bib-open-notes-at-point t]
+      ["Open PDF at point" jorg-bib-open-pdf-at-point t]
+      ["Open url at point" jorg-bib-open-url-at-point t]
+      ["Citation tooltip" jorg-bib-tooltip t]
+      )
      ("export"
       ["manuscript PDF" ox-manuscript-export-and-build-and-open t]
-      ["submission PDF" ox-manuscript-build-submission-manuscript-and-open t]
+      ["submission PDF" ox-manuscript-build-submission-manuscript-and-open t]      
       ))
     ("bibtex"
      ["find non-ascii characters" find-non-ascii-characters t]
      ["reformat entry" bibtex-reformat t]
      ["clean entry" bibtex-clean-entry t]
      ["validate bibtex file" bibtex-validate-globally t]
-     ["build bibliography pdf" jb-build-full-bibliography t])))
+     ["build bibliography pdf from bib file" jb-build-full-bibliography t])))
 
 
 (define-minor-mode kitchingroup-mode
