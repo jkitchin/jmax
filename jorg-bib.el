@@ -120,6 +120,9 @@ inserted"
                (equal (org-element-property :type object) "cite"))
 	(progn
 	  (goto-char link-string-end)
+	  ;; sometimes there are spaces at the end of the link
+	  ;; this code moves point pack until no spaces are there
+	  (while (looking-back " ") (backward-char))  
 	  (insert (concat "," (mapconcat 'identity (reftex-citation t ?a) ","))))
       (insert (concat "cite:" (mapconcat 'identity (reftex-citation t) ",")))
       )))
@@ -215,6 +218,29 @@ construct the heading by hand."
 [[cite:%s]] [[file:%s/%s.pdf][pdf]]\n\n"
 key author journal year volume pages doi url key jorg-bib-pdf-directory key))
 (save-buffer))))))
+
+(defun jorg-bib-citation ()
+  "from a bibtex entry, create a simple citation string"
+  (interactive)
+  (if (eq major-mode 'bibtex-mode)
+      (progn
+        (bibtex-beginning-of-entry)
+        (let* ((cb (current-buffer))
+               (bibtex-expand-strings t)
+               (entry (bibtex-parse-entry t))
+               (title (replace-regexp-in-string "\n\\|\t\\|\s+" " " (reftex-get-bib-field "title" entry)))
+               (year  (reftex-get-bib-field "year" entry))
+               (author (replace-regexp-in-string "\n\\|\t\\|\s+" " " (reftex-get-bib-field "author" entry)))
+               (key (reftex-get-bib-field "=key=" entry))
+               (journal (reftex-get-bib-field "journal" entry))
+               (volume (reftex-get-bib-field "volume" entry))
+               (pages (reftex-get-bib-field "pages" entry))
+               (doi (reftex-get-bib-field "doi" entry))
+               (url (reftex-get-bib-field "url" entry))
+               )
+	  ;;authors, "title", Journal, vol(iss):pages (year).
+            (format "%s, \"%s\", %s, %s:%s (%s)"
+		    author title journal  volume pages year)))))
 
 
 (defun jorg-bib-open-in-browser ()
@@ -371,6 +397,10 @@ key author journal year volume pages doi url key jorg-bib-pdf-directory key))
       matches)))
 
 
+(defun org-insert-ref-link ()
+ (interactive)
+ (insert (org-ref-complete-link)))
+
 (defun org-ref-complete-link (&optional arg)
   "Completion function for ref links"
   (let ((label))
@@ -508,8 +538,20 @@ tooltip."
       bibtex-key
       )))
 
+(defun get-bibtex-key-and-file ()
+  "returns the bibtex key and file that it is in under point"
+ (interactive)
+
+ (let ((cite-bibliography-files (cite-find-bibliography))
+       key file)
+   (setq key (get-bibtex-key-under-cursor))
+   (setq file     (loop for file in cite-bibliography-files do
+			    (if (cite-key-in-file-p key file) 
+				(return file))))
+   (cons key file)))
+
 (defun get-bibtex-entry (key)
-  "Returns the bibtex entry associated with key"
+  "Returns the bibtex entry string associated with key"
   (interactive)
   (setq cite-bibliography-files (cite-find-bibliography))
 
@@ -517,7 +559,7 @@ tooltip."
   (when (not (equal cite-bibliography-files "internal"))      
       (setq bib-file 
 	    (loop for file in cite-bibliography-files do
-		  (if (cite-key-in-file-p bibtex-key file) 
+		  (if (cite-key-in-file-p key file) 
 		      (return file)))))
   ;; and finally, open the file at the key
   (let ((bibkey))
@@ -533,6 +575,8 @@ tooltip."
   "display bibtex entry tooltip"
   (interactive)
   (popup-tip (get-bibtex-entry (cite-strip-key (get-bibtex-key-under-cursor)))))
+
+
 
 ;; variable for the timer object
 (defvar idle-timer-bibtex-timer nil)
@@ -553,6 +597,198 @@ tooltip."
   (setq idle-timer-bibtex-timer nil))
 
 ;; (idle-timer-bibtex-start)
+
+
+(defun jorg-bib-open-pdf-at-point ()
+  "open the pdf for bibtex key under point if it exists"
+  (interactive)
+  (let* ((results (get-bibtex-key-and-file))
+	 (key (car results))
+         (pdf-file (format (concat jorg-bib-pdf-directory "%s.pdf") key)))
+    (if(file-exists-p pdf-file)
+	(org-open-file pdf-file)
+(message "no pdf found for %s" key))))
+
+
+(defun jorg-bib-open-url-at-point ()
+  "open the url for bibtex key under point."
+  (interactive)
+  (let* ((cb (current-buffer))
+	 (results (get-bibtex-key-and-file))
+	 (key (car results))
+	 (bibfile (cdr results)))
+    (save-excursion
+	   (find-file bibfile)
+	   (bibtex-search-entry key)
+	   (bibtex-url))
+	 (switch-to-buffer cb)))
+
+
+(defun jorg-bib-open-notes-at-point ()
+  "open the notes for bibtex key under point."
+  (interactive)
+  (let* ((cb (current-buffer))
+	 (results (get-bibtex-key-and-file))
+	 (key (car results))
+	 (bibfile (cdr results)))
+    (save-excursion
+	   (find-file bibfile)
+	   (bibtex-search-entry key)
+	   (jorg-bib-open-bibtex-notes))))
+
+
+(defun jorg-bib-get-menu-options ()
+  "returns a dynamically determined string of options for the citation under point.
+
+we check to see if there is pdf, and if the key actually exists in the bibliography"
+  (interactive)
+  (let* ((results (get-bibtex-key-and-file))
+	 (key (car results))
+	 (cb (current-buffer))
+         (pdf-file (format (concat jorg-bib-pdf-directory "%s.pdf") key))
+         (bibfile (cdr results))
+	 m1 m2 m3 m4 m5)
+    (setq m1 (if
+		 (progn
+		   (let ((cb (current-buffer)) result)					  
+		     (find-file bibfile)
+		     (setq result (bibtex-search-entry key))
+		     (switch-to-buffer cb)
+		     result))
+		 (format "(o)pen" key bibfile)
+	       "(No key found)"))
+
+    (setq m2 (if 
+		 (progn
+		   (let ((cb (current-buffer)) result)					
+		     (find-file bibfile)
+		     (setq result (bibtex-search-entry key))
+		     (switch-to-buffer cb)
+		     result))
+		 "(c)itation"
+	       "(No key found)"))
+    (setq m3 (if (file-exists-p pdf-file)
+		       (format "(p)df" key)
+		     "(No pdf found)"))
+
+    (setq m4 "(u)rl")
+    (setq m5 "(n)otes")
+    (mapconcat 'identity (list m1 m2 m3 m4 m5) "  ")))
+
+(defun jorg-bib-cite-onclick-minibuffer-menu (&optional link-string)
+  "use a minibuffer to select options for the citation under point.
+
+you select your option with a single key press."
+  (interactive)
+  (let* ((results (get-bibtex-key-and-file))
+	 (key (car results))
+	 (cb (current-buffer))
+         (pdf-file (format (concat jorg-bib-pdf-directory "%s.pdf") key))
+         (bibfile (cdr results))
+	 (choice (read-char-choice (jorg-bib-get-menu-options) '(?o ?c ?p ?u ?n ?q))))
+
+    ;; I had to manually figure out what the different integers that
+    ;; map onto the keys above.
+    (cond
+     ;; open
+     ((= choice 111)
+      (find-file bibfile)
+       (bibtex-search-entry key))
+
+     ;; cite
+     ((= choice 99)
+      (let ((cb (current-buffer)))	
+	(message "%s" (save-excursion (find-file bibfile)
+				      (bibtex-search-entry key)  
+				      (jorg-bib-citation)))
+	(switch-to-buffer cb)))
+
+     ;; pdf
+     ((= choice 112)
+      (jorg-bib-open-pdf-at-point))
+
+     ;; notes
+     ((= choice 110)
+      (jorg-bib-open-notes-at-point))
+
+     ;; url
+     ((= choice 117)
+      (jorg-bib-open-url-at-point))
+
+     ;; anything else we just quit.
+     (t nil))
+    ))
+
+
+
+(defun jorg-bib-cite-onclick-menu (link-string)
+  "Creates a dynamic popup menu for the cite link at point.
+
+you can open the entry, the pdf, notes, url, or see a simple citation."
+  (interactive)
+  (let* ((menu-choice)
+         (results (get-bibtex-key-and-file))
+	 (key (car results))
+	 (cb (current-buffer))
+         (pdf-file (format (concat jorg-bib-pdf-directory "%s.pdf") key))
+         (bibfile (cdr results)))
+    (setq menu-choice
+	  (popup-menu* 
+	   (list  (popup-make-item 
+		   (if
+		       (progn
+			 (let ((cb (current-buffer)) result)					  
+			   (find-file bibfile)
+			   (setq result (bibtex-search-entry key))
+			   (switch-to-buffer cb)
+			   result))
+		       (format "Open %s in %s" key bibfile)
+		     "No key found") :value "bib")
+		  (popup-make-item (if 
+				       (progn
+					 (let ((cb (current-buffer)) result)					
+					   (find-file bibfile)
+					   (setq result (bibtex-search-entry key))
+					   (switch-to-buffer cb)
+					   result))
+				       "Simple citation"
+				     "No key found")  :value "cite")
+		  (popup-make-item 
+		   ;; check if pdf exists.jorg-bib-pdf-directory is a user defined directory.
+                   ;; pdfs are stored by bibtex key in that directory
+		   (if (file-exists-p pdf-file)
+		       (format "Open PDF for %s" key)
+		     "No pdf found") :value "pdf")
+		  (popup-make-item "Open URL" :value "web")
+		  (popup-make-item "Open Notes" :value "notes")
+		  )))
+
+     (cond
+      ;; goto entry in bibfile
+      ((string= menu-choice "bib")       
+       (find-file bibfile)
+       (bibtex-search-entry key))
+
+      ;; goto entry and try opening the url
+      ((string= menu-choice "web")   
+       (jorg-bib-open-url-at-point))
+       
+      ;; goto entry and open notes, create notes entry if there is none
+      ((string= menu-choice "notes")   
+       (jorg-bib-open-notes-at-point))
+
+     ;; open the pdf file if it exists
+     ((string= menu-choice "pdf")
+      (jorg-bib-open-pdf-at-point))
+
+     ;; print citation to minibuffer
+     ((string= menu-choice "cite")
+      (let ((cb (current-buffer)))	
+	(message "%s" (save-excursion (find-file bibfile)
+				      (bibtex-search-entry key)  
+				      (jorg-bib-citation)))
+	(switch-to-buffer cb))))))
+
 
 (defun cite-onclick (link-string)
   "this function executes when you click on cite link. It identifies the key you clicked on and opens the first bibliography file it finds containing the key.
@@ -606,15 +842,15 @@ A right-click opens the pdf associated with the entry, if it exists."
                    (message "%s not found" pdf)
                    (ding)))))))
 
-
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;; cite links
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (org-add-link-type
  "cite"
- 'cite-onclick
+ 'jorg-bib-cite-onclick-minibuffer-menu
+ ;; 'jorg-bib-cite-onclick-menu   ; popup menu
+ ;;'cite-onclick ; just go to entry
  ;; formatting
  (lambda (keyword desc format)
    (cond
