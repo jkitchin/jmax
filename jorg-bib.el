@@ -423,7 +423,17 @@ key author journal year volume pages doi url key jorg-bib-pdf-directory key))
     ((eq format 'latex)
      (format "\\label{%s}" keyword)))))
 
+(defun org-label-store-link ()
+  "store a link to a label. The output will be a ref to that label"
+  ;; First we have to make sure we are on a label link. 
+  (let* ((object (org-element-context)))
+    (when (and (equal (org-element-type object) 'link) 
+               (equal (org-element-property :type object) "label"))
+      (org-store-link-props
+       :type "ref"
+       :link (concat "ref:" (org-element-property :path object))))))
 
+(add-hook 'org-store-link-functions 'org-label-store-link)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;; <<cite links>>
@@ -655,7 +665,7 @@ we check to see if there is pdf, and if the key actually exists in the bibliogra
 		     (setq result (bibtex-search-entry key))
 		     (set-buffer cb)
 		     result))
-		 "(o)pen (c)itation"
+		 "(o)pen"
 	       "(No key found)"))
 
     (setq m3 (if (file-exists-p pdf-file)
@@ -664,7 +674,15 @@ we check to see if there is pdf, and if the key actually exists in the bibliogra
 
     (setq m4 "(u)rl")
     (setq m5 "(n)otes")
-    (mapconcat 'identity (list m1 m3 m4 m5) "  ")))
+    (setq m2 (let ((cb (current-buffer)) citation)
+	       (setq citation (progn
+				(set-buffer (find-file-noselect bibfile))
+				(bibtex-search-entry key)  
+				(jorg-bib-citation)))
+	       (set-buffer cb)
+	       citation))
+
+    (mapconcat 'identity (list m2 "\n" m1 m3 m4 m5) "  ")))
 
 (defun jorg-bib-cite-onclick-minibuffer-menu (&optional link-string)
   "use a minibuffer to select options for the citation under point.
@@ -676,18 +694,18 @@ you select your option with a single key press."
 	 (cb (current-buffer))
          (pdf-file (format (concat jorg-bib-pdf-directory "%s.pdf") key))
          (bibfile (cdr results))
-	 (choice (read-char-choice (jorg-bib-get-menu-options) '(?o ?c ?p ?u ?n ?q))))
-
+	 (choice (read-char (jorg-bib-get-menu-options) )))
+    ;; (message-box "%s" choice)
     ;; I had to manually figure out what the different integers that
     ;; map onto the keys above.
     (cond
      ;; open
-     ((= choice 111)
+     ((= choice ?o)
       (find-file bibfile)
        (bibtex-search-entry key))
 
      ;; cite
-     ((= choice 99)
+     ((= choice ?c)
       (let ((cb (current-buffer)))	
 	(message "%s" (progn
 			(set-buffer (find-file-noselect bibfile))
@@ -695,22 +713,28 @@ you select your option with a single key press."
 			(jorg-bib-citation)))
 	(set-buffer cb)))
 
+     ;; quit
+     ((or 
+      (= choice ?q) ; q
+      (= choice ?\ )) ; space
+      ;; this clears the minibuffer
+      (message ""))
+
      ;; pdf
-     ((= choice 112)
+     ((= choice ?p)
       (jorg-bib-open-pdf-at-point))
 
      ;; notes
-     ((= choice 110)
+     ((= choice ?n)
       (jorg-bib-open-notes-at-point))
 
      ;; url
-     ((= choice 117)
+     ((= choice ?u)
       (jorg-bib-open-url-at-point))
 
      ;; anything else we just quit.
-     (t nil))
-    ))
-
+     (t (message ""))))
+    )
 
 
 (defun jorg-bib-cite-onclick-menu (link-string)
@@ -1157,6 +1181,51 @@ If no bibliography is in the buffer the `reftex-default-bibliography' is used."
   "finds non-ascii characters in the buffer. Useful for cleaning up bibtex files"
   (interactive)
   (occur "[^[:ascii:]]"))
+
+(require 'cl)
+
+(defun index (substring list)
+  "return the index of string in a list of strings"
+  (let ((i 0)
+	(found nil))
+    (dolist (arg list i)
+      (if (string-match substring arg)
+	  (progn 
+	    (setq found t)
+	    (return i)))
+      (setq i (+ i 1)))
+    ;; return counter if found, otherwise return nil
+    (if found i nil)))
+
+
+(defun jorg-bib-find-bad-citations ()
+  "Create a list of citation keys in an org-file that do not have a bibtex entry in the known bibtex files.
+
+Makes a new buffer with clickable links."
+  (interactive)
+  ;; generate the list of bibtex-keys and cited keys
+  (let* ((bibtex-files (cite-find-bibliography))
+	 (bibtex-keys (mapcar (lambda (x) (car x)) (bibtex-global-key-alist)))
+	 (bad-citations '("* Bad Citation List\n")))
+
+    (org-element-map (org-element-parse-buffer) 'link
+      (lambda (link)       
+	(let ((plist (nth 1 link)))			     
+	  (when (equal (plist-get plist ':type) "cite")
+	    (dolist (key (cite-split-keys (plist-get plist ':path)) )
+	      (when (not (index key bibtex-keys))
+		(setq bad-citations (append bad-citations
+					    `(,(format "%s [[elisp:(progn (switch-to-buffer-other-frame \"%s\")(goto-char %s))][not found here]]\n"
+						       key (buffer-name)(plist-get plist ':begin)))))
+		))))))
+
+    (switch-to-buffer-other-window "*Missing citations*")
+    (org-mode)
+    (erase-buffer)
+    (insert (mapconcat 'identity bad-citations ""))
+    ;(setq buffer-read-only t)
+    (use-local-map (copy-keymap org-mode-map))
+    (local-set-key "q" #'(lambda () (interactive) (kill-buffer)))))
 
 
 (provide 'jorg-bib)
