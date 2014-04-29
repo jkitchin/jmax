@@ -26,7 +26,14 @@
 
 (defvar kitchingroup-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "\C-e e") 'email-region)
+    (define-key map (kbd "\M-e r") 'email-region)
+    (define-key map (kbd "\M-e h") 'email-heading)
+    (define-key map (kbd "\M-e p") 'ox-manuscript-export-and-build-and-email)
+    (define-key map (kbd "\M-e a") 'ox-archive-create-and-mail)
+    ;; insert keys
+    (define-key map (kbd "\M-i r") 'org-insert-ref-link)
+    (define-key map (kbd "\M-i c") 'jorg-insert-cite-link)
+    (define-key map (kbd "\M-i f") 'org-footnote-action)
     map)
   "Keymap for kitchingroup mode.")
 
@@ -55,7 +62,9 @@
      ["reformat entry" bibtex-reformat t]
      ["clean entry" bibtex-clean-entry t]
      ["validate bibtex file" bibtex-validate-globally t]
-     ["build bibliography pdf from bib file" jb-build-full-bibliography t])))
+     ["build bibliography pdf from bib file" jb-build-full-bibliography t]
+     ["find bad citations" jorg-bib-find-bad-citations]
+     )))
 
 
 (define-minor-mode kitchingroup-mode
