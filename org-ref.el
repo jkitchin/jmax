@@ -254,12 +254,13 @@
        :type "ref"
        :link (concat "ref:" (org-element-property :name object))))
 
+;; it turns out this does not work. you can already store a link to a heading with a CUSTOM_ID
     ;; store link on heading with custom_id
-    (when (and (equal (org-element-type object) 'headline)
-	       (org-entry-get (point) "CUSTOM_ID"))
-      (org-store-link-props
-       :type "ref"
-       :link (concat "ref:" (org-entry-get (point) "CUSTOM_ID"))))
+;    (when (and (equal (org-element-type object) 'headline)
+;	       (org-entry-get (point) "CUSTOM_ID"))
+;      (org-store-link-props
+;       :type "ref"
+;       :link (concat "ref:" (org-entry-get (point) "CUSTOM_ID"))))
 
     ;; and to #+label: lines
     (when (and (equal (org-element-type object) 'paragraph)
@@ -300,10 +301,12 @@
 	  (goto-char (point-min))
 	  (re-search-forward (format "^#\\+tblname:\\s-*\\(%s\\)\\b" label) nil t))
 
+;; Commented out because these ref links do not actually translate correctly in LaTeX.
+;; you need [[#label]] links.
 	;; CUSTOM_ID
-	(progn
-	  (goto-char (point-min))
-	  (re-search-forward (format ":CUSTOM_ID:\s-*\\(%s\\)" label) nil t))
+;	(progn
+;	  (goto-char (point-min))
+;	  (re-search-forward (format ":CUSTOM_ID:\s-*\\(%s\\)" label) nil t))
 	)
      ;; we did not find anything, so go back to where we came
      (org-mark-ring-goto)
