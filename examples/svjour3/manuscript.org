@@ -1,0 +1,86 @@
+#+LaTeX_CLASS: svjour3
+#+OPTIONS: toc:nil author:nil
+#+LaTeX_HEADER: \usepackage[utf8]{inputenc}
+#+LaTeX_HEADER: \usepackage{fixltx2e}
+#+LaTeX_HEADER: \usepackage{url}
+#+LaTeX_HEADER: \usepackage{graphicx}
+#+LaTeX_HEADER: \usepackage{color}
+#+LaTeX_HEADER: \usepackage{amsmath}
+#+LaTeX_HEADER: \usepackage{textcomp}
+#+LaTeX_HEADER: \usepackage{marvosym}
+#+LaTeX_HEADER: \usepackage{wasysym}
+#+LaTeX_HEADER: \usepackage{latexsym}
+#+LaTeX_HEADER: \usepackage{amssymb}
+#+LaTeX_HEADER: \usepackage{listings}
+#+LaTeX_HEADER: \usepackage{longtable}
+#+LaTeX_HEADER: \usepackage[numbers,sort&compress]{natbib}
+#+LaTeX_HEADER: \usepackage[linktocpage,
+#+LaTeX_HEADER:   pdfstartview=FitH,
+#+LaTeX_HEADER:   colorlinks,
+#+LaTeX_HEADER:   linkcolor=blue,
+#+LaTeX_HEADER:   anchorcolor=blue,
+#+LaTeX_HEADER:   citecolor=blue,
+#+LaTeX_HEADER:   filecolor=blue,
+#+LaTeX_HEADER:   menucolor=blue,
+#+LaTeX_HEADER:   urlcolor=blue]{hyperref}
+#+LaTeX_HEADER: \journalname{Topics in Catalysis}
+
+#+LaTeX_HEADER: \titlerunning{Coverage dependent TPD spectra}
+#+LaTeX_HEADER: \author{Spencer D. Miller \and Vladimir V. Pushkarev \and Andrew J. Gellman \and John R. Kitchin}
+#+LaTeX_HEADER: \institute{Spencer D. Miller \and Vladimir V. Pushkarev \and Andrew J. Gellman \and John R. Kitchin \at Department of Chemical Engineering, Carnegie Mellon University, Pittsburgh, PA, 15213, USA \\\email{jkitchin@andrew.cmu.edu}}
+
+# org takes first text line as a title
+#+TITLE: Simulating temperature programmed desorption of oxygen on Pt(111) using DFT derived coverage dependent desorption barriers
+
+\maketitle
+
+
+\date{Received: date / Accepted: date}
+
+\begin{abstract}
+Your abstract
+
+\keywords{coverage dependence, temperature programmed desorption, density functional theory, late transition metals}
+\end{abstract}
+
+* Introduction
+Oxygen adsorption on late transition metals is of significant importance in many reaction networks. It is required for oxidation processes, and also occurs at the cathode of fuel cells.   As the coverage of oxygen on the surface changes, so too do adsorption parameters such as the adsorption energy, a trend which has been measured experimentally [[cite:conrad1974,conrad1977,ivanov1976,thiel1979,steininger1982,root1983,canning1984,campbell1985,cornish1990,bare1995,peterlinz1995,wartnaby1996,saliba1998,stuckless1998,zheng2000,jerdev2002,ihm2004,weaver2005,fischerwolfarth2011]] and calculated computationally [[cite:tang2004,getman2008,miller2009,miller2009:molsim,miller2011]]. The origin of this coverage dependence has previously been discussed in terms of an adsorbate-induced, substrate mediated surface $d$-band modification mechanism that correlates the increase in overlap between  adsorbate and metal atomic orbitals at high adsorbate coverages to decreased adsorption bond strength [[cite:miller2009, miller2009:molsim,miller2011]].
+
+
+* Experimental methods
+The TPD experiments were carried out in a custom built stainless steel UHV chamber cite:horvath2002.  The chamber was evacuated by a 260 L/s turbo-molecular pump (Pfeiffer, TMU 260), a 4000 L/s two stage cryopump (CTI-Cryogenics, Cryo-Torr 8), and a 500 (N_2) L/s titanium-sublimation pump (Varian).  The background pressure was $\leq 4 \times 10^{-10}$ mbar and the background gas was composed mostly of H_2 ($m/q$ = 2 ), H_{2}O (18), CO (28) and CO_2 (44), as determined from the mass spectra.  The chamber was equipped with a quadrupole mass spectrometer (QMS, Ametek Dycor 2000) for TPD, an X-ray photoelectron spectrometer constructed from a hemispherical energy analyzer (VG Microtech, CLAM 2) and a twin Mg/Al anode x-ray source (SPECS, XR50) for XPS, and a three-grid, dual microchannel-plate low energy electron diffraction optics (OCI Vacuum Engineering) for LEED.
+
+
+* Computational methods
+The DFT calculations were carried out using DACAPO cite:hammer1999 with the Perdew-Wang 91 generalized gradient approximation (GGA) exchange-correlation functional cite:perdew1992 with ultrasoft Vanderbilt pseudopotentials cite:vanderbilt1990.  Four layer slab geometries were used for all calculations with the bottom two layers fixed in bulk positions while the top two layers were allowed to relax.  A 350 eV planewave cutoff was utilized along with a (12 \times 12 \times 1) $k$-point Monkhorst-Pack mesh for the p(1 \times 1) configuration, while all other configurations using meshes of the same density, or as close a density as possible when an exact match was impossible.  The Murnaghan equation of state cite:murnaghan1944  was used to determine the lattice constants, with 4.02 \AA used for the Pt(111) surface.  Only fcc hollow adsorption sites were considered.  Analysis of the coverage dependence of the adsorption energies on Pt, and other late transition metals, has already been performed in detail cite:tang2004,getman2008,miller2011. Coverage is defined as the number of adsorbates per metal atom in the surface, where 1 monolayer (ML) means one adsorbate per surface metal atom, or equivalently one atom per fcc site.
+
+
+
+\begin{equation} 
+\frac{d\theta}{dT} = -\frac{A_d}{\beta}\exp(-E_{des}/RT) \theta^2 \label{eq:balance}
+\end{equation}
+
+* Manuscript preparation method
+This manuscript was prepared in a manner sufficiently different than standard methods that we feel it warrants discussion. In this work, we have prepared a single document containing all of the raw data, the analysis of the raw data that has led to the figures and conclusions in the manuscript, and the manuscript itself. The document is in plain text format, marked up using org-mode syntax cite:Dominik2010. Org-mode is a lightweight text markup language that enables intermingling of narrative text, data and analysis code in an active document cite:5756277 when viewed in the editor Emacs (http://www.gnu.org/software/emacs/). This approach is known as literate programming and reproducible research cite:v46i03. Notably, files in org-mode syntax can be exported to a variety of other formats including LaTeX, PDF and html. The export can be done selectively to include only portions of the complete document. The published manuscript was exported from this document to create LaTeX source which was submitted to this journal. The Supplementary information file is the document itself, which includes all of the data used in the analysis. All analysis was done using Python (http://python.org), and figures were generated with Matplotlib cite:Hunter:2007. All of these software packages are open-source and freely available.
+
+The advantage of this approach is the complete integration of data analysis, figure generation and manuscript preparation. The final document enables near complete transparency of how the data was analyzed, how the figures were prepared, etc..., because all of the codes used to prepare the data files and figures are embedded directly in the document. The supplemental file is not an afterthought, but rather an integral part of the manuscript preparation. We believe that this approach to manuscript preparation will become increasingly useful in the future as it enhances the communication, distribution and reuse of data and its analysis.
+
+* Results and Discussion
+** TPD data and data fitting
+ These spectra are consistent with previously reported TPD spectra at low coverages cite:allers1996,zhdanov1998, although they lack features at lower temperatures typically associated with the formation of oxide phases that form when exposing Pt(111) to stronger oxidants such as NO cite:mudiyanselage2009 or at substantially higher coverages cite:Parker1989489. The TPD data was first zeroed by subtracting the baseline of the QMS reading from all data points.  The QMS readings, in arbitrary units, were then scaled to a desorption rate in units of ML/K, using a coverage for the TPD spectrum at saturation coverage of 0.25 ML. The saturation coverage was chosen based on the similarity of these spectra to literature reports that identified the saturation limit at 0.25 ML cite:allers1996,zhdanov1998. The initial coverages of the other spectra were determined from their areas (under the curve) relative to that of the spectrum at saturation coverage. All of the analysis is available in the Supporting Information file.   A key feature of these spectra is the growing asymmetry of their leading edges as the initial coverage of adsorbed oxygen increases.  In addition, the shifts in peak temperature with increasing initial coverage become reduced as the initial coverage increases.
+
+** Computational approach to coverage dependent adsorption energies
+Our computational approach for simulating TPD spectra begins with the Bronstead-Evans-Polyani (BEP) relationship, which states that the energy of the transition state for a desorption process is linearly related to the adsorption energy of the adsorbate cite:barteau1991,bligaard2004,xu2004.   Xu, Ruban, and Mavrikakis performed a DFT study of the BEP relationship for oxygen dissociation on transition metal surfaces and found a linear relationship held across a wide range of such surfaces cite:xu2004 including the Pt(111) surface. Getman and Schneider have shown that the same relationship applies for coverage dependent oxygen desorption from Pt(111) cite:getman2010. 
+
+
+* Conclusions
+	A coverage independent desorption barrier was found to be inadequate to model the experimentally observed TPD behavior of O_2 desorption from the Pt(111) surface.  Fits utilizing an assumed linear coverage dependence were found to be strong, but required unphysically meaningful individual barriers to be fit to each initial coverage.  A DFT based approach that utilized the coverage dependent differential adsorption energy for oxygen on Pt(111) produced a desorption barrier function that was empirically fit to the experimental spectra based on the BEP relationship.  The resulting simulated spectra were in significant agreement with the experimental observations, and the desorption barrier they were based on was in similarly good agreement with the individual linearly coverage dependent barriers from analysis of the experimental data.  The empirical fitting parameters were concluded to be systematic in nature, and non-specific to the Pt(111) surface, by using the same parameters to produce estimated low coverage desorption barriers for other metal surfaces.  These results help illustrate how DFT results can be related to physically observable adsorption properties, and suggest how insights provided by DFT studies can inform understanding of experimentally observed phenomena.  Additionally, the systematic nature of the empirical corrections demonstrates that results from different DFT techniques can be related both to each other and to experimental observations through systematic corrections.
+
+* Acknowledgments
+JRK gratefully acknowledges support from the DOE Office of Science Early Career Research Program (DE-SC0004031).
+
+
+bibliographystyle:spphys
+
+bibliography:references.bib
+

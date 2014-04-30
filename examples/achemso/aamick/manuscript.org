@@ -1,0 +1,120 @@
+#+TITLE: Identifying Potential BO_2 Oxide Polymorphs for Epitaxial Growth Candidates
+
+#+LATEX_CLASS: achemso
+#+LATEX_CLASS_OPTIONS: [journal=aamick,manuscript=article,email=true]
+#+latex_header: \setkeys{acs}{biblabel=brackets,super=true,articletitle=true}
+#+latex_header: \SectionNumbersOn
+
+#+EXPORT_EXCLUDE_TAGS: noexport
+#+OPTIONS: author:nil date:nil toc:nil
+
+#+latex_header: \usepackage[utf8]{inputenc}
+#+latex_header: \usepackage{fixltx2e}
+#+latex_header: \usepackage{url}
+#+latex_header: \usepackage{mhchem}
+#+latex_header: \usepackage{graphicx}
+#+latex_header: \usepackage{color}
+#+latex_header: \usepackage{amsmath}
+#+latex_header: \usepackage{textcomp}
+#+latex_header: \usepackage{wasysym}
+#+latex_header: \usepackage{latexsym}
+#+latex_header: \usepackage{amssymb}
+
+
+#+latex_header: \usepackage[linktocpage, pdfstartview=FitH, colorlinks, linkcolor=black, anchorcolor=black, citecolor=black, filecolor=black, menucolor=black, urlcolor=black]{hyperref}
+
+
+#+latex_header: \author{Prateek Mehta}
+#+latex_header: \affiliation{Department of Chemical Engineering, Carnegie Mellon University, 5000 Forbes Ave, Pittsburgh, PA 15213}
+
+#+latex_header: \author{Paul A. Salvador}
+#+latex_header: \affiliation{Department of Materials Science and Engineering, Carnegie Mellon University, 5000 Forbes Ave, Pittsburgh, PA 15213}
+
+#+latex_header: \author{John R. Kitchin}
+#+latex_header: \email{jkitchin@andrew.cmu.edu}
+#+latex_header: \affiliation{Department of Chemical Engineering, Carnegie Mellon University, 5000 Forbes Ave, Pittsburgh, PA 15213}
+
+#+latex_header: \keywords{oxide polymorph, density functional theory, metastable, equation of state, epitaxial stabilization, exchange correlation functional}
+
+
+#+begin_abstract
+Transition metal dioxides (\ce{BO_2}) exhibit a number of polymorphic structures with distinct properties, but the isolation of different polymorphs for a given composition is carried out using trial and error experimentation. We present computational studies of the relative stabilities and equations of state for six polymorphs (anatase, brookite, rutile, columbite, pyrite, and fluorite) of five different \ce{BO_2} dioxides (B = Ti, V, Ru, Ir, and Sn). These properties were computed in a consistent fashion using several exchange correlation functionals within the density functional theory formalism, and the effects of the different functionals are discussed relative to their impact on predictive synthesis. We compare the computational results to prior observations of high-pressure synthesis and epitaxial film growth, and then use this discussion to predict new accessible polymorphs in the context of epitaxial stabilization using isostructural substrates. For example, the relative stabilities of the columbite polymorph for VO_{2} and RuO_{2} are similar to those of TiO_{2} and SnO_{2}, the latter two of which have been previously stabilized as epitaxial films.
+#+end_abstract
+
+*Keywords*: oxide polymorph, density functional theory, metastable, equation of state, epitaxial stabilization, exchange correlation functional
+
+\maketitle
+
+* Introduction 
+  :PROPERTIES:
+  :CUSTOM_ID: sec:intro
+  :END:
+
+
+Oxides are technologically important materials for a wide range of applications ranging from catalysis (including CO oxidation  cite:shapovalov-catalysis-2007,chretien-density-2006,Busca-VO2-catalysis-1998,Over-co-oxidation-ruo2-2003 and photocatalysis  cite:Linsebigler-TiO2-catalysis-1995,osterloh-inorganic-2008), electrodes, cite:Hardee-electrode-1977,Feng-electrodes-2003 sensors cite:Meixner-sensors-1996,Korotcenkov-sensor-2007 and electronic devices cite:strukov-electronic-2008,waser-nanoionics-based-2007. Oxides often exhibit various polymorphic structures, but not all are stable in ambient or other easily accessible synthesis conditions. The metastable polymorphs are the subject of considerable interest due to their unique and sometimes superior chemical properties. TiO_{2}, for example, exists naturally in the rutile and anatase polymorphs but anatase has significantly higher photocatalytic activity than rutile. cite:Hadjiivanov-1996-anatase-photocatalyst,Sclafani-2003-anatase-photocatalyst As another example, RuO_{2} in the modified fluorite structure (only accessible at high pressures) has been found to be very hard compared to the stable rutile polymorph cite:Haines-three-oxides-1996,Tse-RuO2-2000. The metastable VO_{2}(B) polymorph has been recently shown to exhibit improved electrochemical performance in lithium-ion batteries compared to other well known vanadium polymorphs cite:liu-design-2009. Finding ways to synthesize specific polymorphs is of great interest for applications, and isolating methods to realize new polymorphs will open avenues for materials design.
+
+In this work we have considered the anatase, rutile, brookite, columbite, fluorite, and pyrite polymorphs of five different \ce{BO_2} oxides: TiO_{2}, VO_{2}, RuO_{2}, IrO_{2} and SnO_{2}. The equations of state and relative stabilities have been computed using several exchange-correlation functionals within the density functional theory formalism. The set of data calculated in this work has substantial value beyond simply estimating relative stability. Trends in stability or band structures may be deduced, elastic properties can be estimated, and the structures may serve as starting points for other types of calculations in the future. For example, substrate-film interfacial energies and film surface energies can be computed in order to produce a complete picture of epitaxial stabilization. Volumetric free energies can also be used to study phase behavior at higher pressures and temperatures cite:OterodelaRoza-gibbs2-2011. To facilitate maximal availability of this data, JSON (JavaScript Object Notation) libraries containing information such as volumes, energies, unit cell parameters, etc... as well as all of the computational parameters used for the calculations have been included in the supporting information cite:supporting-information associated with this work along with examples of using this data.
+
+The rest of this paper is organized as follows. In section [[#sec:Methods]], the technical details of the first principles calculations and methodology applied have been outlined. In section [[*Results and Discussion]], the results are presented and discussed, with a particular focus on describing an energetic window of opportunity for epitaxial stabilization of new compounds. Finally, in section [[#sec:conclusions]], the conclusions of the work have been provided.
+
+* Methods
+  :PROPERTIES:
+  :CUSTOM_ID: sec:Methods
+  :END:
+
+The DFT based first-principles calculations were performed using the Vienna ab-initio Simulation Package (VASP) cite:Kresse-vasp1-1996,Kresse-vasp2-1996 using the projector-augmented wave pseudopotentials cite:Blochl-paw-1994,Kresse-PAW-1999. The exchange correlation functionals used were the local gradient approximation (LDA), cite:Perdew-LDA-1981 and three different generalized gradient approximations: PBE cite:Perdew-PBE1-1996,Perdew-PBE2-1997, PBEsol cite:Perdew-PBEsol-2008 and AM05. cite:Armiento-AM051-2005,Mattsson-AM052-2008 To obtain high precision the plane wave cutoff energy was set to be 520 eV. For the Brillouin zone sampling, a $k$-point convergence study was performed for all polymorphs of all oxides to reach an energy convergence of 10 meV per formula unit. The Monkhorst-Pack $k$-point grids cite:monkhorst-1976-special-brill used for the different structures are described in the supporting information. cite:supporting-information
+
+
+* Results and Discussion
+
+
+The exchange-correlation functionals show the expected behavior, with LDA underestimating the volume and PBE overestimating the volume. The AM05 and PBEsol volumes are very similar and lie between those for LDA and PBE. We have found that AM05 and PBEsol volumes most closely resemble experimental values. The choice of functional also affects the relative stability. This effect is less pronounced for polymorphs of similar volume as compared to polymorphs with largely differing volumes, in which case there is more variation in the relative energies across functionals. For predictive synthesis, the variation across functionals can be used to put bounds on the maximum and minimum energy differences required for epitaxial stabilization to be successful.
+
+In free energy terms, the difference of interest is difference in formation energy between the two polymorphs as thin films: $\Delta G_{poly,films}$. This can be expressed as: cite:gorbenko-epi-2002,bala-thesis-2006
+\begin{equation}
+\Delta G_{poly,films} = V \Delta \Delta G_{V,bulk} + V \Delta w + A \Delta \gamma_{sub/film} + A \Delta \gamma_{surf}, \label{e:delG-film}
+\end{equation}
+where $V$ ($A$) is the volume (area) of the film (assuming flat surfaces), $\Delta \Delta G_{V,bulk}$ is the difference in the volumetric bulk formation energy, $\Delta w$ is the volumetric strain energy difference between the polymorph films, and $\gamma_{sub/film}$ ($\gamma_{surf}$) is the specific film/substrate (film/vapor) interfacial energy. In the most robust versions of epitaxial stabilization, where polymorphs are stabilized via interfacial energies, the two largest terms in Eq. \eqref{e:delG-film} are $V \Delta \Delta G_{V,bulk}$ and $A \Delta \gamma_{sub/film}$. To find a reasonable bound in energies to compare with DFT values, one can discard the negligible terms, let $\Delta G_{poly,films}$ equal zero, convert the volumetric energy to a molar formation energy ($\Delta \Delta G_{m,bulk}$), and rearrange terms in Eq. \eqref{e:delG-film} to yield:
+
+\begin{equation}
+\Delta \Delta G_{m,bulk} = \gamma_{sub/film}(V_{F}N_{A})/t, \label{e:delG-bulk}
+\end{equation}
+where $t$ is the film thickness, $V_{F}$ is the volume per formula unit (assuming the differences are negligible), and $N_{A}$ is Avogadro's number.
+
+* Conclusions 
+  :PROPERTIES:
+  :CUSTOM_ID: sec:conclusions
+  :END:
+
+We have studied the relative stability of the rutile, anatase, columbite, brookite, pyrite and fluorite polymorphs of five different transition metal oxides: TiO_{2}, VO_{2}, RuO_{2}, IrO_{2}, SnO_{2} with the goal to identify potential targets for epitaxial synthesis. Typical values of \ce{BO_2} volumes, film thicknesses and interfacial energies indicate that 10-20 kJ/mol from the most stable polymorph is a reasonable target window within which epitaxial stabilization should be possible. Previously observed epitaxially stabilized polymorphs like columbite and brookite TiO$_2$, anatase VO$_2$, and columbite SnO$_2$ have all been found to lie within this energetic window. With this in mind, our results show that there are many potential candidates for epitaxial synthesis. We have found that the columbite and brookite polymorphs of VO$_2$ and the pyrite and columbite polymorphs of RuO$_2$ lie immediately within this window, and are thus prime candidates for epitaxial synthesis. The pyrite and anatase polymorphs of IrO$_2$ and the brookite and anatase polymorphs of SnO$_2$ lie towards the edge of the postulated window and should be considered as targets if synthesis efforts of the more feasible candidates are successful. A full list of epitaxial and high pressure targets is given in Table ref:table:Conclusions.
+
+#+ATTR_LATEX: :font \footnotesize :align p{1.0cm}p{3.5cm}p{5cm}p{3.5cm}
+#+caption: Potential Epitaxial and High Pressure Targets.
+#+tblname: table:Conclusions
+| Oxide   | Ambient Polymorph | Epitaxial Targets                    | High Pressure Targets |
+|---------+-------------------+--------------------------------------+-----------------------|
+| TiO$_2$ | Anatase, Rutile   | Columbite, Brookite                  | Pyrite, Fluorite      |
+| VO$_2$  | Rutile            | Columbite, Brookite, Anatase         | Pyrite                |
+| RuO$_2$ | Rutile            | Pyrite, Columbite                    | Pyrite, Fluorite      |
+| IrO$_2$ | Rutile            | Pyrite, Columbite                    | Pyrite                |
+| SnO$_2$ | Rutile            | Columbite, Brookite, Anatase         | Pyrite, Fluorite      |
+
+
+\begin{acknowledgement}
+JRK gratefully acknowledges support from the DOE Office of Science Early Career Research Program (DE-SC0004031).
+\end{acknowledgement}
+
+Supporting Information Available: All of the data files used in this work, including examples of how to use it are in the Supporting Information.  This information is available free of charge via the Internet at http://pubs.acs.org.
+
+
+* References
+bibliography:cassi-titles,references
+
+
+
+#+BEGIN_LaTeX
+\begin{tocentry}\includegraphics{coverart}\end{tocentry}
+#+END_LaTeX
+
+
+* build                               :noexport:

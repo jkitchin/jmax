@@ -2,6 +2,7 @@
 
 Try it you might like it. These customizations have been compiled and derived from prelude and the emacs24-starterkit, and my own emacs hackery.
 
+* Installation
 To install this, clone the git repository, change into the jmax directory, and run this command:
 #+begin_src sh
 emacs -q -l init.el
@@ -11,15 +12,16 @@ This will load the emacs on your path, without using whatever you have defined i
 
 The first time you run this, a lot of packages will be downloaded into the elpa folder. This takes a few minutes. You might have to restart emacs.
 
-I run a pretty modern org-mode. You should clone the org-mode repository, and run the make command to build the autoloads. I usually use =make up2= which updates the git repository. Here is what I do inside the jmax directory. 
+** Windows users
+There is an emacs binary in this repository for Windows. This [[./jmax.bat]] file should automatically run emacs with the right libraries.
 
-#+BEGIN_SRC sh
-git clone git://orgmode.org/org-mode.git
-cd org-mode
-make autoloads
-#+END_SRC
+** Other software you probably need
 
-That is it. If you like this, you may want to create some kind of shortcut or alias that automatically loads jmax when you open emacs.
+1. Python https://www.enthought.com/products/canopy/ (Windows, Mac and Linux)
+2. LaTeX  https://www.tug.org/texlive/doc.html (Windows, Linux) ([[https://www.tug.org/mactex/][Mac]])
+3. git    [[http://git-scm.com/download/win][Windows]] [[http://git-scm.com/download/mac][Mac]] [[http://git-scm.com/download/linux][Linux]]
+4. Any other languages that will be used, e.g., Ruby, R, Matlab, compilers, etc...
+
 
 * Customization
 These files contain variables with paths specific to your computer. You probably need to change them.
@@ -47,14 +49,31 @@ As an alternative, put these variables into a .el file in the user directory. Yo
       message-send-mail-function 'smtpmail-send-it
       smtpmail-smtp-server "smtp.andrew.cmu.edu"
       smtpmail-smtp-service 587)
-
 #+END_SRC
 
-* Project goal
-=jmax= is a customized version of emacs to facilitate authoring and consuming org-mode based technical documents.
+* What do these files do?
 
-All of the emacs customization is performed in an org-mode file.
+file:jmax.el does most of the setup that is not related to org-mode. It provides some useful functions. The ones I use the most are get-path, and insert-relative-path.
+
+[[file:jmax-org.el]] is responsible for how we customize org-mode to work for us.
+
+** Scientific manuscript preparation
+See [[./examples]] for many examples of preparing scientific manuscripts for submission to ACS, APS, Elsevier and Springer journals.
+
+We have a pretty decent way of handling citations and references provided by [[file:jorg-bib.el]]. This file sets up how bibtex keys are made and provides a lot of new links for org-mode for citations, references, labels, and bibliography files. 
+
+See this example for the basics [[file:examples/technical-documents-in-org.org]].
+
+If you are a student at CMU, you may appreciate:
+- Writing your MS report in org-mode [[file:ox-cmu-ms-report.el]]
+- Writing your PhD qualifier or proposal in org-mode file:ox-cmu-qualifier.el
+- Writing your PhD dissertation in org-mode [[file:ox-cmu-dissertation.el]]
+
+** Create standalone org-archives
+Ever wanted to package up an org-file and all the figures, files and directories it references so you can email it to someone? Check out [[file:ox-archive.el]].
 
 
+** Handy email functions
+[[file:email.el]] provides functions to email a region, or an org-heading conveniently.
 
 

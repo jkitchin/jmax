@@ -222,9 +222,6 @@
    (process-buffer (python-shell-get-or-create-process))))
 
 
-;(require 'kitchingroup-mode)
-;(kitchingroup-mode +1)
-
 (load-file (expand-file-name "email.el" starter-kit-dir))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -234,11 +231,11 @@
 (setq bbdb-file (expand-file-name "user/bbdb" starter-kit-dir))
 
 (require 'bbdb)
-(bbdb-initialize 'gnus 'message)
+(bbdb-initialize 'gnus 'message 'rmail)
 
 
 ;; This is not defined in my bbdb/icicles installation. This lets me use tab-completion.
-(defalias 'icicle-bbdb-complete-name 'bbdb-complete-mail) 
+;;(defalias 'icicle-bbdb-complete-name 'bbdb-complete-mail) 
 
 ;; http://emacs-fu.blogspot.com/2009/08/managing-e-mail-addresses-with-bbdb.html
 ;; these seem to be v2 variables.
@@ -267,11 +264,10 @@
 ;;    bbdb-elided-display t                    ;; single-line addresses
 )
 
-;; we use our own org-mode
-;; load my org-mode
-(add-to-list 'load-path (expand-file-name "org-mode/lisp" starter-kit-dir))
-(add-to-list 'load-path (expand-file-name "org-mode/contrib/lisp" starter-kit-dir))
-(require 'org)
+
+;; add matlab
+(add-to-list 'load-path (expand-file-name "matlab" starter-kit-dir))
+ (load-library "matlab-load")
 
 
 ;; We load all .el files in the user directory. No order is guaranteed.
@@ -286,24 +282,14 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;; 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(load-file (expand-file-name "jorg-bib.el" starter-kit-dir))
-(load-file (expand-file-name "jorg-manuscript.el" starter-kit-dir))
 
 ;; hide details in dired
 (require 'dired-details+)
 (setq dired-details-hidden-string "")
 
 
+(require 'kitchingroup-mode)
+(kitchingroup-mode)
 
-
-
-;; 2014-04-05 commentd out icicles. It does not do much and does not expand mail with bbdb correctly. 
-;; icicles should supposedly be loaded last
-;; (require 'icicles)
-;; reclaim C-c ' for org-mode
-;;(setq icicle-top-level-key-bindings
-;;      (remove '("'" icicle-occur t) icicle-top-level-key-bindings))
-
-;; (icy-mode 1)
 
 (provide 'jmax)

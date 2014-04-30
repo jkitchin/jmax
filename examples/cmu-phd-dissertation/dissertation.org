@@ -1,0 +1,82 @@
+#+LATEX_CLASS: cmu-dissertation
+#+OPTIONS: toc:nil ^:{}
+
+# Be explicit on packages used 
+#+LATEX_HEADER: \usepackage[sort&compress,super,comma]{natbib}
+#+LATEX_HEADER: \usepackage{natmove}  % move citations after punctuation
+#+LATEX_HEADER: \usepackage{float}
+#+LATEX_HEADER: \usepackage{graphicx}
+#+LATEX_HEADER: \usepackage{setspace}
+#+LATEX_HEADER: \usepackage[font=singlespacing]{caption}
+#+LATEX_HEADER: \usepackage[top=1in, bottom=1in, left=2in, right=1in]{geometry}
+#+LATEX_HEADER: \usepackage{chngcntr}
+#+LATEX_HEADER: \usepackage{amssymb, amsmath}
+#+LATEX_HEADER: \usepackage[mathscr]{euscript}
+#+LATEX_HEADER: \usepackage{color}
+#+LATEX_HEADER: \usepackage{indentfirst}
+#+LATEX_HEADER: \usepackage{subcaption}
+#+LATEX_HEADER: \usepackage{footnote}
+#+LATEX_HEADER: \usepackage{array}
+#+LATEX_HEADER: \usepackage{setspace}
+#+LATEX_HEADER: \usepackage{hyphenat}
+#+LATEX_HEADER: \usepackage{graphics}	
+#+LATEX_HEADER: \usepackage{url}
+#+LATEX_HEADER: \usepackage[titletoc]{appendix}
+#+LATEX_HEADER: \usepackage[version=3]{mhchem}
+#+LATEX_HEADER: \usepackage[linktocpage, pdfstartview=FitH, colorlinks, linkcolor=blue, anchorcolor=blue, citecolor=blue,  filecolor=blue,  menucolor=blue,  urlcolor=blue]{hyperref}
+
+#+TITLE: A Multi-Scale Approach to Understanding CO$_2$-Solvent Systems for the Development of CO$_2$ Capture Technologies
+
+#+AUTHOR: Anita S. Lee
+
+# List your prior degrees with institution. Separate degrees if needed
+# with \\.
+#
+#+PRIORDEGREE: B.S., Chemical Engineering, University of Arizona\\ B.S., Mathematics, University of Arizona
+
+#+DEPARTMENT: Department of Chemical Engineering
+#+DATE: May, 2013
+
+# Acknowledgements in a single line. Separate paragraphs with \\\indent
+#
+#+ACKNOWLEDGEMENTS: I would like to thank the world.
+
+# Abstract in a single line. Separate paragraphs with \\\indent. Use proper LaTeX where needed.
+#
+#+ABSTRACT: CO$_2$ capture from a coal-fired power plant is a difficult problem that is costly due to the high energy demands of the process. Given the existing and well-understood processes for pre-combustion CO$_2$ removal through physical absorption and post-combustion flue gas acid gas treating, developing new solvents with lower energy demands has potential to reduce CO$_2$ capture costs of these processes. In this work, we use analytical and computational techniques to understanding of CO$_2$-solvent systems at a molecular and process scale. This multi-scale understanding of solvent-CO$_2$ systems will guide the design of new solvents for low cost CO$_2$ capture. \\\indent At the molecular level, CO$_2$-solvent interactions were studied to understand the role of the solvent and identify solvent molecular properties that could be used as descriptors and/or tuning parameters of the interactions.  A Density Functional Theory study of CO$_2$-amine solvents for post-combustion capture showed the reaction energy to form bicarbonate and carbamate products were stabilized for amines functionalized with electron donating groups and destabilized with electron withdrawing groups.  Additionally, amine electronegativity was determined to be a good descriptor of the amine-bicarbonate reaction energy, which could be tuned with the choice of functional group and degree of amine functionalization.   CO$_2$ interactions with pre-combustion capture physical solvents, hydrophobic CO$_2$-philic oligomers and 1-alkyl-3-methylimidazolium based ionic liquids, were characterized using Raman spectroscopy.  Additionally, a technique to quantify solubility of CO$_2$ in physical solvents using the Raman spectra was developed and showed CO$_2$ solubility to correlate with molecular weight of the solvent.  \\\indent Aspen Plus simulations coupled with a genetic algorithm were used to understand the potential impact of solvent selection on the post-combustion CO$_2$ capture process by modeling a 90\% CO$_2$ capture process using MEA, DEA, and AMP.  This analysis evaluated and equitably compared the process performance of post-combustion capture solvents and showed the trade-offs between lower energy demands and capital cost of the process and by comparison DEA could achieve 90\% capture from a coal-fired power plant with lowest capital cost and highest net power output from the plant. A similar analysis could be performed with the pre-combustion capture process to assess and compare the performance those solvents. 
+
+# Now you put your regular org-mode text here for your chapters..
+* Introduction
+Put cite links on the left of the punctuation, they will be moved appropriately cite:Aarik-TiO2-film-1996.
+
+* Methods
+fdsafds
+
+* Interesting chapter title
+* Another very interesting title
+kfdkasl
+
+** Subresult section
+nothing to see here.
+* Conclusions
+fdafdsa
+
+
+# References. You do not need to define a References section. The bibliography command automatically makes that.
+\newpage
+\singlespacing
+\addcontentsline{toc}{section}{References}
+bibliographystyle:unsrtnat
+bibliography:references.bib
+
+# Delete this section if you do not have any appendices.
+\newpage
+\begin{appendices}
+* Proof of completeness
+Do not put Appendix in the heading title. It will be added automatically.
+
+* Raw data
+\end{appendices}
+
+
+

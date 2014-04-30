@@ -1,0 +1,1 @@
+start emacs-24.3\bin\runemacs.exe -q -l init.el
