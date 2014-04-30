@@ -266,6 +266,7 @@ start  empty title path
 	("" "marvosym" t)
 	("" "wasysym" t)
 	("" "amssymb" t)
+	("" "amsmath" t)
 	("version=3" "mhchem" t)
 	("numbers,super,sort&compress" "natbib" t)
 	("" "natmove" nil)
