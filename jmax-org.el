@@ -202,7 +202,6 @@
     (if found i nil)))
 
 
-
 ;; support for links to microsoft docx,pptx,xlsx files
 ;; standard org-mode opens these as zip-files
 ;;  http://orgmode.org/manual/Adding-hyperlink-types.html
@@ -215,8 +214,16 @@ start  empty title path
        (shell-command
 	(concat "start \"title\" " (shell-quote-argument path)) t))
 
-(org-add-link-type "msx" 'org-msx-open)
-
+(org-add-link-type 
+ "attachfile" 
+ (lambda (link-string) (org-open-file link-string))
+ ;; formatting
+ (lambda (keyword desc format)
+   (cond
+    ((eq format 'html) (format "")); no output for html
+    ((eq format 'latex)
+     ;; write out the latex bibliography command
+     (format "\\attachfile{%s}" keyword)))))
 
 ;; Setup the frame configuration for following links.
 (setq org-link-frame-setup (quote ((gnus . org-gnus-no-new-news)
