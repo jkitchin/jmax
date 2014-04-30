@@ -316,13 +316,10 @@ citecolor=blue,filecolor=blue,menucolor=blue,urlcolor=blue"
 
 
 ;; these install the new exports
+(require 'org-ref)
 (require 'ox-cmu-qualifier)
 (require 'ox-cmu-ms-report)
 (require 'ox-manuscript)
 (require 'ox-archive)
-
-(load-file (expand-file-name "jorg-bib.el" starter-kit-dir))
-
-
 
 (message "jmax-org.el loaded")
