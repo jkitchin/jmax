@@ -327,6 +327,7 @@ citecolor=blue,filecolor=blue,menucolor=blue,urlcolor=blue"
 (require 'org-ref)
 (require 'ox-cmu-qualifier)
 (require 'ox-cmu-ms-report)
+(require 'ox-cmu-dissertation)
 (require 'ox-manuscript)
 (require 'ox-archive)
 
