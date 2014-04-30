@@ -37,7 +37,7 @@
     map)
   "Keymap for kitchingroup mode.")
 
-(global-set-key (kbd "\e\el") 'goto-line) 
+(global-set-key (kbd "\e\eg") 'goto-line) 
 
 (easy-menu-define my-menu kitchingroup-mode-map "My own menu"
   '("KitchinGroup"
@@ -47,6 +47,8 @@
     ["email org-mode as PDF" ox-manuscript-export-and-build-and-email t]
     ["email org-archive" ox-archive-create-and-mail t])
     ("org-mode"
+     ["Toggle symbols" org-toggle-pretty-entities t]
+     ["Toggle inline images" org-toggle-inline-images t]
      ("editing"
       ["Insert citation" org-ref-insert-cite-link t]
       ["Insert ref link" org-ref-insert-ref-link t]
@@ -63,8 +65,8 @@
      ["reformat entry" bibtex-reformat t]
      ["clean entry" bibtex-clean-entry t]
      ["validate bibtex file" bibtex-validate-globally t]
-     ["build bibliography pdf from bib file" jb-build-full-bibliography t]
-     ["find bad citations" jorg-bib-find-bad-citations]
+     ["build bibliography pdf from bib file" org-ref-build-full-bibliography t]
+     ["find bad citations" org-ref-bib-find-bad-citations t]
      )))
 
 
