@@ -126,15 +126,15 @@
 		       ;; save the key we clicked on.
 		       (setq bibfile (org-ref-strip-string (buffer-substring key-beginning key-end)))
 		       (message "found %s for bibliography" bibfile)
-		       (find-file bibfile)) ; open file on click
+		       (find-file bibfile))) ; open file on click
 
 		     ;; formatting code
-		     (lambda (keyword desc format)
-		       (cond
-			((eq format 'html) (format "")); no output for html
-			((eq format 'latex)
+		   (lambda (keyword desc format)
+		     (cond
+		      ((eq format 'html) (format "")); no output for html
+		      ((eq format 'latex)
 			 ;; write out the latex bibliography command
-			 (format "\\bibliography{%s}" (replace-regexp-in-string  "\\.bib" "" keyword)))))))
+		       (format "\\bibliography{%s}" (replace-regexp-in-string  "\\.bib" "" keyword))))))
 
 (org-add-link-type "bibliographystyle"
 		   (lambda (arg) (message "Nothing implemented for clicking here."))
@@ -358,7 +358,7 @@ matches)))
     (setq label (completing-read "label: " (org-ref-get-labels)))
     (format "ref:%s" label)))
 
-(defun org-insert-ref-link ()
+(defun org-ref-insert-ref-link ()
  (interactive)
  (insert (org-ref-complete-link)))
 
@@ -623,7 +623,7 @@ you select your option with a single key press."
     ((eq format 'html) (format "(<cite>%s</cite>)" path))
     ((eq format 'latex)
      (concat "\\cite{"
-	     (mapconcat (lambda (key) key) (org-ref-split-keys keyword) ",")
+	     (mapconcat (lambda (key) key) (org-ref-split-and-strip-string keyword) ",")
 	     "}")))))
 
 (org-add-link-type
@@ -1021,7 +1021,7 @@ Makes a new buffer with clickable links."
       (lambda (link)       
 	(let ((plist (nth 1 link)))			     
 	  (when (equal (plist-get plist ':type) "cite")
-	    (dolist (key (org-ref-cite-split-keys (plist-get plist ':path)) )
+	    (dolist (key (org-ref-split-and-strip-string (plist-get plist ':path)) )
 	      (when (not (index key bibtex-keys))
 		(setq bad-citations (append bad-citations
 					    `(,(format "%s [[elisp:(progn (switch-to-buffer-other-frame \"%s\")(goto-char %s))][not found here]]\n"
