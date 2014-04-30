@@ -91,6 +91,8 @@ Depending on the type of document you are creating, you may need to specify a bi
 We use cite links to indicate a reference to an entry in the bibliography. Here is an example cite:akhade2012:surface. These links are clickable too. If everything is setup correctly, clicking on the link should open the bibliography at the entry you clicked on. When your cursor is on a link, a tooltip will popup with some details of the citation. If you have sections of your document collapsed, you may see funny stuff in the tooltip.
 
 You can insert citation links by pressing C-c ]. Press enter to accept the default citation type, and then type a few letters to search for what you want. Press enter to get a list of matches. Select the entries you want with m, and then press enter again. The link will be automatically entered. Multiple citations are separated by commas. If you need to add citations to an existing citation, the best thing is to repeat the process just described, and manually delete the extra cite links and join the citations by commas. 
+[[cite:song2002:polyoxometallate]]
+cite:daza-2014-carbon-dioxid 
 
 * Equations
 
@@ -109,7 +111,7 @@ To make references to equations, you must label them. This can only be done by u
 e^x = 4 \label{eq:1}
 \end{equation}
 
-The ref link is clickable, and clicking on it moves the cursor to the corresponding label. You may prefer eqref:eq:1. This will render the number in parentheses.
+The ref link is clickable, and clicking on it moves the cursor to the corresponding label. You may prefer eqref:eq:1. This will render the number in parentheses on export.
 
 ** Multiline formulas
 If you have very long formulas that need to be broken over several lines, use the flalign environment.
@@ -150,12 +152,22 @@ print 'hello world'
 : hello world
 
 * Figures
+  :PROPERTIES:
+  :CUSTOM_ID: sec:figures
+  :END:
 Figures in org-mode are straightforward. You simply create a link to a figure that Emacs can render, and that can be included in a PDF file. That is usually a png file. You can, and should add captions and labels to the figure. Captions are descriptive, and labels allow you to refer to the figure in your document.
+
+
+#+BEGIN_SRC emacs-lisp
+(org-open-link-from-string (concat "[[#sec:figures]]"))
+#+END_SRC
+
+#+RESULTS:
 
 
 Good practice for the label is prefix it with fig: so that later you can easily spot figure labels from table and equation labels.
 #+caption: A descriptive sentence about the figure. 
-#+label: fig:test-label
+#+label: fig:test-label   
 [[./fig1.png]]
 
 The default export behavior is not that nice at setting the width. You can set that the way you want like this:
@@ -198,8 +210,8 @@ Mauris placerat faucibus scelerisque. Nunc interdum egestas nunc ut vestibulum. 
 Tables are one of org-mode's best features. They are easy to create, and customize. Read about them here [[info:org#Tables]]. Consider this table:
 
 #+BEGIN_EXAMPLE
-#+caption: The simplest kind of table.
-#+tblname: tab:example1
+#+caption: The simplest kind of table. label:tab:example1
+#+TBLNAME: tab:example1
 | heading1 | heading2 |
 |----------+----------|
 |        1 |        8 |
@@ -209,7 +221,7 @@ Tables are one of org-mode's best features. They are easy to create, and customi
 The example above is a literal example so you can compare the table syntax with what is exported in LaTeX. Here is the actual table.
 
 #+caption: The simplest kind of table.
-#+tblname: tab:example1
+#+TBLNAME: tab:example1
 | heading1 | heading2 |
 |----------+----------|
 |        1 |        8 |
@@ -245,7 +257,11 @@ We use =#+tblname:= to give the table a name we can reference later. Table ref:t
 You can see the result in Table ref:tab:example2.
 
 For more details on exporting, see [[info:org#Tables%20in%20LaTeX%20export][info:org#Tables in LaTeX export]].
-* Including LaTeX environments
+
+* Including LaTex environments
+  :PROPERTIES:
+  :CUSTOM_ID: sec:latex-env
+  :END:
 
 You can include almost arbitrary environments from LaTeX, such as an array:
 
@@ -283,6 +299,11 @@ to mark it for noexport. Put your cursor on the headline, type C-c C-c and type 
 ** Attaching files to a pdf
 You can use the attachfile package to embed files in a PDF. Like this: \attachfile{technical-documents-in-org.org}.
 
+** List of figures and tables
+
+list-of-figures:lof
+
+list-of-tables:lot
 * Exporting to LaTeX and PDF
 org-mode is not LaTeX, and it cannot do everything LaTeX does. It can do a lot though. To get LaTeX, we have to provide org-mode with the required packages, and tell it what kind of document to export. The default type is an article. We provide some additional document types:
 - cmu-article is like an article, but with one-inch margins
@@ -464,3 +485,5 @@ bibliographystyle:unsrt
 
 # <<bibliography>>
 bibliography:kitchin.bib
+
+cite:man2011:oer-universality
