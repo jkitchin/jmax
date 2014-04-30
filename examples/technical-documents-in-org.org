@@ -29,35 +29,34 @@ Paragraphs are separated by blank lines.
 
 ** Subscripts and superscripts
 
-Usually you use ^ for superscripts and _ for subscripts. The things super or subscripted should be in curly brackets. Here are some examples: N_{A} is Avogadro's number. U_{3d} is the U parameter on the 3d orbitals.  You should explicitly mark the content to be super or subscripted with curly brackets. This is controlled by this line:
+Usually you use ^ for superscripts and _ for subscripts. The things super or subscripted should be in curly brackets. Here are some examples: N_{A} is Avogadro's number. U_{3d} is the U parameter on the 3d orbitals.  You should explicitly mark the content to be super or subscripted with curly brackets. This is controlled by this line in your org-file:
 
 #+BEGIN_EXAMPLE
 #+OPTIONS: ^:{}
 #+END_EXAMPLE
 
 ** Symbols
-Org-mode recognizes many different symbols, including the greek letters, e.g. \alpha, and \Omega. You can make \deg symbol and an \AA symbol. These do not need to be contained in math environments. Some more of my favorites include \times, and  \rightarrow.
+Org-mode recognizes many different symbols, including the greek letters, e.g. \alpha, and \Omega. You can make \deg symbol and an \AA symbol. These do not need to be contained in math environments. Some more of my favorites include \times, and  \rightarrow. You can toggle symbols over these commands with this command: elisp:org-toggle-pretty-entities or C-c C-x \.
+
 
 ** Chemical formulas
-You should always enter chemical formulas like this: NH_{3}. No other way is good.  Here are some example formulas: CH_4, ABO_{3-\delta}, FeO^{+1}, H_{2}SO_{4}, Ca(NO_{3})_{2}.
+You should always enter chemical formulas like this: NH_{3}. No other way is good.  Here are some example formulas: CH_{4}, ABO_{3-\delta}, FeO^{+1}, H_{2}SO_{4}, Ca(NO_{3})_{2}.
 
 Note this is org syntax /not/ LaTeX syntax. You do not need the math-mode you need in LaTeX. Keep your org syntax clean and do not use math-mode like you do in LaTeX.
 
-\(\ce{ABO_{3-\delta}}\)
-
-\ce{ABO_{3-\delta}}
-
 ** References to document sections
 
-You are safest using a link to the headlin text like this. See section [[*Chemical formulas]]. Note the * in the link, and the missing space
+You are safest using a link to the headline text like this. See section [[*Chemical formulas]]. Note the * in the link, and the missing space after the *. This will get converted to the section number in your LaTeX file.
 
-It is possible to create a "label" to a section. You must set a CUSTOM_ID property on the headline. You then refer to that section with this kind of link: see section [[#sec:headline-label]].
+It is possible to create a "label" to a section. You must set a CUSTOM_ID property on the headline. You then refer to that section with this kind of link: see section [[#sec:headline-label]]. 
+
+It is also possible to use a ref link to the CUSTOM_ID: section ref:sec:headline-label. You should include the word "section" in front of the ref link in any case because the link is just converted to a number in LaTeX.
 
 #+BEGIN_EXAMPLE
 ,*** A headline with a custom id property
-    :PROPERTIES:
-    :CUSTOM_ID: sec:headline-label
-    :END:
+,    :PROPERTIES:
+,    :CUSTOM_ID: sec:headline-label
+,    :END:
 #+END_EXAMPLE
 
 *** A headline with a custom id property
@@ -65,6 +64,7 @@ It is possible to create a "label" to a section. You must set a CUSTOM_ID proper
     :CUSTOM_ID: sec:headline-label
     :END:
 This section is intentionally empty.
+
 *** An empty section \label{sec:not-recommended}
 
 If you are used to section labels in LaTeX, you might put the label directly in the heading. This works, but is not recommended because it seems ugly.
@@ -81,18 +81,18 @@ The default is single spacing. It you want the document to come out double-space
 * Bibliography and citations
 ** Specifying the bibliography files where citations come from
 
-You specify the bibtex file(s) you will use with a [[bibliography]] link. This link should be where you want the bibliography to appear in the exported PDF, e.g. usually at the end of the document. Here is what the link looks like. The bibtex file should be in the same directory as your manuscript file.
+You specify the bibtex file(s) you will use with a [[bibliography]] link. This link should be where you want the bibliography to appear in the exported PDF, e.g. usually at the end of the document. The bibtex file should be in the same directory as your manuscript file.
 These links are clickable, and when you click on them, the file under your cursor should be opened.
 
 ** Bibliography style
 Depending on the type of document you are creating, you may need to specify a bibliography style. Use a [[bibliographystyle]] link for this. Some documents provide their own styles, others require you to specify them. See the examples.
 
 ** Citing references
-We use cite links to indicate a reference to an entry in the bibliography. Here is an example cite:akhade2012:surface. These links are clickable too. If everything is setup correctly, clicking on the link should open the bibliography at the entry you clicked on. When your cursor is on a link, a tooltip will popup with some details of the citation. If you have sections of your document collapsed, you may see funny stuff in the tooltip.
+We use cite links to indicate a reference to an entry in the bibliography. Here is an example cite:akhade2012:surface. These links are clickable too. If everything is setup correctly, clicking on the link should give you a citation and a menu in the minibuffer. From this menu you can open the entry, the pdf if you have it, your notes, or the citation url.
 
-You can insert citation links by pressing C-c ]. Press enter to accept the default citation type, and then type a few letters to search for what you want. Press enter to get a list of matches. Select the entries you want with m, and then press enter again. The link will be automatically entered. Multiple citations are separated by commas. If you need to add citations to an existing citation, the best thing is to repeat the process just described, and manually delete the extra cite links and join the citations by commas. 
-[[cite:song2002:polyoxometallate]]
-cite:daza-2014-carbon-dioxid 
+You can insert citation links by pressing C-c ]. Type a few letters to search for what you want. Press enter to get a list of matches. Select the entries you want with m, and then press enter again. The link will be automatically entered. Multiple citations are separated by commas. If you need to add citations to an existing citation, just repeat the command with the cursor in the link, or at the end of the link.
+
+cite:calle-vallejo2013:outer,akhade2012:surface,chao2012:mesoporous,mao2013:emit
 
 * Equations
 
@@ -128,8 +128,10 @@ If you do not like the numbers use flalign*:
 \begin{flalign*}
 &OVac\_FormE(cID) \rightarrow OVac\_FormE(mID, mag, num\_atoms, \\
 &orientation, correction, calc\_quantity, \\
-&calculator, figure) 
+&calculator, figure) \label{eq:multiline}
 \end{flalign*}
+
+Put the labels at the end of the equation, as in this example: eqref:eq:multiline.
 
 * Source code
 One of the main reasons to use org-mode is the integration of source code. 
@@ -155,17 +157,12 @@ print 'hello world'
   :PROPERTIES:
   :CUSTOM_ID: sec:figures
   :END:
-Figures in org-mode are straightforward. You simply create a link to a figure that Emacs can render, and that can be included in a PDF file. That is usually a png file. You can, and should add captions and labels to the figure. Captions are descriptive, and labels allow you to refer to the figure in your document.
+Figures in org-mode are straightforward. You simply create a link to a figure that Emacs can render, and that can be included in a PDF file. That is usually a png file. You can, and should add captions and labels to the figure. Captions are descriptive, and labels allow you to refer to the figure in your document. Add a caption with a line like =#+caption: some text.= You have many options for labels. You can put a LaTeX label in the caption, or a line like =#+label: labeltext=. You can also use a label link in the caption.
 
+By default images are shown with the jmax setup. You can toggle them off like this elisp:org-toggle-inline-images.
 
-#+BEGIN_SRC emacs-lisp
-(org-open-link-from-string (concat "[[#sec:figures]]"))
-#+END_SRC
+It is a good practice for the label to have a prefix on it of fig: so that later you can easily spot figure labels from table and equation labels.
 
-#+RESULTS:
-
-
-Good practice for the label is prefix it with fig: so that later you can easily spot figure labels from table and equation labels.
 #+caption: A descriptive sentence about the figure. 
 #+label: fig:test-label   
 [[./fig1.png]]
@@ -173,16 +170,15 @@ Good practice for the label is prefix it with fig: so that later you can easily 
 The default export behavior is not that nice at setting the width. You can set that the way you want like this:
 
 #+attr_latex: :width 3in :placement [H]
-#+caption: A descriptive sentence about the figure. 
-#+label: fig:test-label2
+#+caption: A descriptive sentence about the figure. label:fig:test-label2
 [[./fig1.png]]
 
 For more details on exporting, see [[info:org#Images%20in%20LaTeX%20export][info:org#Images in LaTeX export]].
 
 ** References to figures
-Later, I can refer to Figure ref:fig:test-label. Figures tend to float around in LaTeX. Do not worry about it.
+Later, I can refer to Figure ref:fig:test-label. Figures tend to float around in LaTeX. Do not worry about it. If you need to specify the location of a figure, see this section [[*Controlling%20placement%20of%20floats][Controlling placement of floats]].
 
-If you want help inserting the references, type M-x org-insert-ref-link, and press tab. This should show you a list of labels in your document. It only shows labels defined as a link.
+If you want help inserting the references, type M-x org-ref-insert-ref-link, and press tab. This should show you a list of labels in your document. It only shows labels defined as a link.
 
 ** Controlling placement of floats
 
@@ -191,7 +187,7 @@ If it is essential to you to have a float in a specific place, you can set a LaT
 #+ATTR_LATEX: :placement [H]
 
 ** Wrapping text around figures
-You may be constrained for space and want your text to wrap around figures. You can use the wrapfig package and some attributes to make this happen. See http://orgmode.org/manual/LaTeX-specific-attributes.html.
+You may be constrained for space and want your text to wrap around figures. You can use the wrapfig package and some attributes to make this happen. See http://orgmode.org/manual/LaTeX-specific-attributes.html. Note that the figure is wrapped into the paragraph after the figure.
 
 #+LATEX_HEADER: \usepackage{wrapfig}
 
@@ -276,7 +272,8 @@ or a verbatim environment:
 some verbatim text
 \end{verbatim}.
 
-Just because you can does not mean you should...
+Just because you can does not mean you should... You should aim to keep this to a minimum, otherwise you might as well use LaTeX.
+
 * Miscellaneous document features
 ** Table of contents
 You can add a table of contents with =\tableofcontents=.
@@ -285,6 +282,11 @@ This is controlled by this option line:
 #+BEGIN_EXAMPLE
 #+OPTION: toc:nil
 #+END_EXAMPLE
+
+If you just want a convenient temporary table of contents use M-x speedbar.
+
+elisp:speedbar
+
 ** Preventing export of some headings
 You can mark some headings with a tag that is listed in 
 
@@ -301,9 +303,10 @@ You can use the attachfile package to embed files in a PDF. Like this: \attachfi
 
 ** List of figures and tables
 
-list-of-figures:lof
+You can create a list of figures link like this: list-of-figures:lof. You can click on it and get a new buffer with a list of figures in it. Or run elisp:org-ref-list-of-figures
 
-list-of-tables:lot
+Similarly, you get a list of tables with list-of-tables:lot, or by running elisp:org-ref-list-of-tables.
+
 * Exporting to LaTeX and PDF
 org-mode is not LaTeX, and it cannot do everything LaTeX does. It can do a lot though. To get LaTeX, we have to provide org-mode with the required packages, and tell it what kind of document to export. The default type is an article. We provide some additional document types:
 - cmu-article is like an article, but with one-inch margins
@@ -424,12 +427,12 @@ This package allows files to be attached an arbitrary file into an exported PDF.
 http://www.ctan.org/pkg/attachfile
 
 
-*** Exporting to a PDF
+** Exporting to a PDF
 You can type C-c C-e j o to build and open a pdf file. This is most often what you want to do, if you just need a pdf.
 
 M-x ox-manuscript-export-and-build-and-open
 
-*** Exporting a manuscript for submission
+** Exporting a manuscript for submission
 Most journals do not want your bibtex file, nor do they use pdflatex. They want a standalone LaTeX file that contains the bibliography and which typically uses eps graphics. We create that file from the org-file with C-c C-e j m. 
 
 M-x ox-manuscript-build-submission-manuscript-and-open
@@ -442,6 +445,9 @@ see [[file:cmu-qualifier/cmu-qualifier.org]]
 
 ** CMU MS report
 see [[file:cmu-ms-report/project-report.org]]
+
+** CMU Dissertation
+[[file:cmu-phd-dissertation/dissertation.org]]
 
 ** ACS journals
 The achemso LaTeX package is used. See the documentation here:
@@ -486,4 +492,3 @@ bibliographystyle:unsrt
 # <<bibliography>>
 bibliography:kitchin.bib
 
-cite:man2011:oer-universality
