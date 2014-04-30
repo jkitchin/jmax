@@ -49,7 +49,7 @@
     ("org-mode"
      ("editing"
       ["Insert citation" org-ref-insert-cite-link t]
-      ["Insert ref link" org-insert-ref-link t]
+      ["Insert ref link" org-ref-insert-ref-link t]
       ["Open notes at point" org-ref-open-notes-at-point t]
       ["Open PDF at point" org-ref-open-pdf-at-point t]
       ["Open url at point" org-ref-open-url-at-point t]
