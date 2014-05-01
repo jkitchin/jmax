@@ -36,17 +36,19 @@
   nil
   "filename to where you will put all your notes about an entry in
   the default bibliography."
-  :type 'list
+  :type 'file
   :group 'org-ref)
 
 (defcustom org-ref-default-bibliography
   nil
   "list of bibtex files to search for. You should use full-paths for each file."
+  :type '(repeat :tag "List of bibtex files" file)
   :group 'org-ref)
 
 (defcustom org-ref-pdf-directory
   nil
   "directory where pdfs are stored by key. put a trailing / in"
+  :type 'directory
   :group 'org-ref)
 
 (defun org-mode-reftex-setup ()
@@ -617,17 +619,18 @@ you select your option with a single key press."
      (t (message ""))))
     )
 
-(org-add-link-type
- "cite"
- 'org-ref-cite-onclick-minibuffer-menu
- ;; formatting
- (lambda (keyword desc format)
+(defun org-ref-cite-link-format (keyword desc format)
    (cond
     ((eq format 'html) (format "(<cite>%s</cite>)" path))
     ((eq format 'latex)
      (concat "\\cite{"
 	     (mapconcat (lambda (key) key) (org-ref-split-and-strip-string keyword) ",")
-	     "}")))))
+	     "}"))))
+
+(org-add-link-type
+ "cite"
+ 'org-ref-cite-onclick-minibuffer-menu
+ 'org-ref-cite-link-format)
 
 (org-add-link-type
  "citealp"
@@ -904,10 +907,6 @@ Relies on the python script /upload_bibtex_citeulike.py being in the user direct
           (script (concat "python " starter-kit-dir "/upload_bibtex_citeulike.py&")))
       (with-temp-buffer (insert bibtex-string)
                         (shell-command-on-region (point-min) (point-max) script t nil nil t)))))
-
-(global-set-key [f10] 'org-ref-open-bibtex-notes)
-(global-set-key [f11] 'org-ref-open-bibtex-pdf)
-(global-set-key [f12] 'org-ref-open-in-browser)
 
 (defun org-ref-build-full-bibliography ()
   "build pdf of all bibtex entries, and open it."
