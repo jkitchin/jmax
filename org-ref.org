@@ -1075,7 +1075,8 @@ If you know the specific bibtex key, you may like to use completion directly. Yo
 #+BEGIN_SRC emacs-lisp  :tangle org-ref.el
 (defun org-cite-complete-link (&optional arg)
   "Completion function for cite links"
-  (format "cite:%s" 
+  (format "%s:%s" 
+          org-ref-default-citation-link
 	  (completing-read 
 	   "bibtex key: " 
 	   (let ((bibtex-files (org-ref-find-bibliography)))
