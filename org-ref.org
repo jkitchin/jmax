@@ -85,6 +85,12 @@ There are some variables needed later to tell this library where you store your 
 
 #+END_SRC
 
+** Program variables
+#+BEGIN_SRC emacs-lisp  :tangle org-ref.el
+(defvar org-ref-bibliography-files
+nil
+"variable to hold bibliography files to be searched")
+#+END_SRC
 ** org-mode / reftex setup
 
 We setup reftex here. We use a custom insert cite link function defined here: [[*org-ref-insert-cite-link][org-ref-insert-cite-link]]. We setup reftex to use our org citation format.
@@ -225,6 +231,63 @@ We also create a bibliographystyle link. There is nothing to do on clicking here
 		      ((eq format 'latex)
 		       ;; write out the latex bibliography command
 		       (format "\\bibliographystyle{%s}" keyword)))))
+#+END_SRC
+
+** addbibresource
+This is apparently used for biblatex.
+#+BEGIN_SRC emacs-lisp :tangle org-ref.el
+(org-add-link-type "addbibresource"
+		   ;; this code is run on clicking. The addbibresource
+		   ;; may contain multiple files. this code finds the
+		   ;; one you clicked on and opens it.
+		   (lambda (link-string)	
+		       ;; get link-string boundaries
+		       ;; we have to go to the beginning of the line, and then search forward
+		       
+		     (let* ((bibfile)
+			    ;; object is the link you clicked on
+			    (object (org-element-context))
+ 
+			    (link-string-beginning) 
+			    (link-string-end))
+
+		     (save-excursion
+		       (goto-char (org-element-property :begin object))
+		       (search-forward link-string nil nil 1)
+		       (setq link-string-beginning (match-beginning 0))
+		       (setq link-string-end (match-end 0)))
+
+		       ;; We set the reftex-default-addbibresource
+		       ;; here. it should be a local variable only in
+		       ;; the current buffer. We need this for using
+		       ;; reftex to do citations.
+		       (set (make-local-variable 'reftex-default-addbibresource) 
+			    (split-string (org-element-property :path object) ","))
+
+		       ;; now if we have comma separated bibliographies
+		       ;; we find the one clicked on. we want to
+		       ;; search forward to next comma from point
+		       (save-excursion
+			 (if (search-forward "," link-string-end 1 1)
+			     (setq key-end (- (match-end 0) 1)) ; we found a match
+			   (setq key-end (point)))) ; no comma found so take the point
+		       ;; and backward to previous comma from point
+		       (save-excursion
+			 (if (search-backward "," link-string-beginning 1 1)
+			     (setq key-beginning (+ (match-beginning 0) 1)) ; we found a match
+			   (setq key-beginning (point)))) ; no match found
+		       ;; save the key we clicked on.
+		       (setq bibfile (org-ref-strip-string (buffer-substring key-beginning key-end)))
+		       (message "found %s for addbibresource" bibfile)
+		       (find-file bibfile))) ; open file on click
+
+		     ;; formatting code
+		   (lambda (keyword desc format)
+		     (cond
+		      ((eq format 'html) (format "")); no output for html
+		      ((eq format 'latex)
+			 ;; write out the latex addbibresource command
+		       (format "\\addbibresource{%s}" (replace-regexp-in-string  "\\.bib" "" keyword))))))
 #+END_SRC
 
 ** List of Figures
@@ -534,6 +597,8 @@ This is just the LaTeX ref for equations. On export, the reference is enclosed i
 This is the main reason this library exists. We want the following behavior. A cite link should be able to contain multiple bibtex keys. You should be able to click on the link, and get a brief citation of the entry for that key, and a menu of options to open the bibtex file, open a pdf if you have it, open your notes on the entry, or open a url if it exists. You should be able to insert new references onto an existing cite link, or create new ones easily. The following code implements these features.
 
 *** Implementing the click actions of cite
+
+**** Getting the key we clicked on
 The first thing we need is to get the bibtex key we clicked on.
 
 #+BEGIN_SRC emacs-lisp  :tangle org-ref.el
@@ -545,35 +610,35 @@ keyword we clicked on. We also strip the text properties."
   (interactive)
   (let* ((object (org-element-context))	 
 	 (link-string (org-element-property :path object)))    
-    (when (and (equal (org-element-type object) 'link) 
-               (equal (org-element-property :type object) "cite"))
-      ;; we need the link path start and end
-      (save-excursion
-	(goto-char (org-element-property :begin object))
-	(search-forward link-string nil nil 1)
-	(setq link-string-beginning (match-beginning 0))
-	(setq link-string-end (match-end 0)))
+    
+    ;; we need the link path start and end
+    (save-excursion
+      (goto-char (org-element-property :begin object))
+      (search-forward link-string nil nil 1)
+      (setq link-string-beginning (match-beginning 0))
+      (setq link-string-end (match-end 0)))
 
-      ;; The key is the text between commas, or the link boundaries
-      (save-excursion
-	(if (search-forward "," link-string-end t 1)
-	    (setq key-end (- (match-end 0) 1)) ; we found a match
-	  (setq key-end link-string-end))) ; no comma found so take the end
-      ;; and backward to previous comma from point which defines the start character
-      (save-excursion
-	(if (search-backward "," link-string-beginning 1 1)
-	    (setq key-beginning (+ (match-beginning 0) 1)) ; we found a match
-	  (setq key-beginning link-string-beginning))) ; no match found
-      ;; save the key we clicked on.
-      (setq bibtex-key (org-ref-strip-string (buffer-substring key-beginning key-end)))
-      (set-text-properties 0 (length bibtex-key) nil bibtex-key)
-      (message "you selected %s" bibtex-key)
-      bibtex-key
-      )))
+    ;; The key is the text between commas, or the link boundaries
+    (save-excursion
+      (if (search-forward "," link-string-end t 1)
+	  (setq key-end (- (match-end 0) 1)) ; we found a match
+	(setq key-end link-string-end))) ; no comma found so take the end
+    ;; and backward to previous comma from point which defines the start character
+    (save-excursion
+      (if (search-backward "," link-string-beginning 1 1)
+	  (setq key-beginning (+ (match-beginning 0) 1)) ; we found a match
+	(setq key-beginning link-string-beginning))) ; no match found
+    ;; save the key we clicked on.
+    (setq bibtex-key (org-ref-strip-string (buffer-substring key-beginning key-end)))
+    (set-text-properties 0 (length bibtex-key) nil bibtex-key)
+    (message "you selected %s" bibtex-key)
+    bibtex-key
+    ))
 #+END_SRC
 
-We also need to find which bibliography file that key is in. For that, we need to know which bibliography files are referred to in the file. If none are specified with a bibliography link, we use the default bibliography. This function searches for a bibliography link, and then the LaTeX bibliography link.
+We also need to find which bibliography file that key is in. For that, we need to know which bibliography files are referred to in the file. If none are specified with a bibliography link, we use the default bibliography. This function searches for a bibliography link, and then the LaTeX bibliography link. We also consider the addbibresource link which is used with biblatex.
 
+**** Getting the bibliographies
 #+BEGIN_SRC emacs-lisp :tangle org-ref.el
 (defun org-ref-find-bibliography ()
   "find the bibliography in the buffer.
@@ -585,34 +650,49 @@ internal bibliographies
 falling back to what the user has set in org-ref-default-bibliography
 "
   (interactive)
-  (save-excursion
-    (goto-char (point-min))
-    ;;  look for a bibliography link
-    (re-search-forward "bibliography:\\([^\]\|\n]+\\)" nil t)
-    (if (match-string 1) ; we found a link
-	(progn
-	  (setq org-ref-bibliography-files
-		(mapcar 'org-ref-strip-string (split-string (match-string 1) ",")))
-	  (message "org-ref-bibliography-files = %s from %s" org-ref-bibliography-files (match-string 1)))
-      (progn ;we did not find a bibliography link. now look for \bibliography
-	(message "no bibliography link found")
-	(goto-char (point-min))
-	(re-search-forward "\\\\bibliography{\\([^}]+\\)}" nil t)
-	(if (match-string 1) ; we found a link
-	    ;; split, and add .bib to each file
-	    (setq org-ref-bibliography-files
-		  (mapcar (lambda (x) (concat x ".bib"))
-			  (mapcar 'org-ref-strip-string 
-				  (split-string (match-string 1) ","))))
-	 ; we did not find a raw latex bibliography. use defaults
-	  (setq org-ref-bibliography-files org-ref-default-bibliography)
-	  (message "org-ref-bibliography-files = %s" org-ref-bibliography-files)))))
-  (message "org-ref-bibliography-files = %s" org-ref-bibliography-files)
-  ;; set reftex-default-bibliography so we can search
-  (set (make-local-variable 'reftex-default-bibliography) org-ref-bibliography-files)
-  org-ref-bibliography-files)
+  (catch 'result
+    (save-excursion
+      (goto-char (point-min))
+      ;;  look for a bibliography link
+      (when (re-search-forward "bibliography:\\([^\]\|\n]+\\)" nil t)      	
+	(setq org-ref-bibliography-files
+	      (mapcar 'org-ref-strip-string (split-string (match-string 1) ",")))
+	(message "bibliography org-ref-bibliography-files = %s from %s" org-ref-bibliography-files (match-string 1))
+	(throw 'result org-ref-bibliography-files))
+
+      
+      ;; we did not find a bibliography link. now look for \bibliography
+      (message "no bibliography link found")
+      (goto-char (point-min))
+      (when (re-search-forward "\\\\bibliography{\\([^}]+\\)}" nil t)
+	;; split, and add .bib to each file
+	(setq org-ref-bibliography-files
+	      (mapcar (lambda (x) (concat x ".bib"))
+		      (mapcar 'org-ref-strip-string 
+			      (split-string (match-string 1) ","))))
+	(message "\\bibliography org-ref-bibliography-files = %s from %s" org-ref-bibliography-files (match-string 1))
+	(throw 'result org-ref-bibliography-files))
+
+      ;; no bibliography found. maybe we need a biblatex addbibresource
+      (goto-char (point-min))
+      ;;  look for a bibliography link
+      (when (re-search-forward "addbibresource:\\([^\]\|\n]+\\)" nil t)
+	(setq org-ref-bibliography-files
+	      (mapcar 'org-ref-strip-string (split-string (match-string 1) ",")))
+	(message "addbibresource org-ref-bibliography-files = %s from %s" org-ref-bibliography-files (match-string 1))
+	(throw 'result org-ref-bibliography-files))
+	  
+      ;; we did not find anything. use defaults
+      (setq org-ref-bibliography-files org-ref-default-bibliography)
+      (message "org-ref-bibliography-files = %s from defaults" org-ref-bibliography-files)))
+
+    (message "finally: org-ref-bibliography-files = %s" org-ref-bibliography-files)
+    ;; set reftex-default-bibliography so we can search
+    (set (make-local-variable 'reftex-default-bibliography) org-ref-bibliography-files)
+    org-ref-bibliography-files)
 #+END_SRC
 
+**** Finding the bibliography file a key is in
 Now, we can see if an entry is in a file. 
 
 #+BEGIN_SRC emacs-lisp :tangle org-ref.el
@@ -632,7 +712,7 @@ Finally, we want to know which file the key is in.
  (interactive)
 
  (let ((org-ref-bibliography-files (org-ref-find-bibliography))
-       key file)
+       (key) (file))
    (setq key (org-ref-get-bibtex-key-under-cursor))
    (setq file     (catch 'result
 		    (loop for file in org-ref-bibliography-files do
@@ -643,6 +723,7 @@ Finally, we want to know which file the key is in.
    (cons key file)))
 #+END_SRC
 
+**** Creating the menu for when we click on a key
 When we click on a cite link, we want to get a menu in the minibuffer. We need to create a string for this. We want a citation, and some options that depend on the key. We want to know if the key is found, if there is a pdf, if etc... Here we create that string.
 
 #+BEGIN_SRC emacs-lisp  :tangle org-ref.el
@@ -683,6 +764,7 @@ we check to see if there is pdf, and if the key actually exists in the bibliogra
     menu-string))
 #+END_SRC
 
+**** convenience functions to act on citation at point
 We need some convenience functions to open act on the citation at point. These will get the pdf, open the url, or open the notes.
 
 #+BEGIN_SRC emacs-lisp :tangle org-ref.el
@@ -736,6 +818,8 @@ We need some convenience functions to open act on the citation at point. These w
 	   (bibtex-search-entry key)
 	   (org-ref-open-bibtex-notes))))
 #+END_SRC
+
+**** the actual minibuffer menu
 Now, we create the menu.
 
 #+BEGIN_SRC emacs-lisp :tangle org-ref.el
@@ -744,12 +828,12 @@ Now, we create the menu.
 
 you select your option with a single key press."
   (interactive)
-  (let* ((results (org-ref-get-bibtex-key-and-file))
+  (let* ((choice (read-char (org-ref-get-menu-options)))
+	 (results (org-ref-get-bibtex-key-and-file))
 	 (key (car results))
 	 (cb (current-buffer))
          (pdf-file (format (concat org-ref-pdf-directory "%s.pdf") key))
-         (bibfile (cdr results))
-	 (choice (read-char (org-ref-get-menu-options) )))
+         (bibfile (cdr results)))
 
     (cond
      ;; open
@@ -786,10 +870,11 @@ you select your option with a single key press."
       (org-ref-open-url-at-point))
 
      ;; anything else we just quit.
-     (t (message ""))))
-    )
+     (t (message "")))))
+    
 #+END_SRC
 
+**** A function to format a cite link
 Next, we define a formatting function for the cite link. This is done so that the cite link definition is very short, and easy to change. You just need to specify the functions in the definition.
 
 #+BEGIN_SRC emacs-lisp :tangle org-ref.el
