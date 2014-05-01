@@ -326,7 +326,8 @@ citecolor=blue,filecolor=blue,menucolor=blue,urlcolor=blue"
 ;; these install the new exports
 ;; (require 'org-ref)
 ;; the real source is in the org-file
-(org-babel-load-file (expand-file-name "org-ref.org" starter-kit-dir))
+(org-babel-tangle-file (expand-file-name "org-ref.org" starter-kit-dir))
+(load-file (expand-file-name "org-ref.el" starter-kit-dir))
 (require 'ox-cmu-qualifier)
 (require 'ox-cmu-ms-report)
 (require 'ox-cmu-dissertation)
