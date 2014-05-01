@@ -115,8 +115,8 @@ We setup reftex here. We use a custom insert cite link function defined here: [[
       (add-to-list 'reftex-cite-format-builtin
                    '(org "Org-mode citation"
                          ((?\C-m . "cite:%l")
-			  (?a . ",%l")
-			  (?A . "autocite:%l")
+			  (?A . ",%l")
+			  (?a . "autocite:%l")
 			  (?t . "citet:%l")
 			  (?T . "citet*:%l")
 			  (?p . "citep:%l")
