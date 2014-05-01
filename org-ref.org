@@ -233,6 +233,21 @@ We also create a bibliographystyle link. There is nothing to do on clicking here
 		       (format "\\bibliographystyle{%s}" keyword)))))
 #+END_SRC
 
+*** Completion for bibliography link
+It would be nice 
+
+#+BEGIN_SRC emacs-lisp :tangle org-ref.el
+(defun org-bibliography-complete-link (&optional arg)
+ (format "bibliography:%s" (read-file-name "enter file: " nil nil t)))
+
+(defun org-ref-insert-bibliography-link ()
+  "insert a bibliography with completion"
+  (interactive)
+  (insert (org-bibliography-complete-link)))
+#+END_SRC
+
+
+
 ** addbibresource
 This is apparently used for biblatex.
 #+BEGIN_SRC emacs-lisp :tangle org-ref.el
@@ -817,6 +832,29 @@ We need some convenience functions to open act on the citation at point. These w
 	   (find-file bibfile)
 	   (bibtex-search-entry key)
 	   (org-ref-open-bibtex-notes))))
+
+(defun org-ref-citation-at-point ()
+  "give message of current citation at point"
+  (interactive)
+  (let* ((cb (current-buffer))
+	(results (org-ref-get-bibtex-key-and-file))
+	(key (car results))
+	(bibfile (cdr results)))	
+    (message "%s" (progn
+		    (set-buffer (find-file-noselect bibfile))
+		    (bibtex-search-entry key)  
+		    (org-ref-bib-citation)))
+    (set-buffer cb)))
+
+(defun org-ref-open-citation-at-point ()
+  "open bibtex file to key at point"
+  (interactive)
+  (let* ((cb (current-buffer))
+	(results (org-ref-get-bibtex-key-and-file))
+	(key (car results))
+	(bibfile (cdr results)))
+    (find-file bibfile)
+    (bibtex-search-entry key)))
 #+END_SRC
 
 **** the actual minibuffer menu
@@ -843,12 +881,8 @@ you select your option with a single key press."
 
      ;; cite
      ((= choice ?c)
-      (let ((cb (current-buffer)))	
-	(message "%s" (progn
-			(set-buffer (find-file-noselect bibfile))
-			(bibtex-search-entry key)  
-			(org-ref-bib-citation)))
-	(set-buffer cb)))
+      (org-ref-citation-at-point))
+      
 
      ;; quit
      ((or 
@@ -1026,9 +1060,9 @@ We need a convenient method to insert links. In reftex you use the keystroke C-c
 
 #+BEGIN_SRC emacs-lisp  :tangle org-ref.el
 (defun org-ref-insert-cite-link (alternative-cite)
-  "Insert a citation link using reftex. If you are on a link, it
+  "Insert a default citation link using reftex. If you are on a link, it
 appends to the end of the link, otherwise, a new link is
-inserted"
+inserted. Use a prefix arg to get a menu of citation types."
   (interactive "P")
   (let* ((object (org-element-context))
 	 (link-string-beginning (org-element-property :begin object))
@@ -1090,6 +1124,23 @@ Alternatively, you may shortcut the org-machinery with this command.
   "Insert a cite link with completion"
   (interactive)
   (insert (org-cite-complete-link)))
+#+END_SRC
+
+*** Storing links to a bibtex entry
+org-mode already defines a store link function for bibtex entries. It does not store the link I want though, it only stores a brief citation of the entry. I want a citation link. Here is a function to do that.
+
+#+BEGIN_SRC emacs-lisp :tangle org-ref.el
+(defun org-ref-store-bibtex-entry-link ()
+  "Save a citation link to the current bibtex entry"
+  (interactive)
+  (let ((link (concat org-ref-default-citation-link 
+		 ":"   
+		 (save-excursion
+		   (bibtex-beginning-of-entry)
+		   (reftex-get-bib-field "=key=" (bibtex-parse-entry))))))
+    (message "saved %s" link)
+    (push (list link) org-stored-links)
+    (car org-stored-links)))
 #+END_SRC
 
 * Utilities
@@ -1442,6 +1493,21 @@ I like my bibtex files to be 100% ascii. This function finds the non-ascii chara
   (occur "[^[:ascii:]]"))
 #+END_SRC
 
+* Aliases
+I like convenience. Here are some aliases for faster typing.
+
+#+BEGIN_SRC emacs-lisp :tangle org-ref.el
+(defalias 'oro 'org-ref-open-citation-at-point)
+(defalias 'orc 'org-ref-citation-at-point)
+(defalias 'orp 'org-ref-open-pdf-at-point)
+(defalias 'oru 'org-ref-open-url-at-point)
+(defalias 'orn 'org-ref-open-notes-at-point)
+
+(defalias 'orib 'org-ref-insert-bibliography-link)
+(defalias 'oric 'org-ref-insert-cite-link)
+(defalias 'orir 'org-ref-insert-ref-link)
+(defalias 'orsl 'org-ref-store-bibtex-entry-link)
+#+END_SRC
 * End of code
 #+BEGIN_SRC emacs-lisp :tangle org-ref.el
 (provide 'org-ref)
