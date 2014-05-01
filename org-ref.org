@@ -76,6 +76,13 @@ There are some variables needed later to tell this library where you store your 
   "directory where pdfs are stored by key. put a trailing / in"
   :type 'directory
   :group 'org-ref)
+
+(defcustom org-ref-default-citation-link
+  "cite"
+  "The default type of citation link to use"
+  :type 'string
+  :group 'org-ref)
+
 #+END_SRC
 
 ** org-mode / reftex setup
@@ -95,7 +102,6 @@ We setup reftex here. We use a custom insert cite link function defined here: [[
 
 (add-hook 'org-mode-hook 'org-mode-reftex-setup)
 
-
 ;; We make two formats. The default inserts a cite link. the "a"
 ;; format is for (a)ppending citations on an existing citation
 (eval-after-load 'reftex-vars
@@ -103,7 +109,18 @@ We setup reftex here. We use a custom insert cite link function defined here: [[
       (add-to-list 'reftex-cite-format-builtin
                    '(org "Org-mode citation"
                          ((?\C-m . "cite:%l")
-			  (?a . ",%l"))))))
+			  (?a . ",%l")
+			  (?A . "autocite:%l")
+			  (?t . "citet:%l")
+			  (?T . "citet*:%l")
+			  (?p . "citep:%l")
+			  (?P . "citep*:%l")
+			  (?h . "citeauthor:%l")
+			  (?H . "citeauthor*:%l")
+			  (?y . "citeyear:%l")
+			  (?x . "citetext:%l")
+			  (?n . "nocite:%l")
+			  )))))
 #+END_SRC
 
 * Links
@@ -603,6 +620,7 @@ Now, we can see if an entry is in a file.
   "determine if the key is in the file"
   (with-temp-buffer
     (insert-file-contents filename)
+    (bibtex-mode)
     (bibtex-search-entry key)))
 #+END_SRC
 
@@ -616,9 +634,11 @@ Finally, we want to know which file the key is in.
  (let ((org-ref-bibliography-files (org-ref-find-bibliography))
        key file)
    (setq key (org-ref-get-bibtex-key-under-cursor))
-   (setq file     (loop for file in org-ref-bibliography-files do
-			    (if (org-ref-key-in-file-p key file) 
-				(return file))))
+   (setq file     (catch 'result
+		    (loop for file in org-ref-bibliography-files do
+			  (message "looking for %s in %s" key file)
+			  (if (org-ref-key-in-file-p key file) 
+			      (throw 'result file)))))
    (message  "you found %s in %s" key file)
    (cons key file)))
 #+END_SRC
@@ -782,6 +802,7 @@ Next, we define a formatting function for the cite link. This is done so that th
 	     "}"))))
 #+END_SRC
 
+*** The actual cite link
 Finally, we define the cite link.
 
 *************** TODO format content to get \cite[content]{path}
@@ -798,6 +819,19 @@ Finally, we define the cite link.
 I do not use these alot, but they are variations of the regular cite commands in LaTeX. For a good reference on what these do see http://merkel.zoneo.net/Latex/natbib.php. The citet variants are for textual citations, and the citep variants are parenthetical citations. What you actually get seems to depend on the bibliography style you are using.
 
 #+BEGIN_SRC emacs-lisp :tangle org-ref.el
+(org-add-link-type
+ "autocite"
+ 'org-ref-cite-onclick-minibuffer-menu
+ ;; formatting
+ (lambda (keyword desc format)
+   (cond
+    ((eq format 'html) (format "(<autocite>%s</autocite>)" path))
+    ((eq format 'latex)
+     (concat "\\autocite{"
+	     (mapconcat (lambda (key) key) (org-ref-split-and-strip-string keyword) ",")
+	     "}")))))
+
+
 (org-add-link-type
  "citealp"
  'org-ref-cite-onclick-minibuffer-menu
@@ -906,37 +940,50 @@ I do not use these alot, but they are variations of the regular cite commands in
 We need a convenient method to insert links. In reftex you use the keystroke C-c ], which gives you a minibuffer to search the bibtex files from. This function is bound to that same keystroke here [[*org-mode%20/%20reftex%20setup][org-mode / reftex setup]]. This function will append to a cite link if you call it while on a link.
 
 #+BEGIN_SRC emacs-lisp  :tangle org-ref.el
-(defun org-ref-insert-cite-link ()
+(defun org-ref-insert-cite-link (alternative-cite)
   "Insert a citation link using reftex. If you are on a link, it
 appends to the end of the link, otherwise, a new link is
 inserted"
-  (interactive)
+  (interactive "P")
   (let* ((object (org-element-context))
 	 (link-string-beginning (org-element-property :begin object))
 	 (link-string-end (org-element-property :end object))
-	 (path (org-element-property :path object)))    
-    
-    (cond
-     ;; case where we are in a link
-     ((and (equal (org-element-type object) 'link) 
-	   (equal (org-element-property :type object) "cite"))
-      (goto-char link-string-end)
-      ;; sometimes there are spaces at the end of the link
-      ;; this code moves point pack until no spaces are there
-      (while (looking-back " ") (backward-char))  
-      (insert (concat "," (mapconcat 'identity (reftex-citation t ?a) ","))))
+	 (path (org-element-property :path object)))  
 
-     ;; We are next to a link, and we want to append
-     ((save-excursion 
-	(backward-char)
-	(and (equal (org-element-type (org-element-context)) 'link) 
-	     (equal (org-element-property :type (org-element-context)) "cite")))
-      (while (looking-back " ") (backward-char))  
-      (insert (concat "," (mapconcat 'identity (reftex-citation t ?a) ","))))
+    (if (not alternative-cite)
+	
+	(cond
+	 ;; case where we are in a link
+	 ((and (equal (org-element-type object) 'link) 
+	       (equal (org-element-property :type object) "cite"))
+	  (goto-char link-string-end)
+	  ;; sometimes there are spaces at the end of the link
+	  ;; this code moves point pack until no spaces are there
+	  (while (looking-back " ") (backward-char))  
+	  (insert (concat "," (mapconcat 'identity (reftex-citation t ?a) ","))))
 
-     ;; insert fresh link
-     (t (insert (concat "cite:" (mapconcat 'identity (reftex-citation t) ",")))))))
+	 ;; We are next to a link, and we want to append
+	 ((save-excursion 
+	    (backward-char)
+	    (and (equal (org-element-type (org-element-context)) 'link) 
+		 (equal (org-element-property :type (org-element-context)) "cite")))
+	  (while (looking-back " ") (backward-char))  
+	  (insert (concat "," (mapconcat 'identity (reftex-citation t ?a) ","))))
+
+	 ;; insert fresh link
+	 (t 
+	  (insert 
+	   (concat org-ref-default-citation-link 
+		   ":" 
+		   (mapconcat 'identity (reftex-citation t) ",")))))
+
+      ;; you pressed a C-u so we run this code
+      (reftex-citation)))
+  )
 #+END_SRC
+
+#+RESULTS:
+: org-ref-insert-cite-link
 
 *** Completion in cite links
 If you know the specific bibtex key, you may like to use completion directly. You use this with the org-mode machinery and tab completion.
@@ -1320,3 +1367,4 @@ I like my bibtex files to be 100% ascii. This function finds the non-ascii chara
 [[elisp:(progn (org-babel-tangle) (load-file "org-ref.el"))]]
 
 [[elisp:(org-babel-load-file "org-ref.org")]]
+
