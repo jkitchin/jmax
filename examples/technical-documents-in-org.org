@@ -38,7 +38,6 @@ Usually you use ^ for superscripts and _ for subscripts. The things super or sub
 ** Symbols
 Org-mode recognizes many different symbols, including the greek letters, e.g. \alpha, and \Omega. You can make \deg symbol and an \AA symbol. These do not need to be contained in math environments. Some more of my favorites include \times, and  \rightarrow. You can toggle symbols over these commands with this command: elisp:org-toggle-pretty-entities or C-c C-x \.
 
-
 ** Chemical formulas
 You should always enter chemical formulas like this: NH_{3}. No other way is good.  Here are some example formulas: CH_{4}, ABO_{3-\delta}, FeO^{+1}, H_{2}SO_{4}, Ca(NO_{3})_{2}.
 
@@ -50,7 +49,7 @@ You are safest using a link to the headline text like this. See section [[*Chemi
 
 It is possible to create a "label" to a section. You must set a CUSTOM_ID property on the headline. You then refer to that section with this kind of link: see section [[#sec:headline-label]]. 
 
-It is also possible to use a ref link to the CUSTOM_ID: section ref:sec:headline-label. You should include the word "section" in front of the ref link in any case because the link is just converted to a number in LaTeX.
+You should include the word "section" in front of the ref link in any case because the link is just converted to a number in LaTeX.
 
 #+BEGIN_EXAMPLE
 ,*** A headline with a custom id property
@@ -111,7 +110,7 @@ To make references to equations, you must label them. This can only be done by u
 e^x = 4 \label{eq:1}
 \end{equation}
 
-The ref link is clickable, and clicking on it moves the cursor to the corresponding label. You may prefer eqref:eq:1. This will render the number in parentheses on export.
+The ref link is clickable, and clicking on it moves the cursor to the corresponding label. You may prefer eqref:eq:1. This will render the number in parentheses on export. You need the amsmath LaTeX package for that. It is default in jmax.
 
 ** Multiline formulas
 If you have very long formulas that need to be broken over several lines, use the flalign environment.
@@ -120,7 +119,7 @@ If you have very long formulas that need to be broken over several lines, use th
 \begin{flalign}
 &OVac\_FormE(cID) \rightarrow OVac\_FormE(mID, mag, num\_atoms, \\
 &orientation, correction, calc\_quantity, \\
-&calculator, figure) 
+&calculator, figure) \label{eq:multiline}
 \end{flalign}
 
 If you do not like the numbers use flalign*:
@@ -128,10 +127,10 @@ If you do not like the numbers use flalign*:
 \begin{flalign*}
 &OVac\_FormE(cID) \rightarrow OVac\_FormE(mID, mag, num\_atoms, \\
 &orientation, correction, calc\_quantity, \\
-&calculator, figure) \label{eq:multiline}
+&calculator, figure) 
 \end{flalign*}
 
-Put the labels at the end of the equation, as in this example: eqref:eq:multiline.
+Put the labels at the end of the equation, as in this example: eqref:eq:multiline. 
 
 * Source code
 One of the main reasons to use org-mode is the integration of source code. 
@@ -299,7 +298,9 @@ to mark it for noexport. Put your cursor on the headline, type C-c C-c and type 
 *** Heading marked for noexport					   :noexport:
 
 ** Attaching files to a pdf
-You can use the attachfile package to embed files in a PDF. Like this: \attachfile{technical-documents-in-org.org}.
+You can use the attachfile link to embed files in a PDF. Like this: attachfile:technical-documents-in-org.org.
+
+Your set of LaTeX packages must include the attachfile package. This is the default in jmax.
 
 ** List of figures and tables
 
