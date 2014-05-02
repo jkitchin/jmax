@@ -1493,6 +1493,27 @@ I like my bibtex files to be 100% ascii. This function finds the non-ascii chara
   (occur "[^[:ascii:]]"))
 #+END_SRC
 
+** Clean a bibtex entry
+   I like neat and orderly bibtex entries. This code will eventually replace the key with my style key, clean the entry, and sort the fields in the order I like them.
+
+#+BEGIN_SRC emacs-lisp :tangle org-ref.el
+(defun org-ref-clean-bibtex-entry()
+  "clean and replace the key in a bibtex function"
+  (interactive)
+  (bibtex-narrow-to-entry)
+  (bibtex-beginning-of-entry)
+  (bibtex-fill-entry) 
+  (bibtex-clean-entry t)
+  ;; save key for other uses, e.g. saving a pdf
+  (kill-new (reftex-get-bib-field "=key=" (bibtex-parse-entry t)))
+  (x-set-selection 'CLIPBOARD (reftex-get-bib-field "=key=" (bibtex-parse-entry t)))
+  (occur "[^[:ascii:]]")
+  (widen)
+;; one day reorder and downcase the fields
+;; I can get all the fields like this
+;; (bibtex-parse-entry t)
+)
+#+END_SRC
 * Aliases
 I like convenience. Here are some aliases for faster typing.
 
@@ -1507,6 +1528,10 @@ I like convenience. Here are some aliases for faster typing.
 (defalias 'oric 'org-ref-insert-cite-link)
 (defalias 'orir 'org-ref-insert-ref-link)
 (defalias 'orsl 'org-ref-store-bibtex-entry-link)
+
+(defalias 'orcb 'org-ref-clean-bibtex-entry)
+
+
 #+END_SRC
 * End of code
 #+BEGIN_SRC emacs-lisp :tangle org-ref.el
