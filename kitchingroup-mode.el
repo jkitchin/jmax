@@ -26,16 +26,18 @@
 
 (defvar kitchingroup-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "\M-e r") 'email-region)
-    (define-key map (kbd "\M-e h") 'email-heading)
-    (define-key map (kbd "\M-e p") 'ox-manuscript-export-and-build-and-email)
-    (define-key map (kbd "\M-e a") 'ox-archive-create-and-mail)
+    (define-key map (kbd "\e\er") 'email-region)
+    (define-key map (kbd "\e\eh") 'email-heading)
+    (define-key map (kbd "\e\ep") 'ox-manuscript-export-and-build-and-email)
+    (define-key map (kbd "\e\ea") 'ox-archive-create-and-mail)
     ;; insert keys
-    (define-key map (kbd "\M-i r") 'org-insert-ref-link)
-    (define-key map (kbd "\M-i c") 'jorg-insert-cite-link)
-    (define-key map (kbd "\M-i f") 'org-footnote-action)
+    (define-key map (kbd "\e\eR") 'org-ref-insert-ref-link)
+    (define-key map (kbd "\e\eC") 'org-ref-insert-cite-link)
+    (define-key map (kbd "\e\ef") 'org-footnote-action)
     map)
   "Keymap for kitchingroup mode.")
+
+(global-set-key (kbd "\e\eg") 'goto-line) 
 
 (easy-menu-define my-menu kitchingroup-mode-map "My own menu"
   '("KitchinGroup"
@@ -45,13 +47,15 @@
     ["email org-mode as PDF" ox-manuscript-export-and-build-and-email t]
     ["email org-archive" ox-archive-create-and-mail t])
     ("org-mode"
+     ["Toggle symbols" org-toggle-pretty-entities t]
+     ["Toggle inline images" org-toggle-inline-images t]
+     ["Toggle LaTeX images" org-preview-latex-fragment t]
      ("editing"
-      ["Insert citation" jorg-insert-cite-link t]
-      ["Insert ref link" org-insert-ref-link t]
-      ["Open notes at point" jorg-bib-open-notes-at-point t]
-      ["Open PDF at point" jorg-bib-open-pdf-at-point t]
-      ["Open url at point" jorg-bib-open-url-at-point t]
-      ["Citation tooltip" jorg-bib-tooltip t]
+      ["Insert citation" org-ref-insert-cite-link t]
+      ["Insert ref link" org-ref-insert-ref-link t]
+      ["Open notes at point" org-ref-open-notes-at-point t]
+      ["Open PDF at point" org-ref-open-pdf-at-point t]
+      ["Open url at point" org-ref-open-url-at-point t]
       )
      ("export"
       ["manuscript PDF" ox-manuscript-export-and-build-and-open t]
@@ -62,8 +66,8 @@
      ["reformat entry" bibtex-reformat t]
      ["clean entry" bibtex-clean-entry t]
      ["validate bibtex file" bibtex-validate-globally t]
-     ["build bibliography pdf from bib file" jb-build-full-bibliography t]
-     ["find bad citations" jorg-bib-find-bad-citations]
+     ["build bibliography pdf from bib file" org-ref-build-full-bibliography t]
+     ["find bad citations" org-ref-bib-find-bad-citations t]
      )))
 
 

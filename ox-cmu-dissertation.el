@@ -112,8 +112,7 @@
 \\begin{center}
 \\setstretch{1.667}
 \\vspace*{15mm}
-\\bf
-{\\" (org-export-data (plist-get info :title) info) "}
+\\bf{" (org-export-data (plist-get info :title) info) "}
 
 \\par\\vspace{15mm}
 

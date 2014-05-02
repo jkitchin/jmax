@@ -199,7 +199,6 @@
     (if found i nil)))
 
 
-
 ;; support for links to microsoft docx,pptx,xlsx files
 ;; standard org-mode opens these as zip-files
 ;;  http://orgmode.org/manual/Adding-hyperlink-types.html
@@ -212,8 +211,16 @@ start  empty title path
        (shell-command
 	(concat "start \"title\" " (shell-quote-argument path)) t))
 
-(org-add-link-type "msx" 'org-msx-open)
-
+(org-add-link-type 
+ "attachfile" 
+ (lambda (link-string) (org-open-file link-string))
+ ;; formatting
+ (lambda (keyword desc format)
+   (cond
+    ((eq format 'html) (format "")); no output for html
+    ((eq format 'latex)
+     ;; write out the latex bibliography command
+     (format "\\attachfile{%s}" keyword)))))
 
 ;; Setup the frame configuration for following links.
 (setq org-link-frame-setup (quote ((gnus . org-gnus-no-new-news)
@@ -256,6 +263,7 @@ start  empty title path
 	("" "marvosym" t)
 	("" "wasysym" t)
 	("" "amssymb" t)
+	("" "amsmath" t)
 	("version=3" "mhchem" t)
 	("numbers,super,sort&compress" "natbib" t)
 	("" "natmove" nil)
@@ -313,13 +321,14 @@ citecolor=blue,filecolor=blue,menucolor=blue,urlcolor=blue"
 
 
 ;; these install the new exports
+;; (require 'org-ref)
+;; the real source is in the org-file
+(org-babel-tangle-file (expand-file-name "org-ref.org" starter-kit-dir))
+(load-file (expand-file-name "org-ref.el" starter-kit-dir))
 (require 'ox-cmu-qualifier)
 (require 'ox-cmu-ms-report)
+(require 'ox-cmu-dissertation)
 (require 'ox-manuscript)
 (require 'ox-archive)
-
-(load-file (expand-file-name "jorg-bib.el" starter-kit-dir))
-
-
 
 (message "jmax-org.el loaded")

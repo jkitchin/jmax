@@ -27,17 +27,17 @@ There is an emacs binary in this repository for Windows. This [[./jmax.bat]] fil
 These files contain variables with paths specific to your computer. You probably need to change them.
 
 To set the variables for our org-bibliography functionality you can run:
-M-x customize-group jorg-bib
+M-x customize-group org-ref
 
-As an alternative, put these variables into a .el file in the user directory. You will want to modify them for your needs of course.
+As an alternative, put these variables into a .el file in the user directory. You will want to modify them for your needs of course. Here is some of what I have in a file in user/jkitchin.el.
 
 #+BEGIN_SRC emacs-lisp
 (setq reftex-default-bibliography '("~/Dropbox/bibliography/references.bib"))
 
-;; see jorg-bib.el for use of these variables
-(setq jorg-bib-bibliography-notes "~/Dropbox/bibliography/notes.org"
-      jorg-bib-default-bibliography '("~/Dropbox/bibliography/references.bib")
-      jorg-bib-pdf-directory "~/Dropbox/bibliography/bibtex-pdfs/")
+;; see org-ref.el for use of these variables
+(setq org-ref-bibliography-notes "~/Dropbox/bibliography/notes.org"
+      org-ref-default-bibliography '("~/Dropbox/bibliography/references.bib")
+      org-ref-pdf-directory "~/Dropbox/bibliography/bibtex-pdfs/")
 
 ;;Tell the program who you are and setup for email
 (setq user-full-name "John Kitchin"
@@ -60,7 +60,7 @@ file:jmax.el does most of the setup that is not related to org-mode. It provides
 ** Scientific manuscript preparation
 See [[./examples]] for many examples of preparing scientific manuscripts for submission to ACS, APS, Elsevier and Springer journals.
 
-We have a pretty decent way of handling citations and references provided by [[file:jorg-bib.el]]. This file sets up how bibtex keys are made and provides a lot of new links for org-mode for citations, references, labels, and bibliography files. 
+We have a pretty decent way of handling citations and references provided by [[file:org-ref.el]]. This file sets up how bibtex keys are made and provides a lot of new links for org-mode for citations, references, labels, and bibliography files. 
 
 See this example for the basics [[file:examples/technical-documents-in-org.org]].
 
@@ -71,7 +71,6 @@ If you are a student at CMU, you may appreciate:
 
 ** Create standalone org-archives
 Ever wanted to package up an org-file and all the figures, files and directories it references so you can email it to someone? Check out [[file:ox-archive.el]].
-
 
 ** Handy email functions
 [[file:email.el]] provides functions to email a region, or an org-heading conveniently.
