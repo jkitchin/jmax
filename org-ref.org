@@ -1503,26 +1503,99 @@ I like my bibtex files to be 100% ascii. This function finds the non-ascii chara
   (occur "[^[:ascii:]]"))
 #+END_SRC
 
+** Resort a bibtex entry
+I like neat and orderly bibtex entries.That means the fields are in a standard order that I like. This function reorders the fields in an entry for articles.
+
+#+BEGIN_SRC emacs-lisp :tangle org-ref.el
+(defun org-ref-sort-bibtex-entry ()
+  "sort fields of entry in standard order and downcase them"
+  (interactive)
+  (bibtex-beginning-of-entry)
+  (let* ((master '("author" "title" "journal" "volume" "issue" "pages" "year" "doi" "url"))
+	 (entry (bibtex-parse-entry))
+	 (entry-fields)
+	 (other-fields)
+	 (type (cdr (assoc "=type=" entry)))
+	 (key (cdr (assoc "=key=" entry))))
+
+    ;; these are the fields we want to order that are in this entry
+    (setq entry-fields (mapcar (lambda (x) (car x)) entry))
+    ;; we do not want to reenter these fields
+    (setq entry-fields (remove "=key=" entry-fields))
+    (setq entry-fields (remove "=type=" entry-fields))
+
+    ;;these are the other fields in the entry
+    (setq other-fields (remove-if-not (lambda(x) (not (member x master))) entry-fields))
+
+    (cond
+     ;; right now we only resort articles
+     ((string= type "article")
+      (bibtex-kill-entry)
+      (insert
+       (concat "@article{" key ",\n" 
+	       (mapconcat  
+		(lambda (field) 
+		  (when (member field entry-fields)
+		    (format "%s = %s," (downcase field) (cdr (assoc field entry))))) master "\n")
+	       (mapconcat 
+		(lambda (field) 
+		  (format "%s = %s," (downcase field) (cdr (assoc field entry)))) other-fields "\n")
+	       "\n}"))
+      (bibtex-fill-entry)
+      (bibtex-clean-entry)
+       ))))
+#+END_SRC
+
 ** Clean a bibtex entry
    I like neat and orderly bibtex entries. This code will eventually replace the key with my style key, clean the entry, and sort the fields in the order I like them.
-
+see [[file:emacs-24.3/lisp/textmodes/bibtex.el::bibtex-autokey-before-presentation-function]] for how to set a function that checks for uniqueness of the key.
 #+BEGIN_SRC emacs-lisp :tangle org-ref.el
 (defun org-ref-clean-bibtex-entry()
   "clean and replace the key in a bibtex function"
   (interactive)
-  (bibtex-narrow-to-entry)
   (bibtex-beginning-of-entry)
-  (bibtex-fill-entry) 
-  (bibtex-clean-entry t)
-  ;; save key for other uses, e.g. saving a pdf
-  (kill-new (reftex-get-bib-field "=key=" (bibtex-parse-entry t)))
-  (x-set-selection 'CLIPBOARD (reftex-get-bib-field "=key=" (bibtex-parse-entry t)))
-  (occur "[^[:ascii:]]")
-  (widen)
-;; one day reorder and downcase the fields
-;; I can get all the fields like this
-;; (bibtex-parse-entry t)
-)
+
+  ;; check for empty pages, and put eid or article id in its place
+  (let ((entry (bibtex-parse-entry))
+	(pages (bibtex-autokey-get-field "pages"))
+        ;; The Journal of Chemical Physics uses eid
+	(eid (bibtex-autokey-get-field "eid")))
+
+    ;; fix pages if they are empty
+    (cond
+     ((string= "-" pages)
+      (when eid	  
+	(bibtex-beginning-of-entry)
+	;; this seems like a clunky way to set the pages field.But I
+	;; cannot find a better way.
+	(goto-char (car (cdr (bibtex-search-forward-field "pages" t))))
+	(bibtex-kill-field)
+	(bibtex-make-field "pages")
+	(backward-char)
+	(insert eid))))
+
+    ;; generate a key, and if it duplicates an existing key, edit it.
+    (let ((key (bibtex-generate-autokey)))
+
+      ;; first we delete the existing key
+      (bibtex-beginning-of-entry)
+      (re-search-forward bibtex-entry-maybe-empty-head)
+      (if (match-beginning bibtex-key-in-head)
+	  (delete-region (match-beginning bibtex-key-in-head)
+			 (match-end bibtex-key-in-head)))
+      ;; check if the key is in the buffer
+      (when (save-excursion
+	      (bibtex-search-entry key))
+	  (setq key (bibtex-read-key "Duplicate Key found, edit: " key)))
+
+      (insert key)
+      (kill-new key)) ;; save key for pasting	    
+
+    (org-ref-sort-bibtex-entry)
+
+    ;; check for non-ascii characters
+    (occur "[^[:ascii:]]")
+    ))
 #+END_SRC
 * Aliases
 I like convenience. Here are some aliases for faster typing.
@@ -1540,8 +1613,6 @@ I like convenience. Here are some aliases for faster typing.
 (defalias 'orsl 'org-ref-store-bibtex-entry-link)
 
 (defalias 'orcb 'org-ref-clean-bibtex-entry)
-
-
 #+END_SRC
 * End of code
 #+BEGIN_SRC emacs-lisp :tangle org-ref.el
