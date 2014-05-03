@@ -1559,12 +1559,21 @@ see [[file:emacs-24.3/lisp/textmodes/bibtex.el::bibtex-autokey-before-presentati
   ;; check for empty pages, and put eid or article id in its place
   (let ((entry (bibtex-parse-entry))
 	(pages (bibtex-autokey-get-field "pages"))
+	(year (bibtex-autokey-get-field "year"))
         ;; The Journal of Chemical Physics uses eid
 	(eid (bibtex-autokey-get-field "eid")))
 
+    ;; asap articles often set year to 0, which messes up key generation. fix that.
+    (when (string= "0" year)  
+      (bibtex-beginning-of-entry)
+      (goto-char (car (cdr (bibtex-search-forward-field "year" t))))
+      (bibtex-kill-field)
+      (bibtex-make-field "year")
+      (backward-char)
+      (insert (read-string "Enter year: ")))
+
     ;; fix pages if they are empty
-    (cond
-     ((string= "-" pages)
+    (when (string= "-" pages)
       (when eid	  
 	(bibtex-beginning-of-entry)
 	;; this seems like a clunky way to set the pages field.But I
@@ -1573,7 +1582,15 @@ see [[file:emacs-24.3/lisp/textmodes/bibtex.el::bibtex-autokey-before-presentati
 	(bibtex-kill-field)
 	(bibtex-make-field "pages")
 	(backward-char)
-	(insert eid))))
+	(insert eid)))
+
+    ;; replace naked & with \&
+    (save-restriction
+      (bibtex-narrow-to-entry)
+      (bibtex-beginning-of-entry)
+      (message "checking &")
+      (replace-regexp " & " " \\\\& ")
+      (widen))
 
     ;; generate a key, and if it duplicates an existing key, edit it.
     (let ((key (bibtex-generate-autokey)))
