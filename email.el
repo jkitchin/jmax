@@ -7,10 +7,15 @@
 (defun email-region (start end)
   "Send region as the body of an email"
   (interactive "r")
-  (let ((content (buffer-substring start end)))
+  (let ((content (buffer-substring start end)) content-with-citations)
+    (setq content-with-citations (with-temp-buffer
+				   (org-mode)
+				   (insert content)
+				   (org-ref-extract-bibtex-entries)
+				   (buffer-string)))
     (compose-mail-other-frame)
     (message-goto-body)
-    (insert content)
+    (insert content-with-citations)
     (message-goto-to)))
 
 (defun email-region-as-attachment (start end)
@@ -18,9 +23,14 @@
   (interactive "r")
   (save-restriction
     (narrow-to-region start end)
-    (let ((cb (buffer-name)))
+    (let ((content (buffer-substring start end))
+	  (cb (buffer-name)))
+      (set-buffer (get-buffer-create "*org-email-region*"))
+      (org-mode)
+      (insert content)
+      (org-ref-extract-bibtex-entries)
       (compose-mail-other-frame)
-      (mml-attach-buffer cb)
+      (mml-attach-buffer "*org-email-region*")
       (message-goto-to))))
 
 (defun email-heading ()
