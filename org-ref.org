@@ -1428,15 +1428,16 @@ If no bibliography is in the buffer the `reftex-default-bibliography' is used."
 
     ;; Now back to the original org buffer and insert the results
     (switch-to-buffer cb)
-    (save-excursion
-      (goto-char (point-max))
-      (insert (format "
+    (when (not (string= "" results))
+      (save-excursion
+        (goto-char (point-max))
+        (insert "\n\n"
+        (org-insert-heading-after-current)
+        (insert (format " Bibtex entries
 
-,** Bibtex entries
-
-,#+BEGIN_SRC: :tangle %s
-,%s
-,#+END_SRC" bibfile results)))))
+#+BEGIN_SRC: text :tangle %s
+%s
+#+END_SRC" bibfile results))))))
 #+END_SRC
 
 ** Find bad cite links
