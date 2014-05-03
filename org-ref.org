@@ -1540,7 +1540,7 @@ I like neat and orderly bibtex entries.That means the fields are in a standard o
 	       (mapconcat 
 		(lambda (field) 
 		  (format "%s = %s," (downcase field) (cdr (assoc field entry)))) other-fields "\n")
-	       "\n}"))
+	       "\n}\n\n"))
       (bibtex-fill-entry)
       (bibtex-clean-entry)
        ))))
@@ -1592,7 +1592,6 @@ see [[file:emacs-24.3/lisp/textmodes/bibtex.el::bibtex-autokey-before-presentati
       (kill-new key)) ;; save key for pasting	    
 
     (org-ref-sort-bibtex-entry)
-
     ;; check for non-ascii characters
     (occur "[^[:ascii:]]")
     ))
