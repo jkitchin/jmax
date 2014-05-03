@@ -46,7 +46,7 @@
 ;; insert aliases
 (defalias 'jif 'org-footnote-action)
 (defalias 'jir 'org-ref-insert-ref-link)
-(defalias 'jic 'org-ref-insert-cite-link
+(defalias 'jic 'org-ref-insert-cite-link)
 
 (global-set-key (kbd "\e\eg") 'goto-line) 
 
