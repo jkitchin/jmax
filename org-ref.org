@@ -1541,6 +1541,7 @@ I like neat and orderly bibtex entries.That means the fields are in a standard o
 		(lambda (field) 
 		  (format "%s = %s," (downcase field) (cdr (assoc field entry)))) other-fields "\n")
 	       "\n}\n\n"))
+      (bibtex-find-entry key)
       (bibtex-fill-entry)
       (bibtex-clean-entry)
        ))))
