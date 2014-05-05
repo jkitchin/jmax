@@ -339,8 +339,11 @@ citecolor=blue,filecolor=blue,menucolor=blue,urlcolor=blue"
              ("fontsize" "\\scriptsize")
              ("linenos" "")))
 
+;; this is a good idea, but it is causing a bug in the mouse pointer
+;; on windows. when you export and open the pdf, the cursor is stuck
+;; in the hour glass. There is no problem with noninteractive build.
 (defcustom jmax-org-interactive-build
-  t
+  nil
   "Determines if pdfs are built with interaction from the user. nil means just build without user interaction. Anything else will show the user a window of the results of each build step, and ask if you should continue to the next step.")
 
 (defun jmax-org-toggle-interactive-build ()
@@ -360,12 +363,12 @@ citecolor=blue,filecolor=blue,menucolor=blue,urlcolor=blue"
     (kill-buffer "*pdflatex*"))
 
   ;; run pdflatex
-  (let ((tex-buffer (find-file-noselect tex-file)))
-    (set-buffer tex-buffer)
-    (if (re-search-forward "{minted}" nil t)
-	(call-process "pdflatex" nil "*pdflatex*" t "-shell-escape" "-interaction" "nonstopmode" tex-file)
-      (call-process "pdflatex" nil "*pdflatex*" t "-interaction" "nonstopmode" tex-file))
-    (kill-buffer tex-buffer))
+  (if (with-temp-buffer
+	(insert-file-contents tex-file)
+	(beginning-of-buffer)
+	(re-search-forward "{minted}" nil t))
+      (call-process "pdflatex" nil "*pdflatex*" t "-shell-escape" "-interaction" "nonstopmode" tex-file)
+    (call-process "pdflatex" nil "*pdflatex*" t "-interaction" "nonstopmode" tex-file))
 
   (when jmax-org-interactive-build
     (switch-to-buffer-other-frame "*pdflatex*")
@@ -399,11 +402,10 @@ citecolor=blue,filecolor=blue,menucolor=blue,urlcolor=blue"
   (let* ((tex-file (replace-regexp-in-string "\"" "" quoted-tex-file))	  
 	 (basename (file-name-sans-extension tex-file))
 	 (pdf-file (concat basename ".pdf"))
-	 (tex-buffer (find-file-noselect tex-file))
 	 (status)
 	 ;; determine if we should run bibtex if there is a bibliography line
-	 (run-bibtex-p (progn 
-			 (set-buffer tex-buffer)
+	 (run-bibtex-p (with-temp-buffer
+			 (insert-file-contents tex-file)
 			 (beginning-of-buffer)
 			 (re-search-forward "\\\\bibliography{" nil t))))
 			 
@@ -439,28 +441,26 @@ citecolor=blue,filecolor=blue,menucolor=blue,urlcolor=blue"
 		      '("*pdflatex*" "*bibtex*" "*Occur*"))
 	      (delete-frame))
 	  (throw 'status nil)))
-
-      (jmax-org-pdflatex tex-file)    
+      
+      (jmax-org-pdflatex tex-file)  
       (mapcar (lambda (x) (when (get-buffer x) (kill-buffer x)))
 	      '("*pdflatex*" "*bibtex*" "*Occur*"))
 
-      (throw 'status "done")))
+      (when jmax-org-interactive-build (delete-frame))
+      "done"))
 
     (message "Finished with status = %s. %s exists = %s in %s." status pdf-file (file-exists-p pdf-file) default-directory)
+    0))
 
-    (kill-buffer tex-buffer)
-    ;; return name of pdf created
-    (file-truename pdf-file)))
-
-(setq org-latex-pdf-process 'jmax-org-latex-pdf-process)
+;(setq org-latex-pdf-process 'jmax-org-latex-pdf-process)
 
 ;; for minted you must run latex with -shell-escape because it calls pygmentize as an external program
-;; (setq org-latex-pdf-process
-;;       '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %b"
-;;         "bibtex %b"
-;;         "makeindex %b"
-;;         "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %b"
-;;         "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %b"))
+(setq org-latex-pdf-process
+      '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %b"
+        "bibtex %b"
+        "makeindex %b"
+        "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %b"
+        "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %b"))
 
 ;; I have not had good luck with this on windows
 ;(setq org-latex-to-pdf-process '("texi2dvi --pdf --clean --verbose --batch"))
