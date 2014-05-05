@@ -1,4 +1,3 @@
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;  You should not need to modify paths below here
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -399,6 +398,7 @@ citecolor=blue,filecolor=blue,menucolor=blue,urlcolor=blue"
   ;; "" in it. we remove them here.
   (let* ((tex-file (replace-regexp-in-string "\"" "" quoted-tex-file))	  
 	 (basename (file-name-sans-extension tex-file))
+	 (pdf-file (concat basename ".pdf"))
 	 (tex-buffer (find-file-noselect tex-file))
 	 (status)
 	 ;; determine if we should run bibtex if there is a bibliography line
@@ -412,8 +412,9 @@ citecolor=blue,filecolor=blue,menucolor=blue,urlcolor=blue"
       (jmax-org-pdflatex tex-file)    
       (when jmax-org-interactive-build
 	(if (y-or-n-p "Continue to bibtex?")
-	    (progn (kill-buffer "*pdflatex*") 
-		   (kill-buffer "*Occur*")
+	    (progn 
+	      (mapcar (lambda (x) (when (get-buffer x) (kill-buffer x)))
+		      '("*pdflatex*" "*bibtex*" "*Occur*"))
 		   (delete-frame))
 	  (throw 'status nil)))
 
@@ -423,29 +424,33 @@ citecolor=blue,filecolor=blue,menucolor=blue,urlcolor=blue"
 	(jmax-org-bibtex tex-file)
 	(when jmax-org-interactive-build
 	  (if (y-or-n-p "Continue to pdflatex 2?")
-	      (progn (kill-buffer "*bibtex*") 
-		     (kill-buffer "*Occur*")
-		     (delete-frame))
+	      (progn 
+		(mapcar (lambda (x) (when (get-buffer x) (kill-buffer x)))
+			'("*pdflatex*" "*bibtex*" "*Occur*"))
+		(delete-frame))
 	    (throw 'status nil))))
 
       ;; Run pdflatex two more times
       (jmax-org-pdflatex tex-file)    
       (when jmax-org-interactive-build
 	(if (y-or-n-p "Continue to pdflatex 3?")
-	    (progn (kill-buffer "*pdflatex*") 
-		   (kill-buffer "*Occur*")
-		   (delete-frame))
+	    (progn 
+	      (mapcar (lambda (x) (when (get-buffer x) (kill-buffer x)))
+		      '("*pdflatex*" "*bibtex*" "*Occur*"))
+	      (delete-frame))
 	  (throw 'status nil)))
 
       (jmax-org-pdflatex tex-file)    
-      (kill-buffer "*pdflatex*") 
-      (kill-buffer "*Occur*")
-      (delete-frame)
+      (mapcar (lambda (x) (when (get-buffer x) (kill-buffer x)))
+	      '("*pdflatex*" "*bibtex*" "*Occur*"))
+
       (throw 'status "done")))
 
-    (message "Finished with status = %s" status)
+    (message "Finished with status = %s. %s exists = %s in %s." status pdf-file (file-exists-p pdf-file) default-directory)
 
-    (kill-buffer tex-buffer)))
+    (kill-buffer tex-buffer)
+    ;; return name of pdf created
+    (file-truename pdf-file)))
 
 (setq org-latex-pdf-process 'jmax-org-latex-pdf-process)
 
