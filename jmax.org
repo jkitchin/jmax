@@ -1,0 +1,23 @@
+#+TITLE: jmax - awesome editing in emacs
+
+* Introduction
+jmax is a customization of emacs that facilitates writing technical documents. I found it takes extensive customization to get emacs to do what you want, and this is my collection of customizations.
+
+** [[./init.el]]
+** [[./packages.el]]
+** [[./jmax.el]]
+** [[./jmax-org.el]]
+** [[./kitchingroup-mode.el]]
+
+** [[file:email.el]]
+** [[file:ox-archive]]
+** [[file:org-ref.org]]
+** [[file:ox-manuscript.el]]
+** [[file:ox-cmu-ms-report.el]]
+** [[file:ox-cmu-qualifier.el]]
+** [[file:ox-cmu-dissertation.el]]
+** user directory
+Put your personal setup and overrides here.
+
+* Latex setup 
+[[./texmf]]
