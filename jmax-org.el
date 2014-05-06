@@ -3,7 +3,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (require 'ox-beamer)
 (require 'ox-texinfo)
-(require 'ox-odt)
+; (require 'ox-odt)
 (require 'org-inlinetask)
 (require 'org-mouse)
 
@@ -112,7 +112,7 @@
 (add-to-list 'org-structure-template-alist
              '("por" "#+BEGIN_SRC python :results output raw\n?\n#+END_SRC" "<src lang=\"python\">\n?\n</src>"))
 
-;; add <pv for python expansion with raw output
+;; add <pv for python expansion with value
 (add-to-list 'org-structure-template-alist
              '("pv" "#+BEGIN_SRC python :results value\n?\n#+END_SRC" "<src lang=\"python\">\n?\n</src>"))
 
@@ -274,8 +274,19 @@ start  empty title path
    (cond
     ((eq format 'html) (format "")); no output for html
     ((eq format 'latex)
-     ;; write out the latex bibliography command
+     ;; write out the latex command
      (format "\\attachfile{%s}" keyword)))))
+
+(org-add-link-type 
+ "index" 
+ (lambda (link-string) (org-open-file link-string))
+ ;; formatting
+ (lambda (keyword desc format)
+   (cond
+    ((eq format 'html) (format "")); no output for html
+    ((eq format 'latex)
+     ;; write out the latex command
+     (format "%s \\index{%s}" keyword keyword)))))
 
 ;; Setup the frame configuration for following links.
 (setq org-link-frame-setup (quote ((gnus . org-gnus-no-new-news)
@@ -343,7 +354,7 @@ citecolor=blue,filecolor=blue,menucolor=blue,urlcolor=blue"
 ;; on windows. when you export and open the pdf, the cursor is stuck
 ;; in the hour glass. There is no problem with noninteractive build.
 (defcustom jmax-org-interactive-build
-  nil
+  t
   "Determines if pdfs are built with interaction from the user. nil means just build without user interaction. Anything else will show the user a window of the results of each build step, and ask if you should continue to the next step.")
 
 (defun jmax-org-toggle-interactive-build ()
@@ -358,41 +369,43 @@ citecolor=blue,filecolor=blue,menucolor=blue,urlcolor=blue"
   (interactive "fTex file: ")
   (message "running pdflatex on %s" tex-file)
 
-  ;; get rid of any existing buffer
-  (when (get-buffer "*pdflatex*")
-    (kill-buffer "*pdflatex*"))
+  (let ((minted-p (with-temp-buffer
+		    (insert-file-contents tex-file)
+		    (beginning-of-buffer)
+		    (re-search-forward "{minted}" nil t)))
+	(search-upper-case nil)
+	(cb (current-buffer))
+	(results))
 
-  ;; run pdflatex
-  (if (with-temp-buffer
-	(insert-file-contents tex-file)
-	(beginning-of-buffer)
-	(re-search-forward "{minted}" nil t))
-      (call-process "pdflatex" nil "*pdflatex*" t "-shell-escape" "-interaction" "nonstopmode" tex-file)
-    (call-process "pdflatex" nil "*pdflatex*" t "-interaction" "nonstopmode" tex-file))
+    ;; run pdflatex
+    (if minted-p
+	(setq results (shell-command-to-string 
+		       (concat "pdflatex -shell-escape -interaction nonstopmode " tex-file)))
+      ;; else
+      (setq results 
+	    (shell-command-to-string 
+	     (concat "pdflatex -interaction nonstopmode " tex-file))))
 
-  (when jmax-org-interactive-build
-    (switch-to-buffer-other-frame "*pdflatex*")
-    (end-of-buffer)
-    (let ((search-upper-case nil))
-      (occur "warning\\|undefined\\|error\\|missing"))))
+    (with-current-buffer (get-buffer-create "*pdflatex*")
+      (insert results))))
 
 (defun jmax-org-bibtex (tex-file)
   "Run bibtex8 on the tex-file."
   (interactive "fTex file: ")
   (message "running bibtex on %s" tex-file)
 
-  ;; get rid of any existing buffer
-  (when (get-buffer "*bibtex*")
-    (kill-buffer "*bibtex*"))
+  (let* ((basename (file-name-sans-extension tex-file))
+	 (output (shell-command-to-string (concat "bibtex8 " basename))))
+    (with-current-buffer (get-buffer-create "*bibtex*")
+      (insert output))))
 
-  (let ((basename (file-name-sans-extension tex-file)))
-    (call-process "bibtex8" nil "*bibtex*" t basename))
-
-  (when jmax-org-interactive-build
-    (switch-to-buffer-other-frame "*bibtex*")
-    (end-of-buffer)
-    (let ((search-upper-case nil))
-      (occur "warning\\|error\\|missing"))))
+(defun jmax-org-makeindex (tex-file)
+  "run makeindex program"
+  (interactive "fTex file: ")
+  (let* ((basename (file-name-sans-extension tex-file))
+	 (output (shell-command-to-string (concat "makeindex " basename))))
+    (with-current-buffer (get-buffer-create "*makeindex*")
+      (insert output))))
 
 (defun jmax-org-latex-pdf-process (quoted-tex-file)
   "Build a tex-file to pdf. The argument is called quoted-tex-file because this seems to be what org-mode passes to this function. The function strips the quotes out. Depending on the value of `jmax-org-interactive-build', you will get buffers of the intermediate output steps."
@@ -403,64 +416,95 @@ citecolor=blue,filecolor=blue,menucolor=blue,urlcolor=blue"
 	 (basename (file-name-sans-extension tex-file))
 	 (pdf-file (concat basename ".pdf"))
 	 (status)
-	 ;; determine if we should run bibtex if there is a bibliography line
-	 (run-bibtex-p (with-temp-buffer
-			 (insert-file-contents tex-file)
-			 (beginning-of-buffer)
-			 (re-search-forward "\\\\bibliography{" nil t))))
+	 (cb (current-buffer))
+	 (run-makeindex-p) 
+	 (run-bibtex-p))
 			 
+    (with-temp-buffer
+      (insert-file-contents tex-file)
+      (beginning-of-buffer)
+      (setq run-makeindex-p (re-search-forward "\\\\makeindex" nil t))
+      (beginning-of-buffer)
+      (setq run-bibtex-p (re-search-forward "\\\\bibliography{" nil t)))
+
     (setq status (catch 'status
       ;; run first pdflatex
       (jmax-org-pdflatex tex-file)    
       (when jmax-org-interactive-build
+	(switch-to-buffer "*pdflatex*")
+	(end-of-buffer)
+	(occur "warning\\|undefined\\|error\\|missing")
 	(if (y-or-n-p "Continue to bibtex?")
+	    ;; continuing. delete buffers
 	    (progn 
 	      (mapcar (lambda (x) (when (get-buffer x) (kill-buffer x)))
-		      '("*pdflatex*" "*bibtex*" "*Occur*"))
-		   (delete-frame))
+		      '("*pdflatex*" "*bibtex*" "*makeindex*" "*Occur*"))
+	      (switch-to-buffer cb))
+	  ;; not continuing
 	  (throw 'status nil)))
 
       ;; run bibtex if needed
-      (message "bibtex needed = %s" run-bibtex-p)
       (when run-bibtex-p
 	(jmax-org-bibtex tex-file)
 	(when jmax-org-interactive-build
-	  (if (y-or-n-p "Continue to pdflatex 2?")
+	  (switch-to-buffer "*bibtex*")
+	  (end-of-buffer)
+	  (occur "warning\\|undefined\\|error\\|missing")
+	  (if (y-or-n-p "Continue?")
+	      ;; continuing. delete buffers
 	      (progn 
-		(mapcar (lambda (x) (when (get-buffer x) (kill-buffer x)))
-			'("*pdflatex*" "*bibtex*" "*Occur*"))
-		(delete-frame))
+	 	(mapcar (lambda (x) (when (get-buffer x) (kill-buffer x)))
+	 		'("*pdflatex*" "*bibtex*" "*makeindex*" "*Occur*"))
+		(switch-to-buffer cb))
+	    ;; not continuing
 	    (throw 'status nil))))
 
-      ;; Run pdflatex two more times
+      (when run-makeindex-p
+	(jmax-org-makeindex tex-file)
+	(when jmax-org-interactive-build
+	  (switch-to-buffer "*makeindex*")
+	  (end-of-buffer)
+	  (occur "warning\\|undefined\\|error\\|missing")
+	  (if (y-or-n-p "Continue to pdflatex 2?")
+	      ;; continuing. delete buffers
+	      (progn 
+	 	(mapcar (lambda (x) (when (get-buffer x) (kill-buffer x)))
+	 		'("*pdflatex*" "*bibtex*" "*makeindex*" "*Occur*"))
+		(switch-to-buffer cb))
+	    ;; not continuing
+	    (throw 'status nil))))
+
       (jmax-org-pdflatex tex-file)    
       (when jmax-org-interactive-build
-	(if (y-or-n-p "Continue to pdflatex 3?")
+	(switch-to-buffer "*pdflatex*")
+	(end-of-buffer)
+	(occur "warning\\|undefined\\|error\\|missing")
+	(if (y-or-n-p "Continue to pdflatex3?")
+	    ;; continuing. delete buffers
 	    (progn 
 	      (mapcar (lambda (x) (when (get-buffer x) (kill-buffer x)))
-		      '("*pdflatex*" "*bibtex*" "*Occur*"))
-	      (delete-frame))
+		      '("*pdflatex*" "*bibtex*" "*makeindex*" "*Occur*"))
+	      (switch-to-buffer cb))
+	  ;; not continuing
 	  (throw 'status nil)))
-      
-      (jmax-org-pdflatex tex-file)  
-      (mapcar (lambda (x) (when (get-buffer x) (kill-buffer x)))
-	      '("*pdflatex*" "*bibtex*" "*Occur*"))
 
-      (when jmax-org-interactive-build (delete-frame))
+      (jmax-org-pdflatex tex-file)
+      (mapcar (lambda (x) (when (get-buffer x) (kill-buffer x)))
+	      '("*pdflatex*" "*bibtex*" "*makeindex*" "*Occur*"))
       "done"))
 
     (message "Finished with status = %s. %s exists = %s in %s." status pdf-file (file-exists-p pdf-file) default-directory)
     0))
 
-;(setq org-latex-pdf-process 'jmax-org-latex-pdf-process)
+(setq org-latex-pdf-process 'jmax-org-latex-pdf-process)
 
 ;; for minted you must run latex with -shell-escape because it calls pygmentize as an external program
-(setq org-latex-pdf-process
-      '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %b"
-        "bibtex %b"
-        "makeindex %b"
-        "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %b"
-        "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %b"))
+;; (setq org-latex-pdf-process
+;;       '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %b"
+;;         "bibtex %b"
+;;         "makeindex %b"
+;;         "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %b"
+;;         "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %b"))
 
 ;; I have not had good luck with this on windows
 ;(setq org-latex-to-pdf-process '("texi2dvi --pdf --clean --verbose --batch"))
