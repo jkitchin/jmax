@@ -528,8 +528,11 @@ citecolor=blue,filecolor=blue,menucolor=blue,urlcolor=blue"
 
 ;; the real source is in the org-file. whenever the org file is newer
 ;; we build the el file.
-(if(< (float-time (nth 5 (file-attributes "org-ref.el")))
-	 (float-time (nth 5 (file-attributes "org-ref.org"))))
+
+(if (or
+     (not (file-exists-p "org-ref.el"))
+     (< (float-time (nth 5 (file-attributes "org-ref.el")))
+	(float-time (nth 5 (file-attributes "org-ref.org")))))
     (progn
       (org-babel-tangle-file (expand-file-name "org-ref.org" starter-kit-dir))
       (load-file (expand-file-name "org-ref.el" starter-kit-dir)))
