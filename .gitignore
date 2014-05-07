@@ -37,3 +37,27 @@ user/News
 *.pyg
 *.tex
 *.aux
+*.lof
+*.lot
+org-ref.el
+*.log
+*.spl
+/examples/achemso/aamick/manuscript.pdf
+/examples/achemso/accacs/manuscript.pdf
+/examples/cmu-phd-dissertation/archive
+/examples/ltxpng
+/examples/acs-test-cite.bib
+/examples/cmu-ms-report/project-report.pdf
+/examples/cmu-qualifier/cmu-qualifier.pdf
+/examples/elsarticle/manuscript.pdf
+/examples/revtex4-1/PRB/manuscript.pdf
+/examples/svjour3/manuscript.pdf
+/examples/technical-documents-in-org.pdf
+/examples/test-cite.pdf
+/org-mode-off/
+/runemacs - Shortcut.lnk
+/examples/revtex4-1/PRL/manuscript.pdf
+/examples/cmu-memo/memo.pdf
+/examples/cmu-letter/test-letter.pdf
+/examples/cmu-phd-dissertation/dissertation.pdf
+/examples/cmu-memo/samplememo.pdf

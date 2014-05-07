@@ -37,6 +37,17 @@
     map)
   "Keymap for kitchingroup mode.")
 
+;;email aliases
+(defalias 'jer 'email-region)
+(defalias 'jeh 'email-heading)
+(defalias 'jep 'ox-manuscript-export-and-build-and-email)
+(defalias 'jea 'ox-archive-create-and-mail)
+
+;; insert aliases
+(defalias 'jif 'org-footnote-action)
+(defalias 'jir 'org-ref-insert-ref-link)
+(defalias 'jic 'org-ref-insert-cite-link)
+
 (global-set-key (kbd "\e\eg") 'goto-line) 
 
 (easy-menu-define my-menu kitchingroup-mode-map "My own menu"

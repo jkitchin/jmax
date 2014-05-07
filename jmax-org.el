@@ -1,11 +1,9 @@
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;  You should not need to modify paths below here
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(setq org-use-speed-commands t)
-
 (require 'ox-beamer)
 (require 'ox-texinfo)
+; (require 'ox-odt)
 (require 'org-inlinetask)
 (require 'org-mouse)
 
@@ -18,6 +16,80 @@
 
 (global-set-key "\C-cL" 'org-insert-link-global)
 (global-set-key "\C-co" 'org-open-at-point-global)
+
+;; activate single letter commands at beginning of a headline.
+;; User-defined Speed commands
+;; ===========================
+
+;; Built-in Speed commands
+;; =======================
+
+;; Outline Navigation
+;; ------------------
+;; n   (org-speed-move-safe (quote outline-next-visible-heading))
+;; p   (org-speed-move-safe (quote outline-previous-visible-heading))
+;; f   (org-speed-move-safe (quote org-forward-heading-same-level))
+;; b   (org-speed-move-safe (quote org-backward-heading-same-level))
+;; F   org-next-block
+;; B   org-previous-block
+;; u   (org-speed-move-safe (quote outline-up-heading))
+;; j   org-goto
+;; g   (org-refile t)
+
+;; Outline Visibility
+;; ------------------
+;; c   org-cycle
+;; C   org-shifttab
+;;     org-display-outline-path
+;; s   org-narrow-to-subtree
+;; =   org-columns
+
+;; Outline Structure Editing
+;; -------------------------
+;; U   org-shiftmetaup
+;; D   org-shiftmetadown
+;; r   org-metaright
+;; l   org-metaleft
+;; R   org-shiftmetaright
+;; L   org-shiftmetaleft
+;; i   (progn (forward-char 1) (call-interactively (quote org-insert-heading-respect-content)))
+;; ^   org-sort
+;; w   org-refile
+;; a   org-archive-subtree-default-with-confirmation
+;; @   org-mark-subtree
+;; #   org-toggle-comment
+
+;; Clock Commands
+;; --------------
+;; I   org-clock-in
+;; O   org-clock-out
+
+;; Meta Data Editing
+;; -----------------
+;; t   org-todo
+;; ,   (org-priority)
+;; 0   (org-priority 32)
+;; 1   (org-priority 65)
+;; 2   (org-priority 66)
+;; 3   (org-priority 67)
+;; :   org-set-tags-command
+;; e   org-set-effort
+;; E   org-inc-effort
+;; W   (lambda (m) (interactive "sMinutes before warning: ") (org-entry-put (point) "APPT_WARNTIME" m))
+
+;; Agenda Views etc
+;; ----------------
+;; v   org-agenda
+;; /   org-sparse-tree
+
+;; Misc
+;; ----
+;; o   org-open-at-point
+;; ?   org-speed-command-help
+;; <   (org-agenda-set-restriction-lock (quote subtree))
+;; >   (org-agenda-remove-restriction-lock)
+
+(setq org-use-speed-commands t)
 
 ;; I like to press enter to follow a link. mouse clicks also work.
 (setq org-return-follows-link t)
@@ -40,10 +112,9 @@
 (add-to-list 'org-structure-template-alist
              '("por" "#+BEGIN_SRC python :results output raw\n?\n#+END_SRC" "<src lang=\"python\">\n?\n</src>"))
 
-;; add <pv for python expansion with raw output
+;; add <pv for python expansion with value
 (add-to-list 'org-structure-template-alist
              '("pv" "#+BEGIN_SRC python :results value\n?\n#+END_SRC" "<src lang=\"python\">\n?\n</src>"))
-
 
 ;; add <el for emacs-lisp expansion
 (add-to-list 'org-structure-template-alist
@@ -183,22 +254,6 @@
 ;; record time I finished a task when I change it to DONE
 (setq org-log-done 'time)
 
-;; Customize generic export
-;; I reset this variable to get my hyperref setup
-(defun index (element list)
-  "return the index of element in list"
-  (let ((i 0)
-	(found nil))
-    (dolist (el list i)
-      (if (equal el element) 
-	  (progn 
-	    (setq found t)
-	    (return i)))
-      (setq i (+ i 1)))
-    ;; return counter if found, otherwise return nil
-    (if found i nil)))
-
-
 ;; support for links to microsoft docx,pptx,xlsx files
 ;; standard org-mode opens these as zip-files
 ;;  http://orgmode.org/manual/Adding-hyperlink-types.html
@@ -219,8 +274,19 @@ start  empty title path
    (cond
     ((eq format 'html) (format "")); no output for html
     ((eq format 'latex)
-     ;; write out the latex bibliography command
+     ;; write out the latex command
      (format "\\attachfile{%s}" keyword)))))
+
+(org-add-link-type 
+ "index" 
+ (lambda (link-string) (org-open-file link-string))
+ ;; formatting
+ (lambda (keyword desc format)
+   (cond
+    ((eq format 'html) (format "")); no output for html
+    ((eq format 'latex)
+     ;; write out the latex command
+     (format "%s \\index{%s}" keyword keyword)))))
 
 ;; Setup the frame configuration for following links.
 (setq org-link-frame-setup (quote ((gnus . org-gnus-no-new-news)
@@ -229,9 +295,6 @@ start  empty title path
 ; Use the current window for C-c ' source editing
 (setq org-src-window-setup 'current-window)
 
-
-;; get our updated org-info
-(add-to-list 'Info-additional-directory-list (expand-file-name "org-mode/info" starter-kit-dir))
 
 ;; use this code in emacs-lisp for folding code.
 (global-set-key (kbd "C-M-]") (lambda () (interactive) (org-cycle t)))
@@ -242,8 +305,8 @@ start  empty title path
                                 (beginning-of-defun))
                               (org-cycle)))
 
+;; use ido completion wherever possible
 (setq org-completion-use-ido t)
-
 
 (setq org-latex-default-packages-alist 
       '(("AUTO" "inputenc" t)
@@ -287,13 +350,161 @@ citecolor=blue,filecolor=blue,menucolor=blue,urlcolor=blue"
              ("fontsize" "\\scriptsize")
              ("linenos" "")))
 
+;; this is a good idea, but it is causing a bug in the mouse pointer
+;; on windows. when you export and open the pdf, the cursor is stuck
+;; in the hour glass. There is no problem with noninteractive build.
+(defcustom jmax-org-interactive-build
+  t
+  "Determines if pdfs are built with interaction from the user. nil means just build without user interaction. Anything else will show the user a window of the results of each build step, and ask if you should continue to the next step.")
+
+(defun jmax-org-toggle-interactive-build ()
+ "toggle state of jmax-org-interactive-build"
+  (interactive)
+  (if jmax-org-interactive-build
+      (setq jmax-org-interactive-build nil)
+    (setq jmax-org-interactive-build t)))
+
+(defun jmax-org-pdflatex (tex-file)
+  "run pdflatex on tex-file. This function checks for the presence of minted, and uses -shell-escape if needed. You can run this interactively, and you will be prompted for a tex file name."
+  (interactive "fTex file: ")
+  (message "running pdflatex on %s" tex-file)
+
+  (let ((minted-p (with-temp-buffer
+		    (insert-file-contents tex-file)
+		    (beginning-of-buffer)
+		    (re-search-forward "{minted}" nil t)))
+	(search-upper-case nil)
+	(cb (current-buffer))
+	(results))
+
+    ;; run pdflatex
+    (if minted-p
+	(setq results (shell-command-to-string 
+		       (concat "pdflatex -shell-escape -interaction nonstopmode " tex-file)))
+      ;; else
+      (setq results 
+	    (shell-command-to-string 
+	     (concat "pdflatex -interaction nonstopmode " tex-file))))
+
+    (with-current-buffer (get-buffer-create "*pdflatex*")
+      (insert results))))
+
+(defun jmax-org-bibtex (tex-file)
+  "Run bibtex8 on the tex-file."
+  (interactive "fTex file: ")
+  (message "running bibtex on %s" tex-file)
+
+  (let* ((basename (file-name-sans-extension tex-file))
+	 (output (shell-command-to-string (concat "bibtex8 " basename))))
+    (with-current-buffer (get-buffer-create "*bibtex*")
+      (insert output))))
+
+(defun jmax-org-makeindex (tex-file)
+  "run makeindex program"
+  (interactive "fTex file: ")
+  (let* ((basename (file-name-sans-extension tex-file))
+	 (output (shell-command-to-string (concat "makeindex " basename))))
+    (with-current-buffer (get-buffer-create "*makeindex*")
+      (insert output))))
+
+(defun jmax-org-latex-pdf-process (quoted-tex-file)
+  "Build a tex-file to pdf. The argument is called quoted-tex-file because this seems to be what org-mode passes to this function. The function strips the quotes out. Depending on the value of `jmax-org-interactive-build', you will get buffers of the intermediate output steps."
+  (interactive "fTex file: ")
+  ;; it seems the filename passed to this function from org-mode has
+  ;; "" in it. we remove them here.
+  (let* ((tex-file (replace-regexp-in-string "\"" "" quoted-tex-file))	  
+	 (basename (file-name-sans-extension tex-file))
+	 (pdf-file (concat basename ".pdf"))
+	 (status)
+	 (cb (current-buffer))
+	 (run-makeindex-p) 
+	 (run-bibtex-p))
+			 
+    (with-temp-buffer
+      (insert-file-contents tex-file)
+      (beginning-of-buffer)
+      (setq run-makeindex-p (re-search-forward "\\\\makeindex" nil t))
+      (beginning-of-buffer)
+      (setq run-bibtex-p (re-search-forward "\\\\bibliography{" nil t)))
+
+    (setq status (catch 'status
+      ;; run first pdflatex
+      (jmax-org-pdflatex tex-file)    
+      (when jmax-org-interactive-build
+	(switch-to-buffer "*pdflatex*")
+	(end-of-buffer)
+	(occur "warning\\|undefined\\|error\\|missing")
+	(if (y-or-n-p "Continue to bibtex?")
+	    ;; continuing. delete buffers
+	    (progn 
+	      (mapcar (lambda (x) (when (get-buffer x) (kill-buffer x)))
+		      '("*pdflatex*" "*bibtex*" "*makeindex*" "*Occur*"))
+	      (switch-to-buffer cb))
+	  ;; not continuing
+	  (throw 'status nil)))
+
+      ;; run bibtex if needed
+      (when run-bibtex-p
+	(jmax-org-bibtex tex-file)
+	(when jmax-org-interactive-build
+	  (switch-to-buffer "*bibtex*")
+	  (end-of-buffer)
+	  (occur "warning\\|undefined\\|error\\|missing")
+	  (if (y-or-n-p "Continue?")
+	      ;; continuing. delete buffers
+	      (progn 
+	 	(mapcar (lambda (x) (when (get-buffer x) (kill-buffer x)))
+	 		'("*pdflatex*" "*bibtex*" "*makeindex*" "*Occur*"))
+		(switch-to-buffer cb))
+	    ;; not continuing
+	    (throw 'status nil))))
+
+      (when run-makeindex-p
+	(jmax-org-makeindex tex-file)
+	(when jmax-org-interactive-build
+	  (switch-to-buffer "*makeindex*")
+	  (end-of-buffer)
+	  (occur "warning\\|undefined\\|error\\|missing")
+	  (if (y-or-n-p "Continue to pdflatex 2?")
+	      ;; continuing. delete buffers
+	      (progn 
+	 	(mapcar (lambda (x) (when (get-buffer x) (kill-buffer x)))
+	 		'("*pdflatex*" "*bibtex*" "*makeindex*" "*Occur*"))
+		(switch-to-buffer cb))
+	    ;; not continuing
+	    (throw 'status nil))))
+
+      (jmax-org-pdflatex tex-file)    
+      (when jmax-org-interactive-build
+	(switch-to-buffer "*pdflatex*")
+	(end-of-buffer)
+	(occur "warning\\|undefined\\|error\\|missing")
+	(if (y-or-n-p "Continue to pdflatex3?")
+	    ;; continuing. delete buffers
+	    (progn 
+	      (mapcar (lambda (x) (when (get-buffer x) (kill-buffer x)))
+		      '("*pdflatex*" "*bibtex*" "*makeindex*" "*Occur*"))
+	      (switch-to-buffer cb))
+	  ;; not continuing
+	  (throw 'status nil)))
+
+      (jmax-org-pdflatex tex-file)
+      (mapcar (lambda (x) (when (get-buffer x) (kill-buffer x)))
+	      '("*pdflatex*" "*bibtex*" "*makeindex*" "*Occur*"))
+      "done"))
+
+    (message "Finished with status = %s. %s exists = %s in %s." status pdf-file (file-exists-p pdf-file) default-directory)
+    0))
+
+(setq org-latex-pdf-process 'jmax-org-latex-pdf-process)
+
 ;; for minted you must run latex with -shell-escape because it calls pygmentize as an external program
-(setq org-latex-pdf-process
-      '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %b"
-        "bibtex %b"
-        "makeindex %b"
-        "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %b"
-        "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %b"))
+;; (setq org-latex-pdf-process
+;;       '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %b"
+;;         "bibtex %b"
+;;         "makeindex %b"
+;;         "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %b"
+;;         "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %b"))
 
 ;; I have not had good luck with this on windows
 ;(setq org-latex-to-pdf-process '("texi2dvi --pdf --clean --verbose --batch"))
@@ -301,9 +512,6 @@ citecolor=blue,filecolor=blue,menucolor=blue,urlcolor=blue"
 ;; avoid getting \maketitle right after begin{document}
 ;; you should put \maketitle if and where you want it.
 (setq org-latex-title-command "") 
-
-
-
 
 ;; customized article. better margins
 (add-to-list 'org-latex-classes
@@ -318,13 +526,18 @@ citecolor=blue,filecolor=blue,menucolor=blue,urlcolor=blue"
 	       ("\\paragraph{%s}" . "\\paragraph*{%s}")
 	       ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
 
+;; the real source is in the org-file. whenever the org file is newer
+;; we build the el file.
 
+(if (or
+     (not (file-exists-p "org-ref.el"))
+     (< (float-time (nth 5 (file-attributes "org-ref.el")))
+	(float-time (nth 5 (file-attributes "org-ref.org")))))
+    (progn
+      (org-babel-tangle-file (expand-file-name "org-ref.org" starter-kit-dir))
+      (load-file (expand-file-name "org-ref.el" starter-kit-dir)))
+  (require 'org-ref))
 
-;; these install the new exports
-;; (require 'org-ref)
-;; the real source is in the org-file
-(org-babel-tangle-file (expand-file-name "org-ref.org" starter-kit-dir))
-(load-file (expand-file-name "org-ref.el" starter-kit-dir))
 (require 'ox-cmu-qualifier)
 (require 'ox-cmu-ms-report)
 (require 'ox-cmu-dissertation)

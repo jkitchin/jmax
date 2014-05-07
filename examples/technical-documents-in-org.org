@@ -53,9 +53,9 @@ You should include the word "section" in front of the ref link in any case becau
 
 #+BEGIN_EXAMPLE
 ,*** A headline with a custom id property
-,    :PROPERTIES:
-,    :CUSTOM_ID: sec:headline-label
-,    :END:
+    :PROPERTIES:
+    :CUSTOM_ID: sec:headline-label
+    :END:
 #+END_EXAMPLE
 
 *** A headline with a custom id property
@@ -113,22 +113,22 @@ e^x = 4 \label{eq:1}
 The ref link is clickable, and clicking on it moves the cursor to the corresponding label. You may prefer eqref:eq:1. This will render the number in parentheses on export. You need the amsmath LaTeX package for that. It is default in jmax.
 
 ** Multiline formulas
-If you have very long formulas that need to be broken over several lines, use the flalign environment.
+If you have very long formulas that need to be broken over several lines, use the align environment. Mark the end of a line with =\\=. Use =\nonumber= for lines you do not want numbered.
 
 
-\begin{flalign}
-&OVac\_FormE(cID) \rightarrow OVac\_FormE(mID, mag, num\_atoms, \\
-&orientation, correction, calc\_quantity, \\
+\begin{align}
+&OVac\_FormE(cID) \rightarrow OVac\_FormE(mID, mag, num\_atoms, \nonumber \\
+&orientation, correction, calc\_quantity,\nonumber \\
 &calculator, figure) \label{eq:multiline}
-\end{flalign}
+\end{align}
 
-If you do not like the numbers use flalign*:
+If you do not like the numbers use align*:
 
-\begin{flalign*}
+\begin{align*}
 &OVac\_FormE(cID) \rightarrow OVac\_FormE(mID, mag, num\_atoms, \\
 &orientation, correction, calc\_quantity, \\
 &calculator, figure) 
-\end{flalign*}
+\end{align*}
 
 Put the labels at the end of the equation, as in this example: eqref:eq:multiline. 
 
@@ -259,17 +259,18 @@ For more details on exporting, see [[info:org#Tables%20in%20LaTeX%20export][info
   :END:
 
 You can include almost arbitrary environments from LaTeX, such as an array:
-
+\begin{equation}
 \begin{array}{llcr}
 a & 9 & \sin (12x) & c \\
 a + b & \cos (x) & 7 & d
 \end{array}
+\end{equation}
 
 or a verbatim environment:
 
 \begin{verbatim}
-some verbatim text
-\end{verbatim}.
+some verbatim text.
+\end{verbatim}
 
 Just because you can does not mean you should... You should aim to keep this to a minimum, otherwise you might as well use LaTeX.
 

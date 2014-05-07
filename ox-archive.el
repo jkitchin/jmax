@@ -145,6 +145,9 @@ All references to files will be copied to the archive. Directories are not copie
 		    org-file-abs-path
 		    (format-time-string "%Y-%m-%d" (current-time))))
 
+    ;; add bibliography references if they exist. 
+    (org-ref-extract-bibtex-entries)
+
     ;; write file to temporary directory
     (write-file (expand-file-name org-file org-archive))
 
@@ -153,7 +156,7 @@ All references to files will be copied to the archive. Directories are not copie
     ;;(message "\n\n ------    %s\n\n" (buffer-file-name))
     ;; move the zip archive up a level
     (rename-file org-archive-zip (concat "../"org-archive ".zip"))
-    (kill-buffer)
+    ;(kill-buffer)
 
     (switch-to-buffer org-file)
     ;; get rid of temp-dir
