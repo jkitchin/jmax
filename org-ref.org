@@ -718,10 +718,13 @@ Now, we can see if an entry is in a file.
 #+BEGIN_SRC emacs-lisp :tangle org-ref.el
 (defun org-ref-key-in-file-p (key filename)
   "determine if the key is in the file"
-  (with-temp-buffer
-    (insert-file-contents filename)
-    (bibtex-mode)
-    (bibtex-search-entry key)))
+  (interactive "skey: \nsFile: ")
+
+  (let ((cb (current-buffer)))
+    (set-buffer (find-file-noselect filename))
+    (prog1 
+	(bibtex-search-entry key nil 0)
+      (set-buffer cb))))
 #+END_SRC
 
 Finally, we want to know which file the key is in.
@@ -737,8 +740,9 @@ Finally, we want to know which file the key is in.
    (setq file     (catch 'result
 		    (loop for file in org-ref-bibliography-files do
 			  (message "looking for %s in %s" key file)
-			  (if (org-ref-key-in-file-p key file) 
-			      (throw 'result file)))))
+			  (if (org-ref-key-in-file-p key (file-truename file)) 
+			      (throw 'result file)
+			    (message "%s not found in %s" key (file-truename file))))))
    (message  "you found %s in %s" key file)
    (cons key file)))
 #+END_SRC
