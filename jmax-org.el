@@ -419,6 +419,12 @@ citecolor=blue,filecolor=blue,menucolor=blue,urlcolor=blue"
 	 (cb (current-buffer))
 	 (run-makeindex-p) 
 	 (run-bibtex-p))
+ 
+    ;; start out clean
+    (ox-manuscript-cleanup)
+
+    (when (file-exists-p pdf-file)
+      (delete-file pdf-file))
 			 
     (with-temp-buffer
       (insert-file-contents tex-file)
