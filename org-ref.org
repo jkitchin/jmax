@@ -83,6 +83,11 @@ There are some variables needed later to tell this library where you store your 
   :type 'string
   :group 'org-ref)
 
+(defcustom org-ref-insert-cite-key
+  "C-c ]"
+  "Keyboard shortcut to insert a citation."
+  :type 'string
+  :group 'org-ref)
 #+END_SRC
 
 ** Program variables
@@ -104,7 +109,7 @@ We setup reftex here. We use a custom insert cite link function defined here: [[
          (reftex-parse-all))
     (make-local-variable 'reftex-cite-format)
     (setq reftex-cite-format 'org)
-    (define-key org-mode-map (kbd "C-c ]") 'org-ref-insert-cite-link))
+    (define-key org-mode-map (kbd org-ref-insert-cite-key) 'org-ref-insert-cite-link))
 
 (add-hook 'org-mode-hook 'org-mode-reftex-setup)
 
