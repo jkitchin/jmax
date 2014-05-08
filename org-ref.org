@@ -472,7 +472,7 @@ At the moment, ref links are not usable for section links. You need [[#CUSTOM_ID
 	;; our label links
 	(progn 
 	  (goto-char (point-min))
-	  (re-search-forward (format "label:%s" label) nil t))
+	  (re-search-forward (format "label:%s\\b" label) nil t))
 
 	;; a latex label
 	(progn
