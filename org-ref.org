@@ -927,7 +927,7 @@ you select your option with a single key press."
     
 #+END_SRC
 
-**** A function to format a cite link
+*** A function to format a cite link
 Next, we define a formatting function for the cite link. This is done so that the cite link definition is very short, and easy to change. You just need to specify the functions in the definition.
 
 #+BEGIN_SRC emacs-lisp :tangle org-ref.el
@@ -935,7 +935,7 @@ Next, we define a formatting function for the cite link. This is done so that th
    (cond
     ((eq format 'html) (format "(<cite>%s</cite>)" path))
     ((eq format 'latex)
-     (concat "\\cite{"
+     (concat "\\cite" (when desc (format "[%s]" desc)) "{"
 	     (mapconcat (lambda (key) key) (org-ref-split-and-strip-string keyword) ",")
 	     "}"))))
 #+END_SRC
