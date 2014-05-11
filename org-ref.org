@@ -42,6 +42,8 @@ This document is an experiment at creating a literate program to provide similar
 ;; Lisp code to setup bibliography cite, ref and label org-mode links.
 ;; also sets up reftex for org-mode. The links are clickable and do
 ;; things that are useful. You should really read org-ref.org for details.
+;;
+;; Package-Requires: ((dash "2.6.0"))
 #+END_SRC
 
 ** requires
@@ -49,6 +51,7 @@ The only external require is reftex-cite
 
 #+BEGIN_SRC emacs-lisp  :tangle org-ref.el
 (require 'reftex-cite)
+(require 'dash)
 #+END_SRC
 
 ** Custom variables
@@ -88,6 +91,11 @@ There are some variables needed later to tell this library where you store your 
   "Keyboard shortcut to insert a citation."
   :type 'string
   :group 'org-ref)
+
+(defconst org-ref-cite-types
+  '("cite" "autocite" "citealp" "citet" "citet*" "citep" "citep*" "citeauthor"
+    "citeauthor*" "citeyear" "nocite" "citetext")
+  "List of citation types known in org-ref")
 #+END_SRC
 
 ** Program variables
@@ -1093,7 +1101,7 @@ inserted. Use a prefix arg to get a menu of citation types."
 	(cond
 	 ;; case where we are in a link
 	 ((and (equal (org-element-type object) 'link) 
-	       (equal (org-element-property :type object) "cite"))
+	       (-contains? org-ref-cite-types (org-element-property :type object)))
 	  (goto-char link-string-end)
 	  ;; sometimes there are spaces at the end of the link
 	  ;; this code moves point pack until no spaces are there
@@ -1104,7 +1112,7 @@ inserted. Use a prefix arg to get a menu of citation types."
 	 ((save-excursion 
 	    (backward-char)
 	    (and (equal (org-element-type (org-element-context)) 'link) 
-		 (equal (org-element-property :type (org-element-context)) "cite")))
+		 (-contains? org-ref-cite-types (org-element-property :type (org-element-context)))))
 	  (while (looking-back " ") (backward-char))  
 	  (insert (concat "," (mapconcat 'identity (reftex-citation t ?a) ","))))
 
