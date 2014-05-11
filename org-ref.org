@@ -121,14 +121,12 @@ We setup reftex here. We use a custom insert cite link function defined here: [[
 
 (add-hook 'org-mode-hook 'org-mode-reftex-setup)
 
-;; We make two formats. The default inserts a cite link. the "a"
-;; format is for (a)ppending citations on an existing citation
 (eval-after-load 'reftex-vars
   '(progn
       (add-to-list 'reftex-cite-format-builtin
                    '(org "Org-mode citation"
-                         ((?\C-m . "cite:%l")
-			  (?A . ",%l")
+                         ((?\C-m . "cite:%l")     ; default
+			  (?d . ",%l")            ; for appending
 			  (?a . "autocite:%l")
 			  (?t . "citet:%l")
 			  (?T . "citet*:%l")
@@ -589,7 +587,7 @@ Alternatively, you may want to just call a function that inserts a link with com
  (interactive)
  (insert (org-ref-complete-link)))
 #+END_SRC
-
+0
 ** eqref
 This is just the LaTeX ref for equations. On export, the reference is enclosed in parentheses.
  
