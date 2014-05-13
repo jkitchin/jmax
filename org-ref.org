@@ -793,10 +793,13 @@ we check to see if there is pdf, and if the key actually exists in the bibliogra
 				 (progn
 				   (set-buffer (find-file-noselect bibfile))
 				   (bibtex-search-entry key)
-				   (when (setq url (bibtex-autokey-get-field "url"))
+				   (when (not 
+					  (string= (setq url (bibtex-autokey-get-field "url")) ""))
+				     (message "url found: %s" url)
 				     (throw 'url url))
 				   
-				   (when (setq url (bibtex-autokey-get-field "doi"))
+				   (when (not 
+					  (string= (setq url (bibtex-autokey-get-field "doi")) ""))
 				     (throw 'url url)))) ""))
 		 "(u)rl" "(no url found)"))
     (set-buffer cb)
