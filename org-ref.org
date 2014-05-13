@@ -1588,7 +1588,7 @@ I like my bibtex files to be 100% ascii. This function finds the non-ascii chara
 #+END_SRC
 
 ** Resort a bibtex entry
-I like neat and orderly bibtex entries.That means the fields are in a standard order that I like. This function reorders the fields in an entry for articles.
+I like neat and orderly bibtex entries.That means the fields are in a standard order that I like. This function reorders the fields in an entry for articles, and makes sure the fields are in lowercase.
 
 #+BEGIN_SRC emacs-lisp :tangle org-ref.el
 (defun org-ref-sort-bibtex-entry ()
@@ -1613,7 +1613,7 @@ I like neat and orderly bibtex entries.That means the fields are in a standard o
 
     (cond
      ;; right now we only resort articles
-     ((string= type "article")
+     ((string= (downcase type) "article") 
       (bibtex-kill-entry)
       (insert
        (concat "@article{" key ",\n" 
