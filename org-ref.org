@@ -91,11 +91,17 @@ There are some variables needed later to tell this library where you store your 
   "Keyboard shortcut to insert a citation."
   :type 'string
   :group 'org-ref)
+#+END_SRC
 
-(defconst org-ref-cite-types
+This next variable determines the citation types that are available in org-ref. Links for each one are automatically generated, and completion functions are automatically generated. Users may add to this list in their own init files.
+
+#+BEGIN_SRC emacs-lisp  :tangle org-ref.el
+(defcustom org-ref-cite-types
   '("cite" "autocite" "citealp" "citet" "citet*" "citep" "citep*" "citeauthor"
     "citeauthor*" "citeyear" "nocite" "citetext")
-  "List of citation types known in org-ref")
+  "List of citation types known in org-ref"
+  :type '(repeat :tag "List of citation types" string)
+  :group 'org-ref)
 #+END_SRC
 
 ** Program variables
@@ -138,6 +144,15 @@ We setup reftex here. We use a custom insert cite link function defined here: [[
 			  (?x . "citetext:%l")
 			  (?n . "nocite:%l")
 			  )))))
+#+END_SRC
+
+You may want to add new formats to the reftex-cite-format-builtin variable. Here is an example of adding two new formats. Note that this does not create the links.
+
+#+BEGIN_SRC emacs-lisp
+;; add new format
+(setf (nth 2 (assoc 'org reftex-cite-format-builtin))
+      (append (nth 2 (assoc 'org reftex-cite-format-builtin)) '((?W  . "textcite:%l")
+            (?z  . "newcite:%l"))))
 #+END_SRC
 
 * Links
@@ -256,8 +271,6 @@ It would be nice
   (interactive)
   (insert (org-bibliography-complete-link)))
 #+END_SRC
-
-
 
 ** addbibresource
 This is apparently used for biblatex.
@@ -587,7 +600,7 @@ Alternatively, you may want to just call a function that inserts a link with com
  (interactive)
  (insert (org-ref-complete-link)))
 #+END_SRC
-0
+
 ** eqref
 This is just the LaTeX ref for equations. On export, the reference is enclosed in parentheses.
  
@@ -959,7 +972,7 @@ Finally, we define the cite link.
  'org-ref-cite-link-format)
 #+END_SRC
 
-*** Miscellaneous cite link variations
+*** Miscellaneous cite link variations				   :noexport:
 I do not use these alot, but they are variations of the regular cite commands in LaTeX. For a good reference on what these do see http://merkel.zoneo.net/Latex/natbib.php. The citet variants are for textual citations, and the citep variants are parenthetical citations. What you actually get seems to depend on the bibliography style you are using.
 
 #+BEGIN_SRC emacs-lisp :tangle org-ref.el
@@ -1080,6 +1093,60 @@ I do not use these alot, but they are variations of the regular cite commands in
   (concat "\\citetext{" path "}")))))
 #+END_SRC
 
+*** Automatic definition of the cite links
+There are many different kinds of citations in LaTeX, but they are all variants of a basic syntax of \citetype[optional text]{label1,label2}. Here we use lisp to generate the link definitions. We define a function that creates the code to create the link, and then we evaluate it. We also create the completion function for the new link, and add it to the list of known links. 
+
+#+BEGIN_SRC emacs-lisp :tangle org-ref.el 
+(defmacro org-ref-make-completion-function (type)
+  `(defun ,(intern (format "org-%s-complete-link" type)) (&optional arg)
+     (interactive)
+     (format "%s:%s" 
+	     ,type
+	     (completing-read 
+	      "bibtex key: " 
+	      (let ((bibtex-files (org-ref-find-bibliography)))
+		(bibtex-global-key-alist))))))
+#+END_SRC
+
+We create the links by mapping the function onto the list of defined link types.
+
+#+BEGIN_SRC emacs-lisp :tangle org-ref.el
+(defun org-ref-define-citation-link (type &optional key)
+  "add a citation link for org-ref. With optional key, set the reftex binding. For example:
+(org-ref-define-citation-link \"citez\" ?z) will create a new citez link, with reftex key of z, 
+and the completion function."
+  (interactive "sCitation Type: \ncKey: ")
+  (eval-expression 
+   `(org-add-link-type 
+     ,type
+     'org-ref-cite-onclick-minibuffer-menu
+
+     ;; formatting
+     (lambda (keyword desc format)
+       (cond
+	((eq format 'html) (format "(<",type">%s</",type">)" path))
+	((eq format 'latex)
+	 (concat "\\" ,type (when desc (format "[%s]" desc)) "{"
+		 (mapconcat (lambda (key) key) (org-ref-split-and-strip-string keyword) ",")
+		 "}"))))))
+
+  ;; create the completion function
+  (eval `(org-ref-make-completion-function ,type))
+
+  ;; store new type so it works with adding citations, which checks
+  ;; for existence in this list
+  (add-to-list 'org-ref-cite-types type)
+
+  ;; and finally if a key is specified, we modify the reftex menu
+  (when key
+    (setf (nth 2 (assoc 'org reftex-cite-format-builtin))
+	  (append (nth 2 (assoc 'org reftex-cite-format-builtin)) 
+		  `((,key  . ,(concat type ":%l")))))))
+
+;; create all the link types and their completion functions
+(mapcar 'org-ref-define-citation-link org-ref-cite-types)
+#+END_SRC
+
 *** org-ref-insert-cite-link
 We need a convenient method to insert links. In reftex you use the keystroke C-c ], which gives you a minibuffer to search the bibtex files from. This function is bound to that same keystroke here [[*org-mode%20/%20reftex%20setup][org-mode / reftex setup]]. This function will append to a cite link if you call it while on a link.
 
@@ -1130,8 +1197,9 @@ inserted. Use a prefix arg to get a menu of citation types."
 : org-ref-insert-cite-link
 
 *** Completion in cite links
-If you know the specific bibtex key, you may like to use completion directly. You use this with the org-mode machinery and tab completion.
-#+BEGIN_SRC emacs-lisp  :tangle org-ref.el
+If you know the specific bibtex key, you may like to use completion directly. You use this with the org-mode machinery and tab completion. Here is the prototypical completion function. These are now all created when the links are created.
+
+#+BEGIN_SRC emacs-lisp  
 (defun org-cite-complete-link (&optional arg)
   "Completion function for cite links"
   (format "%s:%s" 
@@ -1142,13 +1210,13 @@ If you know the specific bibtex key, you may like to use completion directly. Yo
 	     (bibtex-global-key-alist)))))
 #+END_SRC
 
-Alternatively, you may shortcut the org-machinery with this command.
+Alternatively, you may shortcut the org-machinery with this command. You will be prompted for a citation type, and then offered key completion.
 
 #+BEGIN_SRC emacs-lisp :tangle org-ref.el
-(defun org-ref-insert-cite-with-completion ()
+(defun org-ref-insert-cite-with-completion (type)
   "Insert a cite link with completion"
-  (interactive)
-  (insert (org-cite-complete-link)))
+  (interactive (list (ido-completing-read "Type: " org-ref-cite-types)))
+  (insert (funcall (intern (format "org-%s-complete-link" type)))))
 #+END_SRC
 
 *** Storing links to a bibtex entry
@@ -1156,7 +1224,7 @@ org-mode already defines a store link function for bibtex entries. It does not s
 
 #+BEGIN_SRC emacs-lisp :tangle org-ref.el
 (defun org-ref-store-bibtex-entry-link ()
-  "Save a citation link to the current bibtex entry"
+  "Save a citation link to the current bibtex entry. Saves in the default link type."
   (interactive)
   (let ((link (concat org-ref-default-citation-link 
 		 ":"   
