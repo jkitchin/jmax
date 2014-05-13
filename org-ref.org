@@ -1159,6 +1159,7 @@ We need a convenient method to insert links. In reftex you use the keystroke C-c
 appends to the end of the link, otherwise, a new link is
 inserted. Use a prefix arg to get a menu of citation types."
   (interactive "P")
+  (org-ref-find-bibliography)
   (let* ((object (org-element-context))
 	 (link-string-beginning (org-element-property :begin object))
 	 (link-string-end (org-element-property :end object))
