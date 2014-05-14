@@ -36,27 +36,38 @@
 (require 'ox)
 (require 'ox-publish)
 
-
 (defgroup ox-manuscript nil
   "customization group for ox-manuscript")
 
 (defcustom ox-manuscript-latex-command
-  "pdflatex -shell-escape "
-  "Command to run latex. Make sure to have a trailing space at the end."
+  "pdflatex"
+  "Command to run latex."
   :group 'ox-manuscript)
 
 (defcustom ox-manuscript-bibtex-command
-  "bibtex8 "
-  "Command to run bibtex. Make sure to have a trailing space at the end."
+  "bibtex8"
+  "Command to run bibtex."
   :group 'ox-manuscript)
+
+(defcustom ox-manuscript-interactive-build
+  nil
+  "Determines if pdfs are built with interaction from the user. nil means just build without user interaction. Anything else will show the user a window of the results of each build step, and ask if you should continue to the next step."
+  :group 'ox-manuscript)
+
+(defun ox-manuscript-toggle-interactive-build ()
+ "toggle state of ox-manuscript-interactive-build"
+  (interactive)
+  (if ox-manuscript-interactive-build
+      (setq ox-manuscript-interactive-build nil)
+    (setq ox-manuscript-interactive-build t)))
 
 ;; <<ACS journals>>
 (add-to-list 'org-latex-classes
-	     '("achemso"                          ;class-name
+	     '("achemso"                         
 	       "\\documentclass{achemso}
-                [NO-DEFAULT-PACKAGES]
-                [PACKAGES]
-                [EXTRA]"        ; header-string
+ [NO-DEFAULT-PACKAGES]
+ [PACKAGES]
+ [EXTRA]"        
 	       ("\\section{%s}" . "\\section*{%s}")
 	       ("\\subsection{%s}" . "\\subsection*a{%s}")
 	       ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
@@ -64,11 +75,11 @@
 	       ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
 
 ;; <<APS journals>>
-(add-to-list 'org-latex-classes '("revtex4-1"    ;class-name
-				   "\\documentclass{revtex4-1}
-				   [NO-DEFAULT-PACKAGES]
-				   [PACKAGES]
-				   [EXTRA]"
+(add-to-list 'org-latex-classes '("revtex4-1"   
+				  "\\documentclass{revtex4-1}
+ [NO-DEFAULT-PACKAGES]
+ [PACKAGES]
+ [EXTRA]"
 				   ("\\section{%s}" . "\\section*{%s}")
 				   ("\\subsection{%s}" . "\\subsection*{%s}")
 				   ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
@@ -78,9 +89,9 @@
 ;; <<Springer journals>>
 (add-to-list 'org-latex-classes '("svjour3"
 				  "\\documentclass{svjour3}
-				   [NO-DEFAULT-PACKAGES]
-				   [PACKAGES]
-                                   [EXTRA]"
+ [NO-DEFAULT-PACKAGES]
+ [PACKAGES]
+ [EXTRA]"
 				  ("\\section{%s}" . "\\section*{%s}")
 				  ("\\subsection{%s}" . "\\subsection*{%s}")
 				  ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
@@ -89,15 +100,16 @@
 
 ;; <<Elsevier journals>>
 (add-to-list 'org-latex-classes '("elsarticle"
-				  "\\documentclass{elsarticle}
-				   [NO-DEFAULT-PACKAGES]
-				   [EXTRA]
-				   [PACKAGES]"
+"\\documentclass{elsarticle}
+ [NO-DEFAULT-PACKAGES]
+ [PACKAGES]
+ [EXTRA]" 
 				  ("\\section{%s}" . "\\section*{%s}")
 				  ("\\subsection{%s}" . "\\subsection*{%s}")
 				  ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
 				  ("\\paragraph{%s}" . "\\paragraph*{%s}")
 				  ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+
 
 
 (defun ox-manuscript-cleanup (&optional depth)
@@ -150,35 +162,179 @@ Run this from an org-buffer after you have exported it to a LaTeX file"
                                               "{\\([^}].*\\)\.\\(png\\)}")
                                       "\\1{\\3}"  tex-contents)))))
 
-(defun ox-manuscript-pdflatex ()
-  "run `ox-manuscript-latex-command' on the tex file corresponding to an exported org file."
-  (interactive)
-  (let* ((org-file (file-name-nondirectory (buffer-file-name)))
-	 (tex-file (replace-regexp-in-string "org$" "tex" org-file)))
+(defun ox-manuscript-latex (tex-file)
+  "run `ox-manuscript-latex-command' on tex-file. This function checks for the presence of minted, and uses -shell-escape if needed. You can run this interactively, and you will be prompted for a tex file name."
+  (interactive "fTex file: ")
+  (message "running pdflatex on %s" tex-file)
 
-    ;; if no .tex run commands to get one.
-    (if (file-exists-p tex-file)
-	(progn
-	  (message (format "running pdflatex on %s" tex-file))
-	  (unless (eq 0 (shell-command 
-			 (concat ox-manuscript-latex-command tex-file)))
-	    (switch-to-buffer "*Shell Command Output*")
-	    (end-of-buffer)
-	    (error "pdflatex  failed to build")))
-      (error "no tex file found"))))
+  (let ((minted-p (with-temp-buffer
+		    (insert-file-contents tex-file)
+		    (beginning-of-buffer)
+		    (re-search-forward "{minted}" nil t)))
+	(search-upper-case nil)
+	(cb (current-buffer))
+	(results))
 
-(defun ox-manuscript-bibtex ()
-  "run bibtex. You can customize the bibtex command with the variable `ox-manuscript-bibtex-command'."
-  (interactive)
-  (let* ((org-file (file-name-nondirectory (buffer-file-name)))
-         (tex-file (replace-regexp-in-string "org$" "tex" org-file))
-	 (bib-file (file-name-sans-extension tex-file)))
-    (message (format "running bibtex on %s" bib-file))
-    (unless (eq 0 (shell-command 
-		     (concat ox-manuscript-bibtex-command bib-file)))
-	(switch-to-buffer "*Shell Command Output*")
+    ;; run pdflatex
+    (if minted-p
+	(setq results (shell-command-to-string 
+		       (concat 
+			ox-manuscript-latex-command 
+			" -shell-escape -interaction nonstopmode " 
+			tex-file)))
+      ;; else
+      (setq results 
+	    (shell-command-to-string 
+	     (concat ox-manuscript-latex-command 
+		     " -interaction nonstopmode " 
+		     tex-file))))
+
+    (with-current-buffer (get-buffer-create "*latex*")
+      (insert results))))
+
+(defun ox-manuscript-bibtex (tex-file)
+  "Run `ox-manuscript-bibtex-command' on the tex-file."
+  (interactive "fTex file: ")
+  (message "running bibtex on %s" tex-file)
+
+  (let* ((basename (file-name-sans-extension tex-file))
+	 (output (shell-command-to-string (concat ox-manuscript-bibtex-command " " basename))))
+    (with-current-buffer (get-buffer-create "*bibtex*")
+      (insert output))))
+
+(defun ox-manuscript-makeindex (tex-file)
+  "run makeindex program"
+  (interactive "fTex file: ")
+  (let* ((basename (file-name-sans-extension tex-file))
+	 (output (shell-command-to-string (concat "makeindex " basename))))
+    (with-current-buffer (get-buffer-create "*makeindex*")
+      (insert output))))
+
+(defun ox-manuscript-latex-pdf-process (quoted-tex-file)
+  "Build a tex-file to pdf. The argument is called quoted-tex-file because this seems to be what org-mode passes to this function. The function strips the quotes out. Depending on the value of `ox-manuscript-interactive-build', you will get buffers of the intermediate output steps."
+  (interactive "fTex file: ")
+  ;; it seems the filename passed to this function from org-mode has
+  ;; "" in it. we remove them here.
+  (let* ((tex-file (replace-regexp-in-string "\"" "" quoted-tex-file))	  
+	 (basename (file-name-sans-extension tex-file))
+	 (pdf-file (concat basename ".pdf"))
+	 (status)
+	 (cb (current-buffer))
+	 (run-makeindex-p) 
+	 (run-bibtex-p))
+ 
+    ;; start out clean
+    (ox-manuscript-cleanup)
+
+    (when (file-exists-p pdf-file)
+      (delete-file pdf-file))
+			 
+    (with-temp-buffer
+      (insert-file-contents tex-file)
+      (beginning-of-buffer)
+      (setq run-makeindex-p (re-search-forward "\\\\makeindex" nil t))
+      (beginning-of-buffer)
+      (setq run-bibtex-p (re-search-forward "\\\\bibliography{" nil t)))
+
+    (setq status (catch 'status
+      ;; run first latex
+      (ox-manuscript-latex tex-file)    
+      (when ox-manuscript-interactive-build
+	(switch-to-buffer "*latex*")
 	(end-of-buffer)
-	(error "bibtex failed to build"))))
+	(occur "warning\\|undefined\\|error\\|missing")
+	(if (y-or-n-p "Continue to bibtex?")
+	    ;; continuing. delete buffers
+	    (progn 
+	      (mapcar (lambda (x) (when (get-buffer x) (kill-buffer x)))
+		      '("*latex*" "*bibtex*" "*makeindex*" "*Occur*"))
+	      (switch-to-buffer cb))
+	  ;; not continuing
+	  (throw 'status nil)))
+
+      ;; run bibtex if needed
+      (when run-bibtex-p
+	(ox-manuscript-bibtex tex-file)
+	(when ox-manuscript-interactive-build
+	  (switch-to-buffer "*bibtex*")
+	  (end-of-buffer)
+	  (occur "warning\\|undefined\\|error\\|missing")
+	  (if (y-or-n-p "Continue?")
+	      ;; continuing. delete buffers
+	      (progn 
+	 	(mapcar (lambda (x) (when (get-buffer x) (kill-buffer x)))
+	 		'("*latex*" "*bibtex*" "*makeindex*" "*Occur*"))
+		(switch-to-buffer cb))
+	    ;; not continuing
+	    (throw 'status nil))))
+
+      (when run-makeindex-p
+	(ox-manuscript-makeindex tex-file)
+	(when ox-manuscript-interactive-build
+	  (switch-to-buffer "*makeindex*")
+	  (end-of-buffer)
+	  (occur "warning\\|undefined\\|error\\|missing")
+	  (if (y-or-n-p "Continue to latex 2?")
+	      ;; continuing. delete buffers
+	      (progn 
+	 	(mapcar (lambda (x) (when (get-buffer x) (kill-buffer x)))
+	 		'("*latex*" "*bibtex*" "*makeindex*" "*Occur*"))
+		(switch-to-buffer cb))
+	    ;; not continuing
+	    (throw 'status nil))))
+
+      (ox-manuscript-latex tex-file)    
+      (when ox-manuscript-interactive-build
+	(switch-to-buffer "*latex*")
+	(end-of-buffer)
+	(occur "warning\\|undefined\\|error\\|missing")
+	(if (y-or-n-p "Continue to latex3?")
+	    ;; continuing. delete buffers
+	    (progn 
+	      (mapcar (lambda (x) (when (get-buffer x) (kill-buffer x)))
+		      '("*latex*" "*bibtex*" "*makeindex*" "*Occur*"))
+	      (switch-to-buffer cb))
+	  ;; not continuing
+	  (throw 'status nil)))
+
+      (ox-manuscript-latex tex-file)
+      (mapcar (lambda (x) (when (get-buffer x) (kill-buffer x)))
+	      '("*latex*" "*bibtex*" "*makeindex*" "*Occur*"))
+      "done"))
+
+    (message "Finished with status = %s. %s exists = %s in %s." status pdf-file (file-exists-p pdf-file) default-directory)
+    0))
+
+(setq org-latex-pdf-process 'ox-manuscript-latex-pdf-process)
+;; (defun ox-manuscript-pdflatex ()
+;;   "run `ox-manuscript-latex-command' on the tex file corresponding to an exported org file."
+;;   (interactive)
+;;   (let* ((org-file (file-name-nondirectory (buffer-file-name)))
+;; 	 (tex-file (replace-regexp-in-string "org$" "tex" org-file)))
+
+;;     ;; if no .tex run commands to get one.
+;;     (if (file-exists-p tex-file)
+;; 	(progn
+;; 	  (message (format "running pdflatex on %s" tex-file))
+;; 	  (unless (eq 0 (shell-command 
+;; 			 (concat ox-manuscript-latex-command " " tex-file)))
+;; 	    (switch-to-buffer "*Shell Command Output*")
+;; 	    (end-of-buffer)
+;; 	    (error "pdflatex  failed to build")))
+;;       (error "no tex file found"))))
+
+;; (defun ox-manuscript-bibtex ()
+;;   "run bibtex. You can customize the bibtex command with the variable `ox-manuscript-bibtex-command'."
+;;   (interactive)
+;;   (let* ((org-file (file-name-nondirectory (buffer-file-name)))
+;;          (tex-file (replace-regexp-in-string "org$" "tex" org-file))
+;; 	 (bib-file (file-name-sans-extension tex-file)))
+;;     (message (format "running bibtex on %s" bib-file))
+;;     (unless (eq 0 (shell-command 
+;; 		     (concat ox-manuscript-bibtex-command " " bib-file)))
+;; 	(switch-to-buffer "*Shell Command Output*")
+;; 	(end-of-buffer)
+;; 	(error "bibtex failed to build"))))
 
 (defun ox-manuscript-bibliography-to-bbl ()
   "Replace \bibliography{} in tex file with contents of the bbl file.
@@ -192,8 +348,8 @@ we check for a bbl file, and if there is not one, we run pdflatex, then bibtex t
 
     ;; if no .bbl run commands to get one.
     (unless (file-exists-p bbl-file)
-      (ox-manuscript-pdflatex)    
-      (ox-manuscript-bibtex))
+      (ox-manuscript-latex tex-file)    
+      (ox-manuscript-bibtex tex-file))
 
     (find-file tex-file)
     (goto-char (point-min))
@@ -220,16 +376,16 @@ We assume there is a bibliography and style defined if a cite is found. no check
   (interactive)
 
   (let* ((org-file (file-name-nondirectory (buffer-file-name)))
+	 (tex-file (replace-regexp-in-string "org$" "tex" org-file))
          (pdf-file (replace-regexp-in-string "org$" "pdf" org-file)))
-    (ox-manuscript-pdflatex)
+    (ox-manuscript-latex tex-file)
 
     (when (ox-manuscript-run-bibtex-p)
-      (ox-manuscript-bibtex))
+      (ox-manuscript-bibtex tex-file))
 
-    (ox-manuscript-pdflatex)
-    (ox-manuscript-pdflatex)
+    (ox-manuscript-latex tex-file)
+    (ox-manuscript-latex tex-file)
   
-
     (ox-manuscript-cleanup)
     (format "Manuscript built on %s with org-mode %s" (current-time-string) (org-version))
 
@@ -252,13 +408,14 @@ We assume there is a bibliography and style defined if a cite is found. no check
   "create manuscript for submission. This removes the .png extensions from graphics, and replaces the bibliography with the contents of the bbl file. the result is a single, standalone tex-file, and the corresponding pdf."
   (interactive)
   (let* ((org-file (file-name-nondirectory (buffer-file-name)))
+	 (tex-file (replace-regexp-in-string "org$" "tex" org-file))
          (pdf-file (replace-regexp-in-string "org$" "pdf" org-file)))
     (ox-manuscript-cleanup 'deep)
     (org-latex-export-to-latex async subtreep visible-only body-only options)
     (ox-manuscript-remove-image-extensions)
     (ox-manuscript-bibliography-to-bbl)    
-    (ox-manuscript-pdflatex)
-    (ox-manuscript-pdflatex)
+    (ox-manuscript-latex tex-file)
+    (ox-manuscript-latex tex-file)
     (ox-manuscript-cleanup)
 
     (format "Manuscript built on %s with org-mode %s" (current-time-string) (org-version))
@@ -278,7 +435,7 @@ We assume there is a bibliography and style defined if a cite is found. no check
 	(mml-attach-file pdf)
 	(message-goto-to)))
 
-
+;; The backend options
 (org-export-define-derived-backend 'cmu-manuscript 'latex
   :menu-entry
   '(?j "Export with cmu-manuscript"
