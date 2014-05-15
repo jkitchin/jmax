@@ -1568,7 +1568,7 @@ Makes a new buffer with clickable links."
 						       key (buffer-name)(plist-get plist ':begin)))))
 		))))))
 
-    (if identity bad-citations
+    (if bad-citations
       (progn
 	(switch-to-buffer-other-window "*Missing citations*")
 	(org-mode)
@@ -1692,6 +1692,11 @@ see [[file:emacs-24.3/lisp/textmodes/bibtex.el::bibtex-autokey-before-presentati
       ;; check if the key is in the buffer
       (when (save-excursion
 	      (bibtex-search-entry key))
+	(save-excursion
+	  (bibtex-search-entry key)
+	  (bibtex-copy-entry-as-kill)
+	  (switch-to-buffer-other-window "*duplicate entry*")
+	  (bibtex-yank))
 	  (setq key (bibtex-read-key "Duplicate Key found, edit: " key)))
 
       (insert key)
