@@ -1474,7 +1474,8 @@ When you use your default bibliography file, and you want to send an org-file to
 
 If no bibliography is in the buffer the `reftex-default-bibliography' is used."
   (interactive)
-  (let* ((tempname (make-temp-file "extract-bib"))
+  (let* ((temporary-file-directory (file-name-directory (buffer-file-name)))
+         (tempname (make-temp-file "extract-bib"))
          (contents (buffer-string))
          (cb (current-buffer))
 	 basename texfile bibfile results)
@@ -1518,13 +1519,13 @@ If no bibliography is in the buffer the `reftex-default-bibliography' is used."
     (when (not (string= "" results))
       (save-excursion
         (goto-char (point-max))
-        (insert "\n\n"
-        (org-insert-heading-after-current)
-        (insert (format " Bibtex entries
+        (insert "\n\n")
+	(org-insert-heading-after-current)
+	(insert (format " Bibtex entries
 
 ,#+BEGIN_SRC: text :tangle %s
 %s
-,#+END_SRC" bibfile results)))))))
+,#+END_SRC" (file-name-nondirectory bibfile) results))))))
 #+END_SRC
 
 ** Find bad cite links
@@ -1554,6 +1555,7 @@ Makes a new buffer with clickable links."
   (interactive)
   ;; generate the list of bibtex-keys and cited keys
   (let* ((bibtex-files (org-ref-find-bibliography))
+         (bibtex-file-path (mapconcat (lambda (x) (file-name-directory (file-truename x))) bibtex-files ":"))
 	 (bibtex-keys (mapcar (lambda (x) (car x)) (bibtex-global-key-alist)))
 	 (bad-citations '()))
 
