@@ -1547,7 +1547,7 @@ Depending on how you enter citations, you may have citations with no correspondi
     (if found i nil)))
 
 
-(defun org-ref-bib-find-bad-citations ()
+(defun org-ref-find-bad-citations ()
   "Create a list of citation keys in an org-file that do not have a bibtex entry in the known bibtex files.
 
 Makes a new buffer with clickable links."
