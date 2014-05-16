@@ -204,7 +204,7 @@
       '(("w" "Weekly Review"
           (
            ;; put a random entry at the top
-           (get-random-bibtex-entry)
+           ;(get-random-bibtex-entry)
 
            ;; deadlines
           (tags-todo "+DEADLINE<=\"<today>\""

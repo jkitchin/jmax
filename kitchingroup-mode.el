@@ -73,10 +73,12 @@
       ["submission PDF" ox-manuscript-build-submission-manuscript-and-open t]      
       ))
     ("bibtex"
-     ["find non-ascii characters" find-non-ascii-characters t]
+     ["find non-ascii characters" org-ref-find-non-ascii-characters t]
      ["reformat entry" bibtex-reformat t]
      ["clean entry" bibtex-clean-entry t]
-     ["validate bibtex file" bibtex-validate-globally t]
+     ["validate bibtex file" bibtex-validate t]
+     ["sort bibtex file" bibtex-sort-buffer t]
+     ["extract bibtex entries from org" org-ref-extract-bibtex-entries t]
      ["build bibliography pdf from bib file" org-ref-build-full-bibliography t]
      ["find bad citations" org-ref-bib-find-bad-citations t]
      )))
