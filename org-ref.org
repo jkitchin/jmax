@@ -983,7 +983,7 @@ Next, we define a formatting function for the cite link. This is done so that th
 #+BEGIN_SRC emacs-lisp :tangle org-ref.el
 (defun org-ref-cite-link-format (keyword desc format)
    (cond
-    ((eq format 'html) (format "(<cite>%s</cite>)" path))
+    ((eq format 'html) (mapconcat (lambda (key) (format "<a name=\"#%s\">%s</a>" key key) (org-ref-split-and-strip-string keyword) ",")))
     ((eq format 'latex)
      (concat "\\cite" (when desc (format "[%s]" desc)) "{"
 	     (mapconcat (lambda (key) key) (org-ref-split-and-strip-string keyword) ",")
@@ -1163,7 +1163,7 @@ and the completion function."
      ;; formatting
      (lambda (keyword desc format)
        (cond
-	((eq format 'html) (format "(<",type">%s</",type">)" path))
+	((eq format 'html) (mapconcat (lambda (key) (format "<a href=\"#%s\">%s</a>" key key)) (org-ref-split-and-strip-string keyword) ","))
 	((eq format 'latex)
 	 (concat "\\" ,type (when desc (org-ref-format-citation-description desc)) "{"
 		 (mapconcat (lambda (key) key) (org-ref-split-and-strip-string keyword) ",")
@@ -1276,6 +1276,63 @@ org-mode already defines a store link function for bibtex entries. It does not s
     (car org-stored-links)))
 #+END_SRC
 
+*** An html bibliography
+This code provides some functions to generate a simple bibliography in html.
+
+#+BEGIN_SRC emacs-lisp :tangle org-ref.el
+(defun org-ref-get-bibtex-keys ()
+  "return a list of unique keys in the buffer"
+  (interactive)
+  (let ((keys '()))
+    (org-element-map (org-element-parse-buffer) 'link
+      (lambda (link)       
+	(let ((plist (nth 1 link)))			     
+	  (when (-contains? org-ref-cite-types (plist-get plist ':type))
+	    (dolist 
+		(key 
+		 (org-ref-split-and-strip-string (plist-get plist ':path)))
+	      (when (not (-contains? keys key))
+		(setq keys (append keys (list key)))))))))
+    keys))
+#+END_SRC
+
+
+#+BEGIN_SRC emacs-lisp :tangle org-ref.el
+(defun org-ref-get-bibtex-entry-html (key)
+(interactive)
+
+ (let ((org-ref-bibliography-files (org-ref-find-bibliography))
+       (cb (current-buffer))
+       (file) (entry))
+
+   (setq file (catch 'result
+		(loop for file in org-ref-bibliography-files do
+		      (message "looking for %s in %s" key file)
+		      (if (org-ref-key-in-file-p key (file-truename file)) 
+			  (throw 'result file)
+			(message "%s not found in %s" key (file-truename file))))))
+   (set-buffer (find-file-noselect file))
+   (prog1 
+       (bibtex-search-entry key nil 0)
+     (setq entry  (org-ref-bib-html-citation))
+     (set-buffer cb))
+    
+   (format "<li><a id=\"%s\">[%s] %s</a></li>" key key entry)))
+#+END_SRC
+
+
+#+BEGIN_SRC emacs-lisp :tangle org-ref.el 
+(defun org-ref-get-html-bibliography ()
+  "Create an html bibliography when there are keys"
+  (interactive)
+  (let ((keys (org-ref-get-bibtex-keys)))
+    (when keys
+      (concat "<h1>Bibliography</h1>
+<ul>"
+	      (mapconcat (lambda (x) (org-ref-get-bibtex-entry-html x)) keys "\n")
+	      "\n</ul>"))))
+#+END_SRC
+
 * Utilities
 ** create simple text citation from bibtex entry
 
@@ -1302,6 +1359,35 @@ org-mode already defines a store link function for bibtex entries. It does not s
 	  ;;authors, "title", Journal, vol(iss):pages (year).
             (format "%s, \"%s\", %s, %s:%s (%s)"
 		    author title journal  volume pages year)))))
+#+END_SRC
+
+
+#+BEGIN_SRC emacs-lisp :tangle org-ref.el
+(defun org-ref-bib-html-citation ()
+  "from a bibtex entry, create and return a simple citation with html links."
+  (interactive)
+  (if (eq major-mode 'bibtex-mode)
+      (progn
+        (bibtex-beginning-of-entry)
+        (let* ((cb (current-buffer))
+               (bibtex-expand-strings t)
+               (entry (bibtex-parse-entry t))
+               (title (replace-regexp-in-string "\n\\|\t\\|\s+" " " (reftex-get-bib-field "title" entry)))
+               (year  (reftex-get-bib-field "year" entry))
+               (author (replace-regexp-in-string "\n\\|\t\\|\s+" " " (reftex-get-bib-field "author" entry)))
+               (key (reftex-get-bib-field "=key=" entry))
+               (journal (reftex-get-bib-field "journal" entry))
+               (volume (reftex-get-bib-field "volume" entry))
+               (pages (reftex-get-bib-field "pages" entry))
+               (doi (reftex-get-bib-field "doi" entry))
+               (url (reftex-get-bib-field "url" entry))
+               )
+	  ;;authors, "title", Journal, vol(iss):pages (year).
+            (concat (format "%s, \"%s\", %s, %s:%s (%s)."
+			    author title journal  volume pages year)
+		    (when url (format " <a href=\"%s\">link</a>" url))
+		    (when doi (format " <a href=\"http://dx.doi.org/%s\">doi</a>" doi)))
+	    ))))
 #+END_SRC
 
 ** open pdf from bibtex
