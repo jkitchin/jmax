@@ -97,8 +97,35 @@ This next variable determines the citation types that are available in org-ref. 
 
 #+BEGIN_SRC emacs-lisp  :tangle org-ref.el
 (defcustom org-ref-cite-types
-  '("cite" "autocite" "citealp" "citet" "citet*" "citep" "citep*" "citeauthor"
-    "citeauthor*" "citeyear" "nocite" "citetext")
+  '("cite" "nocite" ;; the default latex cite commands
+    ;; natbib cite commands, http://ctan.unixbrain.com/macros/latex/contrib/natbib/natnotes.pdf
+    "citet" "citet*" "citep" "citep*"
+    "citealt" "citealt*" "citealp" "citealp*"
+    "citenum" "citetext"
+    "citeauthor" "citeauthor*"
+    "citeyear" "citeyear*"
+    "Citet" "Citep" "Citealt" "Citealp" "Citeauthor"
+    ;; biblatex commands
+    ;; http://ctan.mirrorcatalogs.com/macros/latex/contrib/biblatex/doc/biblatex.pdf
+    ;; no multiple citation commands supported. the syntax is too
+    ;; heavy for the org-link syntax.
+    "Cite"
+    "parencite" "Parencite"
+    "footcite" "footcitetext"
+    "textcite" "Textcite"
+    "smartcite" "Smartcite"
+    "cite*" "parencite*" "supercite"
+    "autocite" "Autocite" "autocite*" "Autocite*"
+    "Citeauthor*"
+    "citetitle" "citetitle*"
+    "citedate" "citedate*"
+    "citeurl"
+    "fullcite" "footfullcite"
+    ;; "volcite" "Volcite" cannot support the syntax
+    "notecite" "Notecite"
+    "pnotecite" "Pnotecite"
+    "fnotecite"
+    )
   "List of citation types known in org-ref"
   :type '(repeat :tag "List of citation types" string)
   :group 'org-ref)
@@ -110,6 +137,7 @@ This next variable determines the citation types that are available in org-ref. 
 nil
 "variable to hold bibliography files to be searched")
 #+END_SRC
+
 ** org-mode / reftex setup
 
 We setup reftex here. We use a custom insert cite link function defined here: [[*org-ref-insert-cite-link][org-ref-insert-cite-link]]. We setup reftex to use our org citation format.
@@ -1111,9 +1139,17 @@ There are many different kinds of citations in LaTeX, but they are all variants 
 		(bibtex-global-key-alist))))))
 #+END_SRC
 
-We create the links by mapping the function onto the list of defined link types.
+We create the links by mapping the function onto the list of defined link types. 
 
 #+BEGIN_SRC emacs-lisp :tangle org-ref.el
+(defun org-ref-format-citation-description (desc)
+  "return formatted citation description. if the cite link has a description, it is optional text for the citation command. You can specify pre and post text by separating these with ::."
+  (interactive)
+  (cond
+   ((string-match "::" desc)
+    (format "[%s][%s]" (car (setq results (split-string desc "::"))) (cadr results)))
+   (t (format "[%s]" desc))))
+
 (defun org-ref-define-citation-link (type &optional key)
   "add a citation link for org-ref. With optional key, set the reftex binding. For example:
 (org-ref-define-citation-link \"citez\" ?z) will create a new citez link, with reftex key of z, 
@@ -1129,7 +1165,7 @@ and the completion function."
        (cond
 	((eq format 'html) (format "(<",type">%s</",type">)" path))
 	((eq format 'latex)
-	 (concat "\\" ,type (when desc (format "[%s]" desc)) "{"
+	 (concat "\\" ,type (when desc (org-ref-format-citation-description desc)) "{"
 		 (mapconcat (lambda (key) key) (org-ref-split-and-strip-string keyword) ",")
 		 "}"))))))
 
