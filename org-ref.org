@@ -112,8 +112,6 @@ This next variable determines the citation types that are available in org-ref. 
     "Citet" "Citep" "Citealt" "Citealp" "Citeauthor"
     ;; biblatex commands
     ;; http://ctan.mirrorcatalogs.com/macros/latex/contrib/biblatex/doc/biblatex.pdf
-    ;; no multiple citation commands supported. the syntax is too
-    ;; heavy for the org-link syntax.
     "Cite"
     "parencite" "Parencite"
     "footcite" "footcitetext"
@@ -130,6 +128,11 @@ This next variable determines the citation types that are available in org-ref. 
     "notecite" "Notecite"
     "pnotecite" "Pnotecite"
     "fnotecite"
+    ;; multicites. Very limited support for these.
+    "cites" "Cites" "parencites" "Parencites"
+    "footcites" "footcitetexts"
+    "smartcites" "Smartcites" "textcites" "Textcites"
+    "supercites"
     )
   "List of citation types known in org-ref"
   :type '(repeat :tag "List of citation types" string)
@@ -1353,10 +1356,17 @@ We will want to generate formatting functions for each citation type. The reason
 	(org-ref-split-and-strip-string keyword) ","))
 
       ((eq format 'latex)
+       (if (string= (substring type -1) "s")
+	   ;; biblatex format for multicite commands, which all end in s. These are formated as \cites{key1}{key2}...
+	   (concat "\\" ,type (mapconcat (lambda (key) (format "{%s}"  key))
+					 (org-ref-split-and-strip-string keyword) ""))
+	 ;; bibtex format
        (concat "\\" ,type (when desc (org-ref-format-citation-description desc)) "{"
 	       (mapconcat (lambda (key) key) (org-ref-split-and-strip-string keyword) ",")
-	       "}")))))
+	       "}"))))))
 #+END_SRC
+
+
 
 We create the links by mapping the function onto the list of defined link types. 
 
