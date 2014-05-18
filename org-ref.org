@@ -1181,6 +1181,7 @@ you select your option with a single key press."
 #+END_SRC
 
 *** A function to format a cite link
+
 Next, we define a formatting function for the cite link. This is done so that the cite link definition is very short, and easy to change. You just need to specify the functions in the definition. This function is deprecated. The formatting is defined later automatically.
 
 #+BEGIN_SRC emacs-lisp 
@@ -1488,6 +1489,63 @@ org-mode already defines a store link function for bibtex entries. It does not s
     (message "saved %s" link)
     (push (list link) org-stored-links)
     (car org-stored-links)))
+#+END_SRC
+
+*** An html bibliography
+This code provides some functions to generate a simple bibliography in html.
+
+#+BEGIN_SRC emacs-lisp :tangle org-ref.el
+(defun org-ref-get-bibtex-keys ()
+  "return a list of unique keys in the buffer"
+  (interactive)
+  (let ((keys '()))
+    (org-element-map (org-element-parse-buffer) 'link
+      (lambda (link)       
+	(let ((plist (nth 1 link)))			     
+	  (when (-contains? org-ref-cite-types (plist-get plist ':type))
+	    (dolist 
+		(key 
+		 (org-ref-split-and-strip-string (plist-get plist ':path)))
+	      (when (not (-contains? keys key))
+		(setq keys (append keys (list key)))))))))
+    keys))
+#+END_SRC
+
+
+#+BEGIN_SRC emacs-lisp :tangle org-ref.el
+(defun org-ref-get-bibtex-entry-html (key)
+(interactive)
+
+ (let ((org-ref-bibliography-files (org-ref-find-bibliography))
+       (cb (current-buffer))
+       (file) (entry))
+
+   (setq file (catch 'result
+		(loop for file in org-ref-bibliography-files do
+		      (message "looking for %s in %s" key file)
+		      (if (org-ref-key-in-file-p key (file-truename file)) 
+			  (throw 'result file)
+			(message "%s not found in %s" key (file-truename file))))))
+   (set-buffer (find-file-noselect file))
+   (prog1 
+       (bibtex-search-entry key nil 0)
+     (setq entry  (org-ref-bib-html-citation))
+     (set-buffer cb))
+    
+   (format "<li><a id=\"%s\">[%s] %s</a></li>" key key entry)))
+#+END_SRC
+
+
+#+BEGIN_SRC emacs-lisp :tangle org-ref.el 
+(defun org-ref-get-html-bibliography ()
+  "Create an html bibliography when there are keys"
+  (interactive)
+  (let ((keys (org-ref-get-bibtex-keys)))
+    (when keys
+      (concat "<h1>Bibliography</h1>
+<ul>"
+	      (mapconcat (lambda (x) (org-ref-get-bibtex-entry-html x)) keys "\n")
+	      "\n</ul>"))))
 #+END_SRC
 
 * Utilities
