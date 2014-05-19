@@ -132,7 +132,7 @@ This next variable determines the citation types that are available in org-ref. 
     "cites" "Cites" "parencites" "Parencites"
     "footcites" "footcitetexts"
     "smartcites" "Smartcites" "textcites" "Textcites"
-    "supercites"
+    "supercites" "autocites" "Autocites"
     )
   "List of citation types known in org-ref"
   :type '(repeat :tag "List of citation types" string)
@@ -425,7 +425,6 @@ I do not have plans to make a numbered bibliography with numbered citations anyt
 *** the links
 We use a link for the bibliography so that we can click on it to open the bibliography file. The link may have more than one bibliography file in it, separated by commas. Clicking opens the file under the cursor. The bibliographies should be full filenames with the bib extension. Clicking on this link makes reftex-default-bibliography local and sets it to the list of files in the link. We need this to use reftex's searching capability.
 
-
 #+BEGIN_SRC emacs-lisp :tangle org-ref.el
 (org-add-link-type "bibliography"
 		   ;; this code is run on clicking. The bibliography
@@ -479,6 +478,17 @@ We use a link for the bibliography so that we can click on it to open the biblio
 		      ((eq format 'latex)
 			 ;; write out the latex bibliography command
 		       (format "\\bibliography{%s}" (replace-regexp-in-string  "\\.bib" "" keyword))))))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp :tangle org-ref.el
+(org-add-link-type "printbibliography"
+		   (lambda (arg) (message "Nothing implemented for clicking here."))
+		   (lambda (keyword desc format)
+		     (cond
+                      ((eq format 'html) (org-ref-get-html-bibliography))
+		      ((eq format 'latex)
+		       ;; write out the latex bibliography command
+		       (format "\\printbibliography" keyword)))))
 #+END_SRC
 
 We also create a bibliographystyle link. There is nothing to do on clicking here, and we create it for consistency. This sets the style for latex export, so use something appropriate there, e.g. unsrt, plain, plainnat, ...
@@ -927,7 +937,7 @@ falling back to what the user has set in org-ref-default-bibliography
     (save-excursion
       (goto-char (point-min))
       ;;  look for a bibliography link
-      (when (re-search-forward "bibliography:\\([^\]\|\n]+\\)" nil t)      	
+      (when (re-search-forward "\<bibliography:\\([^\]\|\n]+\\)" nil t)      	
 	(setq org-ref-bibliography-files
 	      (mapcar 'org-ref-strip-string (split-string (match-string 1) ",")))
 	(message "bibliography org-ref-bibliography-files = %s from %s" org-ref-bibliography-files (match-string 1))
