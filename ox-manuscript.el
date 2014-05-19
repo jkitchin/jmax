@@ -234,7 +234,7 @@ Run this from an org-buffer after you have exported it to a LaTeX file"
       (beginning-of-buffer)
       (setq run-makeindex-p (re-search-forward "\\\\makeindex" nil t))
       (beginning-of-buffer)
-      (setq run-bibtex-p (re-search-forward "\\\\bibliography{" nil t)))
+      (setq run-bibtex-p (re-search-forward "bibliography" nil t)))
 
     (setq status (catch 'status
       ;; run first latex
