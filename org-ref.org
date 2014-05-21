@@ -2113,25 +2113,27 @@ Sometimes it may be helpful to manually change the order of citations. These fun
 (defun org-ref-swap-citation-link (direction)
  "move citation at point in direction +1 is to the right, -1 to the left"
  (interactive)
+(message "on cite: %s" (org-element-property :type (org-element-context)))
  (let* ((object (org-element-context))	 
         (type (org-element-property :type object))
 	(begin (org-element-property :begin object))
 	(end (org-element-property :end object))
 	(link-string (org-element-property :path object))
-        (key (org-ref-get-bibtex-key-under-cursor))
-	(keys (org-ref-split-and-strip-string link-string))
-        (i (index key keys)) point) ;; defined in org-ref
+	key keys i)
    ;;   We only want this to work on citation links
    (when (-contains? org-ref-cite-types type)
-	 (if (> direction 0) ;; shift right
-	     (org-ref-swap-keys i (+ i 1) keys)
-	   (org-ref-swap-keys i (- i 1) keys))	
-	 (setq keys (mapconcat 'identity keys ","))
-	 ;; and replace the link with the sorted keys
-	 (cl--set-buffer-substring begin end (concat type ":" keys))
-	 ;; now go forward to key so we can move with the key
-	 (re-search-forward key) 
-	 (goto-char (match-beginning 0)))))
+        (setq key (org-ref-get-bibtex-key-under-cursor))
+	(setq keys (org-ref-split-and-strip-string link-string))
+        (setq i (index key keys))  ;; defined in org-ref
+	(if (> direction 0) ;; shift right
+	    (org-ref-swap-keys i (+ i 1) keys)
+	  (org-ref-swap-keys i (- i 1) keys))	
+	(setq keys (mapconcat 'identity keys ","))
+	;; and replace the link with the sorted keys
+	(cl--set-buffer-substring begin end (concat type ":" keys))
+	;; now go forward to key so we can move with the key
+	(re-search-forward key) 
+	(goto-char (match-beginning 0)))))
 
 ;; add hooks to make it work
 (add-hook 'org-shiftright-hook (lambda () (org-ref-swap-citation-link 1)))
