@@ -22,7 +22,8 @@
     (:to "TO" nil nil)
     (:from "FROM" nil nil)
     (:subject "SUBJECT" nil nil)
-    (:cc "CC" nil ""))
+    (:cc "CC" nil "")
+    (:signature-lines "SIGNATURE-LINES" nil t))
   :translate-alist '((template . cmu-memo-template))
   :menu-entry
   '(?M "Export with CMU Memo"
@@ -86,9 +87,13 @@
 \\opening{}
 "
 contents
+
+(unless (string= "nil" (plist-get info :signature-lines))
 "
 \\signaturelines
+")
 
+"
 \\end{letter}
 \\end{document}
 "))))
