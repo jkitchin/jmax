@@ -1998,10 +1998,15 @@ I like neat and orderly bibtex entries.That means the fields are in a standard o
    I like neat and orderly bibtex entries. This code will eventually replace the key with my style key, clean the entry, and sort the fields in the order I like them.
 see [[file:emacs-24.3/lisp/textmodes/bibtex.el::bibtex-autokey-before-presentation-function]] for how to set a function that checks for uniqueness of the key.
 #+BEGIN_SRC emacs-lisp :tangle org-ref.el
-(defun org-ref-clean-bibtex-entry()
-  "clean and replace the key in a bibtex function"
-  (interactive)
-  (bibtex-beginning-of-entry)
+(defun org-ref-clean-bibtex-entry(&optional keep-key)
+  "clean and replace the key in a bibtex function. When keep-key is t, do not replace it. You can use a prefix to specify the key should be kept"
+  (interactive "P")
+  (bibtex-beginning-of-entry) 
+(end-of-line)
+  ;; some entries do not have a key or comma in first line. We check and add it, if needed.
+  (unless (string-match ",$" (thing-at-point 'line))
+    (end-of-line)
+    (insert ","))
 
   ;; check for empty pages, and put eid or article id in its place
   (let ((entry (bibtex-parse-entry))
@@ -2040,32 +2045,38 @@ see [[file:emacs-24.3/lisp/textmodes/bibtex.el::bibtex-autokey-before-presentati
       (widen))
 
     ;; generate a key, and if it duplicates an existing key, edit it.
-    (let ((key (bibtex-generate-autokey)))
+    (unless keep-key
+      (let ((key (bibtex-generate-autokey)))
 
-      ;; first we delete the existing key
-      (bibtex-beginning-of-entry)
-      (re-search-forward bibtex-entry-maybe-empty-head)
-      (if (match-beginning bibtex-key-in-head)
-	  (delete-region (match-beginning bibtex-key-in-head)
-			 (match-end bibtex-key-in-head)))
-      ;; check if the key is in the buffer
-      (when (save-excursion
-	      (bibtex-search-entry key))
-	(save-excursion
-	  (bibtex-search-entry key)
-	  (bibtex-copy-entry-as-kill)
-	  (switch-to-buffer-other-window "*duplicate entry*")
-	  (bibtex-yank))
+	;; first we delete the existing key
+	(bibtex-beginning-of-entry)
+	(re-search-forward bibtex-entry-maybe-empty-head)
+	(if (match-beginning bibtex-key-in-head)
+	    (delete-region (match-beginning bibtex-key-in-head)
+			   (match-end bibtex-key-in-head)))
+	;; check if the key is in the buffer
+	(when (save-excursion
+		(bibtex-search-entry key))
+	  (save-excursion
+	    (bibtex-search-entry key)
+	    (bibtex-copy-entry-as-kill)
+	    (switch-to-buffer-other-window "*duplicate entry*")
+	    (bibtex-yank))
 	  (setq key (bibtex-read-key "Duplicate Key found, edit: " key)))
 
-      (insert key)
-      (kill-new key)) ;; save key for pasting	    
+	(insert key)
+	(kill-new key))) ;; save key for pasting	    
 
+    ;; sort fields within entry
     (org-ref-sort-bibtex-entry)
     ;; check for non-ascii characters
     (occur "[^[:ascii:]]")
     ))
 #+END_SRC
+
+#+RESULTS:
+: org-ref-clean-bibtex-entry
+
 ** Sort the entries in a citation link by year
 I prefer citations in chronological order within a grouping. These functions sort the link under the cursor by year.
 
