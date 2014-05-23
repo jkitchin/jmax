@@ -136,6 +136,23 @@
   "cleans up, then exports the latex and builds using the org-mode machinery"
   (interactive)
   (ox-manuscript-cleanup 'deep)
+
+  ;; insert bibliography style if needed
+  (save-excursion
+    (beginning-of-buffer)
+    (unless (re-search-forward "^bibliographystyle:" nil t)
+      (end-of-buffer)
+      (insert "\n\nbibliographystyle:unsrt")))
+
+  ;; insert bibliography if needed
+  (save-excursion
+    (beginning-of-buffer)
+    (unless (re-search-forward "^bibliography:" nil t)
+      (end-of-buffer)
+      (insert (format "\n\nbibliography:%s" (mapconcat (lambda (x) (file-relative-name x (file-name-directory (buffer-file-name)))) org-ref-default-bibliography ",")))))
+
+  (save-buffer)
+  
   (prog1
       (org-latex-export-to-pdf async subtreep visible-only body-only options)
     (ox-manuscript-cleanup)))
@@ -306,35 +323,6 @@ Run this from an org-buffer after you have exported it to a LaTeX file"
     0))
 
 (setq org-latex-pdf-process 'ox-manuscript-latex-pdf-process)
-;; (defun ox-manuscript-pdflatex ()
-;;   "run `ox-manuscript-latex-command' on the tex file corresponding to an exported org file."
-;;   (interactive)
-;;   (let* ((org-file (file-name-nondirectory (buffer-file-name)))
-;; 	 (tex-file (replace-regexp-in-string "org$" "tex" org-file)))
-
-;;     ;; if no .tex run commands to get one.
-;;     (if (file-exists-p tex-file)
-;; 	(progn
-;; 	  (message (format "running pdflatex on %s" tex-file))
-;; 	  (unless (eq 0 (shell-command 
-;; 			 (concat ox-manuscript-latex-command " " tex-file)))
-;; 	    (switch-to-buffer "*Shell Command Output*")
-;; 	    (end-of-buffer)
-;; 	    (error "pdflatex  failed to build")))
-;;       (error "no tex file found"))))
-
-;; (defun ox-manuscript-bibtex ()
-;;   "run bibtex. You can customize the bibtex command with the variable `ox-manuscript-bibtex-command'."
-;;   (interactive)
-;;   (let* ((org-file (file-name-nondirectory (buffer-file-name)))
-;;          (tex-file (replace-regexp-in-string "org$" "tex" org-file))
-;; 	 (bib-file (file-name-sans-extension tex-file)))
-;;     (message (format "running bibtex on %s" bib-file))
-;;     (unless (eq 0 (shell-command 
-;; 		     (concat ox-manuscript-bibtex-command " " bib-file)))
-;; 	(switch-to-buffer "*Shell Command Output*")
-;; 	(end-of-buffer)
-;; 	(error "bibtex failed to build"))))
 
 (defun ox-manuscript-bibliography-to-bbl ()
   "Replace \bibliography{} in tex file with contents of the bbl file.
