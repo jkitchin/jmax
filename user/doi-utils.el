@@ -57,7 +57,6 @@
   doi =          {%{doi}},
   url =          {%{url}},
   month = 	 {%{month}},
-  json = 	 {%{json-data}}
 }"))))
 
 (defun insert-bibtex-entry-from-doi (doi)
@@ -69,8 +68,7 @@
        (org-ref-clean-bibtex-entry t)
      (org-ref-clean-bibtex-entry))
    ;; try to get pdf
-   (doi-utils-get-pdf-url doi)
-  )
+   (doi-utils-get-bibtex-entry-pdf))
 
 (defun bibtex-set-field (field value)
   "set field to value in bibtex file. create field if it does not exist"
