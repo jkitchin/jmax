@@ -993,13 +993,13 @@ Now, we can see if an entry is in a file.
 Finally, we want to know which file the key is in.
 
 #+BEGIN_SRC emacs-lisp :tangle org-ref.el
-(defun org-ref-get-bibtex-key-and-file ()
-  "returns the bibtex key and file that it is in under point"
+(defun org-ref-get-bibtex-key-and-file (&optional key)
+  "returns the bibtex key and file that it is in. If no key is provided, get one under point"
  (interactive)
-
  (let ((org-ref-bibliography-files (org-ref-find-bibliography))
-       (key) (file))
-   (setq key (org-ref-get-bibtex-key-under-cursor))
+       (file))
+   (unless key
+     (setq key (org-ref-get-bibtex-key-under-cursor)))
    (setq file     (catch 'result
 		    (loop for file in org-ref-bibliography-files do
 			  (message "looking for %s in %s" key file)
@@ -1877,12 +1877,12 @@ If no bibliography is in the buffer the `reftex-default-bibliography' is used."
       (save-excursion
         (goto-char (point-max))
         (insert "\n\n")
-	(org-insert-heading-after-current)
+	(org-insert-heading)
 	(insert (format " Bibtex entries
 
-,#+BEGIN_SRC: text :tangle %s
+,#+BEGIN_SRC text :tangle %s
 %s
-,#+END_SRC" (file-name-nondirectory bibfile) results))))))
+,#+END_SRC" (concat (file-name-sans-extension (file-name-nondirectory (buffer-file-name))) ".bib") results))))))
 #+END_SRC
 
 ** Find bad cite links
@@ -1958,7 +1958,7 @@ I like neat and orderly bibtex entries.That means the fields are in a standard o
   "sort fields of entry in standard order and downcase them"
   (interactive)
   (bibtex-beginning-of-entry)
-  (let* ((master '("author" "title" "journal" "volume" "issue" "pages" "year" "doi" "url"))
+  (let* ((master '("author" "title" "journal" "volume" "number" "pages" "year" "doi" "url"))
 	 (entry (bibtex-parse-entry))
 	 (entry-fields)
 	 (other-fields)
@@ -1998,10 +1998,15 @@ I like neat and orderly bibtex entries.That means the fields are in a standard o
    I like neat and orderly bibtex entries. This code will eventually replace the key with my style key, clean the entry, and sort the fields in the order I like them.
 see [[file:emacs-24.3/lisp/textmodes/bibtex.el::bibtex-autokey-before-presentation-function]] for how to set a function that checks for uniqueness of the key.
 #+BEGIN_SRC emacs-lisp :tangle org-ref.el
-(defun org-ref-clean-bibtex-entry()
-  "clean and replace the key in a bibtex function"
-  (interactive)
-  (bibtex-beginning-of-entry)
+(defun org-ref-clean-bibtex-entry(&optional keep-key)
+  "clean and replace the key in a bibtex function. When keep-key is t, do not replace it. You can use a prefix to specify the key should be kept"
+  (interactive "P")
+  (bibtex-beginning-of-entry) 
+(end-of-line)
+  ;; some entries do not have a key or comma in first line. We check and add it, if needed.
+  (unless (string-match ",$" (thing-at-point 'line))
+    (end-of-line)
+    (insert ","))
 
   ;; check for empty pages, and put eid or article id in its place
   (let ((entry (bibtex-parse-entry))
@@ -2040,31 +2045,110 @@ see [[file:emacs-24.3/lisp/textmodes/bibtex.el::bibtex-autokey-before-presentati
       (widen))
 
     ;; generate a key, and if it duplicates an existing key, edit it.
-    (let ((key (bibtex-generate-autokey)))
+    (unless keep-key
+      (let ((key (bibtex-generate-autokey)))
 
-      ;; first we delete the existing key
-      (bibtex-beginning-of-entry)
-      (re-search-forward bibtex-entry-maybe-empty-head)
-      (if (match-beginning bibtex-key-in-head)
-	  (delete-region (match-beginning bibtex-key-in-head)
-			 (match-end bibtex-key-in-head)))
-      ;; check if the key is in the buffer
-      (when (save-excursion
-	      (bibtex-search-entry key))
-	(save-excursion
-	  (bibtex-search-entry key)
-	  (bibtex-copy-entry-as-kill)
-	  (switch-to-buffer-other-window "*duplicate entry*")
-	  (bibtex-yank))
+	;; first we delete the existing key
+	(bibtex-beginning-of-entry)
+	(re-search-forward bibtex-entry-maybe-empty-head)
+	(if (match-beginning bibtex-key-in-head)
+	    (delete-region (match-beginning bibtex-key-in-head)
+			   (match-end bibtex-key-in-head)))
+	;; check if the key is in the buffer
+	(when (save-excursion
+		(bibtex-search-entry key))
+	  (save-excursion
+	    (bibtex-search-entry key)
+	    (bibtex-copy-entry-as-kill)
+	    (switch-to-buffer-other-window "*duplicate entry*")
+	    (bibtex-yank))
 	  (setq key (bibtex-read-key "Duplicate Key found, edit: " key)))
 
-      (insert key)
-      (kill-new key)) ;; save key for pasting	    
+	(insert key)
+	(kill-new key))) ;; save key for pasting	    
 
+    ;; sort fields within entry
     (org-ref-sort-bibtex-entry)
     ;; check for non-ascii characters
     (occur "[^[:ascii:]]")
     ))
+#+END_SRC
+
+#+RESULTS:
+: org-ref-clean-bibtex-entry
+
+** Sort the entries in a citation link by year
+I prefer citations in chronological order within a grouping. These functions sort the link under the cursor by year.
+
+#+BEGIN_SRC emacs-lisp :tangle org-ref.el
+(defun org-ref-get-citation-year (key)
+  "get the year of an entry with key. Returns year as a string."
+  (interactive)
+  (let* ((results (org-ref-get-bibtex-key-and-file key))
+	 (bibfile (cdr results))
+	 (cb (current-buffer)))
+    (set-buffer (find-file-noselect bibfile))
+    (bibtex-search-entry key nil 0)
+    (prog1 (reftex-get-bib-field "year" (bibtex-parse-entry t))
+      (set-buffer cb))))
+
+(defun org-ref-sort-citation-link ()
+ "replace link at point with sorted link by year"
+ (interactive)
+ (let* ((object (org-element-context))	 
+        (type (org-element-property :type object))
+	(begin (org-element-property :begin object))
+	(end (org-element-property :end object))
+	(link-string (org-element-property :path object))
+	keys years data)
+  (setq keys (org-ref-split-and-strip-string link-string))
+  (setq years (mapcar 'org-ref-get-citation-year keys)) 
+  (setq data (mapcar* (lambda (a b) `(,a . ,b)) years keys))
+  (setq data (cl-sort data (lambda (x y) (< (string-to-int (car x)) (string-to-int (car y))))))
+  ;; now get the keys separated by commas
+  (setq keys (mapconcat (lambda (x) (cdr x)) data ","))
+  ;; and replace the link with the sorted keys
+  (cl--set-buffer-substring begin end (concat type ":" keys))))
+#+END_SRC
+
+** Sort entries in citation links with shift-arrow keys
+Sometimes it may be helpful to manually change the order of citations. These functions define shift-arrow functions.
+#+BEGIN_SRC emacs-lisp :tangle org-ref.el
+(defun org-ref-swap-keys (i j keys)
+ "swap the keys in a list with index i and j"
+ (let ((tempi (nth i keys)))
+   (setf (nth i keys) (nth j keys))
+   (setf (nth j keys) tempi))
+  keys)
+
+(defun org-ref-swap-citation-link (direction)
+ "move citation at point in direction +1 is to the right, -1 to the left"
+ (interactive)
+(message "on cite: %s" (org-element-property :type (org-element-context)))
+ (let* ((object (org-element-context))	 
+        (type (org-element-property :type object))
+	(begin (org-element-property :begin object))
+	(end (org-element-property :end object))
+	(link-string (org-element-property :path object))
+	key keys i)
+   ;;   We only want this to work on citation links
+   (when (-contains? org-ref-cite-types type)
+        (setq key (org-ref-get-bibtex-key-under-cursor))
+	(setq keys (org-ref-split-and-strip-string link-string))
+        (setq i (index key keys))  ;; defined in org-ref
+	(if (> direction 0) ;; shift right
+	    (org-ref-swap-keys i (+ i 1) keys)
+	  (org-ref-swap-keys i (- i 1) keys))	
+	(setq keys (mapconcat 'identity keys ","))
+	;; and replace the link with the sorted keys
+	(cl--set-buffer-substring begin end (concat type ":" keys))
+	;; now go forward to key so we can move with the key
+	(re-search-forward key) 
+	(goto-char (match-beginning 0)))))
+
+;; add hooks to make it work
+(add-hook 'org-shiftright-hook (lambda () (org-ref-swap-citation-link 1)))
+(add-hook 'org-shiftleft-hook (lambda () (org-ref-swap-citation-link -1)))
 #+END_SRC
 * Aliases
 I like convenience. Here are some aliases for faster typing.

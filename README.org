@@ -22,6 +22,19 @@ There is an emacs binary in this repository for Windows. This [[./jmax.bat]] fil
 3. git    [[http://git-scm.com/download/win][Windows]] [[http://git-scm.com/download/mac][Mac]] [[http://git-scm.com/download/linux][Linux]]
 4. Any other languages that will be used, e.g., Ruby, R, Matlab, compilers, etc...
 
+** Spell checking on windows
+Install aspell http://ftp.gnu.org/gnu/aspell/w32/Aspell-0-50-3-3-Setup.exe
+and this dictionary  http://ftp.gnu.org/gnu/aspell/w32/Aspell-en-0.50-2-3.exe.
+
+In your init file:
+
+#+BEGIN_SRC emacs-lisp
+;; set i(a)spell options on different machines
+(setq ispell-personal-dictionary (concat starter-kit-dir "user/.ispell"))
+
+;; adjust this path if it is not where aspell got installed
+(setq-default ispell-program-name "C:/Program Files/Aspell/bin/aspell.exe")
+#+END_SRC
 
 * Customization
 These files contain variables with paths specific to your computer. You probably need to change them.

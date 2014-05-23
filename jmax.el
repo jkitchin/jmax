@@ -211,6 +211,7 @@
   (local-set-key (kbd "RET") 'newline-and-indent))
 
 (add-hook 'python-mode-hook 'set-newline-and-indent)
+(add-hook 'emacs-lisp-mode-hook 'set-newline-and-indent)
 
 ;; turn off yasnippets in python mode
 (add-hook 'python-mode-hook #'(lambda () (yas-global-mode -1)))
