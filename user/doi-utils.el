@@ -101,7 +101,9 @@
 
 (defun update-bibtex-entry-from-doi (doi)
   "update fields in a bibtex entry from the doi."
-  (interactive (list (or (bibtex-autokey-get-field "doi") (read-string "DOI: "))))
+  (interactive (list
+		(or (replace-regexp-in-string "http://dx.doi.org/" "" (bibtex-autokey-get-field "doi"))
+		    (read-string "DOI: "))))
   (let* ((url-request-method "GET") 
 	(url-mime-accept-string "application/citeproc+json")
 	(json-object-type 'plist)
@@ -251,9 +253,10 @@
   (interactive)
   (save-excursion
     (bibtex-beginning-of-entry) 
-    (let ((doi (bibtex-autokey-get-field "doi"))
-	  (key (bibtex-autokey-get-field "doi"))
-	  (pdf-url) (pdf-file))
+    (let ((doi (replace-regexp-in-string "http://dx.doi.org/" "" (bibtex-autokey-get-field "doi")))	       
+	  (key)
+	  (pdf-url)
+	  (pdf-file))
       (re-search-forward bibtex-entry-maybe-empty-head)
       (setq key (match-string bibtex-key-in-head))
       (setq pdf-file (concat org-ref-pdf-directory key ".pdf"))
