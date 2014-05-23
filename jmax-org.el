@@ -266,6 +266,10 @@ start  empty title path
        (shell-command
 	(concat "start \"title\" " (shell-quote-argument path)) t))
 
+(org-add-link-type
+ "msx"
+ 'org-msx-open)
+
 (org-add-link-type 
  "attachfile" 
  (lambda (link-string) (org-open-file link-string))
