@@ -1880,9 +1880,9 @@ If no bibliography is in the buffer the `reftex-default-bibliography' is used."
 	(org-insert-heading)
 	(insert (format " Bibtex entries
 
-,#+BEGIN_SRC: text :tangle %s
+,#+BEGIN_SRC text :tangle %s
 %s
-,#+END_SRC" (file-name-nondirectory bibfile) results))))))
+,#+END_SRC" (concat (file-name-sans-extension (file-name-nondirectory (buffer-file-name))) ".bib") results))))))
 #+END_SRC
 
 ** Find bad cite links
@@ -1958,7 +1958,7 @@ I like neat and orderly bibtex entries.That means the fields are in a standard o
   "sort fields of entry in standard order and downcase them"
   (interactive)
   (bibtex-beginning-of-entry)
-  (let* ((master '("author" "title" "journal" "volume" "issue" "pages" "year" "doi" "url"))
+  (let* ((master '("author" "title" "journal" "volume" "number" "pages" "year" "doi" "url"))
 	 (entry (bibtex-parse-entry))
 	 (entry-fields)
 	 (other-fields)
