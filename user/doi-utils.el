@@ -8,7 +8,7 @@
                                 (format "%s" (eval (read sexp))))) s))
 
 (defun doi-to-bibtex-article (doi)
- "insert a bibtex entry for doi at point"
+ "return a bibtex entry for doi at point"
  (interactive "sDOI: ")
  (let ((url-request-method "GET") 
        (url-mime-accept-string "application/citeproc+json")
@@ -63,7 +63,14 @@
 (defun insert-bibtex-entry-from-doi (doi)
   "insert bibtex entry from a doi"
   (interactive "sDOI: ")
-  (insert (doi-to-bibtex-article doi)))
+  (insert (doi-to-bibtex-article doi))
+  (backward-char)
+  (if (bibtex-key-in-head nil)
+       (org-ref-clean-bibtex-entry t)
+     (org-ref-clean-bibtex-entry))
+   ;; try to get pdf
+   (doi-utils-get-pdf-url doi)
+  )
 
 (defun bibtex-set-field (field value)
   "set field to value in bibtex file. create field if it does not exist"
@@ -138,7 +145,7 @@
 				 (bibtex-set-field "year" year)
 				 (bibtex-set-field "month" month)))
 		    (:volume . (bibtex-set-field "volume" volume))
-		    (:issue . (bibtex-set-field "issue" issue))
+		    (:issue . (bibtex-set-field "number" number))
 		    (:page . (bibtex-set-field "pages" pages))
 		    (:DOI . (bibtex-set-field "doi" doi))
 		    (:URL . (bibtex-set-field "url" url))))
@@ -153,3 +160,112 @@
   (if (bibtex-key-in-head)
       (org-ref-clean-bibtex-entry t)
     (org-ref-clean-bibtex-entry)))
+
+(defvar *doi-utils-redirect* nil
+  "stores redirect url from a callback function")
+
+(defun doi-utils-redirect-callback (&optional status)
+  ;(setq *doi-utils-redirect* nil)
+  (when status ;  is nil if there none
+    (setq *doi-utils-redirect* (plist-get status :redirect))))
+
+(defun doi-utils-get-redirect (doi)
+  "get redirect url from dx.doi.org/doi"
+  (url-retrieve 
+   (format "http://dx.doi.org/%s" doi)
+   'doi-utils-redirect-callback))
+
+(defvar *doi-utils-pdf-url* nil)
+
+(defun doi-utils-get-science-direct-pdf-url (redirect-url)
+  (url-retrieve redirect-url
+		(lambda (status)
+		  (beginning-of-buffer)
+		  (re-search-forward "pdfurl=\"\\([^\"]*\\)\"")
+		  (setq *doi-utils-pdf-url* (match-string 1))))
+  *doi-utils-pdf-url*)
+
+(defun doi-utils-get-pdf-url (doi)
+  "returns a url to a pdf for the doi if one can be calculated"
+  ;; get redirect for some reason, I have to run this twice to get the redirect variable set.
+  (doi-utils-get-redirect doi)
+  (doi-utils-get-redirect doi)
+  
+  (unless *doi-utils-redirect*
+    (error "No redirect found for %s" doi))
+  
+  (cond
+   ;; APS journals
+   ((string-match "^http://journals.aps.org" *doi-utils-redirect*)
+    (message "APS journal at %s found" *doi-utils-redirect*)
+    (replace-regexp-in-string "/abstract/" "/pdf/" *doi-utils-redirect*))
+
+   ;; Science
+   ((string-match "^http://www.sciencemag.org" *doi-utils-redirect*)
+    (concat *doi-utils-redirect* ".full.pdf"))
+
+   ;; Nature
+   ((string-match "^http://www.nature.com/nature" *doi-utils-redirect*)
+    (let ((result *doi-utils-redirect*))
+      (setq result (replace-regexp-in-string "/full/" "/pdf/" result))
+      (replace-regexp-in-string "\.html$" "\.pdf" result)))
+
+   ;; Nature Materials
+   ((string-match "^http://www.nature.com/nmat" *doi-utils-redirect*)
+    (let ((result *doi-utils-redirect*))
+      (setq result (replace-regexp-in-string "/abs/" "/pdf/" result))
+      (replace-regexp-in-string "\.html$" "\.pdf" result)))
+
+   ;; Wiley - it is aguess this works for all of them
+   ((string-match "^http://onlinelibrary.wiley.com" *doi-utils-redirect*)
+    (replace-regexp-in-string "/abstract" "/pdf" *doi-utils-redirect*))
+
+   ;; Springer
+   ((string-match "^http://link.springer.com" *doi-utils-redirect*)
+    (concat *doi-utils-redirect* ".pdf"))
+
+   ;; ACS journals
+   ((string-match "^http://pubs.acs.org" *doi-utils-redirect*)
+    (replace-regexp-in-string "/abs/" "/pdf/" *doi-utils-redirect*))
+
+   ;; AIP - this feels like major hackery but, these urls are complicated
+   ((string-match "^http://scitation.aip.org" *doi-utils-redirect*)
+    ;; get stuff after content
+    (let (p1 p2 s p3)
+      (setq p2 (replace-regexp-in-string "^http://scitation.aip.org/" "" *doi-utils-redirect*))
+      (setq s (split-string p2 "/"))
+      (setq p1 (mapconcat 'identity (-remove-at-indices '(0 6) s) "/"))
+      (setq p3 (concat "/" (nth 0 s) (nth 1 s) "/" (nth 2 s) "/" (nth 3 s)))
+      (format "http://scitation.aip.org/deliver/fulltext/%s.pdf?itemId=/%s&mimeType=pdf&containerItemId=%s" p1 p2 p3)))
+
+   ;; Science direct - must retrieve from the html page
+   ((string-match "^http://www.sciencedirect.com" *doi-utils-redirect*)
+    (doi-utils-get-science-direct-pdf-url *doi-utils-redirect*)
+    *doi-utils-pdf-url*)
+  
+   (t
+    (message "redirect %s is unknown" *doi-utils-redirect*)
+    nil)))
+   
+  
+(defun doi-utils-get-bibtex-entry-pdf ()
+  "get pdf for entry at point. The entry must have a doi. The pdf will be saved to `org-ref-pdf-directory', by the name %s.pdf where %s is the bibtex label. Files will not be overwritten."
+  (interactive)
+  (save-excursion
+    (bibtex-beginning-of-entry) 
+    (let ((doi (bibtex-autokey-get-field "doi"))
+	  (key (bibtex-autokey-get-field "doi"))
+	  (pdf-url) (pdf-file))
+      (re-search-forward bibtex-entry-maybe-empty-head)
+      (setq key (match-string bibtex-key-in-head))
+      (setq pdf-file (concat org-ref-pdf-directory key ".pdf"))
+      (when doi
+	(setq pdf-url (doi-utils-get-pdf-url doi))
+	(if pdf-url
+	    (if (file-exists-p pdf-file)
+		(message "%s already exists" pdf-file)
+	      (url-copy-file pdf-url pdf-file nil)
+	      (message "%s saved" pdf-file))
+	  (message "no url for pdf found"))))))
+
+      
