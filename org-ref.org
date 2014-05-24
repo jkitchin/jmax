@@ -139,6 +139,14 @@ This next variable determines the citation types that are available in org-ref. 
   :group 'org-ref)
 #+END_SRC
 
+We need a hook variable to store user-defined bibtex entry cleaning functions
+#+BEGIN_SRC emacs-lisp :tangle org-ref.el
+(defcustom org-ref-clean-bibtex-entry-hook nil
+  "Hook that is run in org-ref-clean-bibtex-entry. The functions should take no arguments, and operate on the bibtex entry at point."
+  :group 'org-ref
+  :type 'hook)
+#+END_SRC
+
 ** Program variables
 #+BEGIN_SRC emacs-lisp  :tangle org-ref.el
 (defvar org-ref-bibliography-files
@@ -2012,10 +2020,22 @@ see [[file:emacs-24.3/lisp/textmodes/bibtex.el::bibtex-autokey-before-presentati
   (let ((entry (bibtex-parse-entry))
 	(pages (bibtex-autokey-get-field "pages"))
 	(year (bibtex-autokey-get-field "year"))
+        (doi  (bibtex-autokey-get-field "doi"))
         ;; The Journal of Chemical Physics uses eid
 	(eid (bibtex-autokey-get-field "eid")))
 
-    ;; asap articles often set year to 0, which messes up key generation. fix that.
+    ;; replace http://dx.doi.org/ in doi. some journals put that in,
+    ;; but we only want the doi.
+    (when (string-match "^http://dx.doi.org/" doi)
+      (bibtex-beginning-of-entry)
+      (goto-char (car (cdr (bibtex-search-forward-field "doi" t))))
+      (bibtex-kill-field)
+      (bibtex-make-field "doi")
+      (backward-char)
+      (insert (replace-regexp-in-string "^http://dx.doi.org/" "" doi)))
+
+    ;; asap articles often set year to 0, which messes up key
+    ;; generation. fix that.
     (when (string= "0" year)  
       (bibtex-beginning-of-entry)
       (goto-char (car (cdr (bibtex-search-forward-field "year" t))))
@@ -2024,7 +2044,7 @@ see [[file:emacs-24.3/lisp/textmodes/bibtex.el::bibtex-autokey-before-presentati
       (backward-char)
       (insert (read-string "Enter year: ")))
 
-    ;; fix pages if they are empty
+    ;; fix pages if they are empty if there is an eid to put there.
     (when (string= "-" pages)
       (when eid	  
 	(bibtex-beginning-of-entry)
@@ -2067,6 +2087,10 @@ see [[file:emacs-24.3/lisp/textmodes/bibtex.el::bibtex-autokey-before-presentati
 	(insert key)
 	(kill-new key))) ;; save key for pasting	    
 
+    ;; run hooks. each of these operates on the entry with no arguments.
+    ;; this did not work like  i thought, it gives a symbolp error.
+    ;; (run-hooks org-ref-clean-bibtex-entry-hook)
+    (mapcar (lambda (x) (funcall x)) org-ref-clean-bibtex-entry-hook)
     ;; sort fields within entry
     (org-ref-sort-bibtex-entry)
     ;; check for non-ascii characters
