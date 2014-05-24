@@ -269,8 +269,10 @@ sometimes are journal specific."
     (replace-regexp-in-string "/abstract" "/pdf" *doi-utils-redirect*))
 
    ;; Springer
+   ;; http://link.springer.com/article/10.1007%2Fs11244-012-9808-0
+   ;; http://link.springer.com/content/pdf/10.1007%2Fs11244-012-9808-0.pdf
    ((string-match "^http://link.springer.com" *doi-utils-redirect*)
-    (concat *doi-utils-redirect* ".pdf"))
+    (replace-regexp-in-string "/article/" "/content/pdf/" (concat *doi-utils-redirect* ".pdf")))
 
    ;; ACS journals
    ((string-match "^http://pubs.acs.org" *doi-utils-redirect*)
@@ -330,36 +332,45 @@ sometimes are journal specific."
     (message-box "redirect %s is unknown. Please report this message to jkitchin@andrew.cmu.edu." *doi-utils-redirect*)
     nil)))
    
-  
-(defun doi-utils-get-bibtex-entry-pdf ()
-  "download pdf for entry at point. The entry must have a
-doi. The pdf will be saved to `org-ref-pdf-directory', by the
-name %s.pdf where %s is the bibtex label. Files will not be
-overwritten.
 
-you must have permission to access the pdf. Sometimes an html
-file is saved, when the pdf download fails. I do not know how to
-avoid that, usually it would be by examining some http status to
-see an error."
+(defun doi-utils-get-bibtex-entry-pdf ()
+  "download pdf for entry at point if the pdf does not already
+exist locally. The entry must have a doi. The pdf will be saved
+to `org-ref-pdf-directory', by the name %s.pdf where %s is the
+bibtex label. Files will not be overwritten. The pdf will be
+checked to make sure it is a pdf, and not some html failure
+page. you must have permission to access the pdf. We open the pdf
+at the end."
   (interactive)
   (save-excursion
     (bibtex-beginning-of-entry) 
-    (let ((doi (replace-regexp-in-string "http://dx.doi.org/" "" (bibtex-autokey-get-field "doi")))	       
+    (let (;; get doi, removing http://dx.doi.org/ if it is there.
+	  (doi (replace-regexp-in-string
+		"http://dx.doi.org/" ""
+		(bibtex-autokey-get-field "doi")))	       
 	  (key)
 	  (pdf-url)
-	  (pdf-file))
+	  (pdf-file)
+	  (content))
+      ;; get the key and build pdf filename.
       (re-search-forward bibtex-entry-maybe-empty-head)
       (setq key (match-string bibtex-key-in-head))
       (setq pdf-file (concat org-ref-pdf-directory key ".pdf"))
-      (when doi
-	(setq pdf-url (doi-utils-get-pdf-url doi))
-	(if pdf-url
-	    (if (file-exists-p pdf-file)
-		(message "%s already exists" pdf-file)
-	      (url-copy-file pdf-url pdf-file nil)
-	      (message "%s saved" pdf-file))
-	  (message "no url for pdf found")))
-      (org-open-file pdf-file)
-    pdf-file)))
 
-      
+      ;; now get file if needed.
+      (when (and doi (not (file-exists-p pdf-file)))
+	(setq pdf-url (doi-utils-get-pdf-url doi))
+	(url-copy-file pdf-url pdf-file)
+	;; now check if we got a pdf
+	(with-temp-buffer
+	  (insert-file-contents pdf-file)
+	  ;; PDFS start with %PDF-1.x as the first few characters.
+	  (if (not (string= (buffer-substring 1 6) "%PDF-"))
+	      (progn
+		(message "%s" (buffer-string))
+		(delete-file pdf-file))
+	    (message "%s saved" pdf-file)))
+	
+      (when (file-exists-p pdf-file)
+	(org-open-file pdf-file))
+      pdf-file))))
