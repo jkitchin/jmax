@@ -1,3 +1,32 @@
+;;; doi-utils.el --- get bibtex entries and pdfs from a DOI
+
+;; Copyright(C) 2014 John Kitchin
+
+;; Author: John Kitchin <jkitchin@andrew.cmu.edu>
+;; This file is not currently part of GNU Emacs.
+
+;; This program is free software; you can redistribute it and/or
+;; modify it under the terms of the GNU General Public License as
+;; published by the Free Software Foundation; either version 2, or (at
+;; your option) any later version.
+
+;; This program is distributed in the hope that it will be useful, but
+;; WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+;; General Public License for more details.
+
+;; You should have received a copy of the GNU General Public License
+;; along with this program ; see the file COPYING.  If not, write to
+;; the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+;; Boston, MA 02111-1307, USA.
+
+;;; Commentary:
+;;
+;; Lisp code to generate and update bibtex entries from a DOI, and to
+;; download pdfs from publisher websites from a DOI.
+;;
+;; Package-Requires: ((org-ref))
+
 (require 'json)
 
 (defun expand-template (s)
@@ -7,8 +36,8 @@
                               (let ((sexp (substring arg 2 -1)))
                                 (format "%s" (eval (read sexp))))) s))
 
-(defun doi-to-bibtex-article (doi)
- "return a bibtex entry for doi at point"
+(defun doi-to-bibtex-entry (doi)
+ "return a bibtex entry as a string for the doi. Only articles are currently supported"
  (interactive "sDOI: ")
  (let ((url-request-method "GET") 
        (url-mime-accept-string "application/citeproc+json")
@@ -44,8 +73,8 @@
 	 url (plist-get results :URL)
 	 json-data (format "%s" results))
 
-   (when (string= type "journal-article")
-
+   (cond
+    ((string= type "journal-article")
      (expand-template "@article{,
   author = 	 {%{author}},
   title = 	 {%{title}},
@@ -57,12 +86,14 @@
   doi =          {%{doi}},
   url =          {%{url}},
   month = 	 {%{month}},
-}"))))
-
+}"))
+    (t (message-box "%s not supported yet." type)))))
+ 
 (defun insert-bibtex-entry-from-doi (doi)
-  "insert bibtex entry from a doi"
+  "insert bibtex entry from a doi. Also cleans entry using
+org-ref, and tries to download the corresponding pdf."
   (interactive "sDOI: ")
-  (insert (doi-to-bibtex-article doi))
+  (insert (doi-to-bibtex-entry doi))
   (backward-char)
   (if (bibtex-key-in-head nil)
        (org-ref-clean-bibtex-entry t)
@@ -100,7 +131,7 @@
    for key in results by #'cddr collect key))
 
 (defun update-bibtex-entry-from-doi (doi)
-  "update fields in a bibtex entry from the doi."
+  "update fields in a bibtex entry from the doi. Every field will be updated, so previous changes will be lost."
   (interactive (list
 		(or (replace-regexp-in-string "http://dx.doi.org/" "" (bibtex-autokey-get-field "doi"))
 		    (read-string "DOI: "))))
@@ -137,7 +168,7 @@
 	(doi (plist-get results :DOI))
 	(annote (format "%s" results)))
     
-    ;; map the json fields to bibtex fields
+    ;; map the json fields to bibtex fields. The code each field is mapped to is evaluated.
     (setq mapping '((:author . (bibtex-set-field "author" author))
 		    (:title . (bibtex-set-field "title" title))
 		    (:container-title . (bibtex-set-field "journal" journal))
@@ -162,7 +193,7 @@
     (org-ref-clean-bibtex-entry)))
 
 (defvar *doi-utils-waiting* t
-  "stores redirect url from a callback function")
+  "stores waiting state for url retrieval.")
 
 (defvar *doi-utils-redirect* nil
   "stores redirect url from a callback function")
@@ -180,27 +211,39 @@
 
 (defun doi-utils-get-redirect (doi)
   "get redirect url from dx.doi.org/doi"
+  ;; we are going to wait until the url-retrieve is done
   (setq *doi-utils-waiting* t)
+  ;; start with no redirect. it will be set in the callback.
+  (setq *doi-utils-redirect* nil) 
   (url-retrieve 
    (format "http://dx.doi.org/%s" doi)
    'doi-utils-redirect-callback)
-  ; I suspect we need to wait here for the asynchronous process to finish.
-  (while *doi-utils-waiting* (sleep-for   0.1)))
+  ; I suspect we need to wait here for the asynchronous process to
+  ; finish. we loop and sleep until the callback says it is done via
+  ; `*doi-utils-waiting*'. this works as far as i can tell. Before I
+  ; had to run this a few times to get it to work, which i suspect
+  ; just gave the first one enough time to finish.
+  (while *doi-utils-waiting* (sleep-for 0.1)))
 
-(defvar *doi-utils-pdf-url* nil)
+(defvar *doi-utils-pdf-url* nil
+  "stores url to pdf download from a callback function")
 
 (defun doi-utils-get-science-direct-pdf-url (redirect-url)
   "science direct hides the pdf url in html. we get it out here"
+  (setq *doi-utils-waiting* t)
   (url-retrieve redirect-url
 		(lambda (status)
 		  (beginning-of-buffer)
 		  (re-search-forward "pdfurl=\"\\([^\"]*\\)\"")
 		  (setq *doi-utils-pdf-url* (match-string 1))))
+  (while *doi-utils-waiting* (sleep-for 0.1))
   *doi-utils-pdf-url*)
 
-
 (defun doi-utils-get-pdf-url (doi)
-  "returns a url to a pdf for the doi if one can be calculated"
+  "returns a url to a pdf for the doi if one can be
+calculated. The calculated urls are basically worked out by hand
+for each url base. These tend to be publisher specific, and
+sometimes are journal specific."
   (doi-utils-get-redirect doi)
   
   (unless *doi-utils-redirect*
@@ -209,25 +252,18 @@
   (cond
    ;; APS journals
    ((string-match "^http://journals.aps.org" *doi-utils-redirect*)
-    (message "APS journal at %s found" *doi-utils-redirect*)
     (replace-regexp-in-string "/abstract/" "/pdf/" *doi-utils-redirect*))
 
    ;; Science
    ((string-match "^http://www.sciencemag.org" *doi-utils-redirect*)
     (concat *doi-utils-redirect* ".full.pdf"))
 
-   ;; Nature
-   ((string-match "^http://www.nature.com/nature" *doi-utils-redirect*)
+   ;; Nature and related journals
+   ((string-match "^http://www.nature.com" *doi-utils-redirect*)
     (let ((result *doi-utils-redirect*))
       (setq result (replace-regexp-in-string "/full/" "/pdf/" result))
       (replace-regexp-in-string "\.html$" "\.pdf" result)))
-
-   ;; Nature Materials
-   ((string-match "^http://www.nature.com/nmat" *doi-utils-redirect*)
-    (let ((result *doi-utils-redirect*))
-      (setq result (replace-regexp-in-string "/abs/" "/pdf/" result))
-      (replace-regexp-in-string "\.html$" "\.pdf" result)))
-
+   
    ;; Wiley - it is aguess this works for all of them
    ((string-match "^http://onlinelibrary.wiley.com" *doi-utils-redirect*)
     (replace-regexp-in-string "/abstract" "/pdf" *doi-utils-redirect*))
@@ -270,18 +306,41 @@
     *doi-utils-pdf-url*)
 
    ;; tandfonline
+   ;; http://www.tandfonline.com/doi/abs/10.1080/08927022.2013.844898
    ;; http://www.tandfonline.com/doi/full/10.1080/08927022.2013.844898
    ;; http://www.tandfonline.com/doi/pdf/10.1080/08927022.2013.844898
    ((string-match "^http://www.tandfonline.com" *doi-utils-redirect*)
     (replace-regexp-in-string "/abs/\\|/full/" "/pdf/" *doi-utils-redirect*))
-  
+
+   ;; ECS
+   ;; http://jes.ecsdl.org/content/158/10/A1079.abstract
+   ;; http://jes.ecsdl.org/content/158/10/A1079.full.pdf+html
+   ((string-match "^http://jes.ecsdl.org" *doi-utils-redirect*)
+    (replace-regexp-in-string "\.abstract$" ".full.pdf" *doi-utils-redirect*))
+
+   ;; RSC
+   ;; http://pubs.rsc.org/en/Content/ArticleLanding/2014/RA/c3ra47097k
+   ;; http://pubs.rsc.org/en/content/articlepdf/2014/ra/c3ra47097k
+   ((string-match "^http://pubs.rsc.org" *doi-utils-redirect*)
+    (let ((url (downcase *doi-utils-redirect*)))
+      (setq url (replace-regexp-in-string "articlelanding" "articlepdf" url))
+      url))
+   
    (t
-    (message "redirect %s is unknown" *doi-utils-redirect*)
+    (message-box "redirect %s is unknown. Please report this message to jkitchin@andrew.cmu.edu." *doi-utils-redirect*)
     nil)))
    
   
 (defun doi-utils-get-bibtex-entry-pdf ()
-  "get pdf for entry at point. The entry must have a doi. The pdf will be saved to `org-ref-pdf-directory', by the name %s.pdf where %s is the bibtex label. Files will not be overwritten."
+  "download pdf for entry at point. The entry must have a
+doi. The pdf will be saved to `org-ref-pdf-directory', by the
+name %s.pdf where %s is the bibtex label. Files will not be
+overwritten.
+
+you must have permission to access the pdf. Sometimes an html
+file is saved, when the pdf download fails. I do not know how to
+avoid that, usually it would be by examining some http status to
+see an error."
   (interactive)
   (save-excursion
     (bibtex-beginning-of-entry) 
@@ -299,6 +358,8 @@
 		(message "%s already exists" pdf-file)
 	      (url-copy-file pdf-url pdf-file nil)
 	      (message "%s saved" pdf-file))
-	  (message "no url for pdf found"))))))
+	  (message "no url for pdf found")))
+      (org-open-file pdf-file)
+    pdf-file)))
 
       
