@@ -2090,7 +2090,12 @@ see [[file:emacs-24.3/lisp/textmodes/bibtex.el::bibtex-autokey-before-presentati
     ;; run hooks. each of these operates on the entry with no arguments.
     ;; this did not work like  i thought, it gives a symbolp error.
     ;; (run-hooks org-ref-clean-bibtex-entry-hook)
-    (mapcar (lambda (x) (funcall x)) org-ref-clean-bibtex-entry-hook)
+    (mapcar (lambda (x)
+	      (save-restriction
+		(save-excursion
+		  (funcall x))))
+	    org-ref-clean-bibtex-entry-hook)
+    
     ;; sort fields within entry
     (org-ref-sort-bibtex-entry)
     ;; check for non-ascii characters
