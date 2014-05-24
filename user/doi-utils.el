@@ -161,23 +161,36 @@
       (org-ref-clean-bibtex-entry t)
     (org-ref-clean-bibtex-entry)))
 
+(defvar *doi-utils-waiting* t
+  "stores redirect url from a callback function")
+
 (defvar *doi-utils-redirect* nil
   "stores redirect url from a callback function")
 
 (defun doi-utils-redirect-callback (&optional status)
-  ;(setq *doi-utils-redirect* nil)
-  (when status ;  is nil if there none
-    (setq *doi-utils-redirect* (plist-get status :redirect))))
+  "callback for url-retrieve to set the redirect"
+  (when (plist-get status :error)
+    (signal (car (plist-get status :error)) (cdr(plist-get status :error))))
+  (when (plist-get status :redirect) ;  is nil if there none
+    (message "*doi-utils-redirect* set to %s"
+	     (setq *doi-utils-redirect* (plist-get status :redirect))))
+  ;; we have done our job, so we are not waiting any more.
+  (setq *doi-utils-waiting* nil))
+
 
 (defun doi-utils-get-redirect (doi)
   "get redirect url from dx.doi.org/doi"
+  (setq *doi-utils-waiting* t)
   (url-retrieve 
    (format "http://dx.doi.org/%s" doi)
-   'doi-utils-redirect-callback))
+   'doi-utils-redirect-callback)
+  ; I suspect we need to wait here for the asynchronous process to finish.
+  (while *doi-utils-waiting* (sleep-for   0.1)))
 
 (defvar *doi-utils-pdf-url* nil)
 
 (defun doi-utils-get-science-direct-pdf-url (redirect-url)
+  "science direct hides the pdf url in html. we get it out here"
   (url-retrieve redirect-url
 		(lambda (status)
 		  (beginning-of-buffer)
@@ -185,10 +198,9 @@
 		  (setq *doi-utils-pdf-url* (match-string 1))))
   *doi-utils-pdf-url*)
 
+
 (defun doi-utils-get-pdf-url (doi)
   "returns a url to a pdf for the doi if one can be calculated"
-  ;; get redirect for some reason, I have to run this twice to get the redirect variable set.
-  (doi-utils-get-redirect doi)
   (doi-utils-get-redirect doi)
   
   (unless *doi-utils-redirect*
@@ -228,6 +240,19 @@
    ((string-match "^http://pubs.acs.org" *doi-utils-redirect*)
     (replace-regexp-in-string "/abs/" "/pdf/" *doi-utils-redirect*))
 
+   ;; iop
+   ;; http://iopscience.iop.org/0953-8984/21/39/395502/
+   ;; http://iopscience.iop.org/0953-8984/21/39/395502/pdf/0953-8984_21_39_395502.pdf
+   ((string-match "^http://iopscience.iop.org" *doi-utils-redirect*)
+    (let ((tail (replace-regexp-in-string "^http://iopscience.iop.org" "" *doi-utils-redirect*)))
+      (concat "http://iopscience.iop.org" tail "/pdf" (replace-regexp-in-string "/" "_" tail) ".pdf")))
+
+   ;; jstor
+   ;; http://www.jstor.org/stable/2245477
+   ;; http://www.jstor.org/stable/pdfplus/2245477.pdf
+   ((string-match "^http://www.jstor.org" *doi-utils-redirect*)
+    (concat (replace-regexp-in-string "/stable/" "/stable/pdfplus/" *doi-utils-redirect*) ".pdf"))
+
    ;; AIP - this feels like major hackery but, these urls are complicated
    ((string-match "^http://scitation.aip.org" *doi-utils-redirect*)
     ;; get stuff after content
@@ -236,12 +261,19 @@
       (setq s (split-string p2 "/"))
       (setq p1 (mapconcat 'identity (-remove-at-indices '(0 6) s) "/"))
       (setq p3 (concat "/" (nth 0 s) (nth 1 s) "/" (nth 2 s) "/" (nth 3 s)))
-      (format "http://scitation.aip.org/deliver/fulltext/%s.pdf?itemId=/%s&mimeType=pdf&containerItemId=%s" p1 p2 p3)))
+      (format "http://scitation.aip.org/deliver/fulltext/%s.pdf?itemId=/%s&mimeType=pdf&containerItemId=%s"
+	      p1 p2 p3)))
 
    ;; Science direct - must retrieve from the html page
    ((string-match "^http://www.sciencedirect.com" *doi-utils-redirect*)
     (doi-utils-get-science-direct-pdf-url *doi-utils-redirect*)
     *doi-utils-pdf-url*)
+
+   ;; tandfonline
+   ;; http://www.tandfonline.com/doi/full/10.1080/08927022.2013.844898
+   ;; http://www.tandfonline.com/doi/pdf/10.1080/08927022.2013.844898
+   ((string-match "^http://www.tandfonline.com" *doi-utils-redirect*)
+    (replace-regexp-in-string "/abs/\\|/full/" "/pdf/" *doi-utils-redirect*))
   
    (t
     (message "redirect %s is unknown" *doi-utils-redirect*)
