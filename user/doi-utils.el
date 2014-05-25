@@ -99,7 +99,26 @@ org-ref, and tries to download the corresponding pdf."
        (org-ref-clean-bibtex-entry t)
      (org-ref-clean-bibtex-entry))
    ;; try to get pdf
-   (doi-utils-get-bibtex-entry-pdf))
+   (doi-utils-get-bibtex-entry-pdf)
+   (save-selected-window
+     (org-ref-open-bibtex-notes)))
+
+(defun add-bibtex-entry-from-doi (doi)
+  "add entry to end of first entry in org-ref-default-bibliography."
+  (interactive "sDOI: ")
+  (find-file (car org-ref-default-bibliography))
+  (end-of-buffer)
+  (insert "\n\n")
+  (insert-bibtex-entry-from-doi doi))
+
+(defun add-bibtex-entry-from-region (start end)
+  "add entry assuming region is a doi to end of first entry in org-ref-default-bibliography."
+  (interactive "r")
+  (let ((doi (buffer-substring start end)))
+    (find-file (car org-ref-default-bibliography))
+    (end-of-buffer)
+    (insert "\n")
+    (insert-bibtex-entry-from-doi doi)))
 
 (defun bibtex-set-field (field value)
   "set field to value in bibtex file. create field if it does not exist"
@@ -239,60 +258,62 @@ org-ref, and tries to download the corresponding pdf."
   (while *doi-utils-waiting* (sleep-for 0.1))
   *doi-utils-pdf-url*)
 
-(defun doi-utils-get-pdf-url (doi)
-  "returns a url to a pdf for the doi if one can be
-calculated. The calculated urls are basically worked out by hand
-for each url base. These tend to be publisher specific, and
-sometimes are journal specific."
-  (doi-utils-get-redirect doi)
-  
-  (unless *doi-utils-redirect*
-    (error "No redirect found for %s" doi))
-  
-  (cond
-   ;; APS journals
-   ((string-match "^http://journals.aps.org" *doi-utils-redirect*)
-    (replace-regexp-in-string "/abstract/" "/pdf/" *doi-utils-redirect*))
+(defvar pdf-url-functions nil
+  "list of functions that return a url to a pdf from a redirect url. Each function takes one argument, the redirect url. The function must return a pdf-url, or nil.")
 
-   ;; Science
-   ((string-match "^http://www.sciencemag.org" *doi-utils-redirect*)
-    (concat *doi-utils-redirect* ".full.pdf"))
+(defun aps-pdf-url (*doi-utils-redirect*)
+  (when (string-match "^http://journals.aps.org" *doi-utils-redirect*)
+    (replace-regexp-in-string "/abstract/" "/pdf/" *doi-utils-redirect*)))
 
-   ;; Nature and related journals
-   ((string-match "^http://www.nature.com" *doi-utils-redirect*)
+(add-to-list 'pdf-url-functions 'aps-pdf-url)
+
+(defun science-pdf-url (*doi-utils-redirect*)
+  (when (string-match "^http://www.sciencemag.org" *doi-utils-redirect*)
+    (concat *doi-utils-redirect* ".full.pdf")))
+
+(add-to-list 'pdf-url-functions 'science-pdf-url)
+
+(defun nature-pdf-url (*doi-utils-redirect*)
+  (when (string-match "^http://www.nature.com" *doi-utils-redirect*)
     (let ((result *doi-utils-redirect*))
       (setq result (replace-regexp-in-string "/full/" "/pdf/" result))
-      (replace-regexp-in-string "\.html$" "\.pdf" result)))
-   
-   ;; Wiley - it is aguess this works for all of them
-   ((string-match "^http://onlinelibrary.wiley.com" *doi-utils-redirect*)
-    (replace-regexp-in-string "/abstract" "/pdf" *doi-utils-redirect*))
+      (replace-regexp-in-string "\.html$" "\.pdf" result))))
 
-   ;; Springer
-   ;; http://link.springer.com/article/10.1007%2Fs11244-012-9808-0
-   ;; http://link.springer.com/content/pdf/10.1007%2Fs11244-012-9808-0.pdf
-   ((string-match "^http://link.springer.com" *doi-utils-redirect*)
-    (replace-regexp-in-string "/article/" "/content/pdf/" (concat *doi-utils-redirect* ".pdf")))
+(add-to-list 'pdf-url-functions 'nature-pdf-url)
 
-   ;; ACS journals
-   ((string-match "^http://pubs.acs.org" *doi-utils-redirect*)
-    (replace-regexp-in-string "/abs/" "/pdf/" *doi-utils-redirect*))
+(defun wiley-pdf-url (*doi-utils-redirect*)
+  (when (string-match "^http://onlinelibrary.wiley.com" *doi-utils-redirect*)
+    (replace-regexp-in-string "/abstract" "/pdf" *doi-utils-redirect*)))
 
-   ;; iop
-   ;; http://iopscience.iop.org/0953-8984/21/39/395502/
-   ;; http://iopscience.iop.org/0953-8984/21/39/395502/pdf/0953-8984_21_39_395502.pdf
-   ((string-match "^http://iopscience.iop.org" *doi-utils-redirect*)
+(add-to-list 'pdf-url-functions 'wiley-pdf-url)
+
+(defun springer-pdf-url (*doi-utils-redirect*)
+  (when (string-match "^http://link.springer.com" *doi-utils-redirect*)
+    (replace-regexp-in-string "/article/" "/content/pdf/" (concat *doi-utils-redirect* ".pdf"))))
+
+(add-to-list 'pdf-url-functions 'springer-pdf-url)
+
+(defun acs-pdf-url (*doi-utils-redirect*)
+  (when (string-match "^http://pubs.acs.org" *doi-utils-redirect*)
+    (replace-regexp-in-string "/abs/" "/pdf/" *doi-utils-redirect*)))
+
+(add-to-list 'pdf-url-functions 'acs-pdf-url)
+
+(defun iop-pdf-url (*doi-utils-redirect*)
+  (when (string-match "^http://iopscience.iop.org" *doi-utils-redirect*)
     (let ((tail (replace-regexp-in-string "^http://iopscience.iop.org" "" *doi-utils-redirect*)))
-      (concat "http://iopscience.iop.org" tail "/pdf" (replace-regexp-in-string "/" "_" tail) ".pdf")))
+      (concat "http://iopscience.iop.org" tail "/pdf" (replace-regexp-in-string "/" "_" tail) ".pdf"))))
 
-   ;; jstor
-   ;; http://www.jstor.org/stable/2245477
-   ;; http://www.jstor.org/stable/pdfplus/2245477.pdf
-   ((string-match "^http://www.jstor.org" *doi-utils-redirect*)
-    (concat (replace-regexp-in-string "/stable/" "/stable/pdfplus/" *doi-utils-redirect*) ".pdf"))
+(add-to-list 'pdf-url-functions 'iop-pdf-url)
 
-   ;; AIP - this feels like major hackery but, these urls are complicated
-   ((string-match "^http://scitation.aip.org" *doi-utils-redirect*)
+(defun jstor-pdf-url (*doi-utils-redirect*)
+  (when (string-match "^http://www.jstor.org" *doi-utils-redirect*)
+    (concat (replace-regexp-in-string "/stable/" "/stable/pdfplus/" *doi-utils-redirect*) ".pdf")))
+
+(add-to-list 'pdf-url-functions 'jstor-pdf-url)
+
+(defun aip-pdf-url (*doi-utils-redirect*)
+  (when (string-match "^http://scitation.aip.org" *doi-utils-redirect*)
     ;; get stuff after content
     (let (p1 p2 s p3)
       (setq p2 (replace-regexp-in-string "^http://scitation.aip.org/" "" *doi-utils-redirect*))
@@ -300,37 +321,145 @@ sometimes are journal specific."
       (setq p1 (mapconcat 'identity (-remove-at-indices '(0 6) s) "/"))
       (setq p3 (concat "/" (nth 0 s) (nth 1 s) "/" (nth 2 s) "/" (nth 3 s)))
       (format "http://scitation.aip.org/deliver/fulltext/%s.pdf?itemId=/%s&mimeType=pdf&containerItemId=%s"
-	      p1 p2 p3)))
+	      p1 p2 p3))))
 
-   ;; Science direct - must retrieve from the html page
-   ((string-match "^http://www.sciencedirect.com" *doi-utils-redirect*)
+(add-to-list 'pdf-url-functions 'aip-pdf-url)
+
+(defun science-direct-pdf-url (*doi-utils-redirect*)
+  (when (string-match "^http://www.sciencedirect.com" *doi-utils-redirect*)
     (doi-utils-get-science-direct-pdf-url *doi-utils-redirect*)
-    *doi-utils-pdf-url*)
+    *doi-utils-pdf-url*))
 
-   ;; tandfonline
-   ;; http://www.tandfonline.com/doi/abs/10.1080/08927022.2013.844898
-   ;; http://www.tandfonline.com/doi/full/10.1080/08927022.2013.844898
-   ;; http://www.tandfonline.com/doi/pdf/10.1080/08927022.2013.844898
-   ((string-match "^http://www.tandfonline.com" *doi-utils-redirect*)
-    (replace-regexp-in-string "/abs/\\|/full/" "/pdf/" *doi-utils-redirect*))
+(add-to-list 'pdf-url-functions 'science-direct-pdf-url)
 
-   ;; ECS
-   ;; http://jes.ecsdl.org/content/158/10/A1079.abstract
-   ;; http://jes.ecsdl.org/content/158/10/A1079.full.pdf+html
-   ((string-match "^http://jes.ecsdl.org" *doi-utils-redirect*)
-    (replace-regexp-in-string "\.abstract$" ".full.pdf" *doi-utils-redirect*))
+(defun tandfonline-pdf-url (*doi-utils-redirect*)
+  (when (string-match "^http://www.tandfonline.com" *doi-utils-redirect*)
+    (replace-regexp-in-string "/abs/\\|/full/" "/pdf/" *doi-utils-redirect*)))
 
-   ;; RSC
-   ;; http://pubs.rsc.org/en/Content/ArticleLanding/2014/RA/c3ra47097k
-   ;; http://pubs.rsc.org/en/content/articlepdf/2014/ra/c3ra47097k
-   ((string-match "^http://pubs.rsc.org" *doi-utils-redirect*)
+(add-to-list 'pdf-url-functions 'tandfonline-pdf-url)
+
+(defun ecs-pdf-url (*doi-utils-redirect*)
+  (when (string-match "^http://jes.ecsdl.org" *doi-utils-redirect*)
+    (replace-regexp-in-string "\.abstract$" ".full.pdf" *doi-utils-redirect*)))
+
+(add-to-list 'pdf-url-functions 'ecs-pdf-url)
+
+(defun rsc-pdf-url (*doi-utils-redirect*)
+  (when (string-match "^http://pubs.rsc.org" *doi-utils-redirect*)
     (let ((url (downcase *doi-utils-redirect*)))
       (setq url (replace-regexp-in-string "articlelanding" "articlepdf" url))
-      url))
+      url)))
+
+(add-to-list 'pdf-url-functions 'rsc-pdf-url)
+
+(defun doi-utils-get-pdf-url (doi)
+  "returns a url to a pdf for the doi if one can be
+calculated. Loops through the functions in `pdf-url-functions'
+until one is found"
+  (interactive "sDOI: ")
+  (doi-utils-get-redirect doi)
+  
+  (unless *doi-utils-redirect*
+    (error "No redirect found for %s" doi))
+  
+  (catch 'pdf-url
+    (dolist (func pdf-url-functions pdf-url)
+      (let ((pdf-url (funcall func *doi-utils-redirect*)))
+	(when pdf-url
+	  (throw 'pdf-url pdf-url))))))
+	   
+;; (defun doi-utils-get-pdf-url-ori (doi)
+;;   "returns a url to a pdf for the doi if one can be
+;; calculated. The calculated urls are basically worked out by hand
+;; for each url base. These tend to be publisher specific, and
+;; sometimes are journal specific."
+;;   (doi-utils-get-redirect doi)
+  
+;;   (unless *doi-utils-redirect*
+;;     (error "No redirect found for %s" doi))
+  
+;;   (cond
+;;    ;; APS journals
+;;    ((string-match "^http://journals.aps.org" *doi-utils-redirect*)
+;;     (replace-regexp-in-string "/abstract/" "/pdf/" *doi-utils-redirect*))
+
+;;    ;; Science
+;;    ((string-match "^http://www.sciencemag.org" *doi-utils-redirect*)
+;;     (concat *doi-utils-redirect* ".full.pdf"))
+
+;;    ;; Nature and related journals
+;;    ((string-match "^http://www.nature.com" *doi-utils-redirect*)
+;;     (let ((result *doi-utils-redirect*))
+;;       (setq result (replace-regexp-in-string "/full/" "/pdf/" result))
+;;       (replace-regexp-in-string "\.html$" "\.pdf" result)))
    
-   (t
-    (message-box "redirect %s is unknown. Please report this message to jkitchin@andrew.cmu.edu." *doi-utils-redirect*)
-    nil)))
+;;    ;; Wiley - it is aguess this works for all of them
+;;    ((string-match "^http://onlinelibrary.wiley.com" *doi-utils-redirect*)
+;;     (replace-regexp-in-string "/abstract" "/pdf" *doi-utils-redirect*))
+
+;;    ;; Springer
+;;    ;; http://link.springer.com/article/10.1007%2Fs11244-012-9808-0
+;;    ;; http://link.springer.com/content/pdf/10.1007%2Fs11244-012-9808-0.pdf
+;;    ((string-match "^http://link.springer.com" *doi-utils-redirect*)
+;;     (replace-regexp-in-string "/article/" "/content/pdf/" (concat *doi-utils-redirect* ".pdf")))
+
+;;    ;; ACS journals
+;;    ((string-match "^http://pubs.acs.org" *doi-utils-redirect*)
+;;     (replace-regexp-in-string "/abs/" "/pdf/" *doi-utils-redirect*))
+
+;;    ;; iop
+;;    ;; http://iopscience.iop.org/0953-8984/21/39/395502/
+;;    ;; http://iopscience.iop.org/0953-8984/21/39/395502/pdf/0953-8984_21_39_395502.pdf
+;;    ((string-match "^http://iopscience.iop.org" *doi-utils-redirect*)
+;;     (let ((tail (replace-regexp-in-string "^http://iopscience.iop.org" "" *doi-utils-redirect*)))
+;;       (concat "http://iopscience.iop.org" tail "/pdf" (replace-regexp-in-string "/" "_" tail) ".pdf")))
+
+;;    ;; jstor
+;;    ;; http://www.jstor.org/stable/2245477
+;;    ;; http://www.jstor.org/stable/pdfplus/2245477.pdf
+;;    ((string-match "^http://www.jstor.org" *doi-utils-redirect*)
+;;     (concat (replace-regexp-in-string "/stable/" "/stable/pdfplus/" *doi-utils-redirect*) ".pdf"))
+
+;;    ;; AIP - this feels like major hackery but, these urls are complicated
+;;    ((string-match "^http://scitation.aip.org" *doi-utils-redirect*)
+;;     ;; get stuff after content
+;;     (let (p1 p2 s p3)
+;;       (setq p2 (replace-regexp-in-string "^http://scitation.aip.org/" "" *doi-utils-redirect*))
+;;       (setq s (split-string p2 "/"))
+;;       (setq p1 (mapconcat 'identity (-remove-at-indices '(0 6) s) "/"))
+;;       (setq p3 (concat "/" (nth 0 s) (nth 1 s) "/" (nth 2 s) "/" (nth 3 s)))
+;;       (format "http://scitation.aip.org/deliver/fulltext/%s.pdf?itemId=/%s&mimeType=pdf&containerItemId=%s"
+;; 	      p1 p2 p3)))
+
+;;    ;; Science direct - must retrieve from the html page
+;;    ((string-match "^http://www.sciencedirect.com" *doi-utils-redirect*)
+;;     (doi-utils-get-science-direct-pdf-url *doi-utils-redirect*)
+;;     *doi-utils-pdf-url*)
+
+;;    ;; tandfonline
+;;    ;; http://www.tandfonline.com/doi/abs/10.1080/08927022.2013.844898
+;;    ;; http://www.tandfonline.com/doi/full/10.1080/08927022.2013.844898
+;;    ;; http://www.tandfonline.com/doi/pdf/10.1080/08927022.2013.844898
+;;    ((string-match "^http://www.tandfonline.com" *doi-utils-redirect*)
+;;     (replace-regexp-in-string "/abs/\\|/full/" "/pdf/" *doi-utils-redirect*))
+
+;;    ;; ECS
+;;    ;; http://jes.ecsdl.org/content/158/10/A1079.abstract
+;;    ;; http://jes.ecsdl.org/content/158/10/A1079.full.pdf+html
+;;    ((string-match "^http://jes.ecsdl.org" *doi-utils-redirect*)
+;;     (replace-regexp-in-string "\.abstract$" ".full.pdf" *doi-utils-redirect*))
+
+;;    ;; RSC
+;;    ;; http://pubs.rsc.org/en/Content/ArticleLanding/2014/RA/c3ra47097k
+;;    ;; http://pubs.rsc.org/en/content/articlepdf/2014/ra/c3ra47097k
+;;    ((string-match "^http://pubs.rsc.org" *doi-utils-redirect*)
+;;     (let ((url (downcase *doi-utils-redirect*)))
+;;       (setq url (replace-regexp-in-string "articlelanding" "articlepdf" url))
+;;       url))
+   
+;;    (t
+;;     (message-box "redirect %s is unknown. Please report this message to jkitchin@andrew.cmu.edu." *doi-utils-redirect*)
+;;     nil)))
    
 
 (defun doi-utils-get-bibtex-entry-pdf ()
