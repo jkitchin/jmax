@@ -212,7 +212,6 @@ We need several general utilities for this module. They are organized here. We f
 #+BEGIN_SRC emacs-lisp :tangle org-ref.el
 (defun org-ref-strip-string (string)
   "strip leading and trailing whitespace from the string"
-  (interactive)
   (replace-regexp-in-string
    (concat search-whitespace-regexp "$" ) ""
    (replace-regexp-in-string
@@ -349,7 +348,6 @@ environment, only %l is available."
 
 (defun org-ref-get-bibtex-entry-citation (key)
   "returns a string for the bibliography entry corresponding to key, and formatted according to `org-ref-bibliography-entry-format'"
-  (interactive)
 
   (let ((org-ref-bibliography-files (org-ref-find-bibliography))
 	(file) (entry))
@@ -387,7 +385,6 @@ This code provides some functions to generate a simple sorted bibliography in ht
 #+BEGIN_SRC emacs-lisp :tangle org-ref.el
 (defun org-ref-get-bibtex-keys ()
   "return a list of unique keys in the buffer."
-  (interactive)
   (let ((keys '()))
     (org-element-map (org-element-parse-buffer) 'link
       (lambda (link)       
@@ -408,8 +405,7 @@ This function gets the html for one entry.
 #+BEGIN_SRC emacs-lisp :tangle org-ref.el
 (defun org-ref-get-bibtex-entry-html (key)
   "returns an html string for the bibliography entry corresponding to key"
-  (interactive)
-    
+
   (format "<li><a id=\"%s\">[%s] %s</a></li>" key key (org-ref-get-bibtex-entry-citation key)))
 #+END_SRC
 
@@ -418,7 +414,6 @@ Now, we map over the whole list of keys, and the whole bibliography, formatted a
 #+BEGIN_SRC emacs-lisp :tangle org-ref.el 
 (defun org-ref-get-html-bibliography ()
   "Create an html bibliography when there are keys"
-  (interactive)
   (let ((keys (org-ref-get-bibtex-keys)))
     (when keys
       (concat "<h1>Bibliography</h1>
@@ -788,7 +783,6 @@ It would be nice to use completion to enter a ref link, where a list of labels i
 #+BEGIN_SRC emacs-lisp :tangle org-ref.el
 (defun org-ref-get-custom-ids ()
  "return a list of custom_id properties in the buffer"
- (interactive)
  (let ((results '()) custom_id)
    (org-map-entries 
     (lambda () 
@@ -801,7 +795,6 @@ results))
 Here we get a list of the labels defined as raw latex labels, e.g. \label{eqtre}.
 #+BEGIN_SRC emacs-lisp :tangle org-ref.el
 (defun org-ref-get-latex-labels ()
-(interactive) 
 (save-excursion
     (goto-char (point-min))
     (let ((matches '()))
@@ -814,7 +807,6 @@ Finally, we get the table names.
 
 #+BEGIN_SRC emacs-lisp :tangle org-ref.el
 (defun org-ref-get-tblnames ()
-  (interactive)
   (org-element-map (org-element-parse-buffer 'element) 'table
     (lambda (table) 
       (org-element-property :name table))))
@@ -825,7 +817,6 @@ Now, we can put all the labels together which will give us a list of candidates.
 #+BEGIN_SRC emacs-lisp  :tangle org-ref.el
 (defun org-ref-get-labels ()
   "returns a list of labels in the buffer that you can make a ref link to. this is used to auto-complete ref links."
-  (interactive)
   (save-excursion
     (goto-char (point-min))
     (let ((matches '()))
@@ -1539,8 +1530,6 @@ This code provides some functions to generate a simple bibliography in html.
 
 #+BEGIN_SRC emacs-lisp :tangle org-ref.el
 (defun org-ref-get-bibtex-entry-html (key)
-(interactive)
-
  (let ((org-ref-bibliography-files (org-ref-find-bibliography))
        (file) (entry))
 
@@ -1562,7 +1551,6 @@ This code provides some functions to generate a simple bibliography in html.
 #+BEGIN_SRC emacs-lisp :tangle org-ref.el 
 (defun org-ref-get-html-bibliography ()
   "Create an html bibliography when there are keys"
-  (interactive)
   (let ((keys (org-ref-get-bibtex-keys)))
     (when keys
       (concat "<h1>Bibliography</h1>
