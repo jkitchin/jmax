@@ -352,7 +352,6 @@ environment, only %l is available."
   (interactive)
 
   (let ((org-ref-bibliography-files (org-ref-find-bibliography))
-	(cb (current-buffer))
 	(file) (entry))
 
     (setq file (catch 'result
@@ -362,10 +361,10 @@ environment, only %l is available."
 			   (throw 'result file)
 			 (message "%s not found in %s" key (file-truename file))))))
 
-    (set-buffer (find-file-noselect file))
-    (bibtex-search-entry key nil 0)
-    (setq entry  (org-ref-reftex-format-citation (bibtex-parse-entry) org-ref-bibliography-entry-format))
-    (set-buffer cb)
+    (with-temp-buffer
+      (insert-file-contents file)
+      (bibtex-search-entry key nil 0)
+      (setq entry  (org-ref-reftex-format-citation (bibtex-parse-entry) org-ref-bibliography-entry-format)))
     entry))
 #+END_SRC
 
@@ -991,11 +990,10 @@ Now, we can see if an entry is in a file.
   "determine if the key is in the file"
   (interactive "skey: \nsFile: ")
 
-  (let ((cb (current-buffer)))
-    (set-buffer (find-file-noselect filename))
-    (prog1 
-	(bibtex-search-entry key nil 0)
-      (set-buffer cb))))
+  (with-temp-buffer
+    (insert-file-contents filename)
+    (prog1
+        (bibtex-search-entry key nil 0))))
 #+END_SRC
 
 Finally, we want to know which file the key is in.
@@ -1029,7 +1027,6 @@ we check to see if there is pdf, and if the key actually exists in the bibliogra
   (interactive)
   (let* ((results (org-ref-get-bibtex-key-and-file))
 	 (key (car results))
-	 (cb (current-buffer))
          (pdf-file (format (concat org-ref-pdf-directory "%s.pdf") key))
          (bibfile (cdr results))
 	 m1 m2 m3 m4 m5 menu-string)
@@ -1041,30 +1038,32 @@ we check to see if there is pdf, and if the key actually exists in the bibliogra
 		 "(p)df"
 		     "(No pdf found)"))
 
-    (setq m4 (if (not (string= (catch 'url
-				 (progn
-				   (set-buffer (find-file-noselect bibfile))
-				   (bibtex-search-entry key)
-				   (when (not 
-					  (string= (setq url (bibtex-autokey-get-field "url")) ""))
-				     (message "url found: %s" url)
-				     (throw 'url url))
-				   
-				   (when (not 
-					  (string= (setq url (bibtex-autokey-get-field "doi")) ""))
-				     (throw 'url url)))) ""))
-		 "(u)rl" "(no url found)"))
-    (set-buffer cb)
+    (setq m4 (if (not
+                  (and bibfile
+                       (string= (catch 'url
+                                  (progn
+
+                                    (with-temp-buffer
+                                      (insert-file-contents bibfile)
+                                      (bibtex-search-entry key)
+                                      (when (not
+                                             (string= (setq url (bibtex-autokey-get-field "url")) ""))
+                                        (message "url found: %s" url)
+                                        (throw 'url url))
+
+                                      (when (not
+                                             (string= (setq url (bibtex-autokey-get-field "doi")) ""))
+                                        (throw 'url url))))) "")))
+               "(u)rl" "(no url found)"))
     (setq m5 "(n)otes")
     (setq m2 (if bibfile
 		 (progn
-		   (let ((cb (current-buffer)) citation)
-		     (setq citation (progn
-				      (set-buffer (find-file-noselect bibfile))
-				      (bibtex-search-entry key)  
-				      (org-ref-bib-citation)))
-		     (set-buffer cb)
-		     citation))
+                   (setq citation (progn
+                                    (with-temp-buffer
+                                      (insert-file-contents bibfile)
+                                      (bibtex-search-entry key)
+                                      (org-ref-bib-citation))))
+                   citation)
 	       "no key found"))
 
     (setq menu-string (mapconcat 'identity (list m2 "\n" m1 m3 m4 m5 "(q)uit") "  "))
@@ -1090,41 +1089,39 @@ We need some convenience functions to open act on the citation at point. These w
 (defun org-ref-open-url-at-point ()
   "open the url for bibtex key under point."
   (interactive)
-  (let* ((cb (current-buffer))
-	 (results (org-ref-get-bibtex-key-and-file))
+  (let* ((results (org-ref-get-bibtex-key-and-file))
 	 (key (car results))
 	 (bibfile (cdr results)))
     (save-excursion
-      (set-buffer (find-file-noselect bibfile))
-      (bibtex-search-entry key)
-      ;; I like this better than bibtex-url which does not always find
-      ;; the urls
-      (catch 'done
-	(let ((url (bibtex-autokey-get-field "url")))
-	  (when  url
-	    (browse-url url)
-	    (throw 'done nil)))
+      (with-temp-buffer
+        (insert-file-contents bibfile)
+        (bibtex-search-entry key)
+        ;; I like this better than bibtex-url which does not always find
+        ;; the urls
+        (catch 'done
+          (let ((url (bibtex-autokey-get-field "url")))
+            (when  url
+              (browse-url url)
+              (throw 'done nil)))
 
-	(let ((doi (bibtex-autokey-get-field "doi")))
-	  (when doi
-	    (if (string-match "^http" doi)
-		(browse-url doi)
-	      (browse-url (format "http://dx.doi.org/%s" doi)))
-	    (throw 'done nil)))))
-    (set-buffer cb)))
-
+          (let ((doi (bibtex-autokey-get-field "doi")))
+            (when doi
+              (if (string-match "^http" doi)
+                  (browse-url doi)
+                (browse-url (format "http://dx.doi.org/%s" doi)))
+              (throw 'done nil))))))))
 
 (defun org-ref-open-notes-at-point ()
   "open the notes for bibtex key under point."
   (interactive)
-  (let* ((cb (current-buffer))
-	 (results (org-ref-get-bibtex-key-and-file))
+  (let* ((results (org-ref-get-bibtex-key-and-file))
 	 (key (car results))
 	 (bibfile (cdr results)))
     (save-excursion
-	   (find-file bibfile)
-	   (bibtex-search-entry key)
-	   (org-ref-open-bibtex-notes))))
+      (with-temp-buffer
+        (insert-file-contents bibfile)
+        (bibtex-search-entry key)
+        (org-ref-open-bibtex-notes)))))
 
 (defun org-ref-citation-at-point ()
   "give message of current citation at point"
@@ -1134,10 +1131,10 @@ We need some convenience functions to open act on the citation at point. These w
 	(key (car results))
 	(bibfile (cdr results)))	
     (message "%s" (progn
-		    (set-buffer (find-file-noselect bibfile))
-		    (bibtex-search-entry key)  
-		    (org-ref-bib-citation)))
-    (set-buffer cb)))
+		    (with-temp-buffer
+                      (insert-file-contents bibfile)
+                      (bibtex-search-entry key)
+                      (org-ref-bib-citation))))))
 
 (defun org-ref-open-citation-at-point ()
   "open bibtex file to key at point"
@@ -1545,7 +1542,6 @@ This code provides some functions to generate a simple bibliography in html.
 (interactive)
 
  (let ((org-ref-bibliography-files (org-ref-find-bibliography))
-       (cb (current-buffer))
        (file) (entry))
 
    (setq file (catch 'result
@@ -1554,13 +1550,12 @@ This code provides some functions to generate a simple bibliography in html.
 		      (if (org-ref-key-in-file-p key (file-truename file)) 
 			  (throw 'result file)
 			(message "%s not found in %s" key (file-truename file))))))
-   (set-buffer (find-file-noselect file))
-   (prog1 
-       (bibtex-search-entry key nil 0)
-     (setq entry  (org-ref-bib-html-citation))
-     (set-buffer cb))
-    
-   (format "<li><a id=\"%s\">[%s] %s</a></li>" key key entry)))
+   (if file (with-temp-buffer
+              (insert-file-contents file)
+              (prog1
+                  (bibtex-search-entry key nil 0)
+                (setq entry  (org-ref-bib-html-citation)))
+              (format "<li><a id=\"%s\">[%s] %s</a></li>" key key entry)))))
 #+END_SRC
 
 
@@ -1583,7 +1578,6 @@ This code provides some functions to generate a simple bibliography in html.
 (defun org-ref-bib-citation ()
   "from a bibtex entry, create and return a simple citation string."
   (interactive)
-  (if (eq major-mode 'bibtex-mode)
       (progn
         (bibtex-beginning-of-entry)
         (let* ((cb (current-buffer))
@@ -1601,7 +1595,7 @@ This code provides some functions to generate a simple bibliography in html.
                )
 	  ;;authors, "title", Journal, vol(iss):pages (year).
             (format "%s, \"%s\", %s, %s:%s (%s)"
-		    author title journal  volume pages year)))))
+		    author title journal  volume pages year))))
 #+END_SRC
 
 
@@ -1609,7 +1603,6 @@ This code provides some functions to generate a simple bibliography in html.
 (defun org-ref-bib-html-citation ()
   "from a bibtex entry, create and return a simple citation with html links."
   (interactive)
-  (if (eq major-mode 'bibtex-mode)
       (progn
         (bibtex-beginning-of-entry)
         (let* ((cb (current-buffer))
@@ -1630,7 +1623,7 @@ This code provides some functions to generate a simple bibliography in html.
 			    author title journal  volume pages year)
 		    (when url (format " <a href=\"%s\">link</a>" url))
 		    (when doi (format " <a href=\"http://dx.doi.org/%s\">doi</a>" doi)))
-	    ))))
+	    )))
 #+END_SRC
 
 ** open pdf from bibtex
@@ -1666,7 +1659,6 @@ it did not put the key where it needed to be. so, below I replace
 the carriage returns and extra spaces with a single space and
 construct the heading by hand."
   (interactive)
-  (if (eq major-mode 'bibtex-mode)
       (progn
         (bibtex-beginning-of-entry)
         (let* ((cb (current-buffer))
@@ -1682,7 +1674,6 @@ construct the heading by hand."
                (doi (reftex-get-bib-field "doi" entry))
                (url (reftex-get-bib-field "url" entry))
                )
-	  (save-buffer)
 
 	  ;; save key to clipboard to make saving pdf later easier by pasting.
 	  (with-temp-buffer
@@ -1711,7 +1702,7 @@ construct the heading by hand."
  :END:
 [[cite:%s]] [[file:%s/%s.pdf][pdf]]\n\n"
 key author journal year volume pages doi url key org-ref-pdf-directory key))
-(save-buffer))))))
+(save-buffer)))))
 #+END_SRC
 
 ** open url in browser from bibtex
@@ -2114,12 +2105,12 @@ I prefer citations in chronological order within a grouping. These functions sor
   "get the year of an entry with key. Returns year as a string."
   (interactive)
   (let* ((results (org-ref-get-bibtex-key-and-file key))
-	 (bibfile (cdr results))
-	 (cb (current-buffer)))
-    (set-buffer (find-file-noselect bibfile))
-    (bibtex-search-entry key nil 0)
-    (prog1 (reftex-get-bib-field "year" (bibtex-parse-entry t))
-      (set-buffer cb))))
+	 (bibfile (cdr results)))
+    (with-temp-buffer
+      (insert-file-contents bibfile)
+      (bibtex-search-entry key nil 0)
+      (prog1 (reftex-get-bib-field "year" (bibtex-parse-entry t))
+        ))))
 
 (defun org-ref-sort-citation-link ()
  "replace link at point with sorted link by year"
