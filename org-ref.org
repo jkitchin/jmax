@@ -1027,7 +1027,7 @@ we check to see if there is pdf, and if the key actually exists in the bibliogra
   (interactive)
   (let* ((results (org-ref-get-bibtex-key-and-file))
 	 (key (car results))
-         (pdf-file (format (concat org-ref-pdf-directory "%s.pdf") key))
+         (pdf-file (format (concat org-ref-pdf-directory "/%s.pdf") key))
          (bibfile (cdr results))
 	 m1 m2 m3 m4 m5 menu-string)
     (setq m1 (if bibfile		 
@@ -1080,7 +1080,7 @@ We need some convenience functions to open act on the citation at point. These w
   (interactive)
   (let* ((results (org-ref-get-bibtex-key-and-file))
 	 (key (car results))
-         (pdf-file (format (concat org-ref-pdf-directory "%s.pdf") key)))
+         (pdf-file (format (concat org-ref-pdf-directory "/%s.pdf") key)))
     (if (file-exists-p pdf-file)
 	(org-open-file pdf-file)
 (message "no pdf found for %s" key))))
@@ -1160,7 +1160,7 @@ you select your option with a single key press."
 	 (results (org-ref-get-bibtex-key-and-file))
 	 (key (car results))
 	 (cb (current-buffer))
-         (pdf-file (format (concat org-ref-pdf-directory "%s.pdf") key))
+         (pdf-file (format (concat org-ref-pdf-directory "/%s.pdf") key))
          (bibfile (cdr results)))
 
     (cond
@@ -1638,7 +1638,7 @@ the entry of interest in the bibfile. but does not check that."
     (let* ((bibtex-expand-strings t)
            (entry (bibtex-parse-entry t))
            (key (reftex-get-bib-field "=key=" entry))
-           (pdf (format (concat org-ref-pdf-directory "%s.pdf") key)))
+           (pdf (format (concat org-ref-pdf-directory "/%s.pdf") key)))
       (message "%s" pdf)
       (if (file-exists-p pdf)
           (org-open-link-from-string (format "[[file:%s]]" pdf))
