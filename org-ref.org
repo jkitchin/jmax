@@ -944,7 +944,7 @@ falling back to what the user has set in org-ref-default-bibliography
     (save-excursion
       (goto-char (point-min))
       ;;  look for a bibliography link
-      (when (re-search-forward "\<bibliography:\\([^\]\|\n]+\\)" nil t)      	
+      (when (re-search-forward "\\<bibliography:\\([^\]\|\n]+\\)" nil t)
 	(setq org-ref-bibliography-files
 	      (mapcar 'org-ref-strip-string (split-string (match-string 1) ",")))
 	(message "bibliography org-ref-bibliography-files = %s from %s" org-ref-bibliography-files (match-string 1))
