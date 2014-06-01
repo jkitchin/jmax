@@ -305,5 +305,7 @@
       bibtex-autokey-titlewords-stretch 1
       bibtex-autokey-titleword-length 5)
 
+;; so we can use emacsclient
+(server-start)
 
 (provide 'jmax)
