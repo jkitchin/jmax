@@ -1679,7 +1679,7 @@ construct the heading by hand."
           (goto-char (point-min))
           ;; put new entry in notes if we don't find it.
           (unless (re-search-forward (format ":Custom_ID: %s$" key) nil 'end)
-            (insert (format "\n** %s" title))
+            (insert (format "\n** TODO %s - %s" year title))
             (insert (format"
  :PROPERTIES:
   :Custom_ID: %s
