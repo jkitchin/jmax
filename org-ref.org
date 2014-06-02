@@ -1565,55 +1565,56 @@ This code provides some functions to generate a simple bibliography in html.
 #+BEGIN_SRC emacs-lisp :tangle org-ref.el
 (defun org-ref-bib-citation ()
   "from a bibtex entry, create and return a simple citation string."
-  (interactive)
-      (progn
-        (bibtex-beginning-of-entry)
-        (let* ((cb (current-buffer))
-               (bibtex-expand-strings t)
-               (entry (loop for (key . value) in (bibtex-parse-entry t)
-                            collect (cons (downcase key) value)))
-               (title (replace-regexp-in-string "\n\\|\t\\|\s+" " " (reftex-get-bib-field "title" entry)))
-               (year  (reftex-get-bib-field "year" entry))
-               (author (replace-regexp-in-string "\n\\|\t\\|\s+" " " (reftex-get-bib-field "author" entry)))
-               (key (reftex-get-bib-field "=key=" entry))
-               (journal (reftex-get-bib-field "journal" entry))
-               (volume (reftex-get-bib-field "volume" entry))
-               (pages (reftex-get-bib-field "pages" entry))
-               (doi (reftex-get-bib-field "doi" entry))
-               (url (reftex-get-bib-field "url" entry))
-               )
-	  ;;authors, "title", Journal, vol(iss):pages (year).
-            (format "%s, \"%s\", %s, %s:%s (%s)"
-		    author title journal  volume pages year))))
+
+  (bibtex-beginning-of-entry)
+  (let* ((cb (current-buffer))
+	 (bibtex-expand-strings t)
+	 (entry (loop for (key . value) in (bibtex-parse-entry t)
+		      collect (cons (downcase key) value)))
+	 (title (replace-regexp-in-string "\n\\|\t\\|\s+" " " (reftex-get-bib-field "title" entry)))
+	 (year  (reftex-get-bib-field "year" entry))
+	 (author (replace-regexp-in-string "\n\\|\t\\|\s+" " " (reftex-get-bib-field "author" entry)))
+	 (key (reftex-get-bib-field "=key=" entry))
+	 (journal (reftex-get-bib-field "journal" entry))
+	 (volume (reftex-get-bib-field "volume" entry))
+	 (pages (reftex-get-bib-field "pages" entry))
+	 (doi (reftex-get-bib-field "doi" entry))
+	 (url (reftex-get-bib-field "url" entry))
+	 )
+    ;;authors, "title", Journal, vol(iss):pages (year).
+    (format "%s, \"%s\", %s, %s:%s (%s)"
+	    author title journal  volume pages year)))
 #+END_SRC
+
+#+RESULTS:
+: org-ref-bib-citation
 
 
 #+BEGIN_SRC emacs-lisp :tangle org-ref.el
 (defun org-ref-bib-html-citation ()
   "from a bibtex entry, create and return a simple citation with html links."
-  (interactive)
-      (progn
-        (bibtex-beginning-of-entry)
-        (let* ((cb (current-buffer))
-               (bibtex-expand-strings t)
-               (entry (loop for (key . value) in (bibtex-parse-entry t)
-                            collect (cons (downcase key) value)))
-               (title (replace-regexp-in-string "\n\\|\t\\|\s+" " " (reftex-get-bib-field "title" entry)))
-               (year  (reftex-get-bib-field "year" entry))
-               (author (replace-regexp-in-string "\n\\|\t\\|\s+" " " (reftex-get-bib-field "author" entry)))
-               (key (reftex-get-bib-field "=key=" entry))
-               (journal (reftex-get-bib-field "journal" entry))
-               (volume (reftex-get-bib-field "volume" entry))
-               (pages (reftex-get-bib-field "pages" entry))
-               (doi (reftex-get-bib-field "doi" entry))
-               (url (reftex-get-bib-field "url" entry))
-               )
-	  ;;authors, "title", Journal, vol(iss):pages (year).
-            (concat (format "%s, \"%s\", %s, %s:%s (%s)."
-			    author title journal  volume pages year)
-		    (when url (format " <a href=\"%s\">link</a>" url))
-		    (when doi (format " <a href=\"http://dx.doi.org/%s\">doi</a>" doi)))
-	    )))
+
+  (bibtex-beginning-of-entry)
+  (let* ((cb (current-buffer))
+	 (bibtex-expand-strings t)
+	 (entry (loop for (key . value) in (bibtex-parse-entry t)
+		      collect (cons (downcase key) value)))
+	 (title (replace-regexp-in-string "\n\\|\t\\|\s+" " " (reftex-get-bib-field "title" entry)))
+	 (year  (reftex-get-bib-field "year" entry))
+	 (author (replace-regexp-in-string "\n\\|\t\\|\s+" " " (reftex-get-bib-field "author" entry)))
+	 (key (reftex-get-bib-field "=key=" entry))
+	 (journal (reftex-get-bib-field "journal" entry))
+	 (volume (reftex-get-bib-field "volume" entry))
+	 (pages (reftex-get-bib-field "pages" entry))
+	 (doi (reftex-get-bib-field "doi" entry))
+	 (url (reftex-get-bib-field "url" entry))
+	 )
+    ;;authors, "title", Journal, vol(iss):pages (year).
+    (concat (format "%s, \"%s\", %s, %s:%s (%s)."
+		    author title journal  volume pages year)
+	    (when url (format " <a href=\"%s\">link</a>" url))
+	    (when doi (format " <a href=\"http://dx.doi.org/%s\">doi</a>" doi)))
+    ))
 #+END_SRC
 
 ** open pdf from bibtex
