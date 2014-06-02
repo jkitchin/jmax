@@ -54,11 +54,10 @@
        month
        url json-data)
    
-   (setq results 
-	 (with-current-buffer
-	     (url-retrieve-synchronously
-	      (concat "http://dx.doi.org/" doi))
-	 (json-read-from-string (buffer-substring url-http-end-of-headers (point-max))))
+   (setq results (with-current-buffer
+		     (url-retrieve-synchronously
+		      (concat "http://dx.doi.org/" doi))
+		   (json-read-from-string (buffer-substring url-http-end-of-headers (point-max))))
          type (plist-get results :type)
 	 author (mapconcat (lambda (x) (concat (plist-get x :given) " " (plist-get x :family)))
 		     (plist-get results :author) " and ")
@@ -67,7 +66,7 @@
 	 volume (plist-get results :volume)
 	 issue (plist-get results :issue)
 	 year (elt (elt (plist-get (plist-get results :issued) :date-parts) 0) 0)
-	 month (elt (elt (plist-get (plist-get results :issued) :date-parts) 0) 1)
+	 ;; month (elt (elt (plist-get (plist-get results :issued) :date-parts) 0) 1)
 	 pages (plist-get results :page)
 	 doi (plist-get results :DOI)
 	 url (plist-get results :URL)
@@ -85,7 +84,6 @@
   pages = 	 {%{pages}},
   doi =          {%{doi}},
   url =          {%{url}},
-  month = 	 {%{month}},
 }"))
     (t (message-box "%s not supported yet." type)))))
  
