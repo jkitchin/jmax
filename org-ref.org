@@ -1650,38 +1650,38 @@ it did not put the key where it needed to be. so, below I replace
 the carriage returns and extra spaces with a single space and
 construct the heading by hand."
   (interactive)
-      (progn
-        (bibtex-beginning-of-entry)
-        (let* ((cb (current-buffer))
-               (bibtex-expand-strings t)
-               (entry (loop for (key . value) in (bibtex-parse-entry t)
-                           collect (cons (downcase key) value)))
-               (title (replace-regexp-in-string "\n\\|\t\\|\s+" " " (reftex-get-bib-field "title" entry)))
-               (year  (reftex-get-bib-field "year" entry))
-               (author (replace-regexp-in-string "\n\\|\t\\|\s+" " " (reftex-get-bib-field "author" entry)))
-               (key (reftex-get-bib-field "=key=" entry))
-               (journal (reftex-get-bib-field "journal" entry))
-               (volume (reftex-get-bib-field "volume" entry))
-               (pages (reftex-get-bib-field "pages" entry))
-               (doi (reftex-get-bib-field "doi" entry))
-               (url (reftex-get-bib-field "url" entry))
-               )
 
-	  ;; save key to clipboard to make saving pdf later easier by pasting.
-	  (with-temp-buffer
-	    (insert key)
-	    (kill-ring-save (point-min) (point-max)))
+  (bibtex-beginning-of-entry)
+  (let* ((cb (current-buffer))
+	 (bibtex-expand-strings t)
+	 (entry (loop for (key . value) in (bibtex-parse-entry t)
+		      collect (cons (downcase key) value)))
+	 (title (replace-regexp-in-string "\n\\|\t\\|\s+" " " (reftex-get-bib-field "title" entry)))
+	 (year  (reftex-get-bib-field "year" entry))
+	 (author (replace-regexp-in-string "\n\\|\t\\|\s+" " " (reftex-get-bib-field "author" entry)))
+	 (key (reftex-get-bib-field "=key=" entry))
+	 (journal (reftex-get-bib-field "journal" entry))
+	 (volume (reftex-get-bib-field "volume" entry))
+	 (pages (reftex-get-bib-field "pages" entry))
+	 (doi (reftex-get-bib-field "doi" entry))
+	 (url (reftex-get-bib-field "url" entry))
+	 )
 
-          ;; now look for entry in the notes file
-          (if  org-ref-bibliography-notes
-	      (find-file org-ref-bibliography-notes)
-	    (error "org-ref-bib-bibliography-notes is not set to anything"))
-
-          (goto-char (point-min))
-          ;; put new entry in notes if we don't find it.
-          (unless (re-search-forward (format ":Custom_ID: %s$" key) nil 'end)
-            (insert (format "\n** TODO %s - %s" year title))
-            (insert (format"
+    ;; save key to clipboard to make saving pdf later easier by pasting.
+    (with-temp-buffer
+      (insert key)
+      (kill-ring-save (point-min) (point-max)))
+    
+    ;; now look for entry in the notes file
+    (if  org-ref-bibliography-notes
+	(find-file org-ref-bibliography-notes)
+      (error "org-ref-bib-bibliography-notes is not set to anything"))
+    
+    (goto-char (point-min))
+    ;; put new entry in notes if we don't find it.
+    (unless (re-search-forward (format ":Custom_ID: %s$" key) nil 'end)
+      (insert (format "\n** TODO %s - %s" year title))
+      (insert (format"
  :PROPERTIES:
   :Custom_ID: %s
   :AUTHOR: %s
@@ -1694,7 +1694,7 @@ construct the heading by hand."
  :END:
 [[cite:%s]] [[file:%s/%s.pdf][pdf]]\n\n"
 key author journal year volume pages doi url key org-ref-pdf-directory key))
-(save-buffer)))))
+(save-buffer))))
 #+END_SRC
 
 ** open url in browser from bibtex
