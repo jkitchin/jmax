@@ -400,4 +400,27 @@ citecolor=blue,filecolor=blue,menucolor=blue,urlcolor=blue"
 (require 'ox-manuscript)
 (require 'ox-archive)
 
+
+
+(defun sa-ignore-headline (contents backend info)
+  "Ignore headlines with tag `ignoreheading'. This may mess up your labels, since the exporter still creates a label for it."
+  (when (and (org-export-derived-backend-p backend 'latex 'html 'ascii)
+                  (string-match "\\`.*ignoreheading.*\n"
+                                (downcase contents)))
+    (replace-match "" nil nil contents)))
+
+(defun headline-nonumber (contents backend info)
+  "make headlines with nonumber"
+  (when (and (org-export-derived-backend-p backend 'latex 'html 'ascii)
+                  (string-match "\\`.*nonumber.*\n"
+                                (downcase contents)))
+    (let ((output contents))
+      (setq output (replace-regexp-in-string "section{" "section*{" contents))
+      (setq output (replace-regexp-in-string "\\\\hfill{}\\\\textsc{nonumber}" "" output))
+      output)))
+
+(add-to-list 'org-export-filter-headline-functions 'sa-ignore-headline)
+(add-to-list 'org-export-filter-headline-functions 'headline-nonumber)
+
+
 (message "jmax-org.el loaded")
