@@ -220,6 +220,7 @@ org-ref, and tries to download the corresponding pdf."
   (when (plist-get status :error)
     (signal (car (plist-get status :error)) (cdr(plist-get status :error))))
   (when (plist-get status :redirect) ;  is nil if there none
+    (message "redirects = %s" (plist-get status :redirect))
     (message "*doi-utils-redirect* set to %s"
 	     (setq *doi-utils-redirect* (plist-get status :redirect))))
   ;; we have done our job, so we are not waiting any more.
@@ -251,7 +252,7 @@ org-ref, and tries to download the corresponding pdf."
   (url-retrieve redirect-url
 		(lambda (status)
 		  (beginning-of-buffer)
-		  (re-search-forward "pdfurl=\"\\([^\"]*\\)\"")
+		  (re-search-forward "pdfurl=\"\\([^\"]*\\)\"" nil t)
 		  (setq *doi-utils-pdf-url* (match-string 1))))
   (while *doi-utils-waiting* (sleep-for 0.1))
   *doi-utils-pdf-url*)
@@ -329,6 +330,22 @@ org-ref, and tries to download the corresponding pdf."
     *doi-utils-pdf-url*))
 
 (add-to-list 'pdf-url-functions 'science-direct-pdf-url)
+
+;; sometimes I get
+;; http://linkinghub.elsevier.com/retrieve/pii/S0927025609004558
+;; which actually redirect to
+;; http://www.sciencedirect.com/science/article/pii/S0927025609004558
+(defun linkinghub-elsevier-pdf-url (*doi-utils-redirect*)
+  (when (string-match "^http://linkinghub.elsevier.com/retrieve" *doi-utils-redirect*)
+    (let ((second-redirect (replace-regexp-in-string
+			    "http://linkinghub.elsevier.com/retrieve"
+			    "http://www.sciencedirect.com/science/article"
+			    *doi-utils-redirect*)))
+      (message "getting pdf url from %s" second-redirect)
+      ;(doi-utils-get-science-direct-pdf-url second-redirect)
+      *doi-utils-pdf-url*)))
+
+(add-to-list 'pdf-url-functions 'linkinghub-elsevier-pdf-url)
 
 (defun tandfonline-pdf-url (*doi-utils-redirect*)
   (when (string-match "^http://www.tandfonline.com" *doi-utils-redirect*)
@@ -487,17 +504,20 @@ at the end."
       ;; now get file if needed.
       (when (and doi (not (file-exists-p pdf-file)))
 	(setq pdf-url (doi-utils-get-pdf-url doi))
-	(url-copy-file pdf-url pdf-file)
-	;; now check if we got a pdf
-	(with-temp-buffer
-	  (insert-file-contents pdf-file)
-	  ;; PDFS start with %PDF-1.x as the first few characters.
-	  (if (not (string= (buffer-substring 1 6) "%PDF-"))
-	      (progn
-		(message "%s" (buffer-string))
-		(delete-file pdf-file))
-	    (message "%s saved" pdf-file)))
+	(if pdf-url
+	    (progn
+	      (url-copy-file pdf-url pdf-file)
+	      ;; now check if we got a pdf
+	      (with-temp-buffer
+		(insert-file-contents pdf-file)
+		;; PDFS start with %PDF-1.x as the first few characters.
+		(if (not (string= (buffer-substring 1 6) "%PDF-"))
+		    (progn
+		      (message "%s" (buffer-string))
+		      (delete-file pdf-file))
+		  (message "%s saved" pdf-file)))
 	
-      (when (file-exists-p pdf-file)
-	(org-open-file pdf-file))
-      pdf-file))))
+	      (when (file-exists-p pdf-file)
+		(org-open-file pdf-file)))
+	  (message "No pdf-url found for %s at %s" doi *doi-utils-redirect* ))
+	  pdf-file))))
