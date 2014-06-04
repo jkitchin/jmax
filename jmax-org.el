@@ -394,6 +394,8 @@ citecolor=blue,filecolor=blue,menucolor=blue,urlcolor=blue"
       (load-file (expand-file-name "org-ref.el" starter-kit-dir)))
   (require 'org-ref))
 
+(org-babel-load-file (expand-file-name "doi-utils.org" starter-kit-dir))
+
 (require 'ox-cmu-qualifier)
 (require 'ox-cmu-ms-report)
 (require 'ox-cmu-dissertation)
