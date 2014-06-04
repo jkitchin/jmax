@@ -231,21 +231,22 @@ You cannot compute these pdf links; they are embedded in the redirected pages.
 
 ** Add all functions
 #+BEGIN_SRC emacs-lisp
-(add-to-list 'doi-utils-pdf-url-functions
-	     'aps-pdf-url
-	     'science-pdf-url
-	     'nature-pdf-url
-	     'wiley-pdf-url	     
-	     'springer-pdf-url
-	     'acs-pdf-url
-	     'iop-pdf-url
-	     'jstor-pdf-url
-	     'aip-pdf-url
-	     'science-direct-pdf-url
-	     'linkinghub-elsevier-pdf-url
-	     'tandfonline-pdf-url
-	     'ecs-pdf-url
-	     'rsc-pdf-url)
+(setq doi-utils-pdf-url-functions
+      (list
+       'aps-pdf-url
+       'science-pdf-url
+       'nature-pdf-url
+       'wiley-pdf-url	     
+       'springer-pdf-url
+       'acs-pdf-url
+       'iop-pdf-url
+       'jstor-pdf-url
+       'aip-pdf-url
+       'science-direct-pdf-url
+       'linkinghub-elsevier-pdf-url
+       'tandfonline-pdf-url
+       'ecs-pdf-url
+       'rsc-pdf-url))
 #+END_SRC
 
 ** Get the pdf url for a doi
@@ -258,13 +259,27 @@ until one is found"
   
   (unless *doi-utils-redirect*
     (error "No redirect found for %s" doi))
-  
+  (message "applying functions")
   (catch 'pdf-url
-    (dolist (func doi-utils-pdf-url-functions pdf-url)
-      (let ((pdf-url (funcall func *doi-utils-redirect*)))
-	(when pdf-url
-	  (throw 'pdf-url pdf-url))))))
+    (dolist (func doi-utils-pdf-url-functions)
+     (message "calling %s" func)
+      (let ((this-pdf-url (funcall func *doi-utils-redirect*)))
+(message "t: %s" this-pdf-url)
+	(when this-pdf-url
+          (message "found pdf url: %s" this-pdf-url)
+	  (throw 'pdf-url this-pdf-url))))))
 #+END_SRC
+
+#+RESULTS:
+: doi-utils-get-pdf-url
+
+
+#+BEGIN_SRC emacs-lisp
+(doi-utils-get-pdf-url "10.1126/science.1158722")
+#+END_SRC
+
+#+RESULTS:
+: http://www.sciencemag.org/content/321/5890/792.full.pdf
 
 ** Finally, download the pdf
 #+BEGIN_SRC emacs-lisp :tangle doi-utils.el
@@ -546,6 +561,10 @@ The updating function looks like this. We get all the keys from the json plist m
   (if (bibtex-key-in-head)
       (org-ref-clean-bibtex-entry t)
     (org-ref-clean-bibtex-entry)))
+#+END_SRC
+* end of file
+#+BEGIN_SRC emacs-lisp :tangle doi-utils.el
+(provide 'doi-utils)
 #+END_SRC
 * load
 #+BEGIN_SRC emacs-lisp
