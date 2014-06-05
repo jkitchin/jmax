@@ -36,5 +36,6 @@
 (defun email-heading ()
   "Send the current org-mode heading as the body of an email"
   (interactive)
+  (org-entry-put (point) "LASTEMAILED" (current-time-string))
   (org-mark-subtree)
   (email-region (point) (mark)))
