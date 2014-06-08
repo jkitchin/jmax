@@ -354,7 +354,6 @@ environment, only %l is available."
 
     (setq file (catch 'result
 		 (loop for file in org-ref-bibliography-files do
-		       (message "looking for %s in %s" key file)
 		       (if (org-ref-key-in-file-p key (file-truename file)) 
 			   (throw 'result file)
 			 (message "%s not found in %s" key (file-truename file))))))
@@ -470,7 +469,6 @@ We use a link for the bibliography so that we can click on it to open the biblio
 			   (setq key-beginning (point)))) ; no match found
 		       ;; save the key we clicked on.
 		       (setq bibfile (org-ref-strip-string (buffer-substring key-beginning key-end)))
-		       (message "found %s for bibliography" bibfile)
 		       (find-file bibfile))) ; open file on click
 
 		     ;; formatting code
@@ -563,7 +561,6 @@ This is apparently used for biblatex.
 			   (setq key-beginning (point)))) ; no match found
 		       ;; save the key we clicked on.
 		       (setq bibfile (org-ref-strip-string (buffer-substring key-beginning key-end)))
-		       (message "found %s for addbibresource" bibfile)
 		       (find-file bibfile))) ; open file on click
 
 		     ;; formatting code
@@ -843,6 +840,75 @@ Alternatively, you may want to just call a function that inserts a link with com
  (insert (org-ref-complete-link)))
 #+END_SRC
 
+** pageref
+
+This refers to the page of a label in LaTeX.
+
+#+BEGIN_SRC emacs-lisp  :tangle org-ref.el
+(org-add-link-type
+ "pageref"
+ (lambda (label)
+   "on clicking goto the label. Navigate back with C-c &"
+   (org-mark-ring-push)
+   ;; next search from beginning of the buffer
+
+   (unless
+       (or
+	;; our label links
+	(progn 
+	  (goto-char (point-min))
+	  (re-search-forward (format "label:%s\\b" label) nil t))
+
+	;; a latex label
+	(progn
+	  (goto-char (point-min))
+	  (re-search-forward (format "\\label{%s}" label) nil t))
+
+	;; #+label: name  org-definition
+	(progn
+	  (goto-char (point-min))
+	  (re-search-forward (format "^#\\+label:\\s-*\\(%s\\)\\b" label) nil t))
+	
+	;; org tblname
+	(progn
+	  (goto-char (point-min))
+	  (re-search-forward (format "^#\\+tblname:\\s-*\\(%s\\)\\b" label) nil t))
+
+;; Commented out because these ref links do not actually translate correctly in LaTeX.
+;; you need [[#label]] links.
+	;; CUSTOM_ID
+;	(progn
+;	  (goto-char (point-min))
+;	  (re-search-forward (format ":CUSTOM_ID:\s-*\\(%s\\)" label) nil t))
+	)
+     ;; we did not find anything, so go back to where we came
+     (org-mark-ring-goto)
+     (error "%s not found" label))
+   (message "go back with (org-mark-ring-goto) `C-c &`"))
+ ;formatting
+ (lambda (keyword desc format)
+   (cond
+    ((eq format 'html) (format "(<pageref>%s</pageref>)" path))
+    ((eq format 'latex)
+     (format "\\pageref{%s}" keyword)))))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp  :tangle org-ref.el
+(defun org-pageref-complete-link (&optional arg)
+  "Completion function for ref links"
+  (let ((label))
+    (setq label (completing-read "label: " (org-ref-get-labels)))
+    (format "ref:%s" label)))
+#+END_SRC
+
+Alternatively, you may want to just call a function that inserts a link with completion:
+
+#+BEGIN_SRC emacs-lisp  :tangle org-ref.el
+(defun org-pageref-insert-ref-link ()
+ (interactive)
+ (insert (org-pageref-complete-link)))
+#+END_SRC
+
 ** eqref
 This is just the LaTeX ref for equations. On export, the reference is enclosed in parentheses.
  
@@ -873,6 +939,9 @@ This is just the LaTeX ref for equations. On export, the reference is enclosed i
     ((eq format 'latex)
      (format "\\eqref{%s}" keyword)))))
 #+END_SRC
+
+
+
 
 ** cite
 This is the main reason this library exists. We want the following behavior. A cite link should be able to contain multiple bibtex keys. You should be able to click on the link, and get a brief citation of the entry for that key, and a menu of options to open the bibtex file, open a pdf if you have it, open your notes on the entry, or open a url if it exists. You should be able to insert new references onto an existing cite link, or create new ones easily. The following code implements these features.
@@ -912,7 +981,6 @@ keyword we clicked on. We also strip the text properties."
     ;; save the key we clicked on.
     (setq bibtex-key (org-ref-strip-string (buffer-substring key-beginning key-end)))
     (set-text-properties 0 (length bibtex-key) nil bibtex-key)
-    (message "you selected %s" bibtex-key)
     bibtex-key
     ))
 #+END_SRC
@@ -938,12 +1006,10 @@ falling back to what the user has set in org-ref-default-bibliography
       (when (re-search-forward "\\<bibliography:\\([^\]\|\n]+\\)" nil t)
 	(setq org-ref-bibliography-files
 	      (mapcar 'org-ref-strip-string (split-string (match-string 1) ",")))
-	(message "bibliography org-ref-bibliography-files = %s from %s" org-ref-bibliography-files (match-string 1))
 	(throw 'result org-ref-bibliography-files))
 
       
       ;; we did not find a bibliography link. now look for \bibliography
-      (message "no bibliography link found")
       (goto-char (point-min))
       (when (re-search-forward "\\\\bibliography{\\([^}]+\\)}" nil t)
 	;; split, and add .bib to each file
@@ -951,7 +1017,6 @@ falling back to what the user has set in org-ref-default-bibliography
 	      (mapcar (lambda (x) (concat x ".bib"))
 		      (mapcar 'org-ref-strip-string 
 			      (split-string (match-string 1) ","))))
-	(message "\\bibliography org-ref-bibliography-files = %s from %s" org-ref-bibliography-files (match-string 1))
 	(throw 'result org-ref-bibliography-files))
 
       ;; no bibliography found. maybe we need a biblatex addbibresource
@@ -960,14 +1025,11 @@ falling back to what the user has set in org-ref-default-bibliography
       (when (re-search-forward "addbibresource:\\([^\]\|\n]+\\)" nil t)
 	(setq org-ref-bibliography-files
 	      (mapcar 'org-ref-strip-string (split-string (match-string 1) ",")))
-	(message "addbibresource org-ref-bibliography-files = %s from %s" org-ref-bibliography-files (match-string 1))
 	(throw 'result org-ref-bibliography-files))
 	  
       ;; we did not find anything. use defaults
-      (setq org-ref-bibliography-files org-ref-default-bibliography)
-      (message "org-ref-bibliography-files = %s from defaults" org-ref-bibliography-files)))
+      (setq org-ref-bibliography-files org-ref-default-bibliography)))
 
-    (message "finally: org-ref-bibliography-files = %s" org-ref-bibliography-files)
     ;; set reftex-default-bibliography so we can search
     (set (make-local-variable 'reftex-default-bibliography) org-ref-bibliography-files)
     org-ref-bibliography-files)
@@ -999,11 +1061,8 @@ Finally, we want to know which file the key is in.
      (setq key (org-ref-get-bibtex-key-under-cursor)))
    (setq file     (catch 'result
 		    (loop for file in org-ref-bibliography-files do
-			  (message "looking for %s in %s" key file)
 			  (if (org-ref-key-in-file-p key (file-truename file)) 
-			      (throw 'result file)
-			    (message "%s not found in %s" key (file-truename file))))))
-   (message  "you found %s in %s" key file)
+			      (throw 'result file)))))
    (cons key file)))
 #+END_SRC
 
@@ -1039,7 +1098,6 @@ we check to see if there is pdf, and if the key actually exists in the bibliogra
                                       (bibtex-search-entry key)
                                       (when (not
                                              (string= (setq url (bibtex-autokey-get-field "url")) ""))
-                                        (message "url found: %s" url)
                                         (throw 'url url))
 
                                       (when (not
@@ -1058,7 +1116,6 @@ we check to see if there is pdf, and if the key actually exists in the bibliogra
 	       "no key found"))
 
     (setq menu-string (mapconcat 'identity (list m2 "\n" m1 m3 m4 m5 "(q)uit") "  "))
-    (message "%s" menu-string)
     menu-string))
 #+END_SRC
 
@@ -1535,10 +1592,8 @@ This code provides some functions to generate a simple bibliography in html.
 
    (setq file (catch 'result
 		(loop for file in org-ref-bibliography-files do
-		      (message "looking for %s in %s" key file)
 		      (if (org-ref-key-in-file-p key (file-truename file)) 
-			  (throw 'result file)
-			(message "%s not found in %s" key (file-truename file))))))
+			  (throw 'result file)))))
    (if file (with-temp-buffer
               (insert-file-contents file)
               (prog1
@@ -2136,7 +2191,6 @@ Sometimes it may be helpful to manually change the order of citations. These fun
 (defun org-ref-swap-citation-link (direction)
  "move citation at point in direction +1 is to the right, -1 to the left"
  (interactive)
-(message "on cite: %s" (org-element-property :type (org-element-context)))
  (let* ((object (org-element-context))	 
         (type (org-element-property :type object))
 	(begin (org-element-property :begin object))
