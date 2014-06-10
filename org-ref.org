@@ -909,6 +909,37 @@ Alternatively, you may want to just call a function that inserts a link with com
  (insert (org-pageref-complete-link)))
 #+END_SRC
 
+** nameref
+
+The nameref link allows you make links to the text of a section with a label. Clicking on the link takes you to the label, and provides a mark to go back to. This only works if you put a raw latex label in the headline.
+
+#+BEGIN_SRC emacs-lisp  :tangle org-ref.el
+(org-add-link-type
+ "nameref"
+ (lambda (label)
+   "on clicking goto the label. Navigate back with C-c &"
+   (org-mark-ring-push)
+   ;; next search from beginning of the buffer
+
+   (unless
+       (or
+	;; a latex label
+	(progn
+	  (goto-char (point-min))
+	  (re-search-forward (format "\\label{%s}" label) nil t))
+	)
+     ;; we did not find anything, so go back to where we came
+     (org-mark-ring-goto)
+     (error "%s not found" label))
+   (message "go back with (org-mark-ring-goto) `C-c &`"))
+ ;formatting
+ (lambda (keyword desc format)
+   (cond
+    ((eq format 'html) (format "(<nameref>%s</nameref>)" path))
+    ((eq format 'latex)
+     (format "\\nameref{%s}" keyword)))))
+#+END_SRC
+
 ** eqref
 This is just the LaTeX ref for equations. On export, the reference is enclosed in parentheses.
  
@@ -939,7 +970,6 @@ This is just the LaTeX ref for equations. On export, the reference is enclosed i
     ((eq format 'latex)
      (format "\\eqref{%s}" keyword)))))
 #+END_SRC
-
 
 
 
