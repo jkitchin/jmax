@@ -229,6 +229,18 @@ You cannot compute these pdf links; they are embedded in the redirected pages.
       *doi-utils-pdf-url*)))
 #+END_SRC
 
+** PNAS
+http://www.pnas.org/content/early/2014/05/08/1319030111
+http://www.pnas.org/content/early/2014/05/08/1319030111.full.pdf
+
+with supporting info
+http://www.pnas.org/content/early/2014/05/08/1319030111.full.pdf+html?with-ds=yes
+#+BEGIN_SRC emacs-lisp
+(defun pnas-pdf-url (*doi-utils-redirect*)
+  (when (string-match "^http://www.pnas.org" *doi-utils-redirect*)
+    (concat *doi-utils-redirect* ".full.pdf?with-ds=yes")))
+#+END_SRC
+
 ** Add all functions
 #+BEGIN_SRC emacs-lisp
 (setq doi-utils-pdf-url-functions
@@ -246,7 +258,8 @@ You cannot compute these pdf links; they are embedded in the redirected pages.
        'linkinghub-elsevier-pdf-url
        'tandfonline-pdf-url
        'ecs-pdf-url
-       'rsc-pdf-url))
+       'rsc-pdf-url
+       'pnas-pdf-url))
 #+END_SRC
 
 ** Get the pdf url for a doi
@@ -455,7 +468,7 @@ org-ref, and tries to download the corresponding pdf."
 
 It may be you are in some other place when you want to add a bibtex entry. This next function will open the first entry in org-ref-default-bibliography go to the end, and add the entry. You can sort it later.
 
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle doi-utils.el
 (defun doi-utils-add-bibtex-entry-from-doi (doi)
   "add entry to end of first entry in `org-ref-default-bibliography'."
   (interactive "sDOI: ")
@@ -467,7 +480,7 @@ It may be you are in some other place when you want to add a bibtex entry. This 
 
 It may be you want to just highlight a doi, and then add it. Here is that function.
 
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp  :tangle doi-utils.el
 (defun doi-utils-add-bibtex-entry-from-region (start end)
   "add entry assuming region is a doi to end of first entry in `org-ref-default-bibliography'."
   (interactive "r")
@@ -477,6 +490,10 @@ It may be you want to just highlight a doi, and then add it. Here is that functi
     (insert "\n")
     (doi-utils-insert-bibtex-entry-from-doi doi)))
 #+END_SRC
+
+#+RESULTS:
+: doi-utils-add-bibtex-entry-from-region
+
 * Updating bibtex entries
 I wrote this code because it is pretty common for me to copy bibtex entries from ASAP articles that are incomplete, e.g. no page numbers because it is not in print yet. I wanted a convenient way to update an entry from its DOI. Basically, we get the metadata, and update the fields in the entry.
 

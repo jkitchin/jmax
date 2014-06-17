@@ -6,6 +6,7 @@
 ; (require 'ox-odt)
 (require 'org-inlinetask)
 (require 'org-mouse)
+(require 'org-contacts)
 
 (add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode))
 (global-set-key "\C-cl" 'org-store-link)
@@ -394,7 +395,15 @@ citecolor=blue,filecolor=blue,menucolor=blue,urlcolor=blue"
       (load-file (expand-file-name "org-ref.el" starter-kit-dir)))
   (require 'org-ref))
 
-(org-babel-load-file (expand-file-name "doi-utils.org" starter-kit-dir))
+(if (or
+     (not (file-exists-p "doi-utils.el"))
+     (< (float-time (nth 5 (file-attributes "doi-utils.el")))
+	(float-time (nth 5 (file-attributes "doi-utils.org")))))
+    (progn
+      (org-babel-tangle-file (expand-file-name "doi-utils.org" starter-kit-dir))
+      (load-file (expand-file-name "doi-utils.el" starter-kit-dir)))
+  (require 'doi-utils))
+
 
 (require 'ox-cmu-qualifier)
 (require 'ox-cmu-ms-report)

@@ -229,10 +229,10 @@
 ;;;;;;; bbdb 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(setq bbdb-file (expand-file-name "user/bbdb" starter-kit-dir))
+;(setq bbdb-file (expand-file-name "user/bbdb" starter-kit-dir))
 
-(require 'bbdb)
-(bbdb-initialize 'gnus 'message 'rmail)
+;(require 'bbdb)
+;(bbdb-initialize 'gnus 'message 'rmail)
 
 
 ;; This is not defined in my bbdb/icicles installation. This lets me use tab-completion.
@@ -241,7 +241,7 @@
 ;; http://emacs-fu.blogspot.com/2009/08/managing-e-mail-addresses-with-bbdb.html
 ;; these seem to be v2 variables.
 ;; see http://www.emacswiki.org/emacs/UpgradeBBDB for new names
-(setq 
+;(setq 
 ;;    bbdb-offer-save 1                        ;; 1 means save-without-asking
 ;;    bbdb-use-pop-up t                        ;; allow popups for addresses
 ;;    bbdb-electric-p t                        ;; be disposable with SPC
@@ -254,7 +254,7 @@
                                              ;; ...contacts automatically
 ;;    bbdb-canonicalize-redundant-nets-p t     ;; x@foo.bar.cx => x@bar.cx
 
-    bbdb-completion-list t                 ;; complete on anything
+;    bbdb-completion-list t                 ;; complete on anything
 
 ;;    bbdb-complete-name-allow-cycling t       ;; cycle through matches
                                              ;; this only works partially
@@ -263,7 +263,7 @@
 ;;    bbdb-use-alternate-names t               ;; use AKA
 
 ;;    bbdb-elided-display t                    ;; single-line addresses
-)
+;)
 
 
 ;; add matlab
