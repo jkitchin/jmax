@@ -494,4 +494,3 @@ bibliographystyle:unsrt
 # <<bibliography>>
 bibliography:kitchin.bib
 
-
