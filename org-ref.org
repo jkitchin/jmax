@@ -972,7 +972,6 @@ This is just the LaTeX ref for equations. On export, the reference is enclosed i
 #+END_SRC
 
 
-
 ** cite
 This is the main reason this library exists. We want the following behavior. A cite link should be able to contain multiple bibtex keys. You should be able to click on the link, and get a brief citation of the entry for that key, and a menu of options to open the bibtex file, open a pdf if you have it, open your notes on the entry, or open a url if it exists. You should be able to insert new references onto an existing cite link, or create new ones easily. The following code implements these features.
 
@@ -1300,127 +1299,6 @@ Finally, we define the cite link. This is deprecated; the links are autogenerate
 ; 'org-ref-cite-link-format)
 #+END_SRC
 
-*** Miscellaneous cite link variations				   :noexport:
-I do not use these alot, but they are variations of the regular cite commands in LaTeX. For a good reference on what these do see http://merkel.zoneo.net/Latex/natbib.php. The citet variants are for textual citations, and the citep variants are parenthetical citations. What you actually get seems to depend on the bibliography style you are using.
-
-#+BEGIN_SRC emacs-lisp :tangle org-ref.el
-(org-add-link-type
- "autocite"
- 'org-ref-cite-onclick-minibuffer-menu
- ;; formatting
- (lambda (keyword desc format)
-   (cond
-    ((eq format 'html) (format "(<autocite>%s</autocite>)" path))
-    ((eq format 'latex)
-     (concat "\\autocite{"
-	     (mapconcat (lambda (key) key) (org-ref-split-and-strip-string keyword) ",")
-	     "}")))))
-
-
-(org-add-link-type
- "citealp"
- 'org-ref-cite-onclick-minibuffer-menu
- ;; formatting
- (lambda (keyword desc format)
-   (cond
-    ((eq format 'html) (format "(<citealp>%s</citealp>)" path))
-    ((eq format 'latex)
-     (concat "\\citealp{"
-	     (mapconcat (lambda (key) key) (org-ref-split-and-strip-string keyword) ",")
-	     "}")))))
-
-(org-add-link-type
- "citet"
- 'org-ref-cite-onclick-minibuffer-menu
- ;; formatting
- (lambda (keyword desc format)
-   (cond
-((eq format 'html) (format "(<cite>%s</cite>)" path))
-    ((eq format 'latex)
-  (concat "\\citet{" (mapconcat (lambda (key) key) (org-ref-split-and-strip-string keyword) ",") "}")))))
-
-(org-add-link-type
- "citet*"
- 'org-ref-cite-onclick-minibuffer-menu
- ;; formatting
- (lambda (keyword desc format)
-   (cond
-((eq format 'html) (format "(<cite>%s</cite>)" path))
-    ((eq format 'latex)
-  (concat "\\citet*{" (mapconcat (lambda (key) key) (org-ref-split-and-strip-string keyword) ",") "}")))))
-
-;; TODO these links do not support options [see][]
-(org-add-link-type
- "citep"
- 'org-ref-cite-onclick-minibuffer-menu
- ;; formatting
- (lambda (keyword desc format)
-   (cond
-((eq format 'html) (format "(<cite>%s</cite>)" path))
-    ((eq format 'latex)
-  (concat "\\citep{" (mapconcat (lambda (key) key) (org-ref-split-and-strip-string keyword) ",") "}")))))
-
-(org-add-link-type
- "citep*"
- 'org-ref-cite-onclick-minibuffer-menu
- ;; formatting
- (lambda (keyword desc format)
-   (cond
-((eq format 'html) (format "(<cite>%s</cite>)" path))
-    ((eq format 'latex)
-  (concat "\\citep*{" (mapconcat (lambda (key) key) (org-ref-split-and-strip-string keyword) ",") "}")))))
-
-(org-add-link-type
- "citeauthor"
- 'org-ref-cite-onclick-minibuffer-menu
- ;; formatting
- (lambda (keyword desc format)
-   (cond
-((eq format 'html) (format "(<cite>%s</cite>)" path))
-    ((eq format 'latex)
-  (concat "\\citeauthor{" (mapconcat (lambda (key) key) (org-ref-split-and-strip-string keyword) ",") "}")))))
-
-(org-add-link-type
- "citeauthor*"
- 'org-ref-cite-onclick-minibuffer-menu
- ;; formatting
- (lambda (keyword desc format)
-   (cond
-((eq format 'html) (format "(<cite>%s</cite>)" path))
-    ((eq format 'latex)
-  (concat "\\citeauthor*{" (mapconcat (lambda (key) key) (org-ref-split-and-strip-string keyword) ",") "}")))))
-
-(org-add-link-type
- "citeyear"
- 'org-ref-cite-onclick-minibuffer-menu
- ;; formatting
- (lambda (keyword desc format)
-   (cond
-((eq format 'html) (format "(<cite>%s</cite>)" path))
-    ((eq format 'latex)
-  (concat "\\citeyear{" (mapconcat (lambda (key) key) (org-ref-split-and-strip-string keyword) ",") "}")))))
-
-(org-add-link-type
- "nocite"
- 'org-ref-cite-onclick-minibuffer-menu
- ;; formatting
- (lambda (keyword desc format)
-   (cond
-((eq format 'html) (format "(<cite>%s</cite>)" path))
-    ((eq format 'latex)
-  (concat "\\nocite{" (mapconcat (lambda (key) key) (org-ref-split-and-strip-string keyword) ",") "}")))))
-
-(org-add-link-type
- "citetext"
- nil ;; clicking does not make sense
- ;; formatting
- (lambda (keyword desc format)
-   (cond
-((eq format 'html) (format "(<cite>%s</cite>)" path))
-    ((eq format 'latex)
-  (concat "\\citetext{" path "}")))))
-#+END_SRC
-
 *** Automatic definition of the cite links
 There are many different kinds of citations in LaTeX, but they are all variants of a basic syntax of \citetype[optional text]{label1,label2}. Here we use lisp to generate the link definitions. We define a function that creates the code to create the link, and then we evaluate it. We also create the completion function for the new link, and add it to the list of known links. 
 
@@ -1577,7 +1455,7 @@ Alternatively, you may shortcut the org-machinery with this command. You will be
   (insert (funcall (intern (format "org-%s-complete-link" type)))))
 #+END_SRC
 
-*** Storing links to a bibtex entry
+** Storing links to a bibtex entry
 org-mode already defines a store link function for bibtex entries. It does not store the link I want though, it only stores a brief citation of the entry. I want a citation link. Here is a function to do that.
 
 #+BEGIN_SRC emacs-lisp :tangle org-ref.el
@@ -1594,7 +1472,7 @@ org-mode already defines a store link function for bibtex entries. It does not s
     (car org-stored-links)))
 #+END_SRC
 
-*** An html bibliography
+** An html bibliography
 This code provides some functions to generate a simple bibliography in html.
 
 #+BEGIN_SRC emacs-lisp :tangle org-ref.el
