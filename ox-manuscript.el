@@ -137,12 +137,13 @@
   (interactive)
   (ox-manuscript-cleanup 'deep)
 
+  ;; this turns out to be a bad idea. some classes define their own.
   ;; insert bibliography style if needed
-  (save-excursion
-    (beginning-of-buffer)
-    (unless (re-search-forward "^bibliographystyle:" nil t)
-      (end-of-buffer)
-      (insert "\n\nbibliographystyle:unsrt")))
+;  (save-excursion
+;    (beginning-of-buffer)
+;    (unless (re-search-forward "^bibliographystyle:" nil t)
+;      (end-of-buffer)
+;      (insert "\n\nbibliographystyle:unsrt")))
 
   ;; insert bibliography if needed
   (save-excursion
