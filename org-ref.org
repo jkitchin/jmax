@@ -580,6 +580,7 @@ In long documents, a list of figures is not uncommon. Here we create a clickable
 (defun org-ref-list-of-figures (&optional arg)
   "Generate buffer with list of figures in them"
   (interactive)
+  (save-excursion (widen)
   (let* ((c-b (buffer-name))
 	 (counter 0)
 	 (list-of-figures 
@@ -610,7 +611,7 @@ In long documents, a list of figures is not uncommon. Here we create a clickable
     (insert (mapconcat 'identity list-of-figures ""))
     (setq buffer-read-only t)
     (use-local-map (copy-keymap org-mode-map))
-    (local-set-key "q" #'(lambda () (interactive) (kill-buffer)))))
+    (local-set-key "q" #'(lambda () (interactive) (kill-buffer))))))
 
 (org-add-link-type 
  "list-of-figures"
@@ -627,6 +628,8 @@ In long documents, a list of figures is not uncommon. Here we create a clickable
 (defun org-ref-list-of-tables (&optional arg)
   "Generate a buffer with a list of tables"
   (interactive)
+  (save-excursion
+  (widen)
   (let* ((c-b (buffer-name))
 	 (counter 0)
 	 (list-of-tables 
@@ -650,7 +653,7 @@ In long documents, a list of figures is not uncommon. Here we create a clickable
     (insert (mapconcat 'identity list-of-tables ""))
     (setq buffer-read-only t)
     (use-local-map (copy-keymap org-mode-map))
-    (local-set-key "q" #'(lambda () (interactive) (kill-buffer)))))
+    (local-set-key "q" #'(lambda () (interactive) (kill-buffer))))))
 
 (org-add-link-type 
  "list-of-tables"
@@ -673,9 +676,10 @@ The label link provides a way to create labels in org-mode. We make it clickable
    "on clicking count the number of label tags used in the buffer. A number greater than one means multiple labels!"
    (message (format "%s occurences"
 		    (+ (count-matches (format "label:%s\\b" label) (point-min) (point-max) t)
+                       (count-matches (format "^#\\+tblname:\\s-*%s\\b" label) (point-min) (point-max) t)
 		       (count-matches (format "\\label{%s}\\b" label) (point-min) (point-max) t)
                        ;; this is the org-format #+label:
-		       (count-matches (format "#\\+label:%s\\b" label) (point-min) (point-max) t)))))
+		       (count-matches (format "^#\\+label:\\s-*%s\\b" label) (point-min) (point-max) t)))))
  (lambda (keyword desc format)
    (cond
     ((eq format 'html) (format "(<label>%s</label>)" path))
@@ -733,6 +737,9 @@ At the moment, ref links are not usable for section links. You need [[#CUSTOM_ID
    "on clicking goto the label. Navigate back with C-c &"
    (org-mark-ring-push)
    ;; next search from beginning of the buffer
+
+   ;; it is possible you would not find the label if narrowing is in effect
+   (widen)
 
    (unless
        (or
@@ -851,7 +858,7 @@ This refers to the page of a label in LaTeX.
    "on clicking goto the label. Navigate back with C-c &"
    (org-mark-ring-push)
    ;; next search from beginning of the buffer
-
+   (widen)
    (unless
        (or
 	;; our label links
@@ -920,7 +927,7 @@ The nameref link allows you make links to the text of a section with a label. Cl
    "on clicking goto the label. Navigate back with C-c &"
    (org-mark-ring-push)
    ;; next search from beginning of the buffer
-
+   (widen)
    (unless
        (or
 	;; a latex label
@@ -950,6 +957,7 @@ This is just the LaTeX ref for equations. On export, the reference is enclosed i
    "on clicking goto the label. Navigate back with C-c &"
    (org-mark-ring-push)
    ;; next search from beginning of the buffer
+   (widen)
    (goto-char (point-min))
    (unless
        (or
