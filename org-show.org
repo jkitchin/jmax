@@ -13,7 +13,7 @@ https://github.com/tucasp/org-presie
 http://orgmode.org/worg/exporters/beamer/tutorial.html
 http://orgmode.org/worg/org-tutorials/non-beamer-presentations.html#sec-3
 
-The one I like the best is discussed here: http://sachachua.com/blog/2013/04/how-to-present-using-org-mode-in-emacs/. I like it best because you can edit the slides as you go, execute arbitrary emacs code, and it is still pretty simple. I used Sacha's code as the basis for org-show.
+The one I like the best is discussed here: http://sachachua.com/blog/2013/04/how-to-present-using-org-mode-in-emacs/. I like it best because you can edit the slides as you go, execute arbitrary emacs code, and it is still pretty simple. I used Sacha's code as the basis for org-show. There is a lot of similarity.
 
 * org-show
 You can have: 
@@ -386,7 +386,7 @@ That is the end!
 	(setq org-show-current-slide-number (+ org-show-current-slide-number 1))
 	(org-show-goto-slide org-show-current-slide-number))
     (org-show-goto-slide org-show-current-slide-number)
-    (message "At end")))
+    (message "This is the end. My only friend the end.  Jim Morrison.")))
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp :tangle org-show.el
@@ -400,7 +400,7 @@ That is the end!
 	(setq org-show-current-slide-number (- org-show-current-slide-number 1))
 	(org-show-goto-slide org-show-current-slide-number))
     (org-show-goto-slide org-show-current-slide-number)
-    (message "At slide 1")))
+    (message "Once upon a time...")))
 #+END_SRC
 
 ** Open this slide
@@ -427,6 +427,9 @@ On starting, we want to map the slides so we can get slide numbers for navigatio
 
 (defun org-show-initialize ()
   ;; make slide lists for future navigation. rerun this if you change slide order
+  (setq  org-show-slide-titles '()
+         org-show-slide-list '())
+     
   (let ((n 0))
     (org-map-entries
      (lambda ()
@@ -444,9 +447,8 @@ On starting, we want to map the slides so we can get slide numbers for navigatio
   (interactive)
   
   (setq org-show-presentation-file (expand-file-name (buffer-name)))
-  
-  (org-show-initialize)
   (beginning-of-buffer)
+  (org-show-initialize)
   ;; hide slide tags
   (save-excursion
     (while (re-search-forward ":slide:" nil t)
@@ -470,10 +472,11 @@ On starting, we want to map the slides so we can get slide numbers for navigatio
   (find-file org-show-presentation-file)
   ;; make slide tag visible again
   (remove-from-invisibility-spec 'slide)
-  (setq org-show-presentation-file nil)
   (widen)
   (text-scale-set 0)
   (delete-other-windows)
+  (setq org-show-presentation-file nil)
+  (setq org-show-current-slide-number 1)
   (org-show-mode -1))
 
 (defalias 'stop 'org-show-stop-slideshow)
