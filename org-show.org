@@ -1,13 +1,19 @@
+#+TITLE: org-show - simple presentations in org-mode
+#+AUTHOR: John Kitchin
+
+There are several options for "presenting" from org-mode. Here are the options I found.
 
 https://github.com/rlister/org-present
 https://github.com/eschulte/epresent
-http://sachachua.com/blog/2013/04/how-to-present-using-org-mode-in-emacs/
+
 https://github.com/yjwen/org-reveal
 https://github.com/takaxp/org-tree-slide/
 https://github.com/tucasp/org-presie
 
 http://orgmode.org/worg/exporters/beamer/tutorial.html
 http://orgmode.org/worg/org-tutorials/non-beamer-presentations.html#sec-3
+
+The one I like the best is discussed here: http://sachachua.com/blog/2013/04/how-to-present-using-org-mode-in-emacs/. I like it best because you can edit the slides as you go, execute arbitrary emacs code, and it is still pretty simple. I used Sacha's code as the basis for org-show.
 
 * org-show
 You can have: 
@@ -24,7 +30,7 @@ You can have:
                          "*Animation*")))
 (erase-buffer)
 (text-scale-set 6)
-(let* ((strings (list "Emacs+org-mode" "John Kitchin" "" "July 1, 2014" "Carnegie Mellon University"))
+(let* ((strings (list "Emacs + org-mode" "John Kitchin" "" "July 1, 2014" "Carnegie Mellon University"))
        (vpos (/ (- 20
                    1 ;; For the mode-line
                    (1- (length strings)) 
@@ -49,13 +55,18 @@ This should be easy
 ** Equations							      :slide:
 It should be easy to show equations like this  $\int_0^x \frac{1}{2} \sin x dx = 6$.
 
-It is. Maybe you prefer numbers?
+It is. Maybe you prefer numbered equations?
 
 
 \begin{equation}
 e^x = 5
 \end{equation}
 
+The numbering is not consecutive:
+
+\begin{equation}
+2+2=4
+\end{equation}
 
 
 Want to see the equation source? [[elisp:(org-ctrl-c-ctrl-c)][click here]]
@@ -67,6 +78,16 @@ Figures should show up in two panes.
 
 
 The text should show also.
+** A complicated layout						      :slide:
+#+BEGIN_SRC emacs-lisp-slide
+(delete-other-windows)
+(split-window-right)
+(other-window 1)
+(find-file "arxiv.el")
+(split-window-below)
+(other-window 1)
+(find-file "doi-utils.org")
+#+END_SRC
 ** Code blocks should be runnable and editable			      :slide:
 
 #+BEGIN_SRC python
@@ -112,7 +133,8 @@ print 6 + 6
 #+BEGIN_SRC matlab
 % Sadly only on Mac and Linux. That's a deal breaker...
 #+END_SRC
-** Fun and games
+** Interactivity is important	
+We get it.
 *** Snake							      :slide:
 #+BEGIN_SRC emacs-lisp-slide
 (snake)
@@ -194,53 +216,124 @@ Or to open a [[http://kitchingroup.cheme.cmu.edu][website]].
 That is the end!
 
 #+BEGIN_SRC emacs-lisp-slide
-(message "Thank you for your attention!")
+(org-show-animate '("The End" "Thank you for your attention" "" "Questions?"))
 #+END_SRC
 
 
 * The code
+
+** The header
+
+#+BEGIN_SRC emacs-lisp :tangle org-show.el
+;;; org-show.el --- Summary
+;; Copyright(C) 2014 John Kitchin
+
+;; Author: John Kitchin <jkitchin@andrew.cmu.edu>
+;; Contributions from Sacha Chua.
+;; This file is not currently part of GNU Emacs.
+
+;; This program is free software; you can redistribute it and/or
+;; modify it under the terms of the GNU General Public License as
+;; published by the Free Software Foundation; either version 2, or (at
+;; your option) any later version.
+
+;; This program is distributed in the hope that it will be useful, but
+;; WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+;; General Public License for more details.
+
+;; You should have received a copy of the GNU General Public License
+;; along with this program ; see the file COPYING.  If not, write to
+;; the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+;; Boston, MA 02111-1307, USA.
+
+;;; Commentary:
+;; A simple mode for presenting org-files as slide-shows
+#+END_SRC
+
 ** Some basic setup
 #+BEGIN_SRC emacs-lisp :tangle org-show.el
 (require 'eimp)
 
-(defvar sacha/org-show-presentation-file nil "File containing the presentation.")
-(defvar sacha/org-show-slide-tag "slide" "Tag that marks slides.")
-(defvar sacha/org-show-slide-tag-regexp (concat ":" (regexp-quote sacha/org-show-slide-tag) ":"))
-(defvar sacha/org-show-latex-scale 4.0 "scale for latex preview")
-(defvar sacha/org-show-text-scale 4 "scale for text in presentation")
-
+(defvar org-show-presentation-file nil "File containing the presentation.")
+(defvar org-show-slide-tag "slide" "Tag that marks slides.")
+(defvar org-show-slide-tag-regexp (concat ":" (regexp-quote org-show-slide-tag) ":"))
+(defvar org-show-latex-scale 4.0 "scale for latex preview")
+(defvar org-show-text-scale 4 "scale for text in presentation")
+(defvar org-show-current-slide-number 1 "holds current slide number")
 
 ;; From org-pres--eimp-fit
-(defun sacha/org-show-eimp-fit ()
+(defun org-show-eimp-fit ()
   "Function used as a hook, fits the image found to the window."
   (when (eq major-mode 'image-mode)
     (eimp-fit-image-to-window nil)))
 
-(add-hook 'find-file-hook 'sacha/org-show-eimp-fit)
-;(remove-hook 'find-file-hook 'sacha/org-show-eimp-fit)
+(add-hook 'find-file-hook 'org-show-eimp-fit)
+#+END_SRC
+
+** Make a minor mode and menu
+
+#+BEGIN_SRC emacs-lisp :tangle org-show.el
+(require 'easymenu)
+
+(defvar org-show-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map [next] 'org-show-next-slide)
+    (define-key map [prior] 'org-show-previous-slide)
+    
+    (define-key map [f5] 'org-show-start-slideshow)
+    (define-key map [f6] 'org-show-execute-slide)
+    (define-key map (kbd "\e\eg") 'org-show-goto-slide)
+    (define-key map (kbd "\e\et") 'org-show-toc)
+    (define-key map (kbd "\e\eq") 'org-show-stop-slideshow)
+    map)
+  "Keymap for org-show-mode.")
+
+(easy-menu-define my-menu org-show-mode-map "My own menu"
+  '("org-show"
+    ["Start slide show" org-show-start-slideshow t]
+    ["Next slide" org-show-next-slide t]
+    ["Previous slide" org-show-previous-slide t]
+    ["Open this slide" org-show-open-slide t]
+    ["Goto slide" org-show-goto-slide t]
+    ["Table of contents" org-show-toc t]
+    ["Stop slide show"  org-show-stop-slideshow t]
+))
+
+
+(define-minor-mode org-show-mode
+  "Minor mode for org-show
+
+\\{org-show-mode-map}"
+  :lighter " org-show"
+  :global t
+  :keymap org-show-mode-map)
 #+END_SRC
 
 ** Prepare and show the slide 
 
 #+BEGIN_SRC emacs-lisp :tangle org-show.el
-(defun sacha/org-show-execute-slide ()
+(defun org-show-execute-slide ()
   "Process slide at point.
   If it contains an Emacs Lisp source block, evaluate it.
-  If it contains an image, view it and switch to that buffer.
+  If it contains an image, view it in a split buffer
   Else, focus on that buffer.
   Hide all drawers."
   (interactive)
-  (setq sacha/org-show-presentation-file (expand-file-name (buffer-name)))
+  (setq org-show-presentation-file (expand-file-name (buffer-name)))
+  (delete-other-windows)  
 
-  ;; make sure nothing is folded. Thsis seems to be necessary to prevent an error on narrowing then trying to make latex fragments I think.
+  ;; make sure nothing is folded. This seems to be necessary to
+  ;; prevent an error on narrowing then trying to make latex fragments
+  ;; I think.
   (org-cycle '(64))
-    
+
   (org-narrow-to-subtree)
   (visual-line-mode 1)
   (let ((heading-text (nth 4 (org-heading-components)))
-        (org-format-latex-options (plist-put org-format-latex-options :scale sacha/org-show-latex-scale)))
+        (org-format-latex-options (plist-put org-format-latex-options :scale org-show-latex-scale)))
 
-    (set-frame-name (format "%-180s%15s%s" heading-text "slide" (cdr (assoc heading-text sacha/org-show-slide-titles))))
+    (set-frame-name (format "%-180s%15s%s" heading-text "slide " (cdr (assoc heading-text org-show-slide-titles))))
 
     ;; preview equations in the current subtree
     (org-preview-latex-fragment '(4))
@@ -256,12 +349,14 @@ That is the end!
         (org-open-at-point))
       (other-window 1) ; back to slide
       (goto-char (point-min))
-      (text-scale-set sacha/org-show-text-scale)
+      (text-scale-set org-show-text-scale)
       (org-display-inline-images)
       (org-cycle-hide-drawers t)
       (org-show-subtree))
 
-     ;; find and execute source code blocks
+     ;; find and execute source code blocks.
+     ;; you can either have images, or code. Not both.
+     ;; Only code blocks of type emacs-lisp-slide are used.
      ((and (goto-char (point-min))
            (re-search-forward "#\\+begin_src emacs-lisp-slide" nil t))
       (let ((info (org-babel-get-src-block-info)))
@@ -271,59 +366,53 @@ That is the end!
      ;; plain text slides
      (t
       (switch-to-buffer (current-buffer))
-      (text-scale-set sacha/org-show-text-scale)
+      (text-scale-set org-show-text-scale)
       (org-show-subtree)
       (org-cycle-hide-drawers t)
       (org-display-inline-images)
       (delete-other-windows)))))
 #+END_SRC
 
-#+RESULTS:
-: sacha/org-show-execute-slide
-
 ** Next and previous slides
 
 #+BEGIN_SRC emacs-lisp :tangle org-show.el
-(defun next ()
-(interactive)
-  (find-file sacha/org-show-presentation-file)
+(defun org-show-next-slide ()
+  "Goto next slide in presentation"
+  (interactive)
+  (find-file org-show-presentation-file)
   (widen)
-  (org-cycle '(64))
-
-  (let ((n (cdr (assoc (nth 4 (org-heading-components)) sacha/org-show-slide-titles))))
-   (sacha/org-show-goto-slide (+ n 1)))) 
+  (if (< (+ org-show-current-slide-number 1) (length org-show-slide-titles))
+      (progn
+	(setq org-show-current-slide-number (+ org-show-current-slide-number 1))
+	(org-show-goto-slide org-show-current-slide-number))
+    (org-show-goto-slide org-show-current-slide-number)
+    (message "At end")))
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp :tangle org-show.el
-(defun previous ()
-(interactive)
-  (find-file sacha/org-show-presentation-file)
+(defun org-show-previous-slide ()
+  "Goto previous slide in the list"
+  (interactive)
+  (find-file org-show-presentation-file)
   (widen)
-  (org-cycle '(64))
-
-  (let ((n (cdr (assoc (nth 4 (org-heading-components)) sacha/org-show-slide-titles))))
-   (sacha/org-show-goto-slide (- n 1)))) 
+  (if (> (- org-show-current-slide-number 1) 0)
+      (progn
+	(setq org-show-current-slide-number (- org-show-current-slide-number 1))
+	(org-show-goto-slide org-show-current-slide-number))
+    (org-show-goto-slide org-show-current-slide-number)
+    (message "At slide 1")))
 #+END_SRC
 
+** Open this slide
 
 #+BEGIN_SRC emacs-lisp :tangle org-show.el
-(defun sacha/org-show-next-slide ()
-  "Show the next slide."
-  (interactive)
-  (find-file sacha/org-show-presentation-file)
-  (widen)
-  (goto-char (line-end-position))
-  (if (re-search-forward sacha/org-show-slide-tag-regexp nil t)
-    (sacha/org-show-execute-slide)))
-
-(defun sacha/org-show-previous-slide ()
-  "Show the next slide."
-  (interactive)
-  (find-file sacha/org-show-presentation-file)
-  (widen)
-  (goto-char (line-beginning-position))
-  (when (re-search-backward sacha/org-show-slide-tag-regexp nil t)
-    (sacha/org-show-execute-slide)))
+(defun org-show-open-slide ()
+ "Start show at this slide"
+ (setq org-show-presentation-file (expand-file-name (buffer-name))) 
+ (org-show-initialize)
+ (let ((n (cdr (assoc (nth 4 (org-heading-components)) org-show-slide-titles))))
+   (setq org-show-current-slide-number n)
+   (org-show-goto-slide n)))
 #+END_SRC
 
 ** Starting the show
@@ -332,127 +421,96 @@ We need some functions for convenient starting and stopping.
 On starting, we want to map the slides so we can get slide numbers for navigation and to display them on the frame. We also make the slide tags invisible. We set some temporary key bindings. These need to be global because sometimes we navigate out of the slideshow buffer, and we want page up and down to go to the next slides no matter where we are.
 
 
-#+BEGIN_SRC emacs-lisp :results raw
-(setq  sacha/org-show-key-bindings
-       `((,[f6]    ,(key-binding '[f6])       'sacha/org-show-execute-slide)
-         (,[next]  ,(key-binding '[next])     'sacha/org-show-next-slide)
-	 (,[prior] ,(key-binding '[previous]) 'sacha/org-show-previous-slide)))
-
-(global-set-key (nth 0 (car sacha/org-show-key-bindings)) (nth 2 (car sacha/org-show-key-bindings)))
-#+END_SRC
-
-#+RESULTS:
-(quote sacha/org-show-execute-slide)
-(quote sacha/org-show-execute-slide)
-quote
-flyspell-check-next-highlighted-word
-flyspell-check-next-highlighted-word
-((quote [f6]) flyspell-check-next-highlighted-word quote sacha/org-show-execute-slide)
-(((quote [f6]) flyspell-check-next-highlighted-word quote sacha/org-show-execute-slide) ((quote [next]) scroll-up-command quote sacha/org-show-next-slide) ((quote [prior]) nil quote sacha/org-show-previous-slide))
-
 #+BEGIN_SRC emacs-lisp :tangle org-show.el
-(defvar sacha/org-show-slide-list '() "List of slide numbers and markers to each slide")
-(defvar sacha/org-show-slide-titles '() "List of titles and slide numbers for each slide")
-(defvar sacha/org-show-key-bindings
-  `((,[f6]    ,(key-binding '[f6])       sacha/org-show-execute-slide)
-    (,[next]  ,(key-binding '[next])     sacha/org-show-next-slide)
-    (,[prior] ,(key-binding '[prior])    sacha/org-show-previous-slide))
-  "list of keys, original binding and new temporary binding")
+(defvar org-show-slide-list '() "List of slide numbers and markers to each slide")
+(defvar org-show-slide-titles '() "List of titles and slide numbers for each slide")
 
-(defun sacha/org-show-start ()
-  (interactive)
-  
-  (setq sacha/org-show-presentation-file (expand-file-name (buffer-name)))
-  
-  ;; make slide list for future navigation
+(defun org-show-initialize ()
+  ;; make slide lists for future navigation. rerun this if you change slide order
   (let ((n 0))
     (org-map-entries
      (lambda ()
        (when (string-match-p ":slide:" (or (nth 5 (org-heading-components)) ""))
 	 (setq n (+ n 1))
          
-	 (add-to-list 'sacha/org-show-slide-titles 
+	 (add-to-list 'org-show-slide-titles 
 		      (cons (nth 4 (org-heading-components)) n) t)
 
-	 (add-to-list 'sacha/org-show-slide-list 
-		      (cons n (set-marker (make-marker) (point))) t)))))
+	 (add-to-list 'org-show-slide-list 
+		      (cons n (set-marker (make-marker) (point))) t))))))
 
+(defun org-show-start-slideshow ()
+  "Start the slide show, at the beginning"
+  (interactive)
+  
+  (setq org-show-presentation-file (expand-file-name (buffer-name)))
+  
+  (org-show-initialize)
+  (beginning-of-buffer)
   ;; hide slide tags
   (save-excursion
-  (while (re-search-forward ":slide:" nil t)
-    (overlay-put
-     (make-overlay (match-beginning 0)(match-end 0))
-     'invisible 'slide)))
+    (while (re-search-forward ":slide:" nil t)
+      (overlay-put
+       (make-overlay (match-beginning 0)(match-end 0))
+       'invisible 'slide)))
   (add-to-invisibility-spec 'slide)
 
   (beginning-of-buffer)
   (delete-other-windows)
-  ;; temporary key-bindings. these are undone in stop
-  (mapcar (lambda (x)
-	    (let ((key (nth 0 x))
-		  (new-binding (nth 2 x)))
-	      (global-set-key key new-binding))) sacha/org-show-key-bindings)
-  (sacha/org-show-next-slide))
-
-(defalias 'start 'sacha/org-show-start)
+  (org-show-mode 1)
+  (setq org-show-current-slide-number 1)
+  (org-show-goto-slide 1))
 #+END_SRC
 
 ** Stop the show
 
-When we stop, we unbind the keys. 
-
 #+BEGIN_SRC emacs-lisp :tangle org-show.el
-(defun sacha/org-show-stop ()
+(defun org-show-stop-slideshow ()
   (interactive)
-  (find-file sacha/org-show-presentation-file)
+  (find-file org-show-presentation-file)
   ;; make slide tag visible again
   (remove-from-invisibility-spec 'slide)
-  (setq sacha/org-show-presentation-file nil)
+  (setq org-show-presentation-file nil)
   (widen)
   (text-scale-set 0)
+  (delete-other-windows)
+  (org-show-mode -1))
 
-  (mapcar (lambda (x)
-	    (let ((key (nth 0 x))
-		  (old-binding (nth 1 x)))
-	      (global-set-key key old-binding))) sacha/org-show-key-bindings)
-
-  (set-frame-name "Emacs"))
-
-(defalias 'stop 'sacha/org-show-stop)
+(defalias 'stop 'org-show-stop-slideshow)
 #+END_SRC
 
 ** Goto a slide
 #+BEGIN_SRC emacs-lisp :tangle org-show.el
-(defun sacha/org-show-goto-slide (n)
+(defun org-show-goto-slide (n)
+ "Goto slide N"
  (interactive "nSlide number: ")
  (message "Going to slide %s" n)
- (find-file sacha/org-show-presentation-file)
+ (find-file org-show-presentation-file)
+ (setq org-show-current-slide-number n)
  (widen)
- (org-cycle '(64))
- (goto-char (cdr (assoc n sacha/org-show-slide-list)))
- (sacha/org-show-execute-slide))
+ (goto-char (cdr (assoc n org-show-slide-list)))
+ (org-show-execute-slide))
 #+END_SRC
-** keybindings
 
 ** Table of contents
-#+BEGIN_SRC emacs-lisp
-(defun sacha/org-show-toc ()
+#+BEGIN_SRC emacs-lisp :tangle org-show.el
+(defun org-show-toc ()
   (interactive)
   (let ((links) (c-b (buffer-name)) (n))
     (save-excursion
+      (widen)
       (mapcar
        (lambda (x)
 	 (setq n (car x))
 	 (goto-char (cdr x))
 	 (add-to-list
 	  'links
-	  (format "[[elisp:(progn (switch-to-buffer \"%s\")(goto-char %s)(sacha/org-show-execute-slide))][%s]] %s\n"
+	  (format " [[elisp:(progn (switch-to-buffer \"%s\")(goto-char %s)(org-show-execute-slide))][%2s %s]]\n\n"
 		  (marker-buffer (cdr x))
 		  (marker-position (cdr x))
 		  (car x)
 		  (nth 4 (org-heading-components))) t))
-	      sacha/org-show-slide-list))
-
+	      org-show-slide-list))
     
     (switch-to-buffer "*List of Slides*")
     (org-mode)
@@ -463,13 +521,35 @@ When we stop, we unbind the keys.
     ;(setq buffer-read-only t)
     (use-local-map (copy-keymap org-mode-map))
     (local-set-key "q" #'(lambda () (interactive) (kill-buffer)))))
-
-(sacha/org-show-toc)
 #+END_SRC
 
-#+RESULTS:
-| lambda | nil | (interactive) | (kill-buffer) |
+** Utilities
+It seems like we might animate enough to have a function
+#+BEGIN_SRC emacs-lisp :tangle org-show.el
+(require 'animate)
 
+(defun org-show-animate (strings)
+  "Animate STRINGS in an *Animation* buffer"
+  (switch-to-buffer (get-buffer-create
+                     (or animation-buffer-name
+                         "*Animation*")))
+  (erase-buffer)
+  (text-scale-set 6)
+  (let* ((vpos (/ (- 20
+		     1 ;; For the mode-line
+		     (1- (length strings)) 
+		     (length strings))
+		  2))
+	 (width 43)
+	 hpos)
+    (while strings
+      (setq hpos (/ (- width (length (car strings))) 2))
+      (when (> 0 hpos) (setq hpos 0))
+      (when (> 0 vpos) (setq vpos 0))
+      (animate-string (car strings) vpos hpos)
+      (setq vpos (1+ vpos))
+      (setq strings (cdr strings)))))
+#+END_SRC
 ** End
 #+BEGIN_SRC emacs-lisp  :tangle org-show.el
 (provide 'org-show)
