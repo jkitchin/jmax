@@ -133,11 +133,23 @@ Once we have a redirect for a particular doi, we need to compute the url to the 
 #+END_SRC
 
 ** ACS
+here is a typical url http://pubs.acs.org/doi/abs/10.1021/nl500037x
+the pdf is found at http://pubs.acs.org/doi/pdf/10.1021/nl500037x
+
+we just change /abs/ to /pdf/.
+
 #+BEGIN_SRC emacs-lisp  :tangle doi-utils.el
 (defun acs-pdf-url (*doi-utils-redirect*)
   (when (string-match "^http://pubs.acs.org" *doi-utils-redirect*)
     (replace-regexp-in-string "/abs/" "/pdf/" *doi-utils-redirect*)))
 #+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(acs-pdf-url  "http://pubs.acs.org/doi/abs/10.1021/nl500037x")
+#+END_SRC
+
+#+RESULTS:
+: http://pubs.acs.org/doi/pdf/10.1021/nl500037x
 
 ** IOP
 #+BEGIN_SRC emacs-lisp  :tangle doi-utils.el
@@ -180,6 +192,16 @@ Once we have a redirect for a particular doi, we need to compute the url to the 
   (when (string-match "^http://jes.ecsdl.org" *doi-utils-redirect*)
     (replace-regexp-in-string "\.abstract$" ".full.pdf" *doi-utils-redirect*)))
 #+END_SRC
+
+http://ecst.ecsdl.org/content/25/2/2769
+http://ecst.ecsdl.org/content/25/2/2769.full.pdf
+
+#+BEGIN_SRC emacs-lisp :tangle doi-utils.el
+(defun ecst-pdf-url (*doi-utils-redirect*)
+  (when (string-match "^http://ecst.ecsdl.org" *doi-utils-redirect*)
+    (concat *doi-utils-redirect* ".full.pdf")))
+#+END_SRC
+
 
 ** RSC
 #+BEGIN_SRC emacs-lisp :tangle doi-utils.el
@@ -235,14 +257,14 @@ http://www.pnas.org/content/early/2014/05/08/1319030111.full.pdf
 
 with supporting info
 http://www.pnas.org/content/early/2014/05/08/1319030111.full.pdf+html?with-ds=yes
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp  :tangle doi-utils.el
 (defun pnas-pdf-url (*doi-utils-redirect*)
   (when (string-match "^http://www.pnas.org" *doi-utils-redirect*)
     (concat *doi-utils-redirect* ".full.pdf?with-ds=yes")))
 #+END_SRC
 
 ** Add all functions
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle doi-utils.el
 (setq doi-utils-pdf-url-functions
       (list
        'aps-pdf-url
@@ -258,6 +280,7 @@ http://www.pnas.org/content/early/2014/05/08/1319030111.full.pdf+html?with-ds=ye
        'linkinghub-elsevier-pdf-url
        'tandfonline-pdf-url
        'ecs-pdf-url
+       'ecst-pdf-url
        'rsc-pdf-url
        'pnas-pdf-url))
 #+END_SRC
@@ -293,6 +316,14 @@ until one is found"
 
 #+RESULTS:
 : http://www.sciencemag.org/content/321/5890/792.full.pdf
+
+#+BEGIN_SRC emacs-lisp
+(doi-utils-get-pdf-url  "10.1021/nl500037x")
+#+END_SRC
+
+#+RESULTS:
+: http://pubs.acs.org/doi/pdf/10.1021/nl500037x
+
 
 ** Finally, download the pdf
 #+BEGIN_SRC emacs-lisp :tangle doi-utils.el

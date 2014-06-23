@@ -1,5 +1,6 @@
 #+LATEX_CLASS: revtex4-1
-#+LATEX_CLASS_OPTIONS: [aps,prb,citeautoscript,preprint,citeautoscript,showkeys]
+#+LATEX_CLASS_OPTIONS: [aps,prb,citeautoscript,preprint,citeautoscript,showkeys,12pt]
+#+OPTIONS: toc:nil ^:{}
 #+EXPORT_EXCLUDE_TAGS: noexport
 
 # here is where you include the relevant packages. These are pretty
@@ -18,8 +19,9 @@
 #+LATEX_HEADER: \usepackage{amsmath}
 #+LATEX_HEADER: \usepackage{pdfpages}
 #+LATEX_HEADER: \usepackage[version=3]{mhchem}
+#+LATEX_HEADER: \usepackage{setspace}
 #+LATEX_HEADER: \usepackage[linktocpage, pdfstartview=FitH, colorlinks, linkcolor=blue, anchorcolor=blue, citecolor=blue,  filecolor=blue,  menucolor=blue,  urlcolor=blue]{hyperref}
-
+\doublespace
 #+TITLE: Your amazing title
 
 #+AUTHOR: John Kitchin
@@ -50,3 +52,6 @@ bibliography:longtitles.bib,references.bib
 
 
 
+
+
+bibliographystyle:unsrt

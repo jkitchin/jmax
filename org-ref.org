@@ -580,6 +580,7 @@ In long documents, a list of figures is not uncommon. Here we create a clickable
 (defun org-ref-list-of-figures (&optional arg)
   "Generate buffer with list of figures in them"
   (interactive)
+  (save-excursion (widen)
   (let* ((c-b (buffer-name))
 	 (counter 0)
 	 (list-of-figures 
@@ -610,7 +611,7 @@ In long documents, a list of figures is not uncommon. Here we create a clickable
     (insert (mapconcat 'identity list-of-figures ""))
     (setq buffer-read-only t)
     (use-local-map (copy-keymap org-mode-map))
-    (local-set-key "q" #'(lambda () (interactive) (kill-buffer)))))
+    (local-set-key "q" #'(lambda () (interactive) (kill-buffer))))))
 
 (org-add-link-type 
  "list-of-figures"
@@ -627,6 +628,8 @@ In long documents, a list of figures is not uncommon. Here we create a clickable
 (defun org-ref-list-of-tables (&optional arg)
   "Generate a buffer with a list of tables"
   (interactive)
+  (save-excursion
+  (widen)
   (let* ((c-b (buffer-name))
 	 (counter 0)
 	 (list-of-tables 
@@ -650,7 +653,7 @@ In long documents, a list of figures is not uncommon. Here we create a clickable
     (insert (mapconcat 'identity list-of-tables ""))
     (setq buffer-read-only t)
     (use-local-map (copy-keymap org-mode-map))
-    (local-set-key "q" #'(lambda () (interactive) (kill-buffer)))))
+    (local-set-key "q" #'(lambda () (interactive) (kill-buffer))))))
 
 (org-add-link-type 
  "list-of-tables"
@@ -673,9 +676,10 @@ The label link provides a way to create labels in org-mode. We make it clickable
    "on clicking count the number of label tags used in the buffer. A number greater than one means multiple labels!"
    (message (format "%s occurences"
 		    (+ (count-matches (format "label:%s\\b" label) (point-min) (point-max) t)
+                       (count-matches (format "^#\\+tblname:\\s-*%s\\b" label) (point-min) (point-max) t)
 		       (count-matches (format "\\label{%s}\\b" label) (point-min) (point-max) t)
                        ;; this is the org-format #+label:
-		       (count-matches (format "#\\+label:%s\\b" label) (point-min) (point-max) t)))))
+		       (count-matches (format "^#\\+label:\\s-*%s\\b" label) (point-min) (point-max) t)))))
  (lambda (keyword desc format)
    (cond
     ((eq format 'html) (format "(<label>%s</label>)" path))
@@ -733,6 +737,9 @@ At the moment, ref links are not usable for section links. You need [[#CUSTOM_ID
    "on clicking goto the label. Navigate back with C-c &"
    (org-mark-ring-push)
    ;; next search from beginning of the buffer
+
+   ;; it is possible you would not find the label if narrowing is in effect
+   (widen)
 
    (unless
        (or
@@ -851,7 +858,7 @@ This refers to the page of a label in LaTeX.
    "on clicking goto the label. Navigate back with C-c &"
    (org-mark-ring-push)
    ;; next search from beginning of the buffer
-
+   (widen)
    (unless
        (or
 	;; our label links
@@ -920,7 +927,7 @@ The nameref link allows you make links to the text of a section with a label. Cl
    "on clicking goto the label. Navigate back with C-c &"
    (org-mark-ring-push)
    ;; next search from beginning of the buffer
-
+   (widen)
    (unless
        (or
 	;; a latex label
@@ -950,6 +957,7 @@ This is just the LaTeX ref for equations. On export, the reference is enclosed i
    "on clicking goto the label. Navigate back with C-c &"
    (org-mark-ring-push)
    ;; next search from beginning of the buffer
+   (widen)
    (goto-char (point-min))
    (unless
        (or
@@ -970,7 +978,6 @@ This is just the LaTeX ref for equations. On export, the reference is enclosed i
     ((eq format 'latex)
      (format "\\eqref{%s}" keyword)))))
 #+END_SRC
-
 
 
 ** cite
@@ -1300,127 +1307,6 @@ Finally, we define the cite link. This is deprecated; the links are autogenerate
 ; 'org-ref-cite-link-format)
 #+END_SRC
 
-*** Miscellaneous cite link variations				   :noexport:
-I do not use these alot, but they are variations of the regular cite commands in LaTeX. For a good reference on what these do see http://merkel.zoneo.net/Latex/natbib.php. The citet variants are for textual citations, and the citep variants are parenthetical citations. What you actually get seems to depend on the bibliography style you are using.
-
-#+BEGIN_SRC emacs-lisp :tangle org-ref.el
-(org-add-link-type
- "autocite"
- 'org-ref-cite-onclick-minibuffer-menu
- ;; formatting
- (lambda (keyword desc format)
-   (cond
-    ((eq format 'html) (format "(<autocite>%s</autocite>)" path))
-    ((eq format 'latex)
-     (concat "\\autocite{"
-	     (mapconcat (lambda (key) key) (org-ref-split-and-strip-string keyword) ",")
-	     "}")))))
-
-
-(org-add-link-type
- "citealp"
- 'org-ref-cite-onclick-minibuffer-menu
- ;; formatting
- (lambda (keyword desc format)
-   (cond
-    ((eq format 'html) (format "(<citealp>%s</citealp>)" path))
-    ((eq format 'latex)
-     (concat "\\citealp{"
-	     (mapconcat (lambda (key) key) (org-ref-split-and-strip-string keyword) ",")
-	     "}")))))
-
-(org-add-link-type
- "citet"
- 'org-ref-cite-onclick-minibuffer-menu
- ;; formatting
- (lambda (keyword desc format)
-   (cond
-((eq format 'html) (format "(<cite>%s</cite>)" path))
-    ((eq format 'latex)
-  (concat "\\citet{" (mapconcat (lambda (key) key) (org-ref-split-and-strip-string keyword) ",") "}")))))
-
-(org-add-link-type
- "citet*"
- 'org-ref-cite-onclick-minibuffer-menu
- ;; formatting
- (lambda (keyword desc format)
-   (cond
-((eq format 'html) (format "(<cite>%s</cite>)" path))
-    ((eq format 'latex)
-  (concat "\\citet*{" (mapconcat (lambda (key) key) (org-ref-split-and-strip-string keyword) ",") "}")))))
-
-;; TODO these links do not support options [see][]
-(org-add-link-type
- "citep"
- 'org-ref-cite-onclick-minibuffer-menu
- ;; formatting
- (lambda (keyword desc format)
-   (cond
-((eq format 'html) (format "(<cite>%s</cite>)" path))
-    ((eq format 'latex)
-  (concat "\\citep{" (mapconcat (lambda (key) key) (org-ref-split-and-strip-string keyword) ",") "}")))))
-
-(org-add-link-type
- "citep*"
- 'org-ref-cite-onclick-minibuffer-menu
- ;; formatting
- (lambda (keyword desc format)
-   (cond
-((eq format 'html) (format "(<cite>%s</cite>)" path))
-    ((eq format 'latex)
-  (concat "\\citep*{" (mapconcat (lambda (key) key) (org-ref-split-and-strip-string keyword) ",") "}")))))
-
-(org-add-link-type
- "citeauthor"
- 'org-ref-cite-onclick-minibuffer-menu
- ;; formatting
- (lambda (keyword desc format)
-   (cond
-((eq format 'html) (format "(<cite>%s</cite>)" path))
-    ((eq format 'latex)
-  (concat "\\citeauthor{" (mapconcat (lambda (key) key) (org-ref-split-and-strip-string keyword) ",") "}")))))
-
-(org-add-link-type
- "citeauthor*"
- 'org-ref-cite-onclick-minibuffer-menu
- ;; formatting
- (lambda (keyword desc format)
-   (cond
-((eq format 'html) (format "(<cite>%s</cite>)" path))
-    ((eq format 'latex)
-  (concat "\\citeauthor*{" (mapconcat (lambda (key) key) (org-ref-split-and-strip-string keyword) ",") "}")))))
-
-(org-add-link-type
- "citeyear"
- 'org-ref-cite-onclick-minibuffer-menu
- ;; formatting
- (lambda (keyword desc format)
-   (cond
-((eq format 'html) (format "(<cite>%s</cite>)" path))
-    ((eq format 'latex)
-  (concat "\\citeyear{" (mapconcat (lambda (key) key) (org-ref-split-and-strip-string keyword) ",") "}")))))
-
-(org-add-link-type
- "nocite"
- 'org-ref-cite-onclick-minibuffer-menu
- ;; formatting
- (lambda (keyword desc format)
-   (cond
-((eq format 'html) (format "(<cite>%s</cite>)" path))
-    ((eq format 'latex)
-  (concat "\\nocite{" (mapconcat (lambda (key) key) (org-ref-split-and-strip-string keyword) ",") "}")))))
-
-(org-add-link-type
- "citetext"
- nil ;; clicking does not make sense
- ;; formatting
- (lambda (keyword desc format)
-   (cond
-((eq format 'html) (format "(<cite>%s</cite>)" path))
-    ((eq format 'latex)
-  (concat "\\citetext{" path "}")))))
-#+END_SRC
-
 *** Automatic definition of the cite links
 There are many different kinds of citations in LaTeX, but they are all variants of a basic syntax of \citetype[optional text]{label1,label2}. Here we use lisp to generate the link definitions. We define a function that creates the code to create the link, and then we evaluate it. We also create the completion function for the new link, and add it to the list of known links. 
 
@@ -1577,7 +1463,7 @@ Alternatively, you may shortcut the org-machinery with this command. You will be
   (insert (funcall (intern (format "org-%s-complete-link" type)))))
 #+END_SRC
 
-*** Storing links to a bibtex entry
+** Storing links to a bibtex entry
 org-mode already defines a store link function for bibtex entries. It does not store the link I want though, it only stores a brief citation of the entry. I want a citation link. Here is a function to do that.
 
 #+BEGIN_SRC emacs-lisp :tangle org-ref.el
@@ -1594,7 +1480,7 @@ org-mode already defines a store link function for bibtex entries. It does not s
     (car org-stored-links)))
 #+END_SRC
 
-*** An html bibliography
+** An html bibliography
 This code provides some functions to generate a simple bibliography in html.
 
 #+BEGIN_SRC emacs-lisp :tangle org-ref.el

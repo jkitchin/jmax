@@ -138,6 +138,7 @@
    (matlab . t)
    (sqlite . t)
    (ruby . t)
+   (perl . t)
    (org . t)
    (dot . t)
    (plantuml . t)
@@ -404,6 +405,14 @@ citecolor=blue,filecolor=blue,menucolor=blue,urlcolor=blue"
       (load-file (expand-file-name "doi-utils.el" starter-kit-dir)))
   (require 'doi-utils))
 
+(if (or
+     (not (file-exists-p "org-show.el"))
+     (< (float-time (nth 5 (file-attributes "org-show.el")))
+	(float-time (nth 5 (file-attributes "org-show.org")))))
+    (progn
+      (org-babel-tangle-file (expand-file-name "org-show.org" starter-kit-dir))
+      (load-file (expand-file-name "org-show.el" starter-kit-dir)))
+  (require 'org-show))
 
 (require 'ox-cmu-qualifier)
 (require 'ox-cmu-ms-report)
