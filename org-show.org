@@ -526,6 +526,8 @@ On starting, we want to map the slides so we can get slide numbers for navigatio
   (delete-other-windows)
   (setq org-show-presentation-file nil)
   (setq org-show-current-slide-number 1)
+  (set-frame-name (if (buffer-file-name)
+                   (abbreviate-file-name (buffer-file-name))))
   (org-show-mode -1))
 
 (defalias 'stop 'org-show-stop-slideshow)
