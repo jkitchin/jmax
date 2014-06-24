@@ -52,20 +52,47 @@ This should be easy
 2. Run command to start
 3. Navigate through slides, edit as you present
 
+** Test out some themes
+
+[[elisp:(load-theme 'adwaita)]] [[elisp:(disable-theme 'adwaita)]]
+
+[[elisp:(load-theme 'deeper-blue)]] [[elisp:(disable-theme 'deeper-blue)]]
+
+[[elisp:(load-theme 'light-blue)]] [[elisp:(disable-theme 'light-blue)]]
+
+[[elisp:(load-theme 'manoj-dark)]] [[elisp:(disable-theme 'manoj-dark)]]
+
+[[elisp:(load-theme 'misterioso)]] [[elisp:(disable-theme 'misterioso)]]
+
+[[elisp:(load-theme 'tango)]] [[elisp:(disable-theme 'tango)]]
+
+[[elisp:(load-theme 'tango-dark)]] [[elisp:(disable-theme 'tango-dark)]]
+
+[[elisp:(load-theme 'tsdh-dark)]] [[elisp:(disable-theme 'tsdh-dark)]]
+
+[[elisp:(load-theme 'tsdh-light)]] [[elisp:(disable-theme 'tsdh-light)]]
+
+[[elisp:(load-theme 'wheatgrass)]] [[elisp:(disable-theme 'wheatgrass)]]
+
+[[elisp:(load-theme 'whiteboard)]] [[elisp:(disable-theme 'whiteboard)]]
+
+[[elisp:(load-theme 'wombat)]] [[elisp:(disable-theme 'wombat)]]
+
+[[elisp:(load-theme 'my)]] [[elisp:(disable-theme 'my)]]
+
+
+(load-theme 'solarized-light t)
+
+(load-theme 'solarized-dark t)
+
 ** Equations							      :slide:
 It should be easy to show equations like this  $\int_0^x \frac{1}{2} \sin x dx = 6$.
 
-It is. Maybe you prefer numbered equations?
+It is. Maybe you prefer equation environments?
 
 
 \begin{equation}
 e^x = 5
-\end{equation}
-
-The numbering is not consecutive:
-
-\begin{equation}
-2+2=4
 \end{equation}
 
 
@@ -261,14 +288,6 @@ That is the end!
 (defvar org-show-latex-scale 4.0 "scale for latex preview")
 (defvar org-show-text-scale 4 "scale for text in presentation")
 (defvar org-show-current-slide-number 1 "holds current slide number")
-
-;; From org-pres--eimp-fit
-(defun org-show-eimp-fit ()
-  "Function used as a hook, fits the image found to the window."
-  (when (eq major-mode 'image-mode)
-    (eimp-fit-image-to-window nil)))
-
-(add-hook 'find-file-hook 'org-show-eimp-fit)
 #+END_SRC
 
 ** Make a minor mode and menu
@@ -313,6 +332,9 @@ That is the end!
 ** Prepare and show the slide 
 
 #+BEGIN_SRC emacs-lisp :tangle org-show.el
+
+(defvar org-show-temp-images '() "list of temporary images")
+
 (defun org-show-execute-slide ()
   "Process slide at point.
   If it contains an Emacs Lisp source block, evaluate it.
@@ -340,13 +362,20 @@ That is the end!
     (message "") ; clear minibuffer
     (cond
 
-     ;; view images if there is one
+     ;; view images if there is one. WE only do this this for the first one.
      ((and (goto-char (point-min))
-           (re-search-forward "\\[\\[.*\\.\\(jpg\\|gif\\|png\\)" nil t))
-      (split-window-right)      
-      (other-window 1)
-      (let ((org-link-frame-setup '((file . find-file))))
-        (org-open-at-point))
+           (re-search-forward "\\[\\[\\(.*\\.\\(jpg\\|gif\\|png\\)\\)" nil t))
+      (let ((temp-png (make-temp-file "eimp" nil ".png")))
+        (add-to-list 'org-show-temp-images temp-png)
+	(copy-file (match-string 1) temp-png t)
+      
+	(split-window-right)      
+      
+	(other-window 1)
+	(find-file temp-png)
+	(eimp-fit-image-width-to-window nil)
+        (save-buffer))
+                  
       (other-window 1) ; back to slide
       (goto-char (point-min))
       (text-scale-set org-show-text-scale)
@@ -381,7 +410,7 @@ That is the end!
   (interactive)
   (find-file org-show-presentation-file)
   (widen)
-  (if (< (+ org-show-current-slide-number 1) (length org-show-slide-titles))
+  (if (<= (+ org-show-current-slide-number 1) (length org-show-slide-titles))
       (progn
 	(setq org-show-current-slide-number (+ org-show-current-slide-number 1))
 	(org-show-goto-slide org-show-current-slide-number))
@@ -425,9 +454,12 @@ On starting, we want to map the slides so we can get slide numbers for navigatio
 (defvar org-show-slide-list '() "List of slide numbers and markers to each slide")
 (defvar org-show-slide-titles '() "List of titles and slide numbers for each slide")
 
+
+
 (defun org-show-initialize ()
   ;; make slide lists for future navigation. rerun this if you change slide order
   (setq  org-show-slide-titles '()
+         org-show-temp-images '()
          org-show-slide-list '())
      
   (let ((n 0))
@@ -450,12 +482,12 @@ On starting, we want to map the slides so we can get slide numbers for navigatio
   (beginning-of-buffer)
   (org-show-initialize)
   ;; hide slide tags
-  (save-excursion
-    (while (re-search-forward ":slide:" nil t)
-      (overlay-put
-       (make-overlay (match-beginning 0)(match-end 0))
-       'invisible 'slide)))
-  (add-to-invisibility-spec 'slide)
+  ;(save-excursion
+  ;  (while (re-search-forward ":slide:" nil t)
+  ;    (overlay-put
+  ;     (make-overlay (match-beginning 0)(match-end 0))
+  ;     'invisible 'slide)))
+  ;(add-to-invisibility-spec 'slide)
 
   (beginning-of-buffer)
   (delete-other-windows)
@@ -469,9 +501,26 @@ On starting, we want to map the slides so we can get slide numbers for navigatio
 #+BEGIN_SRC emacs-lisp :tangle org-show.el
 (defun org-show-stop-slideshow ()
   (interactive)
-  (find-file org-show-presentation-file)
   ;; make slide tag visible again
-  (remove-from-invisibility-spec 'slide)
+  ;(remove-from-invisibility-spec 'slide)
+
+  ;; clean up temp images
+  (mapcar (lambda (x)
+	    (let ((bname (file-name-nondirectory x)))
+	      (when (get-buffer bname)
+                (set-buffer bname) 
+                (save-buffer)
+		(kill-buffer bname)))
+
+	    (when (file-exists-p x)
+	      (delete-file x)))
+	  org-show-temp-images)
+  (setq org-show-temp-images '())
+
+  ;; clean up miscellaneous buffers
+  (when (get-buffer "*Animation*") (kill-buffer "*Animation*"))
+
+  (find-file org-show-presentation-file)
   (widen)
   (text-scale-set 0)
   (delete-other-windows)
