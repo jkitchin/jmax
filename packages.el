@@ -24,6 +24,7 @@
         'auctex 'reftex
         'undo-tree
 	'diminish
+	'eimp
 	;'icicles
 	'org 'org-plus-contrib
 	'elpy
