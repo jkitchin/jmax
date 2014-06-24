@@ -675,11 +675,13 @@ The label link provides a way to create labels in org-mode. We make it clickable
  (lambda (label)
    "on clicking count the number of label tags used in the buffer. A number greater than one means multiple labels!"
    (message (format "%s occurences"
-		    (+ (count-matches (format "label:%s\\b" label) (point-min) (point-max) t)
-                       (count-matches (format "^#\\+tblname:\\s-*%s\\b" label) (point-min) (point-max) t)
+		    (+ (count-matches (format "label:%s\\b[^-:]" label) (point-min) (point-max) t)
+                       ;; for tblname, it is not enough to get word boundary
+                       ;; tab-little and tab-little-2 match then.
+                       (count-matches (format "^#\\+tblname:\\s-*%s\\b[^-:]" label) (point-min) (point-max) t)
 		       (count-matches (format "\\label{%s}\\b" label) (point-min) (point-max) t)
                        ;; this is the org-format #+label:
-		       (count-matches (format "^#\\+label:\\s-*%s\\b" label) (point-min) (point-max) t)))))
+		       (count-matches (format "^#\\+label:\\s-*%s\\b[^-:]" label) (point-min) (point-max) t)))))
  (lambda (keyword desc format)
    (cond
     ((eq format 'html) (format "(<label>%s</label>)" path))
@@ -822,11 +824,13 @@ Now, we can put all the labels together which will give us a list of candidates.
 (defun org-ref-get-labels ()
   "returns a list of labels in the buffer that you can make a ref link to. this is used to auto-complete ref links."
   (save-excursion
-    (goto-char (point-min))
-    (let ((matches '()))
-      (while (re-search-forward "label:\\([a-zA-z0-9:-]*\\)" (point-max) t)
-	(add-to-list 'matches (match-string-no-properties 1) t))
-      (append matches (org-ref-get-latex-labels) (org-ref-get-tblnames) (org-ref-get-custom-ids)))))
+    (save-restriction
+      (widen)
+      (goto-char (point-min))
+      (let ((matches '()))
+	(while (re-search-forward "label:\\([a-zA-z0-9:-]*\\)" (point-max) t)
+	  (add-to-list 'matches (match-string-no-properties 1) t))
+	(append matches (org-ref-get-latex-labels) (org-ref-get-tblnames) (org-ref-get-custom-ids))))))
 #+END_SRC
 
 Now we create the completion function. This works from the org-machinery, e.g. if you type C-c C-l to insert a link, and use completion by pressing tab.
@@ -1858,7 +1862,7 @@ Depending on how you enter citations, you may have citations with no correspondi
   (let ((i 0)
 	(found nil))
     (dolist (arg list i)
-      (if (string-match substring arg)
+      (if (string-match (concat "^" substring "$") arg)
 	  (progn 
 	    (setq found t)
 	    (return i)))
@@ -1899,6 +1903,9 @@ Makes a new buffer with clickable links."
 					;(setq buffer-read-only t)
 	(use-local-map (copy-keymap org-mode-map))
 	(local-set-key "q" #'(lambda () (interactive) (kill-buffer))))
+
+      (when (get-buffer "*Missing citations*")
+          (kill-buffer "*Missing citations*"))
       (message "No bad cite links found"))))
 #+END_SRC
 
