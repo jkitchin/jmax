@@ -569,7 +569,7 @@ This is apparently used for biblatex.
 		      ((eq format 'html) (format "")); no output for html
 		      ((eq format 'latex)
 			 ;; write out the latex addbibresource command
-		       (format "\\addbibresource{%s}" (replace-regexp-in-string  "\\.bib" "" keyword))))))
+		       (format "\\addbibresource{%s}" keyword)))))
 #+END_SRC
 
 ** List of Figures
