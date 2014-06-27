@@ -293,14 +293,16 @@ That is the end!
 
 ** Some basic setup
 #+BEGIN_SRC emacs-lisp :tangle org-show.el
-(require 'eimp)
-
 (defvar org-show-presentation-file nil "File containing the presentation.")
 (defvar org-show-slide-tag "slide" "Tag that marks slides.")
 (defvar org-show-slide-tag-regexp (concat ":" (regexp-quote org-show-slide-tag) ":"))
 (defvar org-show-latex-scale 4.0 "scale for latex preview")
 (defvar org-show-text-scale 4 "scale for text in presentation")
 (defvar org-show-current-slide-number 1 "holds current slide number")
+
+(defvar org-show-mogrify-p (executable-find "mogrify"))
+
+(when org-show-mogrify-p (require 'eimp))
 #+END_SRC
 
 ** Make a minor mode and menu
@@ -386,7 +388,9 @@ That is the end!
       
 	(other-window 1)
 	(find-file temp-png)
-	(eimp-fit-image-width-to-window nil)
+        (when org-show-mogrify-p 
+          (eimp-fit-image-width-to-window nil))
+
         (save-buffer))
                   
       (other-window 1) ; back to slide
