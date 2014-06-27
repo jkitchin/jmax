@@ -201,7 +201,6 @@
 
 ;; give me some warning of upcoming deadlines
 (setq org-deadline-warning-days 0)
-
 (setq org-agenda-custom-commands
       '(("w" "Weekly Review"
           (
