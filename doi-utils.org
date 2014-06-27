@@ -119,10 +119,34 @@ Once we have a redirect for a particular doi, we need to compute the url to the 
 #+END_SRC
 
 ** Wiley
+http://onlinelibrary.wiley.com/doi/10.1002/anie.201402680/abstract
+http://onlinelibrary.wiley.com/doi/10.1002/anie.201402680/pdf
+
+It appears that it is not enough to use the pdf url above. That takes you to an html page. The actual link to teh pdf is embedded in that page. This is how ScienceDirect does things too.
+
+This is where the link is hidden:
+
+<iframe id="pdfDocument" src="http://onlinelibrary.wiley.com/store/10.1002/anie.201402680/asset/6397_ftp.pdf?v=1&amp;t=hwut2142&amp;s=d4bb3cd4ad20eb733836717f42346ffb34017831" width="100%" height="675px"></iframe>
+
+
+
 #+BEGIN_SRC emacs-lisp  :tangle doi-utils.el
+(defun doi-utils-get-wiley-pdf-url (redirect-url)
+  "wileyscience direct hides the pdf url in html. we get it out here"
+  (setq *doi-utils-waiting* t)
+  (url-retrieve redirect-url
+		(lambda (status)
+		  (beginning-of-buffer)
+		  (re-search-forward "<iframe id=\"pdfDocument\" src=\"\\([^\"]*\\)\"" nil)
+		  (setq *doi-utils-pdf-url* (match-string 1)
+			,*doi-utils-waiting* nil)))
+  (while *doi-utils-waiting* (sleep-for 0.1))
+  ,*doi-utils-pdf-url*)
+
 (defun wiley-pdf-url (*doi-utils-redirect*)
   (when (string-match "^http://onlinelibrary.wiley.com" *doi-utils-redirect*)
-    (replace-regexp-in-string "/abstract" "/pdf" *doi-utils-redirect*)))
+   (doi-utils-get-wiley-pdf-url (replace-regexp-in-string "/abstract" "/pdf" *doi-utils-redirect*))
+   ,*doi-utils-pdf-url*))
 #+END_SRC
 
 ** Springer
@@ -226,15 +250,16 @@ You cannot compute these pdf links; they are embedded in the redirected pages.
 		(lambda (status)
 		  (beginning-of-buffer)
 		  (re-search-forward "pdfurl=\"\\([^\"]*\\)\"" nil t)
-		  (setq *doi-utils-pdf-url* (match-string 1))))
+		  (setq *doi-utils-pdf-url* (match-string 1)
+			,*doi-utils-waiting* nil)))
   (while *doi-utils-waiting* (sleep-for 0.1))
-  *doi-utils-pdf-url*)
+  ,*doi-utils-pdf-url*)
 
 
 (defun science-direct-pdf-url (*doi-utils-redirect*)
   (when (string-match "^http://www.sciencedirect.com" *doi-utils-redirect*)
     (doi-utils-get-science-direct-pdf-url *doi-utils-redirect*)
-    *doi-utils-pdf-url*))
+    ,*doi-utils-pdf-url*))
 
 ;; sometimes I get
 ;; http://linkinghub.elsevier.com/retrieve/pii/S0927025609004558
@@ -248,7 +273,7 @@ You cannot compute these pdf links; they are embedded in the redirected pages.
 			    ,*doi-utils-redirect*)))
       (message "getting pdf url from %s" second-redirect)
       ;(doi-utils-get-science-direct-pdf-url second-redirect)
-      *doi-utils-pdf-url*)))
+      ,*doi-utils-pdf-url*)))
 #+END_SRC
 
 ** PNAS
@@ -324,6 +349,13 @@ until one is found"
 #+RESULTS:
 : http://pubs.acs.org/doi/pdf/10.1021/nl500037x
 
+
+#+BEGIN_SRC emacs-lisp
+(doi-utils-get-pdf-url  "10.1002/anie.201402680")
+#+END_SRC
+
+#+RESULTS:
+: http://onlinelibrary.wiley.com/doi/10.1002/anie.201402680/pdf
 
 ** Finally, download the pdf
 #+BEGIN_SRC emacs-lisp :tangle doi-utils.el
