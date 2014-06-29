@@ -1,0 +1,26 @@
+The mhchem Bundle 2014-03-20
+
+containing
+- mhchem v3.17
+- hpstatement v1.00
+- rsphrase v3.11
+
+The mhchem package provides commands for typesetting
+chemical molecular formulae and equations.
+
+The hpstatement package provides commands for the official
+hazard statements and precautionary statements (H and P
+statements) that are used to label chemicals.
+
+The rsphrase package provides commands for the official
+Risk and Safety (R and S) Phrases that are used to label
+chemicals.
+
+
+Copyright 2004-2014 Martin Hensel
+
+This work may be distributed and/or modified under the
+conditions of the LaTeX Project Public License version 1.3c
+which can be found at
+  http://www.latex-project.org/lppl/lppl-1-3c.txt
+and is included as lppl-1-3c.txt.

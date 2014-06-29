@@ -1,0 +1,17 @@
+This work consists of the files
+
+  mhchem.sty      (Copyright Martin Hensel)
+  hpstatement.sty (Copyright Martin Hensel, except the contained statements)
+  rsphrase.sty    (Copyright Martin Hensel, except the contained phrases)
+  
+  README          (Copyright Martin Hensel)
+  mhchem.pdf      (Copyright Martin Hensel)
+  mhchem.tex      (Copyright Martin Hensel)
+  
+  manifext.txt    (Copyright Maritn Hensel)
+  lppl-1-3c.txt   (Copyright LaTeX3 Project)
+  
+This work may be distributed and/or modified under the
+conditions of the LaTeX Project Public License version 1.3c
+which is included as lppl-1-3c.txt
+
