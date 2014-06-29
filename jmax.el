@@ -32,6 +32,10 @@
 (global-undo-tree-mode)
 (diminish 'undo-tree-mode)
 
+(setq custom-file (expand-file-name "user/custom.el" starter-kit-dir))
+(when (file-exists-p custom-file)
+  (load custom-file))
+      
 ;; bookmarks
 (require 'bookmark)
 (setq bookmark-default-file (expand-file-name "bookmarks" starter-kit-dir)
@@ -218,11 +222,9 @@
 (add-hook 'python-mode-hook #'(lambda () (yas-global-mode -1)))
 
 ;; I want python to always show me the output. this advice makes that happen.
-(defadvice python-shell-send-buffer (before switch-to-python-output activate)
+(defadvice python-shell-send-buffer (after switch-to-python-output activate)
   "Show python output in another frame after you run a script"
-  (switch-to-buffer-other-frame
-   (process-buffer (python-shell-get-or-create-process))))
-
+  (switch-to-buffer-other-frame "*Python*"))
 
 (load-file (expand-file-name "email.el" starter-kit-dir))
 
