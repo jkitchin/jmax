@@ -61,3 +61,11 @@ org-ref.el
 /examples/cmu-letter/test-letter.pdf
 /examples/cmu-phd-dissertation/dissertation.pdf
 /examples/cmu-memo/samplememo.pdf
+/doi-utils.el
+emacs-24.4
+ltxpng
+/org-show.el
+/emacs-ipython-notebook/
+themes
+/org-mode-bleeding-edge/
+/English
