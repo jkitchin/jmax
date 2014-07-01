@@ -276,6 +276,21 @@ repo: %s
  (lambda (arg)
    (tq-clone-and-open arg)))
 
+;; Link to record answers. ans:label-data
+;; parse the path, split by -
+;; save in *andrewid*-label.dat
+(org-add-link-type
+ "ans"
+ (lambda (path)
+   (let* ((fields (split-string path "-"))
+	  (label (nth 0 fields))
+	  (data (nth 1 fields))
+	  (data-file (format "%s-%s.dat" *andrewid* label)))
+     (with-temp-file data-file
+       (insert data))
+     (shell-command (format "git add %s" data-file))
+     (shell-command (format "git commit -m \"%s\"" data-file))
+     (shell-command "git push"))))
 
 ;;;; menu and minor mode
 
