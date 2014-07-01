@@ -79,7 +79,7 @@ Thanks Sacha!
 
 [[elisp:(load-theme 'anti-zenburn t)]] [[elisp:(disable-theme 'anti-zenburn)]]
 
-** Equations							      :slide:
+** Equations 							      :slide:
 It should be easy to show equations like this  $\int_0^x \frac{1}{2} \sin x dx = 6$.
 
 It is. Maybe you prefer equation environments?
@@ -317,6 +317,8 @@ That is the end!
     
     (define-key map [f5] 'org-show-start-slideshow)
     (define-key map [f6] 'org-show-execute-slide)
+    (define-key map (kbd "C--") 'org-show-decrease-text-size)
+    (define-key map (kbd "C-=") 'org-show-increase-text-size)
     (define-key map (kbd "\e\eg") 'org-show-goto-slide)
     (define-key map (kbd "\e\et") 'org-show-toc)
     (define-key map (kbd "\e\eq") 'org-show-stop-slideshow)
@@ -621,6 +623,30 @@ It seems like we might animate enough to have a function
       (setq vpos (1+ vpos))
       (setq strings (cdr strings)))))
 #+END_SRC
+
+dynamic rescalling of text size
+
+#+BEGIN_SRC emacs-lisp :tangle org-show.el
+(defun org-show-increase-text-size (&optional arg)
+  "Increase text size. Bound to \\[org-show-increase-text-size].
+
+With prefix ARG, set `org-show-text-scale' so subsquent slides are the same text size."
+  (interactive "P")
+  (text-scale-increase 1.5)
+  (when arg
+    (setq org-show-text-scale (* org-show-text-scale 1.5))))
+
+(defun org-show-decrease-text-size (&optional arg)
+  "Increase text size. Bound to \\[org-show-decrease-text-size].
+
+With prefix ARG, set `org-show-text-scale' so subsquent slides are the same text size."
+  (interactive "P")
+  (text-scale-decrease 1.5)
+  (when arg
+    (setq org-show-text-scale (/ org-show-text-scale 1.5)))
+)
+#+END_SRC
+
 ** End
 #+BEGIN_SRC emacs-lisp  :tangle org-show.el
 (provide 'org-show)
