@@ -1,6 +1,5 @@
 ;;; techela.el --- functions for students to use in techela courses
 
-
 ;;; Commentary:
 ;; A techela course has a course-name, and is served on a techela server at
 ;; git clone course-name@techela.cheme.cmu.edu:course
@@ -12,7 +11,8 @@
 ;;; Code:
 
 (defvar tq-git-server "techela.cheme.cmu.edu" "The git server")
-(defvar tq-course-directory nil "location to clone the course to")
+(defvar tq-root-directory nil "location to clone the course and student work to")
+(defvar tq-course-directory nil "directory wher the course content is. It is inside `tq-root-directory'")
 (defvar tq-current-course nil "Store value of current course")
 
 (defun tq-syllabus (tq-course-name)
@@ -43,7 +43,6 @@ The user id_rsa.pub key must be registered in the course.
   ;; Set this for the current session
   (setq tq-current-course tq-course-name)
 
-
   ;; define directories to variables if they exist
   (when (and (boundp 'tq-courses) tq-courses)
     (let ((vars (cdr (assoc tq-course-name tq-courses))))
@@ -51,10 +50,6 @@ The user id_rsa.pub key must be registered in the course.
 	(setq tq-root-directory (nth 0 vars)
 	      tq-course-directory (nth 1 vars)))))
 
-  ;; make directory if needed
-  (unless (file-exists-p tq-root-directory)
-    (make-directory tq-root-directory))
-  
   ;; make sure basic variables are defined
   ;; ANDREWID
   (unless (and (boundp '*andrewid*) *andrewid*)
@@ -78,8 +73,12 @@ The user id_rsa.pub key must be registered in the course.
      'tq-root-directory
      (file-name-as-directory
       (ido-read-directory-name "Enter directory to download course: " nil
-			  (format "~/Desktop/%s" tq-course-name)))))
+			       (format "~/Desktop/%s" tq-course-name)))))
 
+  ;; make directory if needed
+  (unless (file-exists-p tq-root-directory)
+    (make-directory tq-root-directory))
+  
   ;; clone course if we need it. This will be in a repo called "course"
   (unless (and tq-course-directory (file-exists-p tq-course-directory))
     (let ((default-directory (file-name-as-directory tq-root-directory)))
@@ -208,7 +207,7 @@ REPO should not have the extension .git on it"
           (
            ;; deadlines
           (tags-todo "+DEADLINE>=\"<today>\""
-                     ((org-agenda-overriding-header "Deadlines")
+                     ((org-agenda-overriding-header "Upcoming Deadlines")
 		      ))
 
           ;; now the agenda
@@ -302,7 +301,6 @@ repo: %s
 
 \\{techela-mode-map}"
   :lighter " techela"
-  :global t
   :keymap techela-mode-map)
 
 (provide 'techela)
