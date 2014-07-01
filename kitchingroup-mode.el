@@ -50,8 +50,25 @@
 
 (global-set-key (kbd "\e\eg") 'goto-line) 
 
+
+(defun kg-get-num-incoming-changes ()
+  "Return number of changes the remote is different than local."
+  (unless (in-git-p)
+    (error "You are not in a git repo.  We think you are in %s" default-directory))
+  (shell-command "git fetch origin")
+  (string-to-number (shell-command-to-string "git rev-list HEAD...origin/master --count")))
+
+
+(defun kg-update ()
+  "Run git pull.  Refresh file currently visited."
+  (interactive)
+  (shell-command "git pull")
+  (revert-buffer t t))
+
+
 (easy-menu-define my-menu kitchingroup-mode-map "My own menu"
   '("KitchinGroup"
+    [(format "Update (-%s)" (kg-get-num-incoming-changes)) kg-update t]
     ("email"
     ["email region" email-region t]
     ["email org-mode heading" email-heading t]

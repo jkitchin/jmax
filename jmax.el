@@ -313,4 +313,8 @@
 (or (server-running-p)
     (server-start))
 
+;; load course module
+(require 'techela)
+
+
 (provide 'jmax)
