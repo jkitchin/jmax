@@ -267,7 +267,11 @@ default-directory.
 		(= 1 status)) ; no change in files
       (switch-to-buffer "*techela-log*")
       (error "Problem committing. Check the logs")))
-  (mygit "git push")
+
+  (unless (= 0 (car (mygit "git push")))
+    (switch-to-buffer "*techela-log*")
+    (error "Problem pushing to server. Check the logs"))
+  
   (message "Woohoo! You turned it in!"))
 
 (defun tq-update ()
