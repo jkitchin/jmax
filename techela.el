@@ -113,7 +113,13 @@ Makes sure these variables are set.
      `((,smtpmail-smtp-server 587 nil nil))))
 
   (unless (and (boundp 'smtpmail-smtp-service) smtpmail-smtp-service)
-    (customize-save-variable 'smtpmail-smtp-service 587)))
+    (customize-save-variable 'smtpmail-smtp-service 587))
+
+  ;; setup git
+  (shell-command (format "git config --global user.name \"%s\"" user-full-name))
+  (shell-command (format "git config --global user.email %s" user-mail-address))
+
+  )
 
 
 (defun techela (tq-course-name)
