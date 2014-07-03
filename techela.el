@@ -27,13 +27,13 @@
 (defvar tq-debug nil "Whether to debug or not. non-nil triggers some debug action")
 
 (defun tq-log (format-string &rest args)
-  "log a message to *techela-log*. Same syntax as `message'.
+  "log a message to *techela log*. Same syntax as `message'.
 The first argument is a format control string, and the rest are data
 to be formatted under control of the string.  See `format' for details.
 
 Note: Use (tq-log \"%s\" VALUE) to print the value of expressions and
 variables to avoid accidentally interpreting `%' as format specifiers."
-  (with-current-buffer (get-buffer-create "*techela-log*")
+  (with-current-buffer (get-buffer-create "*techela log*")
     (end-of-buffer)
     (insert "\n")
     (insert (apply 'format format-string args))))
@@ -273,11 +273,11 @@ default-directory.
   (let ((status (car (mygit "git commit -am \"turning in\""))))
     (unless (or (= 0 status)  ; no problem
 		(= 1 status)) ; no change in files
-      (switch-to-buffer "*techela-log*")
+      (switch-to-buffer "*techela log*")
       (error "Problem committing. Check the logs")))
 
   (unless (= 0 (car (mygit "git push")))
-    (switch-to-buffer "*techela-log*")
+    (switch-to-buffer "*techela log*")
     (error "Problem pushing to server. Check the logs"))
   
   (message "Woohoo! You turned it in!"))
@@ -365,8 +365,8 @@ Messages\n==========\n")
    (when (get-buffer "*mygit-process*")
      (insert (with-current-buffer "*mygit-process*" (buffer-string)))
      (insert "\n"))
-   (when (get-buffer "*techela-log*")
-     (insert (with-current-buffer "*techela-log*" (buffer-string)))
+   (when (get-buffer "*techela log*")
+     (insert (with-current-buffer "*techela log*" (buffer-string)))
      (insert "\n"))
    (message-goto-body) ; go back to beginning of email body
    
