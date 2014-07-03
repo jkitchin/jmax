@@ -227,7 +227,9 @@ default-directory.
 "
   (if (file-exists-p repo)
       repo
-    (mygit (format "git clone %s@%s:%s.git" tq-current-course tq-git-server repo))
+    (when (not (= 0 (car (mygit (format "git clone %s@%s:%s.git" tq-current-course tq-git-server repo)))))
+      (switch-to-buffer "*techela log*")
+      (error "Problem cloning %s" repo))
     repo))
 
 
