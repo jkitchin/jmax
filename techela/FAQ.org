@@ -1,0 +1,22 @@
+#+TITLE: Techela FAQ
+#+AUTHOR: John Kitchin
+
+* Can I do teams?
+Yes. You can define teams in gitolite-admin/gitolite.conf like this:
+
+#+BEGIN_EXAMPLE
+@team-1 = userid1 userid2 userid3
+#+END_EXAMPLE
+
+Then, you can create repos with team access like this:
+
+#+BEGIN_EXAMPLE
+repo team-project-1
+    RW = @team-1
+#+END_EXAMPLE
+
+* Can students turn in a Word document?
+Any kind of file can be turned in. Simply put a copy of the file into the assignment directory andturn it in.  All files in the directory will be turned in.
+
+* Do I have to use org-mode?
+Yes. Some files need to be in org-mode for the framework to work. 

@@ -1,0 +1,174 @@
+#+TITLE: Techela - Technology Enhanced Learning and Assessment
+#+AUTHOR: John Kitchin
+
+* Introduction
+
+Techela is a framework for teaching courses. 
+
+* Initial server setup
+The initial setup of a techela server is described here.
+** Create a new user
+The server is run on an ordinary Linux server under a dedicated user. The username should be the name of the course. I used system-config-users and added the user org-course.
+
+** install gitolite
+gitolite is the git server we use to create and manage git repositories for the course. First, login as the user for the course, and then run these commands.
+
+#+BEGIN_SRC sh
+git clone git://github.com/sitaramc/gitolite
+cd $HOME
+mkdir bin
+gitolite/install --to $HOME/bin
+#+END_SRC
+
+** setup  the admin
+All communication with gitolite is done through ssh. You need to supply an ssh key to setup the server. This key should be from the computer you will do most of the administration from.
+
+On some machine, generate an ssh key pair. 
+
+#+BEGIN_SRC sh
+ssh-keygen
+#+END_SRC
+
+I opted to do this with no passphrase. Copy the id_rsa.pub key to $HOME on the gitolite server as admin-username.pub. Now, run the setup command to add your public key.
+
+#+BEGIN_SRC sh
+gitolite setup -pk jkitchin.pub 
+#+END_SRC
+
+Initialized empty Git repository in /home/org-course/repositories/gitolite-admin.git/
+Initialized empty Git repository in /home/org-course/repositories/testing.git/
+WARNING: /home/org-course/.ssh missing; creating a new one
+    (this is normal on a brand new install)
+WARNING: /home/org-course/.ssh/authorized_keys missing; creating a new one
+    (this is normal on a brand new install)
+[org-course@jkitchin-780 ~]$ 
+
+That is it. The rest can be done via the admin repo on a remote machine.
+
+** clone the admin repo
+Create a directory somewhere on your remote machine where you want the course to live. Then, clone the admin repo into it. 
+
+#+BEGIN_SRC sh
+git clone org-course@git-it.cheme.cmu.edu:gitolite-admin
+#+END_SRC
+
+** edit gitolite/gitolite.conf
+Go ahead and configure git if you have not already done so.
+
+  git config --global user.email "jkitchin@andrew.cmu.edu"
+  git config --global user.name "John Kitchin"
+
+Now, we create the course repo. This is the repo that all students will have access to. We define the @instructors team
+
+
+Add this to gitolite.conf.
+
+#+BEGIN_EXAMPLE
+@instructors = jkitchin mehakc
+
+repo course
+    RW+ = jkitchin
+    RW = @instructors
+    R = @students
+
+# file containing all student usernames
+include "students.conf"
+
+# we create a single file for each student repo
+include "repos/*.conf"
+#+END_EXAMPLE
+
+#+BEGIN_SRC sh
+mkdir repos
+touch repos/README
+echo "student repo conf files go here" >> repos/README
+
+touch students.conf
+#+END_SRC
+
+That creates the course repo, and sets up the directories and files we need to create student repos. You have to commit and push these changes to 
+
+#+BEGIN_SRC sh
+git add repos students.conf
+git commit -m "add students.conf and repos"
+git push
+#+END_SRC
+
+Now, you can clone the course repo.
+
+#+BEGIN_SRC sh
+git clone org-course@techela.cheme.cmu.edu:course
+#+END_SRC
+
+* Course setup in gitolite-admin
+This section describes the "private" course setup, i.e. the part students do not need to see.
+
+** keydir
+gitolite requirement. Contains userid.pub files.
+
+** conf
+gitolite requirement. Contains gitolite.conf, which sets up repos.
+
+*** conf/repos
+We can actually create repo.conf files in this directory, and they are included in the gitolite.conf automatically. We only make one repo.conf per repository.
+
+** roster.dat
+File containing registered students. This should be the datafile downloaded from fio, although any csv file with the userid in the second column, last name in the third column, and first name in the fourth column will do right now.
+
+This form takes me straight there for 06-625 in the fall. You have to enter your andrewid and password.
+
+#+BEGIN_SRC text :tangle roster.html
+<HTML><HEAD><TITLE>06-625 Roster</TITLE></HEAD>
+<BODY onload="document.forms['foo'].submit();">
+
+<p><form name="foo"
+action="https://www.as.cmu.edu/fio/proc.formproc" 
+method="post" <br />
+<input type="hidden" name="VAR1" value="Fall 2014, 06625 A, CHMCL & REACTV SYSTM"><br />
+<input type="hidden" name="ARGNUM" value=4>
+<input type="hidden" name="FUNCNAME" value="run_datafile">
+<input type="hidden" name="VAR2" value="screen"><br />
+<input type="hidden" name="VAR3" value="FULL"><br />
+<input type="submit" name="submit" value="Submit"><br />
+</form></p>
+
+</HTML>
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(org-babel-tangle)
+(browse-url "roster.html")
+#+END_SRC
+
+When you change the roster, you need to run elisp:ta-update-roster which will automatically update students.conf, and roster.org
+
+** assignments
+Assignments are referred to by label. There should be a directory with the name "label" for each assignment. The contents of this directory will be copied to student repos, so do not put solutions here!
+
+Each assignment should also contain #+POINTS, #+CATEGORY and #+DUEDATE information, which is added to the syllabus when you use elisp:ta-assign-assignment
+
+*** TODO how do you update the due dates? 
+these always end up changing, and we will need to update the syllabus, and possibly student files.
+
+** gradebook
+This directory contains a grading file for each assignment. The files contain links to each file, and a summary of the grades.
+
+** ../course
+This is the student facing part of the course. The syllabus should go in here, and any course notes/materials.
+
+** ../student-work
+Student repos will be cloned into this directory. This is where you will pull their work after it is collected.
+
+** ../class-work
+Class repos will be cloned here. This is where you pull class repos for analysis.
+
+
+* Running your course
+** Create assignments
+Each assignment exists in a directory LABEL in gitolite-admin/assignments. In this directory there should be a LABEL.org file. You put the assignment directions in that file. You can put whatever other files you want in the LABEL directory.
+
+** TODO Assign assignments
+
+** TODO Collect assignments
+
+** TODO Grade assignments
