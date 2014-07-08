@@ -1,4 +1,0 @@
-#!/bin/sh
-
-# custom ssh for running git in batch mode for techela
-exec ssh -o "BatchMode yes" "$@"
