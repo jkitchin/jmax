@@ -28,6 +28,9 @@
 	;'icicles
 	'org 'org-plus-contrib
 	'elpy
+	'f ; file functions https://github.com/rejeep/f.el
+	's ; string functions
+	'dash ; list functions
         'rainbow-mode)
   "Libraries that should be installed by default.")
 
