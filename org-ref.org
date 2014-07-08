@@ -42,7 +42,7 @@ This document is an experiment at creating a literate program to provide similar
 ;; also sets up reftex for org-mode. The links are clickable and do
 ;; things that are useful. You should really read org-ref.org for details.
 ;;
-;; Package-Requires: ((dash "2.6.0"))
+;; Package-Requires: ((dash))
 #+END_SRC
 
 ** requires
