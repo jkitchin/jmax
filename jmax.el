@@ -178,6 +178,15 @@
   (switch-to-buffer current_buffer) ; back to the original buffer
   (insert  (expand-file-name selected_file)))
 
+(defun insert-path (&optional arg)
+  "insert relative path unles prefix is used, then absolute path"
+  (interactive "P")
+  (message "arg = %s" arg)
+  (if (equal arg nil)
+      (insert-relative-path)
+    (insert-absolute-path)))
+
+  
 (defun insert-buffer-filename()
   "Inserts filename associated with current buffer"
   (interactive)
@@ -185,7 +194,7 @@
 
 (global-unset-key "\C-cg")
 (global-set-key "\C-cg" 'get-path)
-(global-set-key "\C-cp" 'insert-relative-path)
+(global-set-key "\C-cp" 'insert-path)
 (global-set-key "\C-cf" 'insert-buffer-filename)
 
 (defun unfill-paragraph ()
@@ -308,12 +317,8 @@
       bibtex-autokey-titlewords-stretch 1
       bibtex-autokey-titleword-length 5)
 
-;; so we can use emacsclient
-(require 'server)
-(or (server-running-p)
-    (server-start))
-
 ;; load course module
+(add-to-list 'load-path (expand-file-name "techela" starter-kit-dir))
 (require 'techela)
 
 
