@@ -95,6 +95,9 @@
 ;; I like to press enter to follow a link. mouse clicks also work.
 (setq org-return-follows-link t)
 
+;; renumber footnotes when new ones are inserted
+(setq org-footnote-auto-adjust t)
+
 ;; default with images open
 (setq org-startup-with-inline-images "inlineimages")
 
