@@ -26,7 +26,7 @@ You can have:
 2. split to show slide and full image
 3. plain text
 
-** Title slide 							      :slide:
+** Title slide							      :slide:
 #+BEGIN_SRC emacs-lisp-slide
 (org-show-animate '("Welcome to the org-show" "John Kitchin"))
 #+END_SRC
@@ -79,7 +79,7 @@ Thanks Sacha!
 
 [[elisp:(load-theme 'anti-zenburn t)]] [[elisp:(disable-theme 'anti-zenburn)]]
 
-** Equations 							      :slide:
+** Equations							      :slide:
 It should be easy to show equations like this  $\int_0^x \frac{1}{2} \sin x dx = 6$.
 
 It is. Maybe you prefer equation environments?
@@ -145,7 +145,7 @@ print 6 + 62
 
 
 They are.
-** We can use many languages 					      :slide:
+** We can use many languages					      :slide:
 (of course, you must have them installed on your computer)
 
 #+BEGIN_SRC emacs-lisp
@@ -194,7 +194,7 @@ We get it.
 #+END_SRC
 
 
-*** Become a graffiti artist 					      :slide:
+*** Become a graffiti artist					      :slide:
 #+BEGIN_SRC emacs-lisp-slide
 (progn
   (switch-to-buffer (get-buffer-create "*artist*"))
@@ -213,7 +213,7 @@ We get it.
   (artist-select-op-line))
 #+END_SRC
 
-** No seriously, we can do real work! 				      :slide:
+** No seriously, we can do real work!				      :slide:
    :PROPERTIES:
    :CUSTOM_ID: sec:data-tab-code
    :END:
@@ -302,7 +302,12 @@ That is the end!
 
 (defvar org-show-mogrify-p (executable-find "mogrify"))
 
+(defvar org-show-tags-column -60 "column position to move tags to in slide mode")
+(defvar org-show-original-tags-column org-tags-column "Save value so we can change back to it")
+
 (when org-show-mogrify-p (require 'eimp))
+
+
 #+END_SRC
 
 ** Make a minor mode and menu
@@ -382,18 +387,26 @@ That is the end!
      ;; view images if there is one. WE only do this this for the first one.
      ((and (goto-char (point-min))
            (re-search-forward "\\[\\[\\(.*\\.\\(jpg\\|gif\\|png\\)\\)" nil t))
-      (let ((temp-png (make-temp-file "eimp" nil ".png")))
+      
+      (unless (file-exists-p "org-show-images")
+	(make-directory "org-show-images"))
+      
+      (let* ((png-file (match-string 1))
+	     (temp-png (expand-file-name (concat "org-show-images/" (secure-hash 'sha1
+					    (with-temp-buffer
+					      (insert-file-contents png-file)
+					      (buffer-string))) ".png"))))
+
         (add-to-list 'org-show-temp-images temp-png)
-	(copy-file (match-string 1) temp-png t)
+	(unless (file-exists-p temp-png)
+	  (copy-file png-file temp-png t))
       
 	(split-window-right)      
       
 	(other-window 1)
 	(find-file temp-png)
-        (when org-show-mogrify-p 
-          (eimp-fit-image-width-to-window nil))
-
-        (save-buffer))
+        (when org-show-mogrify-p
+          (eimp-fit-image-width-to-window nil)))
                   
       (other-window 1) ; back to slide
       (goto-char (point-min))
@@ -473,8 +486,6 @@ On starting, we want to map the slides so we can get slide numbers for navigatio
 (defvar org-show-slide-list '() "List of slide numbers and markers to each slide")
 (defvar org-show-slide-titles '() "List of titles and slide numbers for each slide")
 
-
-
 (defun org-show-initialize ()
   ;; make slide lists for future navigation. rerun this if you change slide order
   (setq  org-show-slide-titles '()
@@ -496,18 +507,20 @@ On starting, we want to map the slides so we can get slide numbers for navigatio
 (defun org-show-start-slideshow ()
   "Start the slide show, at the beginning"
   (interactive)
-  
+    
   (setq org-show-presentation-file (expand-file-name (buffer-name)))
   (beginning-of-buffer)
+  (setq org-tags-column org-show-tags-column)
+  (org-set-tags-command '(4) t)
+
   (org-show-initialize)
   ;; hide slide tags
-  ;(save-excursion
-  ;  (while (re-search-forward ":slide:" nil t)
-  ;    (overlay-put
-  ;     (make-overlay (match-beginning 0)(match-end 0))
-  ;     'invisible 'slide)))
-  ;(add-to-invisibility-spec 'slide)
-
+  (save-excursion
+    (while (re-search-forward ":slide:" nil t)
+      (overlay-put
+       (make-overlay (match-beginning 0)(match-end 0))
+       'invisible 'slide)))
+  (add-to-invisibility-spec 'slide)
   (beginning-of-buffer)
   (delete-other-windows)
   (org-show-mode 1)
@@ -521,7 +534,7 @@ On starting, we want to map the slides so we can get slide numbers for navigatio
 (defun org-show-stop-slideshow ()
   (interactive)
   ;; make slide tag visible again
-  ;(remove-from-invisibility-spec 'slide)
+  (remove-from-invisibility-spec 'slide)
 
   ;; clean up temp images
   (mapcar (lambda (x)
@@ -547,6 +560,9 @@ On starting, we want to map the slides so we can get slide numbers for navigatio
   (setq org-show-current-slide-number 1)
   (set-frame-name (if (buffer-file-name)
                    (abbreviate-file-name (buffer-file-name))))
+  (setq org-tags-column org-show-original-tags-column)
+  (org-set-tags-command '(4) t)
+
   (org-show-mode -1))
 
 (defalias 'stop 'org-show-stop-slideshow)
