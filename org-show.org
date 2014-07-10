@@ -85,7 +85,7 @@ It should be easy to show equations like this  $\int_0^x \frac{1}{2} \sin x dx =
 It is. Maybe you prefer equation environments?
 
 \begin{equation}
-e^x = 5
+e^x = 55
 \end{equation}
 
 Want to see the equation source? [[elisp:(org-ctrl-c-ctrl-c)][click here]]
@@ -297,6 +297,11 @@ That is the end!
 (defvar org-show-slide-tag "slide" "Tag that marks slides.")
 (defvar org-show-slide-tag-regexp (concat ":" (regexp-quote org-show-slide-tag) ":"))
 (defvar org-show-latex-scale 4.0 "scale for latex preview")
+
+(defvar org-show-original-latex-scale
+  (plist-get org-format-latex-options :scale)
+  "Original scale for latex preview, so we can reset it.")
+
 (defvar org-show-text-scale 4 "scale for text in presentation")
 (defvar org-show-current-slide-number 1 "holds current slide number")
 
@@ -535,6 +540,9 @@ On starting, we want to map the slides so we can get slide numbers for navigatio
   (interactive)
   ;; make slide tag visible again
   (remove-from-invisibility-spec 'slide)
+
+  ;; reset latex scale
+  (plist-put org-format-latex-options :scale org-show-original-latex-scale)
 
   ;; clean up temp images
   (mapcar (lambda (x)
