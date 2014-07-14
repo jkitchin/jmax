@@ -1,0 +1,4 @@
+#+TITLE: A python interface to Techela
+#+AUTHOR: John Kitchin
+
+This is a prototype so far. Techela is written in Emacs-lisp and org-mode. Python can automate some aspects of Techela, but not all of them.
