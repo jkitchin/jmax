@@ -85,9 +85,8 @@ The user id_rsa.pub key must be registered in the course.
 
   ;; let user know if an update is needed
   (when (> (tq-get-num-incoming-changes) 0)
-    (message "%s is out of date. Please update" tq-course-name)
-    (easy-menu-add-item techela-menu nil
-			["Update Course needed!" tq-update t])))
+    (message "%s is out of date. Please wait while I update it" course)
+    (tq-update)))
 
 
 (defun tq-get-assignment (label)
@@ -121,6 +120,7 @@ The user id_rsa.pub key must be registered in the course.
 		  label))))
       (techela-mode 1))))
 
+
 (defun  tq-turn-it-in ()
   "Save all buffers.  add files in current git directory, commit them and push."
   (interactive)
@@ -144,9 +144,8 @@ The user id_rsa.pub key must be registered in the course.
 (defun tq-update ()
   "Run git pull.  Refresh file currently visited."
   (interactive)
-  (mygit "git pull")
+  (mygit "git pull origin master")
   (revert-buffer t t)
-  (easy-menu-remove-item techela-menu nil "Update Course needed!")
   (techela-mode 1))
 
 
@@ -267,7 +266,7 @@ Messages\n==========\n")
        (insert data))
      (mygit (format "git add %s" data-file))
      (mygit (format "git commit -m \"%s\"" data-file))
-     (mygit "git push"))))
+     (mygit "git push origin master"))))
 
 
 
