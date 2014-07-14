@@ -121,38 +121,29 @@ DATA should be obtained and modified from `tq-config-read-data'."
 
   ;; how to send mail
   (unless (and (boundp 'send-mail-function) send-mail-function)
-    (let ((data (tq-config-read-data)))
-      (unless (gethash "send-mail-function" data)
-	(puthash "send-mail-function" "smtpmail-send-it" data)
-	(tq-config-write-data data))
-      ;; this variable takes a symbol, so we make one from the string we read.
-      (setq send-mail-function (intern (gethash "send-mail-function" data)))))
-
+    (setq send-mail-function 'smtpmail-send-it))
+  
   ;; the server to send mail from
   (unless (and (boundp 'smtpmail-smtp-server) smtpmail-smtp-server)
-    (let ((data (tq-config-read-data)))
-      (unless (gethash "smtpmail-smtp-server" data)
-	(puthash "smtpmail-smtp-server" "smtp.andrew.cmu.edu" data)
-	(tq-config-write-data data))
-      (setq smtpmail-smtp-server (gethash "smtpmail-smtp-server" data))))
-
+    (setq smtpmail-smtp-server "smtp.andrew.cmu.edu"))
+  
   ;; credentials we use with authentication.
   (unless (and (boundp 'smtpmail-starttls-credentials) smtpmail-starttls-credentials)
-    (let ((data (tq-config-read-data)))
-      (unless (gethash "smtpmail-starttls-credentials" data)
-	(puthash "smtpmail-starttls-credentials"
-		 "((\"smtp.andrew.cmu.edu\" 587 nil nil))" data)
-	(tq-config-write-data data))
-      (setq smtpmail-starttls-credentials
-	    ;; this should be a lisp list. we read it from the string.
-	    (read (gethash "smtpmail-starttls-credentials" data)))))
-    
-  ;; setup git. This probably clobbers existing setting. It would be
-  ;; courteous to only run this if these are empty.
-  (shell-command (format "git config --global user.name \"%s\"" user-full-name))
-  (shell-command (format "git config --global user.email %s" user-mail-address))
+    (setq smtpmail-starttls-credentials '(("smtp.andrew.cmu.edu" 587 nil nil))))
 
-  )
+  ;; service port number
+  (unless (and (boundp 'smtpmail-smtp-service) and smtpmail-smtp-service)
+    (setq smtpmail-smtp-service 587))
+    
+  ;; setup git if it is not. Only set these if they are not already set.
+  (when (string= "" (shell-command-to-string "git config --global user.name"))
+    (shell-command (format "git config --global user.name \"%s\"" user-full-name)))
+
+  (when (string= "" (shell-command-to-string "git config --global user.email"))
+    (shell-command (format "git config --global user.email %s" user-mail-address)))
+
+  (when (string= "" (shell-command-to-string "git config --global push.default"))
+    (shell-command "git config --global push.default matching")))
 
 
 (provide 'techela-setup)
