@@ -786,7 +786,7 @@ a link in the heading."
 	  (clean (string= "" git-status))
 	  (n (tq-get-num-incoming-changes)))
      (if clean
-	 (insert (format "* gitolite-admin is clean (remote changes = %s)" n))
+	 (insert (format "* gitolite-admin is clean (remote changes = %s)\n" n))
 
        ;; Dirty course
        (insert (format "* gitolite-admin is dirty (remote changes = %s)
@@ -812,7 +812,7 @@ git status:
 	  (clean (string= "" git-status))
 	  (n (tq-get-num-incoming-changes)))
      (if clean
-	 (insert (format "* Course is clean (remote changes = %s)" n))
+	 (insert (format "* Course is clean (remote changes = %s)\n" n))
 
        ;; Dirty course
        (insert (format "* Course is dirty (remote changes = %s)
