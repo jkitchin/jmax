@@ -142,14 +142,6 @@ method="post" <br />
 
 When you change the roster, you need to run elisp:ta-update-roster which will automatically update students.conf, and roster.org
 
-** assignments
-Assignments are referred to by label. There should be a directory with the name "label" for each assignment. The contents of this directory will be copied to student repos, so do not put solutions here!
-
-Each assignment should also contain #+POINTS, #+CATEGORY and #+DUEDATE information, which is added to the syllabus when you use elisp:ta-assign-assignment
-
-*** TODO how do you update the due dates? 
-these always end up changing, and we will need to update the syllabus, and possibly student files.
-
 ** gradebook
 This directory contains a grading file for each assignment. The files contain links to each file, and a summary of the grades.
 
@@ -162,6 +154,23 @@ Student repos will be cloned into this directory. This is where you will pull th
 ** ../class-work
 Class repos will be cloned here. This is where you pull class repos for analysis.
 
+** ../assignments
+Assignments are referred to by label. There should be a directory with the name "label" for each assignment. The contents of this directory will be copied to student repos, so do not put solutions here!
+
+Each assignment should also contain #+POINTS, #+CATEGORY and #+DUEDATE information, which is added to the syllabus when you use elisp:ta-assign-assignment
+
+You create a new assignment repo simply by:
+
+#+BEGIN_SRC sh
+git clone org-course@techela.cheme.cmu.edu:a/label
+#+END_SRC
+
+This automatically creates the remote repo and local directory. Then, you add your content to it and push it back. 
+
+*** TODO how do you update the due dates? 
+these always end up changing, and we will need to update the syllabus, and possibly student files.
+
+* 
 
 * Running your course
 ** Create assignments
@@ -172,3 +181,36 @@ Each assignment exists in a directory LABEL in gitolite-admin/assignments. In th
 ** TODO Collect assignments
 
 ** TODO Grade assignments
+
+
+* testing new setup.
+
+#+BEGIN_SRC emacs-lisp
+(tq-config-set-user-course "org-course" "jkitchin" "/home/test")
+(tq-config-set-user-course "625" "jkitchin" "home/625")
+#+END_SRC
+
+#+RESULTS:
+: home/625
+
+#+BEGIN_SRC emacs-lisp
+(tq-config-write-data (tq-config-read-data))
+#+END_SRC
+
+#+RESULTS:
+
+(puthash "test" "test" (gethash "user" (tq-config-read-data)))
+
+#+BEGIN_SRC emacs-lisp
+(tq-config-get-user-courses)
+#+END_SRC
+
+#+RESULTS:
+| 625 | org-course |
+#+BEGIN_SRC emacs-lisp
+(tq-config-get-user-course "org-course")
+#+END_SRC
+
+#+RESULTS:
+: #s(hash-table size 65 test equal rehash-size 1.5 rehash-threshold 0.8 data ("root-dir" "/home/test" "userid" "jkitchin"))
+

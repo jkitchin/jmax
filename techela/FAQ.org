@@ -18,5 +18,93 @@ repo team-project-1
 * Can students turn in a Word document?
 Any kind of file can be turned in. Simply put a copy of the file into the assignment directory andturn it in.  All files in the directory will be turned in.
 
-* Do I have to use org-mode?
-Yes. Some files need to be in org-mode for the framework to work. 
+* Do I have to use Emacs or org-mode?
+Not really. Techela is a git based framework for distributing and collecting course materials. You can use git any way you want. However, you will have to roll your own solutions to use another method, e.g. Python or shell script.
+
+** Create assignment repos
+As an instructor you create an assignment repo like this:
+#+BEGIN_SRC sh
+git clone org-course@techela.cheme.cmu.edu:a/label
+
+cd label
+# Add files
+git add files
+git commit files -m "some message"
+git push -u origin master
+#+END_SRC
+
+
+When it is time to assign the assignment to students, you need to create private repos for each student. While these can be any path you want, I you make them like this. For each student, create a file in the gitolite-admin/conf/student-work/label/userid-label.conf with the following contents.
+
+#+BEGIN_EXAMPLE
+repo student-work/label/userid-label
+    RW = userid
+#+END_EXAMPLE
+
+When you have created all of them, do this in the gitolite-admin directory:
+
+#+BEGIN_SRC sh
+git add conf/student-work
+git commit -m "add new assignment repos"
+git push
+#+END_SRC
+
+This creates bare repos on the server that students can access.
+
+Then, you run this command to give students read access to the assignment repo.
+
+#+BEGIN_SRC sh
+ssh org-course@techela.cheme.cmu.edu perms + READERS @students
+#+END_SRC
+
+Students will run this command to clone the repo to their local machine. They only have read permission on this repo so they need to change the remote they will push to.
+
+#+BEGIN_SRC sh
+git clone org-course@techela.cheme.cmu.edu:a/label
+cd label
+git remote rename origin src
+git remote add origin org-course@techela.cheme.cmu.edu:student-work/label/userid-label
+#+END_SRC
+
+They will do their work in the label directory, and when they are done perform the following commands.
+#+BEGIN_SRC sh
+git add *
+git commit -am "Turning work in"
+git push -u origin master
+#+END_SRC
+
+** Collecting the assignments
+You need to change the conf file for each assignment repo to have the correct permissions, in this case, read-only for the students like this.
+
+#+BEGIN_EXAMPLE
+repo student-work/label/userid-label
+    R = userid
+#+END_EXAMPLE
+
+When you have modified all of them, do this in the gitolite-admin directory:
+
+#+BEGIN_SRC sh
+git add conf/student-work
+git commit -m "add new assignment repos"
+git push
+#+END_SRC
+
+Now, you need to clone/pull each repo to your local machine. The first time you do this, you will have to clone them, e.g.
+
+#+BEGIN_SRC sh
+cd student-work/label/userid-label
+git clone org-course@techela.cheme.cmu.edu:student-work/label/userid-label
+cd user-label
+git tag -a turned-in -m "Work turned in by student" 
+#+END_SRC
+
+You will do your grading, and then run this command to "return" the work.
+
+#+BEGIN_SRC sh
+git tag -a graded -m "graded" 
+git add *
+git commit -am "Finished grading"
+git push --tags -u origin master
+#+END_SRC
+
+Finally, students need to pull their repo to see the grade and feedback. 
