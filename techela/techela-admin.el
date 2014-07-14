@@ -242,62 +242,40 @@ Optional argument RW read-write permission."
      (mygit "git push"))))
 
 
-;; (defun ta-assign-to (label userid)
-;;   "Assign assignment LABEL to USERID."
-;;   (interactive
-;;    (list
-;;     (ido-completing-read "Label: " (ta-get-assigned-assignments) nil t)
-;;     (ido-completing-read "Userid: " (ta-get-userids))))
-;;   ;; first, create the repo and push it.
-;;   (let* ((repo-name (ta-get-repo-name label userid))
-;; 	 (student-dir (file-name-as-directory
-;; 		       (expand-file-name
-;; 			userid
-;; 			ta-course-student-work-dir)))
-;; 	 (student-repo-dir (file-name-as-directory
-;; 			    (expand-file-name
-;; 			     ;; take only the last part of the reponame
-;; 			     (f-filename (ta-get-repo-name label userid))
-;; 			     student-dir)))
-;; 	 (assignment-dir (file-name-as-directory
-;; 			  (expand-file-name
-;; 			   label
-;; 			   ta-course-assignments-dir))))
+(defun ta-assign-to (label userid)
+  "Assign assignment LABEL to USERID.
+This gives the student RW access to a repo they can push to. You
+need to make sure the student is in the roster, and that
+`ta-roster-update' has been run so the student also has R access
+to assignments."
+  (interactive
+   (list
+    (ido-completing-read "Label: " (ta-get-assigned-assignments) nil t)
+    (ido-completing-read "Userid: " (ta-get-userids))))
+  ;; first, create the repo and push it.
+  (let* ((repo-name (ta-get-repo-name label userid)))
+    ;; this pushes so the effect is immediate
+    (ta-create-edit-repo reponame
+			 nil       ;R permission
+			 '(userid)) ;; RW permission
+    ))
 
-;;     ;; this pushes 
-;;     (ta-create-edit-repo reponame
-;; 			 nil       ;R permission
-;; 			 '(userid)) ;; RW permission
-
-;;     ;; remote repo exists now. we need to check if local repo
-;;     ;; exists. We assume if it exists, it has what it needs in it.
-;;     (unless (file-exists-p student-repo-dir)
-;;       (copy-directory assignment-dir student-repo-dir nil t))
-
-;;     ;; insert name into student org-file
-;;     (let ((tbuf (find-file-noselect (expand-file-name
-;; 				     (format "%s.org" label) ;; the org-file
-;; 				     student-repo-dir))))
-;;       (with-current-buffer tbuf
-;; 	(goto-char (point-min))
-;; 	(insert (format "#+USERID: %s\n#+AUTHOR: %s\n#+ASSIGNMENT: %s\n"
-;; 			userid
-;; 			(plist-get (cdr (assoc userid (ta-roster))) :name) label)))
-;;       (set-buffer tbuf)
-;;       (save-buffer)
-;;       (kill-buffer tbuf))
-      
-;;     ;; now make it a git repo and push it remotely
-;;     (with-current-directory
-;;      student-repo-dir
-;;      (mygit "git init")
-;;      (mygit "git add *")
-;;      (mygit "git commit -m \"initial commit\"")
-;;      (mygit (format "git remote add origin \"%s@%s:%s.git\""
-;; 		    ta-course-name ta-course-server
-;; 		    (format "%s-%s-%s" ta-course-name userid label)))
-;;      (mygit "git push -u origin master"))))
-
+(defun ta-create-assignment (label)
+  "Create a new assignment LABEL or open the one with LABEL."
+  (interactive "sLabel: ")
+  (let ((assignment-dir (file-name-as-directory
+			 (expand-file-name
+			  label
+			  ta-course-assignments-dir))))
+    (unless (file-exists-p assignment-dir)
+      ;; no dir found. make one.
+      (with-current-directory
+       ta-course-assignments-dir
+       (mygit (format "git clone %s@%s:a/%s"
+		      ta-course-name ta-course-server label))))
+    (find-file (expand-file-name
+		    (concat label ".org")
+		    assignment-dir))))
 
 (defun ta-create-assignment-repos (label)
   "Create repos for an assignment LABEL.
@@ -876,7 +854,8 @@ git status:
 
 ** Assignments
 
-- [[elisp:ta-create-assignment-repos][Create repos for an assignment]] (students cannot access them until you assign it.)
+- [[elisp:ta-create-assignment][Create or edit an assignment]]
+- [[elisp:ta-create-assignment-repos][Create repos for an assignment]] (no student access until you assign it.)
 - [[elisp:ta-assign-assignment][Assign an assignment]] (give students RW access)
 - [[elisp:ta-collect][Collect an assignment]] (change students to R access. Does not pull)
 - [[elisp:ta-pull-repos][Pull an assignment]] (get local copies of assignment)
