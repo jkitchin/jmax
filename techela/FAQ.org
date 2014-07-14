@@ -19,7 +19,7 @@ repo team-project-1
 Any kind of file can be turned in. Simply put a copy of the file into the assignment directory andturn it in.  All files in the directory will be turned in.
 
 * Do I have to use Emacs or org-mode?
-Not really. Techela is a git based framework for distributing and collecting course materials. You can use git any way you want. However, you will have to roll your own solutions to use another method, e.g. Python or shell script.
+Not really. Techela is a git based framework for distributing and collecting course materials. You can use git any way you want. However, you will have to roll your own solutions to use another method, e.g. Python or shell script. You will also not be able to get the integrated syllabus/grading tools that only exist in org-mode + Emacs.
 
 ** Create assignment repos
 As an instructor you create an assignment repo like this:

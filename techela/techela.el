@@ -19,14 +19,14 @@
   "The git server where techela courses are served.")
 
 (defvar tq-root-directory nil
-  "Location to clone the course and student work to. This location is not a git repository.")
+  "Location to clone the course and student work to.  This location is not a git repository.")
 
 (defvar tq-course-directory nil
-  "Directory where the course content is. This will be a git repository. It is inside `tq-root-directory'")
+  "Directory where the course content is.  This will be a git repository.  It is inside `tq-root-directory'.")
 
-(defvar tq-current-course nil "Store value of current course")
+(defvar tq-current-course nil "Store value of current course.")
 
-(defvar tq-userid nil "Global variable to store a course userid")
+(defvar tq-userid nil "Global variable to store a course userid.")
 
 
 (defun techela (course)
@@ -34,8 +34,7 @@
 
 The course should exist at COURSE@techela.cheme.cmu.edu:course
 
-The user id_rsa.pub key must be registered in the course.
-"
+The user id_rsa.pub key must be registered in the course."
   (interactive
    (list
     (ido-completing-read
@@ -53,7 +52,7 @@ The user id_rsa.pub key must be registered in the course.
   
   ;; load directories to variables if they exist
   (let ((course-hash (tq-config-get-user-course course)))
-    (if course-hash      
+    (if course-hash
 	(setq tq-root-directory (gethash "root-dir" course-hash)
 	      tq-course-directory (expand-file-name "course" tq-root-directory)
 	      tq-userid (gethash "userid" course-hash))
@@ -112,7 +111,7 @@ The user id_rsa.pub key must be registered in the course.
 	 student-repo-dir
 	 (mygit "git remote rename origin src")
 	 (mygit
-	  (format "git remote add origin %s@%s:s/%s/%s-%s"
+	  (format "git remote add origin %s@%s:student-work/%s/%s-%s"
 		  tq-current-course
 		  tq-git-server
 		  label
@@ -122,7 +121,9 @@ The user id_rsa.pub key must be registered in the course.
 
 
 (defun  tq-turn-it-in ()
-  "Save all buffers.  add files in current git directory, commit them and push."
+  "Save all buffers, add files in current git directory, commit them and push.
+
+Check *techela log* for error messages."
   (interactive)
   (save-some-buffers t t) ; make sure all buffers are saved
   (tq-insert-system-info) ; creates a file
@@ -132,11 +133,11 @@ The user id_rsa.pub key must be registered in the course.
     (unless (or (= 0 status)  ; no problem
 		(= 1 status)) ; no change in files
       (switch-to-buffer "*techela log*")
-      (error "Problem committing. Check the logs")))
+      (error "Problem committing.  Check the logs")))
 
   (unless (= 0 (car (mygit "git push origin master")))
     (switch-to-buffer "*techela log*")
-    (error "Problem pushing to server. Check the logs"))
+    (error "Problem pushing to server.  Check the logs"))
   
   (message "Woohoo! You turned it in!"))
 
@@ -212,6 +213,7 @@ repo: %s
 
 
 (defun tq-send-error-report ()
+  "Send an error report to the instructor."
   (interactive)
   (compose-mail-other-frame)
    (message-goto-to)

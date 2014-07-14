@@ -132,7 +132,7 @@ DATA should be obtained and modified from `tq-config-read-data'."
     (setq smtpmail-starttls-credentials '(("smtp.andrew.cmu.edu" 587 nil nil))))
 
   ;; service port number
-  (unless (and (boundp 'smtpmail-smtp-service) and smtpmail-smtp-service)
+  (unless (and (boundp 'smtpmail-smtp-service) smtpmail-smtp-service)
     (setq smtpmail-smtp-service 587))
     
   ;; setup git if it is not. Only set these if they are not already set.

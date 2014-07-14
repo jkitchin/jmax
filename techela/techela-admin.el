@@ -480,7 +480,12 @@ assignment dir.
       ;; push them all at once.
       (with-current-directory
        ta-gitolite-admin-dir
-       (mygit "git push")))))
+       (mygit "git push"))
+
+      ;; Now, give them read access on the assignment
+      (shell-command (format "ssh org-course@techela.cheme.cmu.edu perms a/%s + READERS @students" label))
+
+      )))
 
 
 (defun ta-collect(label)
@@ -545,13 +550,20 @@ permissions of the repo to Read-only first."
 	  (with-current-directory
 	   repo-dir
 	   ;; should perhaps consider making sure we are clean before we pull?
-	   (mygit "git pull"))
+	   (let ((process-environment (cons GIT_SSH process-environment)))
+	     (start-process-shell-command "git-pull"  ; process anme
+					  "*git pull*" ; buffer for output
+					  "git pull")))		 
 	;; repo-dir did not exist. So we clone it.
 	(with-current-directory
 	 (file-name-directory repo-dir-name)
-	 (mygit (format "git clone %s@%s:%s" ta-course-name
-			ta-course-server
-			repo-name)))))))
+	 (let ((process-environment (cons GIT_SSH process-environment)))
+	   (start-process-shell-command "git-clone"
+					"*git clone*"
+					(format "git clone %s@%s:%s"
+						ta-course-name
+						ta-course-server
+						repo-name))))))))
 
 
 (defun ta-return (label)
@@ -576,9 +588,11 @@ This means go into each repo, commit all changes, and push them."
 		       ta-root-dir))))
       (with-current-directory
        repo-dir
-       (mygit "git add *")
-       (mygit "git commit -am \"Returning\"")
-       (mygit "git push")))))
+       (let ((process-environment (cons GIT_SSH process-environment)))
+	 (start-process-shell-command
+	  "ta-return"
+	  "*ta return*"
+	  "git add * && git commit -am \"Returning\" && git push"))))))
 
 
 (defun ta-grade (label)
@@ -725,7 +739,8 @@ a link in the heading."
 
 
 (defun ta-open-assignment (label userid)
-  "Open the USERID assignment LABEL."
+  "Open the USERID assignment LABEL.
+This will be in student-work/label/userid-label/userid-label.org."
   (interactive (list (ido-completing-read "Label: " (ta-get-assigned-assignments))
 		     (ido-completing-read "Userid: " (ta-get-userids))))
   (let* ((repo (ta-get-repo-name label userid))
@@ -741,13 +756,20 @@ a link in the heading."
 	 (mygit "git pull origin master")
 	 (find-file (concat label ".org"))
 	 (grade-mode))
-      ;; else
-      (with-current-directory
-       (file-name-as-directory
-      	(expand-file-name
-      	 userid
-      	 ta-course-student-work))
-       (mygit (format "git clone %s@%s:%s" ta-course-name ta-course-server repo)))
+      ;; else. no dir. make the student dir if needed, and clone the repo
+      (let ((label-dir (expand-file-name
+			  label
+			  ta-course-student-work-dir)))
+	(unless (file-exists-p label-dir)
+	  (make-directory label-dir t))
+	
+	(with-current-directory
+	 label-dir
+	 (mygit (format "git clone %s@%s:%s"
+			ta-course-name
+			ta-course-server
+			repo))))
+      ;; now open it.
       (with-current-directory
        repo-dir
        (find-file (concat label ".org"))
@@ -850,17 +872,18 @@ git status:
 
 - [[elisp:(find-file (expand-file-name \"roster.dat\" ta-gitolite-admin-dir))][Open the roster.dat]]
 - [[elisp:(find-file (expand-file-name \"roster.org\" ta-gitolite-admin-dir))][Open the roster.org]]
+- [[elisp:ta-update-roster][Update the roster]] (do this after you change roster.dat)
 
 ** Assignments
 
-- [[elisp:ta-create-assignment-repos][Create repos for an assignment]]
-- [[elisp:ta-assign-assignment][Assign an assignment]]
-- [[elisp:ta-collect][Collect an assignment]]
-- [[elisp:ta-pull-repos][Pull an assignment]]
-- [[elisp:ta-return][Return an assignment]]
-- [[elisp:ta-grade][Grade an assignment]]
+- [[elisp:ta-create-assignment-repos][Create repos for an assignment]] (students cannot access them until you assign it.)
+- [[elisp:ta-assign-assignment][Assign an assignment]] (give students RW access)
+- [[elisp:ta-collect][Collect an assignment]] (change students to R access. Does not pull)
+- [[elisp:ta-pull-repos][Pull an assignment]] (get local copies of assignment)
+- [[elisp:ta-return][Return an assignment]] (push local copies to server)
+- [[elisp:ta-grade][Grade an assignment]] (create grading list)
 
-- [[elisp:ta-open-assignment][Open student assignment]]
+- [[elisp:ta-open-assignment][Open a student assignment]]
 
 - [[elisp:ta-show-assigned-assignments][Show assigned assignments]]
 
