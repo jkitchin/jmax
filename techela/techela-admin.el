@@ -12,11 +12,15 @@
 (require 'csv)
 (require 'techela-roster)
 (require 'techela-grade)
+(require 'f)
 
 ;;; Code:
 
 (defvar ta-course-server "techela.cheme.cmu.edu")
 (defvar ta-course-name nil "The course currently in action.")
+(defvar ta-root-dir nil "The root directory for course files.")
+
+;; i would like to deprecate this
 (defvar ta-email-host "andrew.cmu.edu" "Hostname to construct email address from for userids with no @ in them.")
 
 (defun techela-admin (course-name)
@@ -29,50 +33,52 @@ to, and that is saved in custom.el."
    (list
     (ido-completing-read
      "Course name: "
-     (if (boundp 'techela-admin-courses) ; this means it is in custom.el
-	 (mapcar (lambda (x) (car x)) techela-admin-courses)
-       '()))))
+     (tq-config-get-admin-courses))))
 
   (setq ta-course-name course-name)
 
-  ;; load directories if they exist. We only need ta-root-dir,
-  ;; everything else is derived.
-  (when (and (boundp 'techela-admin-courses) techela-admin-courses)
-    (let ((vars (cdr (assoc ta-course-name techela-admin-courses))))
-      (if vars
-	  (setq ta-root-dir (nth 0 vars))
-	;; no course found, set these to nil so we have to start over
-	(setq ta-root-dir nil))))
-
-  (unless (and (boundp 'ta-root-dir) ta-root-dir)
+  (let ((course-hash (tq-config-get-admin-course course-name)))
+    (if course-hash      
+	(setq ta-root-dir (gethash "root-dir" course-hash)
+	      ta-userid (gethash "userid" course-hash))
+    ;; else no entry get info and add one.
     (setq ta-root-dir
 	  (file-name-as-directory
-	   (ido-read-directory-name "Enter course admin directory: " nil
-				    (format "~/Desktop/%s" ta-course-name)))))
+	   (ido-read-directory-name "Enter directory to download admin course: " nil
+				    (format "~/Desktop/%s" ta-course-name)))
+	  ta-userid (read-from-minibuffer "Enter admin userid: "))
+    ;; save course for future
+    (tq-config-set-admin-course ta-course-name ta-userid ta-root-dir)))
 
+  (ta-setup-user)
+  
   ;; we should have a ta-root-dir now, so we set all the derived variables
   (setq ta-gitolite-admin-dir (file-name-as-directory
 			       (expand-file-name
 				"gitolite-admin"
 				ta-root-dir))
-	
+
+	;; path to the roster file
 	ta-roster (expand-file-name "roster.dat" ta-gitolite-admin-dir)
-	
+
+	;; local directory where assignment folders are
 	ta-course-assignments-dir (file-name-as-directory
 				  (expand-file-name
 				   "assignments"
-				   ta-gitolite-admin-dir))
-	
+				   ta-root-dir))
+	;; public facing course
 	ta-course-dir (file-name-as-directory
 		       (expand-file-name
 			"course"
 			ta-root-dir))
-	
+
+	;; local place where userid folders can be found
 	ta-course-student-work-dir (file-name-as-directory
 				    (expand-file-name
 				     "student-work"
 				     ta-root-dir))
-	
+
+	;; local place where class exercise folders can be found
 	ta-course-class-work-dir (file-name-as-directory
 				  (expand-file-name
 				   "class-work"
@@ -101,14 +107,6 @@ to, and that is saved in custom.el."
     (with-current-directory
      ta-root-dir
      (mygit (format "git clone %s@%s:course" ta-course-name ta-course-server))))
-
-  ;; update the techela-admin-courses with the new root directory
-  (if (and (boundp 'techela-admin-courses) techela-admin-courses)
-      (add-to-list 'techela-admin-courses (cons ta-course-name (list ta-root-dir)))
-    (setq techela-admin-courses (list (cons ta-course-name (list ta-root-dir)))))
-
-  ;; and save the variable so we can use it next time.
-  (customize-save-variable 'techela-admin-courses techela-admin-courses)
 
   ;; open with the status view
   (ta-status))
@@ -175,46 +173,61 @@ to, and that is saved in custom.el."
 
 ;;; ==========================================================================================
 ;;; REPO creation functions
-  
+
+(defun ta-get-repo-name (label userid)
+  "Return student private reponame on server for assignment LABEL of USERID.
+
+For example: student-work/userid//userid-label."
+  (format "student-work/%s/%s-%s" label userid label))
+
+
 (defun ta-create-edit-repo-conf (reponame &optional R RW RW+)
-  "Create a repo file for REPONAME with permissions.
+  "Create a repo file for REPONAME with permissions. REPONAME may be a path.
 R is a list of users with Read permission
 RW is a list of users with Read/Write permission
 RW+ is a list of users with force permission.
 
-This creates a repo.conf file at conf/repos/repo.conf, then
-commits it.  No push is done to create the repo on the
-server.  This is intentional, as sometimes you may want to create
-several conf files before pushing.
+This creates a repo.conf file in the admin conf directory, then
+commits it.  No push is done to create the repo on the server.
+This is intentional, as sometimes you may want to create several
+conf files before pushing. See `ta-create-edit-repo' which will
+create and push the repo.
 
 An existing conf file is overwritten, which allows you to change
 permissions on an existing repo."
 
   (let ((repo-conf-dir (file-name-as-directory
-			(expand-file-name "conf/repos" ta-gitolite-admin-dir))))
+			(expand-file-name "conf" ta-gitolite-admin-dir))))
     (with-current-directory
      repo-conf-dir
-     ;; write out repo.conf to ta-gitolite-admin-dir/conf/repos/repo.conf
-     (let ((repo-file (expand-file-name (concat reponame ".conf") repo-conf-dir)))
-	   (with-temp-file repo-file
-	     (insert
-	      (concat "repo " reponame "\n"
-		      (when R
-			(format "    R = %s\n" (mapconcat 'identity R " ")))
-		      (when RW
-			(format "    RW = %s\n" (mapconcat 'identity RW " ")))
-		      (when RW+
-			(format "    RW+ = %s\n" (mapconcat 'identity RW+ " ")))
-		      "\n")))
+     (let ((repo-file
+	    (expand-file-name
+	     (concat reponame ".conf")
+	     repo-conf-dir)))
+       ;; make sure we have the folder to put it in. This mirrors what
+       ;; is on gitolite
+       (unless (file-exists-p (file-name-directory repo-file))
+	 (make-directory (file-name-directory repo-file) t))
 
-	   (tq-log "-------------------- ta-create-edit-repo ---------------------\n")
-	   ;; add conf/repos/repo.conf
-	   (mygit (format "git add %s" (file-relative-name repo-file repo-conf-dir)))
-     
-	   (mygit (format "git commit %s -m \"create/edit %s"
-			  (file-relative-name repo-file repo-conf-dir)
-			  reponame))
-	   (tq-log "--------------------------------------------------------------\n")))))
+       (with-temp-file repo-file
+	 (insert
+	  (concat "repo " reponame "\n"
+		  (when R
+		    (format "    R = %s\n" (mapconcat 'identity R " ")))
+		  (when RW
+		    (format "    RW = %s\n" (mapconcat 'identity RW " ")))
+		  (when RW+
+		    (format "    RW+ = %s\n" (mapconcat 'identity RW+ " ")))
+		  "\n")))
+       
+       (tq-log "-------------------- ta-create-edit-repo ---------------------\n")
+
+       (mygit (format "git add %s" (file-relative-name repo-file repo-conf-dir)))
+       
+       (mygit (format "git commit %s -m \"create/edit %s"
+		      (file-relative-name repo-file repo-conf-dir)
+		      reponame))
+       (tq-log "--------------------------------------------------------------\n")))))
 
 
 (defun ta-create-edit-repo (reponame &optional R RW RW+)
@@ -223,181 +236,170 @@ Optional argument R read-only permission.
 Optional argument RW read-write permission."
   (ta-create-edit-repo-conf reponame R RW RW+)
   (let ((repo-conf-dir (file-name-as-directory
-			(expand-file-name "conf/repos" ta-gitolite-admin-dir))))
+			(expand-file-name "conf" ta-gitolite-admin-dir))))
     (with-current-directory
      repo-conf-dir
      (mygit "git push"))))
 
 
-(defun ta-pull ()
-  "Run git pull in the current directory."
-  (interactive)
-  (mygit "git pull"))
+;; (defun ta-assign-to (label userid)
+;;   "Assign assignment LABEL to USERID."
+;;   (interactive
+;;    (list
+;;     (ido-completing-read "Label: " (ta-get-assigned-assignments) nil t)
+;;     (ido-completing-read "Userid: " (ta-get-userids))))
+;;   ;; first, create the repo and push it.
+;;   (let* ((repo-name (ta-get-repo-name label userid))
+;; 	 (student-dir (file-name-as-directory
+;; 		       (expand-file-name
+;; 			userid
+;; 			ta-course-student-work-dir)))
+;; 	 (student-repo-dir (file-name-as-directory
+;; 			    (expand-file-name
+;; 			     ;; take only the last part of the reponame
+;; 			     (f-filename (ta-get-repo-name label userid))
+;; 			     student-dir)))
+;; 	 (assignment-dir (file-name-as-directory
+;; 			  (expand-file-name
+;; 			   label
+;; 			   ta-course-assignments-dir))))
 
+;;     ;; this pushes 
+;;     (ta-create-edit-repo reponame
+;; 			 nil       ;R permission
+;; 			 '(userid)) ;; RW permission
 
-(defun ta-return ()
-  "Commit directory, and push it."
-  (interactive)
-  (mygit "git add *")
-  (mygit "git commit -m \"returning work\"")
-  (mygit "git push"))
+;;     ;; remote repo exists now. we need to check if local repo
+;;     ;; exists. We assume if it exists, it has what it needs in it.
+;;     (unless (file-exists-p student-repo-dir)
+;;       (copy-directory assignment-dir student-repo-dir nil t))
 
-
-(defun ta-assign-to (label userid)
-  "Assign assignment LABEL to USERID."
-  (interactive
-   (list
-    (ido-completing-read "Label: " (ta-get-assigned-assignments) nil t)
-    (ido-completing-read "Userid: " (ta-get-userids))))
-  ;; first, create the repo and push it.
-  (let* ((repo-name (concat ta-course-name "-" userid "-" label))
-	 (conf-repo-dir (file-name-as-directory
-			 (expand-file-name
-			  "conf/repos"
-			  ta-gitolite-admin-dir)))
-	 (student-dir (file-name-as-directory
-		       (expand-file-name
-			userid
-			ta-course-student-work-dir)))
-	 (student-repo-dir (file-name-as-directory
-			    (expand-file-name
-			     repo-name
-			     student-dir)))
-	 (assignment-dir (file-name-as-directory
-			  (expand-file-name
-			   label
-			   ta-course-assignments-dir))))
-
-    ;; this pushes 
-    (ta-create-edit-repo reponame nil '(userid))
-
-    ;; remote repo exists now. we need to check if local repo
-    ;; exists. We assume if it exists, it has what it needs in it.
-    (unless (file-exists-p student-repo-dir)
-      (copy-directory assignment-dir student-repo-dir nil t))
-
-    ;; insert name into student org-file
-    (let ((tbuf (find-file-noselect (expand-file-name
-				     (format "%s.org" label) ;; the org-file
-				     student-repo-dir))))
-      (with-current-buffer tbuf
-	(goto-char (point-min))
-	(insert (format "#+USERID: %s\n#+AUTHOR: %s\n#+ASSIGNMENT: %s\n"
-			userid
-			(plist-get (cdr (assoc userid (ta-roster))) :name) label)))
-      (set-buffer tbuf)
-      (save-buffer)
-      (kill-buffer tbuf))
+;;     ;; insert name into student org-file
+;;     (let ((tbuf (find-file-noselect (expand-file-name
+;; 				     (format "%s.org" label) ;; the org-file
+;; 				     student-repo-dir))))
+;;       (with-current-buffer tbuf
+;; 	(goto-char (point-min))
+;; 	(insert (format "#+USERID: %s\n#+AUTHOR: %s\n#+ASSIGNMENT: %s\n"
+;; 			userid
+;; 			(plist-get (cdr (assoc userid (ta-roster))) :name) label)))
+;;       (set-buffer tbuf)
+;;       (save-buffer)
+;;       (kill-buffer tbuf))
       
-    ;; now make it a git repo and push it remotely
-    (with-current-directory
-     student-repo-dir
-     (mygit "git init")
-     (mygit "git add *")
-     (mygit "git commit -m \"initial commit\"")
-     (mygit (format "git remote add origin \"%s@%s:%s.git\""
-		    ta-course-name ta-course-server
-		    (format "%s-%s-%s" ta-course-name userid label)))
-     (mygit "git push -u origin master"))))
+;;     ;; now make it a git repo and push it remotely
+;;     (with-current-directory
+;;      student-repo-dir
+;;      (mygit "git init")
+;;      (mygit "git add *")
+;;      (mygit "git commit -m \"initial commit\"")
+;;      (mygit (format "git remote add origin \"%s@%s:%s.git\""
+;; 		    ta-course-name ta-course-server
+;; 		    (format "%s-%s-%s" ta-course-name userid label)))
+;;      (mygit "git push -u origin master"))))
 
 
 (defun ta-create-assignment-repos (label)
-  "Create an assignment LABEL.
+  "Create repos for an assignment LABEL.
 
 1. This will prompt you for a LABEL, which is a directory in the
 assignment dir.
 
-2. Create repo confs for all students in the course, with
+2. Create empty repo confs for all students in the course, with
 instructor only access, and push that to create the repos on the
-server. Students cannot access these repos yet.
+server. Students cannot access these repos yet. That is where
+they will push their work.
 
-3. Create the local repos by copying the assignment dir to the
-student dir, making a local git repo.
-
-4. push the local repos to the server.
+We do not clone these yet, because they are empty.
 
 You must \"assign\" the assignment in another step, which
-involves giving the students read/write permissions.
-
-This step is slow right now, so you would normally do this in
-advance of assigning, which is comparatively fast."
+involves giving the students read/write permissions. See
+`ta-assign-assignment'."
   (interactive (list
 		(ido-completing-read
 		 "Label: "
-		 (with-current-directory
-		  ta-course-assignments-dir
-		  (remove-if-not
-		   'file-directory-p
-		   ;; list directories, except for . and ..
-		   (directory-files ta-course-assignments-dir nil "[^.{1,2}]")))
+		 (ta-get-possible-assignments)
 		 nil ; predicate
 		 t ; require match
 		 )))
 
   (let* ((userids (ta-get-userids))
-	 (repos (mapcar (lambda (userid) (format "%s-%s-%s" ta-course-name userid label)) userids)))
+	 (repos (mapcar
+		 (lambda (userid)
+		   (ta-get-repo-name label userid))
+		 userids)))
 
     ;; create all the conf files
-    (mapcar (lambda (reponame) (ta-create-edit-repo-conf reponame nil '("@instructors"))) repos)
+    (mapcar
+     (lambda (reponame) (ta-create-edit-repo-conf reponame nil '("@instructors")))
+     repos)
 
     ;; push them all at once.
     (with-current-directory
      ta-gitolite-admin-dir
-     (mygit "git push"))
+     (mygit "git push"))))
 
-    ;; Now we want to create the local directories
-    ;; the assignment is in ta-course-assignments-dir/label
-    ;; we want to copy it to ta-course-student-work-dir/userid/label
+;; I have commented out this code rather than delete it right now. I realized I cannot insert user specific data this way. that is probably ok.
+;;     ;; Now we want to create the local directories
+;;     ;; the assignment is in ta-course-assignments-dir/label
+;;     ;; we want to copy it to ta-course-student-work-dir/userid/label
 
-    (with-current-directory
-     ta-course-student-work-dir
-     (message "working in %s" default-directory)
-     ;; make sure each directory exists.
-     (mapcar (lambda (userid)
-	       (let ((assignment-source (expand-file-name label ta-course-assignments-dir))
-		     (assignment-dest (expand-file-name
-				       (concat ta-course-name "-" userid "-" label)
-				       (expand-file-name userid ta-course-student-work-dir))))
-		 (unless (file-exists-p assignment-dest)
-		   (copy-directory assignment-source assignment-dest nil t)
+;;     (with-current-directory
+;;      ta-course-student-work-dir
 
-		   ;; Now we really should update the assignment-file. Let us get the details from the file
-		   (let (POINTS CATEGORY DUEDATE)
-		     (with-current-buffer (find-file-noselect (expand-file-name
-							       (format "%s.org" label) ;; the org-file
-							       (expand-file-name label ta-course-assignments-dir)))
-		       (let ((info (org-element-map
-				       (org-element-parse-buffer 'element) 'keyword
-				     (lambda (keyword) (cons (org-element-property :key keyword)
-							     (org-element-property :value keyword))))))
-			 (setq POINTS (cdr (assoc "POINTS" info))
-			       CATEGORY (cdr (assoc "CATEGORY" info))
-			       DUEDATE (cdr (assoc "DUEDATE" info)))))
+;;      ;; make sure each directory exists.
+;;      (mapcar (lambda (userid)
+;; 	       (let ((assignment-source (expand-file-name label ta-course-assignments-dir))
+;; 		     (assignment-dest (expand-file-name
+;; 				       (f-filename (ta-get-repo-name label userid))
+;; 				       (expand-file-name userid ta-course-student-work-dir))))
+;; 		 (unless (file-exists-p assignment-dest)
+;; 		   (copy-directory assignment-source assignment-dest nil t)
 
-		     ;; insert name into document
-		     (let ((tbuf (find-file-noselect (expand-file-name
-							       (format "%s.org" label) ;; the org-file
-							       assignment-dest))))
-		       (with-current-buffer tbuf
-			 (goto-char (point-min))
-			 (insert (format "#+USERID: %s\n#+AUTHOR: %s\n#+ASSIGNMENT: %s\n"
-					 userid
-					 (plist-get (cdr (assoc userid (ta-roster))) :name) label)))
-		       (set-buffer tbuf)
-		       (save-buffer)
-		       (kill-buffer tbuf)))
+;; 		   ;; Now we update the assignment-file. Let us get
+;; 		   ;; the details from the file
+;; 		   (let (POINTS CATEGORY DUEDATE RUBRIC)
+;; 		     (with-current-buffer
+;; 			 (find-file-noselect
+;; 			  (expand-file-name
+;; 			   (format "%s.org" label) ;; the org-file
+;; 			   (expand-file-name label ta-course-assignments-dir)))
+		       
+;; 		       (setq POINTS (gb-get-filetag "POINTS")
+;; 			     CATEGORY (gb-get-filetag "CATEGORY")
+;; 			     DUEDATE (gb-get-filetag "DUEDATE")
+;; 			     RUBRIC (gb-get-filetag "RUBRIC"))
+;; 		       (unless (and POINTS CATEGORY DUEDATE RUBRIC)
+;; 			 (error "You need to define points, category, duedate and rubric")))
+		     
+;; 		     ;; insert data into document
+;; 		     (let ((tbuf (find-file-noselect (expand-file-name
+;; 						      (format "%s.org" label) ;; the org-file
+;; 						      assignment-dest))))
+;; 		       (with-current-buffer tbuf
+;; 			 (goto-char (point-min))
+;; 			 (insert (format "#+USERID: %s
+;; #+AUTHOR: %s
+;; #+ASSIGNMENT: %s
+;; #+RUBRIC: %s\n"
+;; 					 userid
+;; 					 (plist-get (cdr (assoc userid (ta-roster))) :name)
+;; 					 label)))
+;; 		       (set-buffer tbuf)
+;; 		       (save-buffer)
+;; 		       (kill-buffer tbuf)))
     
-		   ;; now make it a git repo and push it remotely
-		   (with-current-directory
-		    (file-name-as-directory assignment-dest)
-		    (mygit "git init")
-		    (mygit "git add *")
-		    (mygit "git commit -m \"initial commit\"")
-		    (mygit (format "git remote add origin \"%s@%s:%s.git\""
-				   ta-course-name ta-course-server
-				   (format "%s-%s-%s" ta-course-name userid label)))
-		    (mygit "git push -u origin master")))))
-	     userids))))
+;; 		   ;; now make it a git repo and push it remotely
+;; 		   (with-current-directory
+;; 		    (file-name-as-directory assignment-dest)
+;; 		    (mygit "git init")
+;; 		    (mygit "git add *")
+;; 		    (mygit "git commit -m \"initial commit\"")
+;; 		    (mygit (format "git remote add origin \"%s@%s:%s.git\""
+;; 				   ta-course-name ta-course-server
+;; 				   (format "%s-%s-%s" ta-course-name userid label)))
+;; 		    (mygit "git push -u origin master")))))
+;; 	     userids))))
 
 
 (defun ta-assign-assignment (label)
@@ -406,7 +408,9 @@ advance of assigning, which is comparatively fast."
 1. This will prompt you for a LABEL, which is a directory in the
 assignment dir.
 
-2. Set repos to RW for students"
+2. Set repos to RW for students.
+
+3. Update the syllabus with the assignment."
   (interactive (list
 		(ido-completing-read
 		 "Label: "		 
@@ -415,68 +419,68 @@ assignment dir.
 		 t ; require match
 		 )))
 
-
-  ;; update reponames
-  (mapcar
-   (lambda (userid)
-     (ta-create-edit-repo-conf
-      (format "%s-%s-%s" ta-course-name userid label) ;; the reponame
-      nil           ;; R
-      `(,userid)))  ;; RW
-     (ta-get-userids))
-
-  ;; push them all at once.
-  (with-current-directory
-   ta-gitolite-admin-dir
-   (mygit "git push"))
-
-  ;; Now we really should update the syllabus. Let us get the details from the file
-  (let (POINTS CATEGORY DUEDATE)
+  ;; First we update the syllabus. Let us get the details from the assignment file
+  (let (POINTS CATEGORY DUEDATE RUBRIC)
     (with-current-buffer (find-file-noselect
 			  (expand-file-name
 			   (format "%s.org" label) ;; the org-file
 			   (expand-file-name label ta-course-assignments-dir)))
-      (let ((info (org-element-map
-		      (org-element-parse-buffer 'element) 'keyword
-		    (lambda (keyword) (cons (org-element-property :key keyword)
-					    (org-element-property :value keyword))))))
-	(setq POINTS (cdr (assoc "POINTS" info))
-	      CATEGORY (cdr (assoc "CATEGORY" info))
-	      DUEDATE (cdr (assoc "DUEDATE" info)))))
+ 
+      (setq POINTS (gb-get-filetag "POINTS")
+	    CATEGORY (gb-get-filetag "CATEGORY")
+	    RUBRIC (gb-get-filetag "RUBRIC")	      
+	    DUEDATE (gb-get-filetag "DUEDATE"))
+    
+      (unless (and POINTS CATEGORY RUBRIC DUEDATE)
+	(error "You must define the points, category, duedate and rubric in the assignment file"))
 
-    ;; Get syllabus
-    (with-current-buffer (find-file-noselect
-			  (expand-file-name "syllabus.org"
-					    ta-course-dir))
-      (save-restriction
-	(widen)
-	(beginning-of-buffer)
-	(re-search-forward "* Assignments")
-	(org-narrow-to-subtree)
+      ;; Get syllabus
+      (with-current-buffer (find-file-noselect
+			    (expand-file-name "syllabus.org"
+					      ta-course-dir))
+	(save-restriction
+	  (widen)
+	  (beginning-of-buffer)
+	  (org-open-link-from-string "[[#assignments]]")
+	  (org-narrow-to-subtree)
+	  ;; we add an assignment headline, as long as here is not one already
+	  (let ((entries
+		 (org-map-entries
+		  (lambda ()
+		    (nth 4 (org-heading-components))))))
+	    (unless (-contains? entries (format "assignment:%s" label))
+	      ;; add new entry
+	      (goto-char (point-max))
+	      (insert "\n** TODO assignment:" label)
+	      (org-set-tags-to ":assignment:")
+	      (goto-char (point-max))
+	      (org-entry-put (point) "CATEGORY" CATEGORY)
+	      (org-entry-put (point) "POINTS" POINTS)
+	      (org-entry-put (point) "LABEL" label)
+	      
+	      (org-entry-put (point) "RUBRIC" RUBRIC)
+	      (org-deadline nil DUEDATE)
+	      (save-buffer)))))
+      ;; Finally, we need to commit the syllabus change, and push it.
+      (with-current-directory
+       ta-course-dir
+       (mygit (format "git commit syllabus.org -m \"added assignment %s" label))
+       (mygit "git push"))
 
-	(let ((entries
-	       (org-map-entries
-		(lambda ()
-		  (nth 4 (org-heading-components))))))
-	  (unless (-contains? entries (format "assignment:%s" label))
-	    ;; add new entry
-	    (goto-char (point-max))
-	    (insert "\n** TODO assignment:" label)
-	    (org-set-tags-to ":assignment:")
-	    (goto-char (point-max))
-	    (org-entry-put (point) "CATEGORY" CATEGORY)
-	    (goto-char (point-max))
-	    (org-entry-put (point) "POINTS" POINTS)
-	    (goto-char (point-max))
-	    (org-deadline nil DUEDATE)
-	    (save-buffer)))))
-    ;; Finally, we need to commit the syllabus change, and push it.
-    (with-current-directory
-     ta-course-dir
-     (mygit (format "git commit syllabus.org -m \"added assignment %s" label))
-     (mygit "git push"))
-			    
-    ))
+    
+      ;; update repo permissions
+      (mapcar
+       (lambda (userid)
+	 (ta-create-edit-repo-conf
+	  (ta-get-repo-name label userid)
+	  nil           ;; R
+	  (list userid)))  ;; RW
+       (ta-get-userids))
+
+      ;; push them all at once.
+      (with-current-directory
+       ta-gitolite-admin-dir
+       (mygit "git push")))))
 
 
 (defun ta-collect(label)
@@ -487,7 +491,7 @@ assignments dir.
 2. Set student permission to R in each repo.conf.
 3. Push the new conf files to the server.
 
-This does not pull the repos.
+This does not pull the repos. See `ta-pull-repos'.
 "
   (interactive (list
 		(ido-completing-read
@@ -496,15 +500,12 @@ This does not pull the repos.
 		 nil ; predicate
 		 t ; require match
 		 )))
-  ;; TODO use dolist instead of side-effect in mapcar
-  ;; update reponames
-  (mapcar
-   (lambda (userid)
-     (ta-create-edit-repo-conf
-      (format "%s-%s-%s" ta-course-name userid label) ;; the reponame
+
+  (dolist (userid (ta-get-userids))
+    (ta-create-edit-repo-conf
+      (ta-get-repo-name label userid)
       (list userid) ;; R
-      nil)) ;; RW
-     (ta-get-userids))
+      nil))         ;; RW
 
   ;; push them all at once.
   (with-current-directory
@@ -514,8 +515,9 @@ This does not pull the repos.
 
 (defun ta-pull-repos (label)
   "Pull the assignment LABEL repo for each student.  This is not
-a fast operation because it requires n pulls. It assumes you have
-run `ta-collect'."
+a fast operation because it requires a pull for every
+student. You may want to run `ta-collect' to change the
+permissions of the repo to Read-only first."
   (interactive (list
 		(ido-completing-read
 		 "Label: "
@@ -523,61 +525,33 @@ run `ta-collect'."
 		 nil ; predicate
 		 t ; require match
 		 )))
-  (dolist (userid (ta-get-userids) nil)
-    (let* ((repo-name (concat ta-course-name "-" userid "-" label))
-	   (student-dir (file-name-as-directory
-			 (expand-file-name
-			  userid
-			  ta-course-student-work-dir)))
+  (dolist (userid (ta-get-userids))
+    (let* ((repo-name (ta-get-repo-name label userid))
+	   (repo-dir-name (expand-file-name
+		       repo-name
+		       ta-root-dir))
 	   (repo-dir (file-name-as-directory
 		      (expand-file-name
 		       repo-name
-		       student-dir))))
+		       ta-root-dir))))
+
+      ;; make sure we have the root dir to work in up to the repo, but
+      ;; not including. Later we clone it if it does not exist.
+      (unless (file-exists-p repo-dir-name)
+	(make-directory  (file-name-directory repo-dir-name) t))
+      
       (if (file-exists-p repo-dir)
+	  ;; we have a copy fo the work so we pull it.
 	  (with-current-directory
 	   repo-dir
 	   ;; should perhaps consider making sure we are clean before we pull?
 	   (mygit "git pull"))
 	;; repo-dir did not exist. So we clone it.
 	(with-current-directory
-	 student-dir
+	 (file-name-directory repo-dir-name)
 	 (mygit (format "git clone %s@%s:%s" ta-course-name
 			ta-course-server
-			reponame)))))))
-
-
-(defun ta-update-all-student-work ()
-  "Update all student work.
-
-We do not check if our local copy is up to date first.  we probably should."
-  (interactive)
-  (let ((userids (ta-get-userids))
-	(assigned-assignments (ta-get-assigned-assignments))
-	(student-assignment-dir)
-	(student-assignment)
-	(student-dir)
-	(value))
-    (dolist (userid userids value)
-      (dolist (assignment assigned-assignments nil)
-	(setq student-dir (expand-file-name
-			   userid
-			   ta-student-work-dir))
-	(setq student-assignment (format "%s-%s-%s" ta-course-name userid assignment))
-	(setq student-assignment-dir (file-name-as-directory
-				       student-assignment
-				       student-dir))
-
-	;; check if the directory exists
-	(if (file-exists-p student-assignment-dir)
-	    ;; we have a directory. We should go in and pull
-	    (with-current-directory
-	     student-assignment-dir
-	     (mygit "git pull"))
-	  ;; We did not find the directory. We should clone it.
-	  (with-current-directory
-	   student-dir
-	   (mygit (format "git clone %s@%s:%s"
-			  ta-course-name ta-course-server student-assignment))))))))
+			repo-name)))))))
 
 
 (defun ta-return (label)
@@ -592,15 +566,14 @@ This means go into each repo, commit all changes, and push them."
 		 t ; require match
 		 )))
   (dolist (userid (ta-get-userids))
-    (let* ((repo-name (concat ta-course-name "-" userid "-" label))
-	   (student-dir (file-name-as-directory
-			 (expand-file-name
-			  userid
-			  ta-course-student-work-dir)))
+    (let* ((repo-name (ta-get-repo-name label userid))
+	   (repo-dir-name (expand-file-name
+		       repo-name
+		       ta-root-dir))
 	   (repo-dir (file-name-as-directory
 		      (expand-file-name
 		       repo-name
-		       student-dir))))
+		       ta-root-dir))))
       (with-current-directory
        repo-dir
        (mygit "git add *")
@@ -608,9 +581,11 @@ This means go into each repo, commit all changes, and push them."
        (mygit "git push")))))
 
 
-
 (defun ta-grade (label)
-  "Collect and pull repos for assignment LABEL. Open the grading org-file"
+  "Collect and pull repos for assignment LABEL. Open the grading org-file.
+
+This is not fast. 
+"
   (interactive (list
 		(ido-completing-read
 		 "Label: "
@@ -621,13 +596,14 @@ This means go into each repo, commit all changes, and push them."
 
   ;; set permissions to R for students
   (ta-collect label)
-
+  (message "%s has been collected" label)
+  
   ;; now pull them
   (ta-pull-repos label)
-
+  (message "%s has been pulled" label)
   ;; Now, make org-file
   (let ((grading-file (expand-file-name
-		       (format "gradebook/%s.org" label)
+		       (format "gradebook/grading-%s.org" label)
 		       ta-gitolite-admin-dir)))
     (if (file-exists-p grading-file)
 	(find-file grading-file)
@@ -638,23 +614,15 @@ This means go into each repo, commit all changes, and push them."
 #+DATE: " (format-time-string "[%Y-%m-%d %a]" (current-time)) "
 
 * Grading for " label " [/]\n")
-      (dolist (userid (ta-get-userids))
-	(let* ((repo-name (format "%s-%s-%s" ta-course-name
-				  userid
-				  label))
-	       (student-dir (file-name-as-directory
-			     (expand-file-name
-			      userid
-			      ta-course-student-work-dir)))
-	       
+      (dolist (userid (sort (ta-get-userids) 'string-lessp))
+	(let* ((repo-name (ta-get-repo-name label userid))
 	       (repo-dir (file-name-as-directory
 			  (expand-file-name
 			   repo-name
-			   student-dir)))
+			   ta-root-dir)))
 	       (student-org-file (expand-file-name
 			  (concat label ".org")
 			  repo-dir)))
-	  
 	   (if (file-exists-p student-org-file)
 	       (insert (format "** TODO [[%s][%s]]\n"
 			       (file-relative-name
@@ -674,14 +642,51 @@ This means go into each repo, commit all changes, and push them."
 2. [[elisp:(ta-return \"%s\")][Return the assignments]]
 " label)
 		   (format "
-3. [[elisp:(progn (save-buffer) (mygit \"git add %s\") (mygit \"git commit %s -m \\\"save and commit\\\") (mygit \"git push\"))][Save and push this file]]" grading-file grading-file))
+3. [[elisp:ta-save-commit-and-push][Save and push this file]]" grading-file grading-file))
 	 )))
+
+
+(defun ta-update-all-student-work ()
+  "Loop through all assignment repos and pull/clone them locally.
+
+We do not check if our local copy is up to date first.  we probably should."
+  (interactive)
+  (let ((userids (ta-get-userids))
+	(assigned-assignments (ta-get-assigned-assignments))
+    (dolist (userid userids)
+      (dolist (label assigned-assignments nil)
+	(ta-pull-repos label))))))
+
+
+;; (defun ta-save-commit-and-push ()
+;;   "Save current buffer. Commit changes and push it."
+;;   (interactive)
+;;   (save-buffer)
+;;   (mygit (format "git add %s" (buffer-file-name)))
+;;   (mygit (format "git commit %s -m\"saving grade file\"" (buffer-file-name)))
+;;   (mygit "git push"))
+
 
 (defun ta-summarize (label)
   "Insert a summary of grades for assignment LABEL"
-  ;; TODO
-  )
+  (forward-line 2)
+  (insert "| userid | grade |\n|-\n")
+  (dolist (userid (sort (ta-get-userids) 'string-lessp))
+    (let* ((repo (f-filename (ta-get-repo-name label userid)))	  
+	   (repo-dir (file-name-as-directory
+			 (expand-file-name
+			  repo
+			  ta-root-dir)))
+	   (org-file (expand-file-name
+		      (concat label ".org") repo-dir))
+	   (grade))
 
+      (setq grade (gb-get-grade org-file))
+      (insert (format "| %15s | %s |\n" userid grade))))
+  (insert "\n\n")
+  ;; realign table
+  (previous-line 3)
+  (org-ctrl-c-ctrl-c))
 
 
 (defun ta-get-categories ()
@@ -689,7 +694,7 @@ This means go into each repo, commit all changes, and push them."
   (let ((table (with-current-buffer
 		   (find-file-noselect (expand-file-name "syllabus.org" ta-course-dir))
 		 (beginning-of-buffer)
-		 (re-search-forward "#\\+tblname: categories")
+		 (re-search-forward "#\\+tblname:\\s-*categories")
 		 (forward-line)
 		 (org-table-to-lisp))))
     (mapcar (lambda (x) (car x)) (cddr table))))
@@ -713,29 +718,40 @@ a link in the heading."
   (with-temp-buffer
     (insert-file-contents (expand-file-name "syllabus.org" ta-course-dir))
     (org-mode)
-    (mapcar (lambda (entry)
-	      (string-match "assignment:\\(.*\\)" entry)
-	      (match-string 1 entry))
-	    (org-map-entries
-	     (lambda ()
-	       (nth 4 (org-heading-components)))
-	     "assignment"))))
+    (org-map-entries
+     (lambda ()
+       (org-entry-get (point) "LABEL"))
+     "assignment")))
 
 
-(defun ta-open-assignment (userid label)
+(defun ta-open-assignment (label userid)
   "Open the USERID assignment LABEL."
-  (interactive (list (ido-completing-read "Userid: " (ta-get-userids))
-		     (ido-completing-read "Label: " (ta-get-assigned-assignments))))
-  (with-current-directory
-   (expand-file-name
-    (concat ta-course-name "-" userid "-" label)
-    (expand-file-name
-     userid
-     ta-course-student-work-dir))
-   ;; initially there may not be tracking information, so we are specific in the pull
-   (mygit "git pull origin master")
-   (find-file (concat label ".org"))
-   (grade-mode)))
+  (interactive (list (ido-completing-read "Label: " (ta-get-assigned-assignments))
+		     (ido-completing-read "Userid: " (ta-get-userids))))
+  (let* ((repo (ta-get-repo-name label userid))
+	 (repo-dir (file-name-as-directory
+			(expand-file-name
+			 repo
+			 ta-root-dir))))
+    (message "looking for %s %s"  repo repo-dir)
+    (if (file-exists-p repo-dir)	
+	(with-current-directory
+	 repo-dir
+	 ;; initially there may not be tracking information, so we are specific in the pull
+	 (mygit "git pull origin master")
+	 (find-file (concat label ".org"))
+	 (grade-mode))
+      ;; else
+      (with-current-directory
+       (file-name-as-directory
+      	(expand-file-name
+      	 userid
+      	 ta-course-student-work))
+       (mygit (format "git clone %s@%s:%s" ta-course-name ta-course-server repo)))
+      (with-current-directory
+       repo-dir
+       (find-file (concat label ".org"))
+       (grade-mode)))))
 
 
 (defun ta-show-assigned-assignments ()
@@ -745,9 +761,9 @@ a link in the heading."
  (erase-buffer)
  (mapcar (lambda (label)
 	   (let* ((label-org (concat label ".org"))
-		 (label-file (expand-file-name
-			      label-org
-			      (expand-file-name label ta-course-assignments-dir))))
+		  (label-file (expand-file-name
+			       label-org
+			       (expand-file-name label ta-course-assignments-dir))))
 	     
 	     (insert (format "- [[file:%s][%s]]\n" label-file label ))))
 	 (ta-get-assigned-assignments))
@@ -777,7 +793,7 @@ a link in the heading."
   :PROPERTIES:
   :VISIBILITY: folded
   :END:
-
+git status:
 %s" n git-status))
        (insert "
 
@@ -804,7 +820,7 @@ a link in the heading."
   :PROPERTIES:
   :VISIBILITY: folded
   :END:
-
+git status:
 %s" n git-status))
        
        (insert "
@@ -817,10 +833,6 @@ a link in the heading."
 #+END_SRC
 
 "))))
-
-  (insert "* TODO Student repos
-- write a function to check the repos?
-")
 
     (insert "
 * Menu of options
@@ -846,6 +858,7 @@ a link in the heading."
 - [[elisp:ta-collect][Collect an assignment]]
 - [[elisp:ta-pull-repos][Pull an assignment]]
 - [[elisp:ta-return][Return an assignment]]
+- [[elisp:ta-grade][Grade an assignment]]
 
 - [[elisp:ta-open-assignment][Open student assignment]]
 
@@ -853,10 +866,12 @@ a link in the heading."
 
 - [[elisp:(find-file ta-course-assignments-dir)][Open the assignments directory]]
 - [[elisp:(find-file ta-course-student-work-dir)][Open student work directory]]
+- [[elisp:ta-pull-repos][Update student repos]] (pulls them all locally.)
 
 ** TODO Reports
 Stay tuned for this.
 ")
+    (goto-char (point-min))
     (org-mode))
 
   

@@ -9,6 +9,7 @@
 
 ;;; Code:
 
+
 (defun ta-roster ()
   "Return a data structure of userids and names.
 
@@ -30,20 +31,37 @@ Use it like this:
 	      contents))))
 
 
-(defun ta-hav-user-pubkey-p (userid)
+(defun ta-have-user-pubkey-p (userid)
   "Return whether we have the ssh.pub key for USERID."
   (interactive
    (list
     (ido-completing-read "Userid: " (ta-get-userids) nil t)))
 
-  (with-current-dir
+  (with-current-directory
    (expand-file-name
     "keydir"
     ta-gitolite-admin-dir)
    (file-exists-p (format "%s.pub" userid))))
 
 
+(defun ta-check-pub-keys ()
+  "Generate a buffer showing which students we are missing ssh.pub keys."
+  (interactive)
+  (switch-to-buffer "*ta pub keys*")
+  (erase-buffer)
+  (insert "#+TITLE: Check if we have ssh.pub keys for users\n\n")
+  (dolist (userid (sort (ta-get-userids) 'string-lessp))
+    (unless (ta-have-user-pubkey-p userid)
+    (insert
+     (format
+      "%15s missing  %s\n"
+      userid
+      (format "[[elisp:(progn (ta-email \"%s\")(message-goto-subject)(insert \"(%s) Missing ssh pub key\")(message-goto-body)(insert \"Dear %s,\\n\\nI need you to email me your ~/.ssh/id_rsa.pub key. See http://bit.ly/pubkey for directions.\\n\\nThanks,\\nProfessor Kitchin\\n\"))][Email %s]]"
+	      userid
+	      ta-course-name (plist-get (cdr (assoc userid (ta-roster))) :name) userid)))))
+  (org-mode))
 
+  
 (defun ta-update-roster ()
   "Update the list of students in conf/students.conf group.
 

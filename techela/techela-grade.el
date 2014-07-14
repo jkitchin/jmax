@@ -1,11 +1,7 @@
 ;;; techela-grade.el --- Functions for grading techela assignments
-;;; techela-grade.el
-;;; Commentary
-;;; These are functions to facilitate grading in techela courses
-
 
 ;;; Commentary:
-;; 
+;; These are functions to facilitate grading in techela courses
 
 ;;; Code:
 
@@ -31,6 +27,8 @@
     ("R" . 0.1)
     ("R-" . 0.05)
     ("R--" . 0.0)
+    ("P" . 1.0)    ;; Pass
+    ("F" . 0.0)    ;; Fail
     ("WAIVED" . nil))
   "Numeric multipliers for letter grades.")
 
@@ -86,9 +84,9 @@ placed after the new link when it is done."
 
 
 (defun gb-insert-comment ()
-  "Insert a comment line of form \"# (*andrewid*): \"."
+  "Insert a comment line of form \"# (ta-userid): \"."
   (interactive)
-  (insert (format "\n# (%s): \n" *andrewid*))
+  (insert (format "\n# (%s): \n" ta-userid))
   (previous-line)
   (end-of-line))
 
@@ -125,27 +123,77 @@ placed after the new link when it is done."
 	(insert (format "#+GRADE: %s" lettergrade)))
     ;else no grade found yet
     (goto-char (point-max))
-    ;; save grade in a section so it does not get erased by new footnotes.
-    (insert "* Grade\n")
     (insert (format "\n#+GRADE: %s" lettergrade)))
   (save-buffer))
+
+
+
+(defun gb-grade ()
+  "Run a rubric function to insert the grade"
+  (interactive)
+  (let ((rubric)
+	(label (gb-get-filetag "ASSIGNMENT"))
+	(cb (current-buffer))
+	(tbuf (find-file-noselect (expand-file-name "syllabus.org" ta-course-dir))))
+    ;; get the rubric from the syllabus, to make sure it has not been
+    ;; altered by a student
+    (set-buffer tbuf)
+    (org-open-link-from-string
+     (format "[[#%s]]" label) tbuf)
+    (setq rubric (read (org-entry-get (point) "RUBRIC")))
+    (set-buffer cb)
+    (kill-buffer tbuf)
+    
+    ;; Now, loop over rubric
+    (setq categories (mapcar (lambda (x) (car x)) rubric))
+    (setq LGS (mapcar (lambda (cell)
+			(ido-completing-read
+			 (concat (car cell) ": ")
+			 (mapcar (lambda (x) (car x)) gb-MULTIPLIERS))) rubric))
+
+    (setq multipliers (mapcar (lambda (LG) (cdr (assoc LG gb-MULTIPLIERS)))
+			      LGS))
+    (setq weights (mapcar (lambda (x) (cdr x)) rubric))
+    (setq grade (reduce '+ (cl-mapcar (lambda (weight multiplier) (* weight multiplier))
+			  weights multipliers)))
+    (goto-char (point-max))
+    (cl-mapcar (lambda (category grade) (insert (format "#+%s: %s\n" category grade)))
+	       categories LGS)
+    (insert (format "#+GRADE: %s" grade))
+    (save-buffer)))
 
 
 ;; see http://kitchingroup.cheme.cmu.edu/blog/2013/05/05/Getting-keyword-options-in-org-files/
 (defun gb-get-grade (fname)
   "Open file FNAME and get grade."
   (interactive "fFile: ")
-  (if (and (file-exists-p fname) (file-readable-p fname))
-      (progn
-	(let ((b (find-file-noselect fname))
-	      (kwds))
-	  (set-buffer b)
-	  (setq kwds (org-element-map (org-element-parse-buffer 'element) 'keyword
+  (when (and (file-exists-p fname) (file-readable-p fname))
+    (with-temp-buffer
+      (insert-file-contents fname)
+      (org-mode)
+      (gb-get-filetag "GRADE"))))
+
+
+(defun gb-set-filetag (tag value)
+  "Set filetag TAG to VALUE."
+  (interactive "sTag: \nsValue: ")
+  (save-excursion
+    (goto-char (point-min))
+    (if (re-search-forward (format "#\\+%s:" tag) (point-max) 'end)
+	(progn
+	  (beginning-of-line)
+	  (kill-line)
+	  (insert (format "#+%s: %s" tag value)))
+      (insert (format "\n#+%s: %s" tag value)))))
+
+
+(defun gb-get-filetag (tag)
+  "Return value for TAG in the org-file."
+  (interactive "sTag: ")
+  (setq kwds (org-element-map (org-element-parse-buffer 'element) 'keyword
 		       (lambda (keyword) (cons (org-element-property :key keyword)
 					       (org-element-property :value keyword)))))
-	  ;(kill-buffer b)
-	  (or (cdr (assoc "GRADE" kwds))
-	      (error "No grade found in %s" fname))))))
+  (cdr (assoc tag kwds)))
 
 (defun gb-save-and-close-buffer ()
   "Save current buffer and kill it."
