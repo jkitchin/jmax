@@ -1,1 +1,1 @@
-start %HOME%\Dropbox\jmax\emacs-24.3\bin\runemacs.exe -l %HOME%\Dropbox\jmax\init.el %1
+start emacs-24.3\bin\runemacs.exe -l init.el %1
