@@ -6,7 +6,11 @@
 ;;
 ;; Students must send their id_rsa.pub key to the course admin to
 ;; access the course.
-;; 
+;;
+;; TODO: Dynamic assignment menu showing students assignments and
+;; grades/due dates
+;;
+;; TODO: Student grade report
 
 ;;; Code:
 
