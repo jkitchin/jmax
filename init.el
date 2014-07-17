@@ -21,6 +21,7 @@
 	      (shell-command-to-string
 	       "git rev-list HEAD...origin/master --count")))
   (when (y-or-n-p-with-timeout "jmax is not up to date. Update now?" 10 nil)
+    (message "updating jmax now")
     (shell-command "git pull")))
 
 (require 'packages)
