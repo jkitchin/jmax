@@ -15,6 +15,12 @@
 (add-to-list 'load-path starter-kit-dir)
 (add-to-list 'load-path user-dir)
 
+;; check status of jmax, and update if needed.
+(shell-command "git fetch")
+(unless (= 0 (shell-command "git rev-list HEAD...origin/master --count"))
+  (when (y-or-n-p-with-timeout "jmax is not up to date. Update now?" 10 nil)
+    (shell-command "git pull")))
+
 (require 'packages)
 (require 'jmax)
 ;;; end init
