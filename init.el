@@ -15,7 +15,8 @@
 (add-to-list 'load-path starter-kit-dir)
 (add-to-list 'load-path user-dir)
 
-;; check status of jmax, and update if needed.
+;; check status of jmax, and update if needed. We use a timeout of 10
+;; seconds which defaults to no update. 
 (shell-command "git fetch")
 (unless (= 0 (string-to-number
 	      (shell-command-to-string
