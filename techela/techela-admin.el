@@ -7,18 +7,32 @@
 ;; public course is available at
 ;; coursename@techela.cheme.cmu.edu:course.
 ;; See README.org and FAQ.org
+;;
+;; TODO: Reports
+;; Student grade report
+;; Assignment summary
+;; Participation summary
+;; tagged assignment summary (ta-show-performance tag-expression)
+;;     TAG-EXPRESSION should select the assignments, then we aggregate
+;;     the scores
 
-(require 'cl)
+(require 'cl-lib)
 (require 'csv)
+(require 'techela)
 (require 'techela-roster)
 (require 'techela-grade)
-(require 'f)
+(require 'f) ; file utilities
 
 ;;; Code:
 
-(defvar ta-course-server "techela.cheme.cmu.edu")
+(defvar ta-course-server "techela.cheme.cmu.edu" "Hostname where the course is served.")
 (defvar ta-course-name nil "The course currently in action.")
 (defvar ta-root-dir nil "The root directory for course files.")
+
+(defvar ta-gitolite-admin-dir nil "Derived variable that stores the location of the admin directory.")
+(defvar ta-roster nil "Derived variable absolute path to the roster file")
+(defvar ta-course-dir nil "Derived variable absolute path to the public course file.")
+(defvar ta-course-student-work-dir nil "Derived variable to the location of student work.")
 
 ;; i would like to deprecate this
 (defvar ta-email-host "andrew.cmu.edu" "Hostname to construct email address from for userids with no @ in them.")
@@ -260,9 +274,51 @@ to assignments."
 			 '(userid)) ;; RW permission
     ))
 
+
+(defun ta-collect-from (label userid)
+  "Collect assignment LABEL from USERID.
+This sets that repo to R access for USERID. We do not pull the assignment here."
+  (interactive
+   (list
+    (ido-completing-read "Label: " (ta-get-assigned-assignments) nil t)
+    (ido-completing-read "Userid: " (ta-get-userids))))
+  (let* ((repo-name (ta-get-repo-name label userid)))
+    ;; this pushes so the effect is immediate
+    (ta-create-edit-repo reponame			 
+			 '(userid)))) ;; R permission
+
+
+(defun ta-return-to (label userid)
+  "Commit changes to LABEL and push to USERID repo."
+  (interactive
+   (list
+    (ido-completing-read "Label: " (ta-get-assigned-assignments) nil t)
+    (ido-completing-read "Userid: " (ta-get-userids))))
+  (let* ((repo-name (ta-get-repo-name label userid))
+	 (repo-dir-name (expand-file-name
+			 repo-name
+			 ta-root-dir))
+	 (repo-dir (file-name-as-directory
+		    (expand-file-name
+		     repo-name
+		     ta-root-dir))))
+    (with-current-directory
+     repo-dir
+     (let ((process-environment (cons GIT_SSH process-environment)))
+       (start-process-shell-command
+	"ta-return"
+	"*ta return*"
+	"git add * && git commit -am \"Returning\" && git push")))))
+
+
+    
+;;; These are class functions which should efficiently operate on each entry of the roster.
+
 (defun ta-create-assignment (label)
-  "Create a new assignment LABEL or open the one with LABEL."
-  (interactive "sLabel: ")
+  "Create or edit an assignment LABEL."
+  (interactive (list
+    (ido-completing-read "Label: " (ta-get-possible-assignments))))
+
   (let ((assignment-dir (file-name-as-directory
 			 (expand-file-name
 			  label
@@ -278,7 +334,7 @@ to assignments."
 		    assignment-dir))))
 
 (defun ta-create-assignment-repos (label)
-  "Create repos for an assignment LABEL.
+  "Create repos for all students in the roster for an assignment LABEL.
 
 1. This will prompt you for a LABEL, which is a directory in the
 assignment dir.
@@ -490,7 +546,7 @@ This does not pull the repos. See `ta-pull-repos'.
       (list userid) ;; R
       nil))         ;; RW
 
-  ;; push them all at once.
+  ;; push the repo permission changes all at once.
   (with-current-directory
    ta-gitolite-admin-dir
    (mygit "git push")))
@@ -845,30 +901,37 @@ git status:
 
 - [[elisp:(find-file ta-course-dir)][Open the course directory]]
 
-- [[elisp:(ta-email \"*all*\")][Email the class]]
-- [[elisp:ta-email][Email a student]]
+- [[elisp:(ta-email \"*all*\")][Email the class]]    
 
-- [[elisp:(find-file (expand-file-name \"roster.dat\" ta-gitolite-admin-dir))][Open the roster.dat]]
-- [[elisp:(find-file (expand-file-name \"roster.org\" ta-gitolite-admin-dir))][Open the roster.org]]
+- [[elisp:(find-file (expand-file-name \"roster.dat\" ta-gitolite-admin-dir))][Open the roster.dat]]   [[elisp:(find-file (expand-file-name \"roster.org\" ta-gitolite-admin-dir))][Open the roster.org]]
 - [[elisp:ta-update-roster][Update the roster]] (do this after you change roster.dat)
 
 ** Assignments
 
+- [[elisp:(find-file ta-course-assignments-dir)][Open the assignments directory]]
+- [[elisp:(find-file ta-course-student-work-dir)][Open student work directory]]
+- [[elisp:ta-pull-repos][Update student repos]] (pulls them all locally.)
+
 - [[elisp:ta-create-assignment][Create or edit an assignment]]
-- [[elisp:ta-create-assignment-repos][Create repos for an assignment]] (no student access until you assign it.)
-- [[elisp:ta-assign-assignment][Assign an assignment]] (give students RW access)
-- [[elisp:ta-collect][Collect an assignment]] (change students to R access. Does not pull)
-- [[elisp:ta-pull-repos][Pull an assignment]] (get local copies of assignment)
-- [[elisp:ta-return][Return an assignment]] (push local copies to server)
-- [[elisp:ta-grade][Grade an assignment]] (create grading list)
+- [[elisp:ta-create-assignment-repos][Create class repos for an assignment]] (no student access until you assign it.)
+- [[elisp:ta-assign-assignment to class][Assign an assignment]] (give students RW access)
+- [[elisp:ta-collect][Collect an assignment from class]] (change students to R access. Does not pull)
+- [[elisp:ta-pull-repos][Pull an assignment from class]] (get local copies of assignment)
+- [[elisp:ta-return][Return an assignment to class]] (push local copies to server)
+- [[elisp:ta-grade][Grade an assignment for class]] (create grading list)
 
 - [[elisp:ta-open-assignment][Open a student assignment]]
 
 - [[elisp:ta-show-assigned-assignments][Show assigned assignments]]
 
-- [[elisp:(find-file ta-course-assignments-dir)][Open the assignments directory]]
-- [[elisp:(find-file ta-course-student-work-dir)][Open student work directory]]
-- [[elisp:ta-pull-repos][Update student repos]] (pulls them all locally.)
+*** Individual student actions
+
+- [[elisp:ta-assign-to][Assign assignment to a student]]
+- [[elisp:ta-collect-from][Collect assignment from a student]]
+- [[elisp:ta-open-assignment][Open a student assignment]]
+- [[elisp:ta-return-to][Return your changes in an assignment to a student]]
+
+- [[elisp:ta-email][Email a student]]
 
 ** TODO Reports
 Stay tuned for this.
