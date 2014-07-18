@@ -22,7 +22,8 @@
 (unless (= 0 (string-to-number
 	      (shell-command-to-string
 	       "git rev-list HEAD...origin/master --count")))
-  (when (y-or-n-p-with-timeout "jmax is not up to date. Update now?" 10 nil)
+  (when (let ((last-nonmenu-event nil))
+	  (y-or-n-p "jmax is not up to date. Update now?"))
     (message "updating jmax now")
     (shell-command "git pull")))
 
