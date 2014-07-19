@@ -18,14 +18,15 @@
 ;; check status of jmax, and update if needed. We use a timeout of 10
 ;; seconds which defaults to no update. We could use a variable
 ;; setting here but where would it get set?
-(shell-command "git fetch")
-(unless (= 0 (string-to-number
-	      (shell-command-to-string
-	       "git rev-list HEAD...origin/master --count")))
-  (when (let ((last-nonmenu-event nil))
-	  (y-or-n-p "jmax is not up to date. Update now?"))
-    (message "updating jmax now")
-    (shell-command "git pull")))
+(let ((default-directory starter-kit-dir))
+  (shell-command "git fetch")
+  (unless (= 0 (string-to-number
+		(shell-command-to-string
+		 "git rev-list HEAD...origin/master --count")))
+    (when (let ((last-nonmenu-event nil))
+	    (y-or-n-p "jmax is not up to date. Update now?"))
+      (message "updating jmax now")
+      (shell-command "git pull"))))
 
 (require 'packages)
 (require 'jmax)
