@@ -188,7 +188,7 @@ Make sure ssh is available. Generate ~/.ssh/techela_id key and
 	    (entry (format  "Host %s
   User %s
   IdentityFile ~/.ssh/techela-%s
-" tq-git-server tq-current-course tq_userid)))
+" tq-git-server tq-current-course tq-userid)))
 	(with-temp-file (expand-file-name "~/.ssh/techela-config")
 	  (insert contents)
 	  (goto-char (point-max))
