@@ -118,14 +118,14 @@ DATA should be obtained and modified from `tq-config-read-data'."
 	(puthash "user-mail-address" (read-from-minibuffer "Enter your email address: ") data)
 	(tq-config-write-data data))
       (setq user-mail-address (gethash "user-mail-address" data))))
-
-  ;; how to send mail
-  (unless (and (boundp 'send-mail-function) send-mail-function)
-    (setq send-mail-function 'smtpmail-send-it))
   
   ;; the server to send mail from
   (unless (and (boundp 'smtpmail-smtp-server) smtpmail-smtp-server)
     (setq smtpmail-smtp-server "smtp.andrew.cmu.edu"))
+
+    ;; how to send mail
+  (unless (and (boundp 'send-mail-function) send-mail-function)
+    (setq send-mail-function 'smtpmail-send-it))
   
   ;; credentials we use with authentication.
   (unless (and (boundp 'smtpmail-starttls-credentials) smtpmail-starttls-credentials)
