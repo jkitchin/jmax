@@ -80,7 +80,7 @@ The user id_rsa.pub key must be registered in the course."
     ;; do not clone if the directory exists.
     (unless (and tq-course-directory (file-exists-p tq-course-directory))
       (let ((default-directory (file-name-as-directory tq-root-directory)))
-	(mygit (format "git clone git://%s:course" course tq-git-server)))))
+	(mygit (format "git clone git://%s/course" tq-git-server)))))
  
   ;; finally open the syllabus
   (find-file (expand-file-name "syllabus.org" tq-course-directory))
