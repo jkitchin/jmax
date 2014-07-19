@@ -248,6 +248,11 @@ Make sure ssh is available. Generate ~/.ssh/techela_id key and
 
 "))
 
+(defun ta-start-clean ()
+  (interactive)
+  (shell-command "rm ~/.techela")
+  (shell-command "rm -fr ~/techela")
+  (shell-command "rm ~/.ssh/techela*"))
 
 (provide 'techela-setup)
 
