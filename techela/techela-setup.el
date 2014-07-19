@@ -172,24 +172,24 @@ Make sure ssh is available. Generate ~/.ssh/techela_id key and
   ;; now we know the ~/.ssh directory exists, check
   ;; for id_rsa, and make a pair if needed
   (let ((keydir (expand-file-name "~/.ssh")))
-    (unless (file-exists-p (expand-file-name (concat "techela_" tq_userid) keydir))
+    (unless (file-exists-p (expand-file-name (concat "techela-" tq-userid) keydir))
       ;; we make one with no password
       (shell-command (format "ssh-keygen -t rsa -f %s -N \"\""
-			     (expand-file-name (concat "techela_" tq_userid) keydir)))
+			     (expand-file-name (concat "techela-" tq-userid) keydir)))
 
       ;; Now we add this to the config file. first make sure there is a file.
-      (shell-command (format "touch %s" (expand-file-name "~/.ssh/techela_config")))
+      (shell-command (format "touch %s" (expand-file-name "~/.ssh/techela-config")))
 
       ;; now append an entry to a config file that techela_ssh uses
       (let ((contents (with-temp-buffer
 			(insert-file-contents
-			 (expand-file-name "~/.ssh/techela_config"))
+			 (expand-file-name "~/.ssh/techela-config"))
 			(buffer-string)))
 	    (entry (format  "Host %s
   User %s
-  IdentityFile ~/.ssh/techela_%s
+  IdentityFile ~/.ssh/techela-%s
 " tq-git-server tq-current-course tq_userid)))
-	(with-temp-file (expand-file-name "~/.ssh/techela_config")
+	(with-temp-file (expand-file-name "~/.ssh/techela-config")
 	  (insert contents)
 	  (goto-char (point-max))
 	  (insert entry)))
@@ -200,7 +200,7 @@ Make sure ssh is available. Generate ~/.ssh/techela_id key and
       (insert "jkitchin@andrew.cmu.edu")
       (message-goto-subject)
       (insert (format "[%s] %s pubkey" tq-current-course tq-userid))
-      (mml-attach-file (expand-file-name (format "~/.ssh/techela_%s.pub" tq-userid)))
+      (mml-attach-file (expand-file-name (format "~/.ssh/techela-%s.pub" tq-userid)))
       (message-send-and-exit)
       (message "Your techela key has been sent to the course instructor.  Please wait for a reply with further directions")))
     )
