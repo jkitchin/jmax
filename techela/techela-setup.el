@@ -123,8 +123,8 @@ DATA should be obtained and modified from `tq-config-read-data'."
   (unless (and (boundp 'smtpmail-smtp-server) smtpmail-smtp-server)
     (setq smtpmail-smtp-server "smtp.andrew.cmu.edu"))
 
-    ;; how to send mail
-  (unless (and (boundp 'send-mail-function) send-mail-function)
+  ;; how to send mail
+  (when (equal send-mail-function 'sendmail-query-once)
     (setq send-mail-function 'smtpmail-send-it))
   
   ;; credentials we use with authentication.
