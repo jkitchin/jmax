@@ -216,9 +216,10 @@ Make sure ssh is available. Generate ~/.ssh/techela_id key and
   (insert "ssh located at: " (executable-find "ssh") "\n")
   (insert "python located at: " (executable-find "python") "\n")
 
-  (insert "\njmax installed at: " starter-kit-dir "\n")
-  (insert "jmax current commit: " (shell-command-to-string "git rev-parse HEAD"))
-  (insert "jmax tag: " (shell-command-to-string "git tag"))
+  (let ((default-directory starter-kit-dir))
+    (insert "\njmax installed at: " starter-kit-dir "\n")
+    (insert "jmax current commit: " (shell-command-to-string "git rev-parse HEAD"))
+    (insert "jmax tag: " (shell-command-to-string "git tag")))
 
   
   (insert "\n~/.techela contains:
