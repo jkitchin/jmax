@@ -44,9 +44,6 @@ The user id_rsa.pub key must be registered in the course."
     (ido-completing-read
      "Course name: "
      (tq-config-get-user-courses))))
-
-  (ta-setup-user)
-  (ta-setup-ssh)
   
   ;; Set this for the current session
   (setq tq-current-course course)
@@ -71,7 +68,10 @@ The user id_rsa.pub key must be registered in the course."
 	  tq-userid (read-from-minibuffer "Enter userid: "))
 
     (tq-config-set-user-course course tq-userid tq-root-directory))
-    
+
+    (ta-setup-user)
+    (ta-setup-ssh)
+
     ;; make root directory if needed, including parents
     (unless (file-exists-p tq-root-directory)
       (make-directory tq-root-directory t))
