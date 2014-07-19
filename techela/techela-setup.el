@@ -172,9 +172,10 @@ Make sure ssh is available. Generate ~/.ssh/techela_id key and
   ;; now we know the ~/.ssh directory exists, check
   ;; for id_rsa, and make a pair if needed
   (let ((keydir (expand-file-name "~/.ssh")))
-    (unless (file-exists-p (expand-file-name "techela_id" keydir))
+    (unless (file-exists-p (expand-file-name (concat "techela_" tq_userid) keydir))
       ;; we make one with no password
-      (shell-command (format "ssh-keygen -t rsa -f %s -N \"\"" (expand-file-name "techela_id" keydir)))
+      (shell-command (format "ssh-keygen -t rsa -f %s -N \"\""
+			     (expand-file-name (concat "techela_" tq_userid) keydir)))
 
       ;; Now we add this to the config file. first make sure there is a file.
       (shell-command (format "touch %s" (expand-file-name "~/.ssh/techela_config")))
@@ -186,8 +187,8 @@ Make sure ssh is available. Generate ~/.ssh/techela_id key and
 			(buffer-string)))
 	    (entry (format  "Host %s
   User %s
-  IdentityFile ~/.ssh/techela_id
-" tq-git-server tq-current-course)))
+  IdentityFile ~/.ssh/techela_%s
+" tq-git-server tq-current-course tq_userid)))
 	(with-temp-file (expand-file-name "~/.ssh/techela_config")
 	  (insert contents)
 	  (goto-char (point-max))
@@ -199,7 +200,7 @@ Make sure ssh is available. Generate ~/.ssh/techela_id key and
       (insert "jkitchin@andrew.cmu.edu")
       (message-goto-subject)
       (insert (format "[%s] %s pubkey" tq-current-course tq-userid))
-      (mml-attach-file (expand-file-name "~/.ssh/techela_id.pub"))
+      (mml-attach-file (expand-file-name (format "~/.ssh/techela_%s.pub" tq-userid)))
       (message-send-and-exit)
       (message "Your techela key has been sent to the course instructor.  Please wait for a reply with further directions")))
     )
