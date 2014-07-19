@@ -46,7 +46,8 @@ The user id_rsa.pub key must be registered in the course."
      (tq-config-get-user-courses))))
 
   (ta-setup-user)
-
+  (ta-setup-ssh)
+  
   ;; Set this for the current session
   (setq tq-current-course course)
 
@@ -61,10 +62,10 @@ The user id_rsa.pub key must be registered in the course."
 	      tq-course-directory (expand-file-name "course" tq-root-directory)
 	      tq-userid (gethash "userid" course-hash))
     ;; else no entry get info and add one.
-    (setq tq-root-directory
-	  (file-name-as-directory
-	   (ido-read-directory-name "Enter directory to download course: " nil
-				    (format "~/Desktop/%s" course)))
+      (setq tq-root-directory	    
+	    (file-name-as-directory
+	     (expand-file-name
+	      (format "~/techela/%s" course)))
 	  tq-course-directory (file-name-as-directory
 			       (expand-file-name "course" tq-root-directory))
 	  tq-userid (read-from-minibuffer "Enter userid: "))
@@ -79,7 +80,7 @@ The user id_rsa.pub key must be registered in the course."
     ;; do not clone if the directory exists.
     (unless (and tq-course-directory (file-exists-p tq-course-directory))
       (let ((default-directory (file-name-as-directory tq-root-directory)))
-	(mygit (format "git clone %s@%s:course" course tq-git-server)))))
+	(mygit (format "git clone git://%s:course" course tq-git-server)))))
  
   ;; finally open the syllabus
   (find-file (expand-file-name "syllabus.org" tq-course-directory))
@@ -139,7 +140,7 @@ Check *techela log* for error messages."
       (switch-to-buffer "*techela log*")
       (error "Problem committing.  Check the logs")))
 
-  (unless (= 0 (car (mygit "git push origin master")))
+  (unless (= 0 (car (mygit "git push -u origin master")))
     (switch-to-buffer "*techela log*")
     (error "Problem pushing to server.  Check the logs"))
   

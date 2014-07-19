@@ -269,9 +269,9 @@ to assignments."
   ;; first, create the repo and push it.
   (let* ((repo-name (ta-get-repo-name label userid)))
     ;; this pushes so the effect is immediate
-    (ta-create-edit-repo reponame
-			 nil       ;R permission
-			 '(userid)) ;; RW permission
+    (ta-create-edit-repo repo-name
+			 nil        ;;R permission
+			 (list userid)) ;; RW permission
     ))
 
 
@@ -284,8 +284,8 @@ This sets that repo to R access for USERID. We do not pull the assignment here."
     (ido-completing-read "Userid: " (ta-get-userids))))
   (let* ((repo-name (ta-get-repo-name label userid)))
     ;; this pushes so the effect is immediate
-    (ta-create-edit-repo reponame			 
-			 '(userid)))) ;; R permission
+    (ta-create-edit-repo repo-name			 
+			 (list userid)))) ;; R permission
 
 
 (defun ta-return-to (label userid)
@@ -373,68 +373,6 @@ involves giving the students read/write permissions. See
      ta-gitolite-admin-dir
      (mygit "git push"))))
 
-;; I have commented out this code rather than delete it right now. I realized I cannot insert user specific data this way. that is probably ok.
-;;     ;; Now we want to create the local directories
-;;     ;; the assignment is in ta-course-assignments-dir/label
-;;     ;; we want to copy it to ta-course-student-work-dir/userid/label
-
-;;     (with-current-directory
-;;      ta-course-student-work-dir
-
-;;      ;; make sure each directory exists.
-;;      (mapcar (lambda (userid)
-;; 	       (let ((assignment-source (expand-file-name label ta-course-assignments-dir))
-;; 		     (assignment-dest (expand-file-name
-;; 				       (f-filename (ta-get-repo-name label userid))
-;; 				       (expand-file-name userid ta-course-student-work-dir))))
-;; 		 (unless (file-exists-p assignment-dest)
-;; 		   (copy-directory assignment-source assignment-dest nil t)
-
-;; 		   ;; Now we update the assignment-file. Let us get
-;; 		   ;; the details from the file
-;; 		   (let (POINTS CATEGORY DUEDATE RUBRIC)
-;; 		     (with-current-buffer
-;; 			 (find-file-noselect
-;; 			  (expand-file-name
-;; 			   (format "%s.org" label) ;; the org-file
-;; 			   (expand-file-name label ta-course-assignments-dir)))
-		       
-;; 		       (setq POINTS (gb-get-filetag "POINTS")
-;; 			     CATEGORY (gb-get-filetag "CATEGORY")
-;; 			     DUEDATE (gb-get-filetag "DUEDATE")
-;; 			     RUBRIC (gb-get-filetag "RUBRIC"))
-;; 		       (unless (and POINTS CATEGORY DUEDATE RUBRIC)
-;; 			 (error "You need to define points, category, duedate and rubric")))
-		     
-;; 		     ;; insert data into document
-;; 		     (let ((tbuf (find-file-noselect (expand-file-name
-;; 						      (format "%s.org" label) ;; the org-file
-;; 						      assignment-dest))))
-;; 		       (with-current-buffer tbuf
-;; 			 (goto-char (point-min))
-;; 			 (insert (format "#+USERID: %s
-;; #+AUTHOR: %s
-;; #+ASSIGNMENT: %s
-;; #+RUBRIC: %s\n"
-;; 					 userid
-;; 					 (plist-get (cdr (assoc userid (ta-roster))) :name)
-;; 					 label)))
-;; 		       (set-buffer tbuf)
-;; 		       (save-buffer)
-;; 		       (kill-buffer tbuf)))
-    
-;; 		   ;; now make it a git repo and push it remotely
-;; 		   (with-current-directory
-;; 		    (file-name-as-directory assignment-dest)
-;; 		    (mygit "git init")
-;; 		    (mygit "git add *")
-;; 		    (mygit "git commit -m \"initial commit\"")
-;; 		    (mygit (format "git remote add origin \"%s@%s:%s.git\""
-;; 				   ta-course-name ta-course-server
-;; 				   (format "%s-%s-%s" ta-course-name userid label)))
-;; 		    (mygit "git push -u origin master")))))
-;; 	     userids))))
-
 
 (defun ta-assign-assignment (label)
   "Assign LABEL to students.
@@ -462,7 +400,7 @@ assignment dir.
  
       (setq POINTS (gb-get-filetag "POINTS")
 	    CATEGORY (gb-get-filetag "CATEGORY")
-	    RUBRIC (gb-get-filetag "RUBRIC")	      
+	    RUBRIC (gb-get-filetag "RUBRIC")
 	    DUEDATE (gb-get-filetag "DUEDATE"))
     
       (unless (and POINTS CATEGORY RUBRIC DUEDATE)
@@ -475,6 +413,7 @@ assignment dir.
 	(save-restriction
 	  (widen)
 	  (beginning-of-buffer)
+	  ;; This link relies on a CUSTOM_ID
 	  (org-open-link-from-string "[[#assignments]]")
 	  (org-narrow-to-subtree)
 	  ;; we add an assignment headline, as long as here is not one already
@@ -490,7 +429,7 @@ assignment dir.
 	      (goto-char (point-max))
 	      (org-entry-put (point) "CATEGORY" CATEGORY)
 	      (org-entry-put (point) "POINTS" POINTS)
-	      (org-entry-put (point) "LABEL" label)
+	      (org-entry-put (point) "CUSTOM_ID" label)
 	      
 	      (org-entry-put (point) "RUBRIC" RUBRIC)
 	      (org-deadline nil DUEDATE)
@@ -768,7 +707,7 @@ a link in the heading."
     (org-mode)
     (org-map-entries
      (lambda ()
-       (org-entry-get (point) "LABEL"))
+       (org-entry-get (point) "CUSTOM_ID"))
      "assignment")))
 
 
@@ -918,9 +857,8 @@ git status:
 - [[elisp:ta-collect][Collect an assignment from class]] (change students to R access. Does not pull)
 - [[elisp:ta-pull-repos][Pull an assignment from class]] (get local copies of assignment)
 - [[elisp:ta-return][Return an assignment to class]] (push local copies to server)
-- [[elisp:ta-grade][Grade an assignment for class]] (create grading list)
 
-- [[elisp:ta-open-assignment][Open a student assignment]]
+- [[elisp:ta-grade][Grade an assignment for class]] (create grading list)
 
 - [[elisp:ta-show-assigned-assignments][Show assigned assignments]]
 

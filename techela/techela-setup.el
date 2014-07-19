@@ -1,11 +1,11 @@
 ;;; techela-setup.el --- setup techela courses and admin config file
 
-
-;; The idea is that we will store the data in $HOME/.techela in json
-;; so we can avoid the whole custom.el file. The problem with that is
-;; that I am concerned about jmax clobbering other people's custom.el
-;; files, and this way we have a dedicated file containing our data in
-;; a language agnostic format.
+;; The setup for techela is a ~/.techela file that contains some
+;; configuration data for user and admin courses, and a directory
+;; ~/techela that is a directory containing the courses. We modify the
+;; ssh command in techela_ssh so that it uses a config file
+;; ~/.ssh/techela_config which points to a specific id_rsa
+;; (~/.ssh/techela_id) key we are going to use.
 ;;
 ;; we use the same setup for users and admins (instructors).
 
@@ -98,7 +98,7 @@ DATA should be obtained and modified from `tq-config-read-data'."
 
 
 (defun ta-setup-user ()
-  "Makes sure these variables are set:  `user-full-name', 
+  "Makes sure these variables are set:  `user-full-name',
 `user-mail-address', `send-mail-function',
 `message-send-mail-function', `smtpmail-smtp-server',
 `smtpmail-starttls-credentials', `smtpmail-smtp-service'."
@@ -106,7 +106,7 @@ DATA should be obtained and modified from `tq-config-read-data'."
   ;; Full name
   (unless (and (boundp 'user-full-name) user-full-name)
     (let ((data (tq-config-read-data)))
-      (unless (gethash "user-full-name" data)	  
+      (unless (gethash "user-full-name" data)
 	(puthash "user-full-name" (read-from-minibuffer "Enter your full name: ") data)
 	(tq-config-write-data data))
       (setq user-full-name (gethash "user-full-name" data))))
@@ -134,8 +134,14 @@ DATA should be obtained and modified from `tq-config-read-data'."
   ;; service port number
   (unless (and (boundp 'smtpmail-smtp-service) smtpmail-smtp-service)
     (setq smtpmail-smtp-service 587))
-    
+
+  (unless (executable-find "python")
+    (error "I cannot find python. You cannot use techela."))	  
+  
   ;; setup git if it is not. Only set these if they are not already set.
+  (unless (executable-find "git")
+    (error "I cannot find git.  You cannot use techela"))
+
   (when (string= "" (shell-command-to-string "git config --global user.name"))
     (shell-command (format "git config --global user.name \"%s\"" user-full-name)))
 
@@ -144,6 +150,102 @@ DATA should be obtained and modified from `tq-config-read-data'."
 
   (when (string= "" (shell-command-to-string "git config --global push.default"))
     (shell-command "git config --global push.default matching")))
+
+
+(defun ta-setup-ssh ()
+  "Setup ssh for use with techela.
+Make sure ssh is available. Generate ~/.ssh/techela_id key and
+~/.ssh/techela_config. Email key to instructor."
+  (interactive)
+
+  (unless (executable-find "ssh")
+    (error "I cannot find ssh.  You cannot use techela"))
+
+  ;; check for ~/.ssh
+  (unless (file-exists-p
+	   (expand-file-name "~/.ssh"))
+    (make-directory (expand-file-name "~/.ssh") t))
+
+  ;; now we know the ~/.ssh directory exists, check
+  ;; for id_rsa, and make a pair if needed
+  (let ((keydir (expand-file-name "~/.ssh")))
+    (unless (file-exists-p (expand-file-name "techela_id" keydir))
+      ;; we make one with no password
+      (shell-command (format "ssh-keygen -t rsa -f %s -N \"\"" (expand-file-name "techela_id" keydir)))
+
+      ;; Now we add this to the config file. first make sure there is a file.
+      (shell-command (format "touch %s" (expand-file-name "~/.ssh/techela_config")))
+
+      ;; now append an entry to a config file that techela_ssh uses
+      (let ((contents (with-temp-buffer
+			(insert-file-contents
+			 (expand-file-name "~/.ssh/techela_config"))
+			(buffer-string)))
+	    (entry (format  "Host %s
+  User %s
+  IdentityFile ~/.ssh/techela_id
+" tq-git-server tq-current-course)))
+	(with-temp-file (expand-file-name "~/.ssh/techela_config")
+	  (insert contents)
+	  (goto-char (point-max))
+	  (insert entry)))
+
+      ;; now create an email and send the key to the instructor
+      (compose-mail)
+      (message-goto-to)
+      (insert "jkitchin@andrew.cmu.edu")
+      (message-goto-subject)
+      (insert (format "[%s] %s pubkey" tq-current-course tq-userid))
+      (mml-attach-file (expand-file-name "~/.ssh/techela_id.pub"))
+      (message-send-and-exit)
+      (message "Your techela key has been sent to the course instructor.  Please wait for a reply with further directions")))
+    )
+
+(defun ta-describe ()
+  "Open a buffer with information about the setup for techela."
+  (interactive)
+  (switch-to-buffer (get-buffer-create "*techela describe*"))
+  (insert (format "Name: %s\n" user-full-name))
+  (insert (format "Userid = %s\n" tq-userid))
+  (insert (format "Email: %s\n" user-mail-address))
+
+  (insert (format "System: %s" system-type) "\n")
+  (insert (format "Window system: %s" window-system) "\n")
+  (insert "~/ located at: " (expand-file-name "~/") "\n")
+  (insert "git located at: " (executable-find "git") "\n")
+  (insert "ssh located at: " (executable-find "ssh") "\n")
+  (insert "python located at: " (executable-find "python") "\n")
+
+  (insert "\njmax installed at: " starter-kit-dir "\n")
+  (insert "jmax current commit: " (shell-command-to-string "git rev-parse HEAD"))
+  (insert "jmax tag: " (shell-command-to-string "git tag"))
+
+  
+  (insert "\n~/.techela contains:
+#+BEGIN====================================================================
+")
+  (insert-file-contents (expand-file-name "~/.techela"))
+  (goto-char (point-max))
+  (insert "\n#+END====================================================================
+
+")
+  (insert "\n~/.ssh/techela_config contains:
+#+BEGIN====================================================================
+")
+  (insert-file-contents (expand-file-name "~/.ssh/techela_config"))
+  (goto-char (point-max))
+  (insert "\n#+END====================================================================
+
+")
+
+(insert "\n~/.ssh/techela_id.pub contains:
+#+BEGIN====================================================================
+")
+  (insert-file-contents (expand-file-name "~/.ssh/techela_id.pub"))
+  (goto-char (point-max))
+  (insert "\n#+END====================================================================
+
+"))
 
 
 (provide 'techela-setup)

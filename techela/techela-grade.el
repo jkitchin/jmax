@@ -129,16 +129,23 @@ placed after the new link when it is done."
 
 
 (defun gb-grade ()
-  "Run a rubric function to insert the grade"
+  "Run a rubric function to insert the grade.
+This assumes the assignment label is the filename you are in."
   (interactive)
   (let ((rubric)
-	(label (gb-get-filetag "ASSIGNMENT"))
+	(label (file-name-sans-extension
+		(file-name-nondirectory (buffer-name))))
 	(cb (current-buffer))
 	(tbuf (find-file-noselect (expand-file-name "syllabus.org" ta-course-dir))))
+    (unless (-contains? (ta-get-assigned-assignments) label)
+      (error "%s is not an assignment" label))
+    
     ;; get the rubric from the syllabus, to make sure it has not been
     ;; altered by a student
     (set-buffer tbuf)
+    (goto-char (point-min))
     (org-open-link-from-string
+     ;; there must be a section with a custom_id in the syllabus
      (format "[[#%s]]" label) tbuf)
     (setq rubric (read (org-entry-get (point) "RUBRIC")))
     (set-buffer cb)
@@ -157,9 +164,9 @@ placed after the new link when it is done."
     (setq grade (reduce '+ (cl-mapcar (lambda (weight multiplier) (* weight multiplier))
 			  weights multipliers)))
     (goto-char (point-max))
-    (cl-mapcar (lambda (category grade) (insert (format "#+%s: %s\n" category grade)))
+    (cl-mapcar (lambda (category grade) (gb-set-filetag category grade))
 	       categories LGS)
-    (insert (format "#+GRADE: %s" grade))
+    (gb-set-filetag "GRADE" (format "%1.3f" grade))
     (save-buffer)))
 
 
@@ -195,11 +202,13 @@ placed after the new link when it is done."
 					       (org-element-property :value keyword)))))
   (cdr (assoc tag kwds)))
 
+
 (defun gb-save-and-close-buffer ()
   "Save current buffer and kill it."
   (interactive)
   (save-buffer)
   (kill-buffer))
+
 
 ;; here I rebind Alt-s as a prefix to these functions.
 ;; it seems like a reasonable choice.
@@ -209,7 +218,7 @@ placed after the new link when it is done."
     (define-key gb-map (kbd "M-s n") 'gb-insert-footnote)
     (define-key gb-map (kbd "M-s c") 'gb-insert-comment)
     (define-key gb-map (kbd "M-s t") 'gb-feedback-typo)
-    (define-key gb-map (kbd "M-s g") 'gb-assign-grade)
+    (define-key gb-map (kbd "M-s g") 'gb-grade)
     (define-key gb-map (kbd "M-s q") 'gb-save-and-close-buffer)
     gb-map)
   "Keymap for function `grade-mode'.")
