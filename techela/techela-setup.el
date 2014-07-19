@@ -104,7 +104,7 @@ DATA should be obtained and modified from `tq-config-read-data'."
 `smtpmail-starttls-credentials', `smtpmail-smtp-service'."
 
   ;; Full name
-  (unless (and (boundp 'user-full-name) user-full-name)
+  (unless (and (boundp 'user-full-name) user-full-name (not (string= "" user-full-name)))
     (let ((data (tq-config-read-data)))
       (unless (gethash "user-full-name" data)
 	(puthash "user-full-name" (read-from-minibuffer "Enter your full name: ") data)
