@@ -124,6 +124,10 @@
 (add-to-list 'org-structure-template-alist
              '("el" "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC" "<src lang=\"emacs-lisp\">\n?\n</src>"))
 
+;; add <sh for shell
+(add-to-list 'org-structure-template-alist
+             '("sh" "#+BEGIN_SRC sh\n?\n#+END_SRC" "<src lang=\"shell\">\n?\n</src>"))
+
 ;; do not evaluate code on export by default
 (setq org-export-babel-evaluate nil)
 
