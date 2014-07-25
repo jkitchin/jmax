@@ -15,9 +15,7 @@
 (add-to-list 'load-path starter-kit-dir)
 (add-to-list 'load-path user-dir)
 
-;; check status of jmax, and update if needed. We use a timeout of 10
-;; seconds which defaults to no update. We could use a variable
-;; setting here but where would it get set?
+;; check status of jmax, and update if needed. 
 (let ((default-directory starter-kit-dir))
   (shell-command "git fetch")
   (unless (= 0 (string-to-number
