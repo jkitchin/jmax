@@ -234,19 +234,19 @@ Make sure ssh is available. Generate ~/.ssh/techela_id key and
   (insert "\n#+END====================================================================
 
 ")
-  (insert "\n~/.ssh/techela_config contains:
+  (insert "\n~/.ssh/techela-config contains:
 #+BEGIN====================================================================
 ")
-  (insert-file-contents (expand-file-name "~/.ssh/techela_config"))
+  (insert-file-contents (expand-file-name "~/.ssh/techela-config"))
   (goto-char (point-max))
   (insert "\n#+END====================================================================
 
 ")
 
-(insert "\n~/.ssh/techela_id.pub contains:
+(insert (format "\n~/.ssh/techela-%s.pub contains:
 #+BEGIN====================================================================
-")
-  (insert-file-contents (expand-file-name "~/.ssh/techela_id.pub"))
+" tq-userid))
+  (insert-file-contents (expand-file-name (format "~/.ssh/techela-%s.pub" tq-userid)))
   (goto-char (point-max))
   (insert "\n#+END====================================================================
 
