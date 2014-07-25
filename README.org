@@ -36,6 +36,17 @@ In your init file:
 (setq-default ispell-program-name "C:/Program Files/Aspell/bin/aspell.exe")
 #+END_SRC
 
+** Mac users
+I installed Emacs 24.3 from http://emacsformacosx.com.
+
+I installed git from http://git-scm.com/download/mac
+
+Enthought Canopy has a Mac version.
+
+and MacTeX from http://www.tug.org/mactex.
+
+After that, I was able to clone jmax as described above, and I used the jmax-mac.sh script to open emacs configured to use jmax.
+
 * Customization
 These files contain variables with paths specific to your computer. You probably need to change them.
 
