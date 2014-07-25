@@ -150,7 +150,7 @@ inserted (with `i')."
       (dired-details-hide))))
 
 (defun dired-details-delete-overlays ()
-  (mapc '(lambda (list) (mapc 'delete-overlay
+  (mapc #'(lambda (list) (mapc 'delete-overlay
                              (cdr list)))
         dired-details-internal-overlay-list)
   (setq dired-details-internal-overlay-list nil))
@@ -187,7 +187,7 @@ in this dired buffer."
       (widen)
       ;;hide each displayed subdirectory
       (mapc
-       '(lambda (dir-and-pos)
+       #'(lambda (dir-and-pos)
           (let ((cached-overlays (assoc (car dir-and-pos)
                                         dired-details-internal-overlay-list)))
             (if cached-overlays
@@ -264,7 +264,7 @@ hidden in this buffer."
 
 (defun dired-details-frob-overlays ( hide )
   (if dired-details-internal-overlay-list
-    (mapc '(lambda (list)
+    (mapc #'(lambda (list)
              (mapc (if hide 'dired-details-hide-overlay 'dired-details-show-overlay)
                    (cdr list)))
           dired-details-internal-overlay-list)))
