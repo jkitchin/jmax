@@ -57,9 +57,7 @@ to, and that is saved in custom.el."
 	      ta-userid (gethash "userid" course-hash))
     ;; else no entry get info and add one.
     (setq ta-root-dir
-	  (file-name-as-directory
-	   (ido-read-directory-name "Enter directory to download admin course: " nil
-				    (format "~/Desktop/%s" ta-course-name)))
+	  (file-name-as-directory (expand-file-name ta-course-name "~/techela-admin" ))
 	  ta-userid (read-from-minibuffer "Enter admin userid: "))
     ;; save course for future
     (tq-config-set-admin-course ta-course-name ta-userid ta-root-dir)))
@@ -331,7 +329,18 @@ This sets that repo to R access for USERID. We do not pull the assignment here."
 		      ta-course-name ta-course-server label))))
     (find-file (expand-file-name
 		    (concat label ".org")
-		    assignment-dir))))
+		    assignment-dir))
+    (gb-set-filetag "ASSIGNMENT" label)
+    (goto-char (point-min))
+    (unless (re-search-forward "#\\+POINTS:" nil t)
+;; TODO: completion on category and rubric. Input for due date.
+      (insert "#+TITLE:
+#+POINTS:
+#+CATEGORY:
+#+RUBRIC:
+#+DUEDATE:"))
+    ))
+
 
 (defun ta-create-assignment-repos (label)
   "Create repos for all students in the roster for an assignment LABEL.
@@ -429,10 +438,11 @@ assignment dir.
 	      (goto-char (point-max))
 	      (org-entry-put (point) "CATEGORY" CATEGORY)
 	      (org-entry-put (point) "POINTS" POINTS)
-	      (org-entry-put (point) "CUSTOM_ID" label)
-	      
+	      (org-entry-put (point) "CUSTOM_ID" label)	      
 	      (org-entry-put (point) "RUBRIC" RUBRIC)
 	      (org-deadline nil DUEDATE)
+	      (goto-char (point-max))
+	      (insert "\n")
 	      (save-buffer)))))
       ;; Finally, we need to commit the syllabus change, and push it.
       (with-current-directory

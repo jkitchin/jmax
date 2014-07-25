@@ -6,9 +6,10 @@
 
 ;;; Code:
 
-(defvar GIT_SSH (format "GIT_SSH=%s" (expand-file-name "techela/techela_ssh" starter-kit-dir)))
+(defvar *GIT_SSH* (format "GIT_SSH=%s" (expand-file-name "techela/techela_ssh" starter-kit-dir)))
 
 (defvar tq-debug nil "Whether to debug or not.  non-nil triggers some debug action.")
+
 
 (defun tq-log (format-string &rest args)
   "Log a message to *techela log*.  Same syntax as `message'.
@@ -20,7 +21,7 @@ variables to avoid accidentally interpreting `%' as format specifiers.
 Argument FORMAT-STRING format string.
 Optional argument ARGS extra arguments."
   (with-current-buffer (get-buffer-create "*techela log*")
-    (end-of-buffer)
+    (goto-char (point-max))
     (insert "\n")
     (insert (apply 'format format-string args))))
 
@@ -38,13 +39,13 @@ DIRECTORY is expanded"
 For example:
  (mygit \"git clone org-course@techela.cheme.cmu.edu:course\")
 
-Sets GIT_SSH to `GIT_SSH', and temporarily modifies the process
-environment before running git. `GIT_SSH' points to a shell
+Sets GIT_SSH to `*GIT_SSH*', and temporarily modifies the process
+environment before running git. `*GIT_SSH*' points to a shell
 script that runs ssh in batch mode.
 
 returns (status output)"
   (interactive "sgit command: ")
-  (let ((process-environment (cons GIT_SSH process-environment))
+  (let ((process-environment (cons *GIT_SSH* process-environment))
         (status) (output))
     (when (get-buffer "*mygit-process*") (kill-buffer "*mygit-process*"))
     (tq-log "\nRunning \"%s\"\n  CWD = %s" git-command default-directory)
