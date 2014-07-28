@@ -18,6 +18,9 @@
 (global-set-key "\C-cL" 'org-insert-link-global)
 (global-set-key "\C-co" 'org-open-at-point-global)
 
+(require 'org-id)
+(setq org-id-link-to-org-use-id 'create-if-interactive)
+
 ;; activate single letter commands at beginning of a headline.
 ;; User-defined Speed commands
 ;; ===========================
@@ -299,6 +302,12 @@ start  empty title path
     ((eq format 'latex)
      ;; write out the latex command
      (format "%s \\index{%s}" keyword keyword)))))
+
+;; make access to python documentation available cross-platform
+(org-add-link-type
+ "pydoc"
+ (lambda (link-string)
+   (shell-command (format "python -m pydoc %s" link-string))))
 
 ;; Setup the frame configuration for following links.
 (setq org-link-frame-setup (quote ((gnus . org-gnus-no-new-news)
