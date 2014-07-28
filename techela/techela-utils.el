@@ -26,12 +26,16 @@ Optional argument ARGS extra arguments."
     (insert (apply 'format format-string args))))
 
 
-(defmacro with-current-directory (directory &rest body)
-  "Set the working directory temporarily set to DIRECTORY and run BODY.
-DIRECTORY is expanded"
-  `(let ((default-directory ,(file-name-as-directory (expand-file-name (eval directory)))))
-     ,@body))
+;(defmacro with-current-directory (directory &rest body)
+;  "Set the working directory temporarily set to DIRECTORY and run BODY.
+;DIRECTORY is expanded"
+;  `(let ((default-directory ,(file-name-as-directory (expand-file-name (eval directory)))))
+;     ,@body))
 
+
+(defun with-current-directory (directory &rest body)
+  (let ((default-directory (file-name-as-directory (expand-file-name directory))))
+    body))
 
 (defun mygit (git-command)
   "Run GIT-COMMAND in custom environment.
@@ -102,6 +106,108 @@ it.  If you want to clone it somewhere else, temporarily define
     (insert (format "\n%s" system-type))
     (insert (shell-command-to-string ifconfig-program))))
 
+;; http://www.gnu.org/software/emacs/manual/html_node/eintr/Files-List.html
+(defun files-in-below-directory (directory)
+  "List the .org files in DIRECTORY and in its sub-directories."
+  ;; Although the function will be used non-interactively,
+  ;; it will be easier to test if we make it interactive.
+  ;; The directory will have a name such as
+  ;;  "/usr/local/share/emacs/22.1.1/lisp/"
+  (interactive "DDirectory name: ")
+  (let (org-files-list
+	(current-directory-list
+	 (directory-files-and-attributes directory t)))
+    ;; while we are in the current directory
+    (while current-directory-list
+      (cond
+       ;; check to see whether filename ends in `.el'
+       ;; and if so, append its name to a list.
+       ((equal ".org" (substring (car (car current-directory-list)) -4))
+	(setq org-files-list
+	      (cons (car (car current-directory-list)) org-files-list)))
+       ;; check whether filename is that of a directory
+       ((eq t (car (cdr (car current-directory-list))))
+	;; decide whether to skip or recurse
+	(if
+	    (equal "."
+		   (substring (car (car current-directory-list)) -1))
+	    ;; then do nothing since filename is that of
+	    ;;   current directory or parent, "." or ".."
+	    ()
+	  ;; else descend into the directory and repeat the process
+	  (setq org-files-list
+		(append
+		 (files-in-below-directory
+		  (car (car current-directory-list)))
+		 org-files-list)))))
+      ;; move to the next filename in the list; this also
+      ;; shortens the list so the while loop eventually comes to an end
+      (setq current-directory-list (cdr current-directory-list)))
+    ;; return the filenames
+    org-files-list))'
+
+
+(defun tq-search (regexp)
+  "Search all of the course files using `multi-occur-in-matching-buffers' for REGEXP.
+
+Opens all course files, then does the search."
+  (interactive (list (read-regexp "Regexp: ")))
+
+  (let ((org-files (files-in-below-directory tq-course-directory)))
+    (message "%s" org-files)
+  
+    (dolist (f org-files)
+      (message "opening %s" f)
+      (find-file-noselect f))
+
+    (multi-occur-in-matching-buffers ".*.org" regexp)))
+  
+
+(defun tq-index ()
+  "Generate a temporary index buffer from the course files."
+  (interactive)
+  (let ((*index-links*)
+	(*initial-letters*)
+	(org-files (files-in-below-directory tq-course-directory)))
+    ;; get links
+    (dolist (f org-files)
+      (find-file f)
+
+      (org-element-map (org-element-parse-buffer) 'link
+	(lambda (link)       
+	  (let ((type (nth 0 link))
+		(plist (nth 1 link)))
+	    
+	    (when (equal (plist-get plist ':type) "index")
+	      (add-to-list '*index-links* 
+			   (cons (plist-get plist :path)
+				 (format "[[elisp:(progn (switch-to-buffer \"%s\")(goto-char %s))][%s]] (%s)"
+								 
+					 (current-buffer)
+					 (plist-get plist :begin)
+					 (save-excursion
+					   (goto-char (plist-get plist :begin))
+					   (replace-regexp-in-string "\n" "" (thing-at-point 'sentence)))
+					 (file-name-nondirectory (buffer-file-name))))))))))				
+    (setq *index-links*  (cl-sort *index-links* 'string-lessp :key 'car))
+
+    ;; now first letters
+    (dolist (link *index-links*)
+      (add-to-list '*initial-letters* (substring (car link) 0 1) t))
+
+
+    (switch-to-buffer (get-buffer-create "*index*"))
+    (org-mode)
+    (erase-buffer)
+    (insert "#+TITLE: Index\n\n")
+    (dolist (letter *initial-letters*)
+      (insert (format "* %s\n" (upcase letter)))
+      ;; now process the links
+      (while (and *index-links* (string= letter (substring (car (car *index-links*)) 0 1)))
+	(let ((link (pop *index-links*)))
+	  (insert (format "%s %s\n\n" (car link) (cdr link)))))))) 
+    
+    
 
 (provide 'techela-utils)
 

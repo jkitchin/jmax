@@ -3,7 +3,7 @@
 
 * Introduction
 
-Techela is a framework for teaching courses. 
+Techela is a framework for teaching courses. It provides a way to easily distribute, collect, grade, and return digital assignments. 
 
 * Initial server setup
 The initial setup of a techela server is described here.
@@ -109,8 +109,10 @@ gitolite requirement. Contains userid.pub files.
 ** conf
 gitolite requirement. Contains gitolite.conf, which sets up repos.
 
-*** conf/repos
+*** conf/student-work
 We can actually create repo.conf files in this directory, and they are included in the gitolite.conf automatically. We only make one repo.conf per repository.
+*** conf/students.conf
+This file defines the @students group. It is usually generated automatically from the roster.
 
 ** roster.dat
 File containing registered students. This should be the datafile downloaded from fio, although any csv file with the userid in the second column, last name in the third column, and first name in the fourth column will do right now.
@@ -146,7 +148,7 @@ When you change the roster, you need to run elisp:ta-update-roster which will au
 This directory contains a grading file for each assignment. The files contain links to each file, and a summary of the grades.
 
 ** ../course
-This is the student facing part of the course. The syllabus should go in here, and any course notes/materials.
+This is the student facing part of the course. The syllabus should go in here, and any course notes/materials. This is a separate git repository.
 
 ** ../student-work
 Student repos will be cloned into this directory. This is where you will pull their work after it is collected.
@@ -170,7 +172,45 @@ This automatically creates the remote repo and local directory. Then, you add yo
 *** TODO how do you update the due dates? 
 these always end up changing, and we will need to update the syllabus, and possibly student files.
 
-* 
+* Providing anonymous access to the course directory in gitolite
+So that students can get started right away on the first day, we enable anonymous read access to the course directory. Here is how we set that up. Note, this only works for one course.
+
+Add this to your xinet.d directory 
+#+BEGIN_SRC text :tangle git
+# default: off
+# description: The git dæmon allows git repositories to be exported using \
+#       the git:// protocol.
+
+service git
+{
+        disable         = no
+        socket_type     = stream
+        wait            = no
+        user            = daemon
+        server          = /usr/libexec/git-core/git-daemon
+        server_args     = --base-path=/home/org-course/repositories  --syslog --inetd --verbose
+        log_on_failure  += USERID
+}
+#+END_SRC
+
+Run this to restart all the xinetd instances.
+#+BEGIN_SRC sh
+sudo killall -HUP xinetd
+#+END_SRC
+
+We have to add daemon to the course group.
+#+BEGIN_SRC sh
+usermod -a -G org-course daemon
+#+END_SRC
+
+And finally give the group read access to the course repository. Note that you have to give +x access to the parent directories.
+
+#+BEGIN_SRC sh
+chmod g+x /home/org-course
+chmod g+x /home/org-course/repositories
+chmod -R g+rx /home/org-course/repositories/course.git
+#+END_SRC
+
 
 * Running your course
 ** Create assignments
@@ -182,35 +222,4 @@ Each assignment exists in a directory LABEL in gitolite-admin/assignments. In th
 
 ** TODO Grade assignments
 
-
-* testing new setup.
-
-#+BEGIN_SRC emacs-lisp
-(tq-config-set-user-course "org-course" "jkitchin" "/home/test")
-(tq-config-set-user-course "625" "jkitchin" "home/625")
-#+END_SRC
-
-#+RESULTS:
-: home/625
-
-#+BEGIN_SRC emacs-lisp
-(tq-config-write-data (tq-config-read-data))
-#+END_SRC
-
-#+RESULTS:
-
-(puthash "test" "test" (gethash "user" (tq-config-read-data)))
-
-#+BEGIN_SRC emacs-lisp
-(tq-config-get-user-courses)
-#+END_SRC
-
-#+RESULTS:
-| 625 | org-course |
-#+BEGIN_SRC emacs-lisp
-(tq-config-get-user-course "org-course")
-#+END_SRC
-
-#+RESULTS:
-: #s(hash-table size 65 test equal rehash-size 1.5 rehash-threshold 0.8 data ("root-dir" "/home/test" "userid" "jkitchin"))
 

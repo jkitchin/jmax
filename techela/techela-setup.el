@@ -246,7 +246,7 @@ Make sure ssh is available. Generate ~/.ssh/techela_id key and
 (insert (format "\n~/.ssh/techela-%s.pub contains:
 #+BEGIN====================================================================
 " tq-userid))
-  (insert-file-contents (expand-file-name (format "~/.ssh/techela-%s.pub" tq-userid)))
+  (insert-file-contents (expand-file-name (format "~/.ssh/%s.pub" tq-userid)))
   (goto-char (point-max))
   (insert "\n#+END====================================================================
 

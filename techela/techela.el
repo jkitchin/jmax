@@ -32,6 +32,7 @@
 
 (defvar tq-userid nil "Global variable to store a course userid.")
 
+(defvar tq-course-files nil "list of org-files that constitute the course")
 
 (defun techela (course)
   "Open the syllabus for COURSE.
@@ -81,11 +82,13 @@ The user id_rsa.pub key must be registered in the course."
     (unless (and tq-course-directory (file-exists-p tq-course-directory))
       (let ((default-directory (file-name-as-directory tq-root-directory)))
 	(mygit (format "git clone git://%s/course" tq-git-server)))))
- 
+
   ;; finally open the syllabus
   (find-file (expand-file-name "syllabus.org" tq-course-directory))
   (toggle-read-only)
   (techela-mode)
+
+  (setq org-id-extra-files (files-in-below-directory tq-course-directory))
 
   ;; let user know if an update is needed
   (when (> (tq-get-num-incoming-changes) 0)
@@ -292,6 +295,7 @@ Messages\n==========\n")
   '("techela"
     ["Get assignment " tq-get-assignment t]
     ["Turn assignment in" tq-turn-it-in t]
+    ["Search course files" tq-search t]
     ["Course agenda" tq-agenda t]
 ;    ["Get grade report" tq-grade-report t]
     ["Email" tq-email t]
