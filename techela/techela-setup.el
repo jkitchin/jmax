@@ -198,6 +198,17 @@ Make sure ssh is available. Generate ~/.ssh/techela_id key and
 	  (goto-char (point-max))
 	  (insert entry)))
 
+      ;; Append a line to the ~/.authinfo for authentication with mail
+      ;; Users will be prompted for their andrew password
+      (let ((contents (with-temp-buffer
+			(insert-file-contents
+			 (expand-file-name "~/.authinfo"))
+			(buffer-string))))
+	(with-temp-file (expand-file-name "~/.authinfo")
+	  (when contents (insert contents))
+	  (goto-char (point-max))
+	  (insert (format "\nmachine smtp.andrew.cmu.edu port 587 login %s" tq-userid))))
+
       ;; now create an email and send the key to the instructor
       (compose-mail)
       (message-goto-to)
