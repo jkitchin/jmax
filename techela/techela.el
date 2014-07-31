@@ -153,6 +153,27 @@ Check *techela log* for error messages."
 (defun tq-update ()
   "Run git pull.  Refresh file currently visited."
   (interactive)
+  (if (not (string= "" (shell-command-to-string
+			  (concat "git status --porcelain "
+				  (file-name-nondirectory
+				   (buffer-file-name))))))
+    ;; the file is dirty. We will commit the results. so we can
+      ;; pull. This may result in a conflict later that we have to merge.
+      (progn
+	(message "It looks like you have made changes to this file. There may be conflicting changes when we merge the update with your changes. These will look like:
+<<<<<<<< HEAD
+Your changes
+========
+Changes on the server
+>>>>>>>> some-random-git hash characters
+These will be committed so that future merges are possible. You can choose which version to keep."
+	(shell-command (concat "git commit -m \"my changes\" " (file-name-nondirectory
+								(buffer-file-name))))
+
+	(mygit "git pull origin master")
+	;; and now we commit our changes. This will have
+	(shell-command "git commit -a -m \"accepting merge\""))
+  
   (mygit "git pull origin master")
   (revert-buffer t t)
   (techela-mode 1))

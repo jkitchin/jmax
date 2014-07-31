@@ -100,8 +100,8 @@ DATA should be obtained and modified from `tq-config-read-data'."
 (defun ta-setup-user ()
   "Makes sure these variables are set:  `user-full-name',
 `user-mail-address', `send-mail-function',
-`message-send-mail-function', `smtpmail-smtp-server',
-`smtpmail-starttls-credentials', `smtpmail-smtp-service'."
+`message-send-mail-function', `smtpmail-smtp-server'. Configure
+git with this information where needed."
 
   ;; Full name
   (let ((data (tq-config-read-data)))
@@ -124,14 +124,7 @@ DATA should be obtained and modified from `tq-config-read-data'."
   ;; how to send mail. We use smtp.
   (when (equal send-mail-function 'sendmail-query-once)
     (setq send-mail-function 'smtpmail-send-it))
-  
-  ;; service port number
-;  (unless (and (boundp 'smtpmail-smtp-service) smtpmail-smtp-service)
-;    (setq smtpmail-smtp-service 587))
-
-  (unless (and (boundp 'mail-host-address) mail-host-address)
-    (setq mail-host-address "andrew.cmu.edu"))
-  
+    
   ;; setup git if it is not. Only set these if they are not already set.
   (unless (executable-find "git")
     (error "I cannot find git.  You cannot use techela"))
