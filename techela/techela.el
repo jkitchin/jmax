@@ -318,9 +318,11 @@ Messages\n==========\n")
     ["Get assignment " tq-get-assignment t]
     ["Turn assignment in" tq-turn-it-in t]
     ["Search course files" tq-search t]
+    ["Course index" tq-index t]
     ["Course agenda" tq-agenda t]
 ;    ["Get grade report" tq-grade-report t]
     ["Email" tq-email t]
+    ["Update current file" tq-update t]
     ["Send error report" tq-send-error-report t]
 ))
 
