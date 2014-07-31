@@ -166,7 +166,7 @@ Your changes
 ========
 Changes on the server
 >>>>>>>> some-random-git hash characters
-These will be committed so that future merges are possible. You can choose which version to keep."
+These will be committed so that future merges are possible. You should probably keep the server version to avoid future conflicts.")
 	(shell-command (concat "git commit -m \"my changes\" " (file-name-nondirectory
 								(buffer-file-name))))
 
