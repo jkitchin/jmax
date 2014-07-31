@@ -104,11 +104,23 @@ The user id_rsa.pub key must be registered in the course."
 			    label
 			    tq-root-directory))))
     (if (file-exists-p student-repo-dir)
-	;; open it
-	(find-file (expand-file-name
-		    (concat label ".org")
-		    student-repo-dir))
-    ;; clone it.
+	;; This means we have a copy. We should check if it is up to date
+	(with-current-directory
+	 student-repo-dir
+	 (if (not (string= "" (shell-command-to-string
+			       "git status --porcelain")))
+	     ;; There are some local changes. We commit them, and pull
+	     (progn
+	       (shell-command "git commit -am \"my changes\"")
+	       (shell-command "git pull"))
+	   ;; we were clean. Let's pull anyway to get remote changes.
+	   (shell-command "git pull"))
+	    
+	 ;; now, open the file
+	 (find-file (expand-file-name
+		     (concat label ".org")
+		     student-repo-dir)))
+    ;; The repo does not exist, so we make it by cloning it.
       (let ((default-directory tq-root-directory)
 	    (repo (format "a/%s" label)))
 	;; clone and open label.org
