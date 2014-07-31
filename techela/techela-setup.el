@@ -126,8 +126,8 @@ DATA should be obtained and modified from `tq-config-read-data'."
     (setq send-mail-function 'smtpmail-send-it))
   
   ;; service port number
-  (unless (and (boundp 'smtpmail-smtp-service) smtpmail-smtp-service)
-    (setq smtpmail-smtp-service 587))
+;  (unless (and (boundp 'smtpmail-smtp-service) smtpmail-smtp-service)
+;    (setq smtpmail-smtp-service 587))
 
   (unless (and (boundp 'mail-host-address) mail-host-address)
     (setq mail-host-address "andrew.cmu.edu"))
