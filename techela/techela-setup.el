@@ -161,8 +161,9 @@ Make sure ssh is available. Generate ~/.ssh/techela_id key and
     (make-directory (expand-file-name "~/.ssh") t))
 
   ;; now we know the ~/.ssh directory exists, check
-  ;; for id_rsa, and make a pair if needed
+  ;; for userid and userid.pub, and make a pair if needed
   (let ((keydir (expand-file-name "~/.ssh")))
+    ;; here we look for the existence of ~/.ssh/userid which is a private ssh key
     (unless (file-exists-p (expand-file-name tq-userid keydir))
       ;; we make one with no password
       (shell-command (format "ssh-keygen -t rsa -f %s -N \"\""
