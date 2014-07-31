@@ -112,7 +112,7 @@ DATA should be obtained and modified from `tq-config-read-data'."
 
   ;; email address
   (let ((data (tq-config-read-data)))
-    (unless (gethash "user-mail-address")
+    (unless (gethash "user-mail-address" data)
       (puthash "user-mail-address" (read-from-minibuffer "Enter your email address: ") data)
       (tq-config-write-data data))
     (setq user-mail-address (gethash "user-mail-address" data)))
