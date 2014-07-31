@@ -176,7 +176,7 @@ These will be committed so that future merges are possible. You should probably 
   
   (mygit "git pull origin master")
   (revert-buffer t t)
-  (techela-mode 1))
+  (techela-mode 1)))
 
 
 ;; This sets up an agenda view of the course assignments
