@@ -216,10 +216,20 @@ chmod -R g+rx /home/org-course/repositories/course.git
 ** Create assignments
 Each assignment exists in a directory LABEL in gitolite-admin/assignments. In this directory there should be a LABEL.org file. You put the assignment directions in that file. You can put whatever other files you want in the LABEL directory.
 
-** TODO Assign assignments
+You can use elisp:ta-create-assignment to automatically create the directory, the org-file, and the git repo. This will prompt you for important properties of the assignment like the points, category, due date, etc... You will have to create the assignment after that, commit the changes and push them to the server before you assign them.
 
-** TODO Collect assignments
+** Assign assignments
+Assignment is a multistep process. First, you create the assignment, commit and push it to the server. Then, you need to create repos for each student. This is done with elisp:ta-create-assignment-repos. That will create repos for each student that are empty, and with no access for the students. Next, you assign an assignment with elisp:ta-assign-assignment. This will give students access to the assignment, and give them RW access to their repo to turn it in. Finally, an entry in the syllabus is added so the students will know when it is due.
 
-** TODO Grade assignments
+
+** Collect assignments
+
+There are a few steps in collecting an assignment too. The fastest step is to run elisp:ta-collect, which simply changes the student repos to read-only. To view the work, you must run elisp:ta-pull-repos, which will pull all the student work to your local repo.
+
+** Grade assignments
+You have to run elisp:ta-grade, which will collect the assignment, pull them, and generate a grading document with links to each assignment. You will click on each link to grade each assignment. In each assignment, use the functions elisp:gb-feedback, elisp:gb-feedback-typo, and finally elisp:gb-grade. You will be prompted for a letter grade for each category of the rubric. This function will compute the weighted average grade.
+
+** Returning assignments
+Run elisp:ta-return to commit all changes to each student repo and push them back to the server.
 
 

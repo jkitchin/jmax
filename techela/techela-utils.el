@@ -26,16 +26,16 @@ Optional argument ARGS extra arguments."
     (insert (apply 'format format-string args))))
 
 
-;(defmacro with-current-directory (directory &rest body)
-;  "Set the working directory temporarily set to DIRECTORY and run BODY.
-;DIRECTORY is expanded"
-;  `(let ((default-directory ,(file-name-as-directory (expand-file-name (eval directory)))))
-;     ,@body))
+(defmacro with-current-directory (directory &rest body)
+  "Set the working directory temporarily set to DIRECTORY and run BODY.
+DIRECTORY is expanded"
+  `(let ((default-directory ,(file-name-as-directory (expand-file-name (eval directory)))))
+     ,@body))
 
 
-(defun with-current-directory (directory &rest body)
-  (let ((default-directory (file-name-as-directory (expand-file-name directory))))
-    body))
+;(defun with-current-directory (directory &rest body)
+;  (let ((default-directory (file-name-as-directory (expand-file-name directory))))
+;    (apply 'eval body)))
 
 (defun mygit (git-command)
   "Run GIT-COMMAND in custom environment.

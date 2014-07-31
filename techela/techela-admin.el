@@ -34,7 +34,11 @@
 (defvar ta-course-dir nil "Derived variable absolute path to the public course file.")
 (defvar ta-course-student-work-dir nil "Derived variable to the location of student work.")
 
-;; i would like to deprecate this
+(defvar ta-rubrics '(("participation" . (("participation" . 1.0)))
+		     ("homework" . (("technical" . 0.7) ("presentation" . 0.2) ("typography" . 0.1))))
+  "List of rubrics for assignments. Each element should be a list of components in alist form.")
+
+;; i would like to deprecate this so techela is not CMU centric
 (defvar ta-email-host "andrew.cmu.edu" "Hostname to construct email address from for userids with no @ in them.")
 
 (defun techela-admin (course-name)
@@ -309,11 +313,8 @@ This sets that repo to R access for USERID. We do not pull the assignment here."
 	"git add * && git commit -am \"Returning\" && git push")))))
 
 
-    
-;;; These are class functions which should efficiently operate on each entry of the roster.
-
 (defun ta-create-assignment (label)
-  "Create or edit an assignment LABEL."
+  "Create or edit an assignment LABEL. Interactively prompt for points, category, rubric and due date."
   (interactive (list
     (ido-completing-read "Label: " (ta-get-possible-assignments))))
 
@@ -327,20 +328,29 @@ This sets that repo to R access for USERID. We do not pull the assignment here."
        ta-course-assignments-dir
        (mygit (format "git clone %s@%s:a/%s"
 		      ta-course-name ta-course-server label))))
+
+    ;; create the org file and make sure it has the right filetags.
     (find-file (expand-file-name
 		    (concat label ".org")
 		    assignment-dir))
     (gb-set-filetag "ASSIGNMENT" label)
     (goto-char (point-min))
-    (unless (re-search-forward "#\\+POINTS:" nil t)
-;; TODO: completion on category and rubric. Input for due date.
-      (insert "#+TITLE:
-#+POINTS:
-#+CATEGORY:
-#+RUBRIC:
-#+DUEDATE:"))
-    ))
-
+    ;; we assume that unless points is defined, we need to insert all
+    ;; these things. We use completion where possible.
+    (unless (re-search-forward "#\\+POINTS:" nil 'end)
+      (insert (format "
+#+POINTS: %s
+#+CATEGORY: %s
+#+RUBRIC: %s
+#+DUEDATE: "
+		      (read-input "Points: ")
+		      (ido-completing-read "Category: " (ta-get-categories))
+		      (cdr (assoc (ido-completing-read "Rubric: " (mapcar 'car ta-rubrics)) ta-rubrics))))
+      (goto-char (point-max))
+      ;; insert a due date.
+      (org-time-stamp '()))))
+		      
+;;; These are class functions which should efficiently operate on each entry of the roster.
 
 (defun ta-create-assignment-repos (label)
   "Create repos for all students in the roster for an assignment LABEL.
@@ -794,12 +804,14 @@ This will be in student-work/label/userid-label/userid-label.org."
 	 (insert (format "* gitolite-admin is clean (remote changes = %s)\n" n))
 
        ;; Dirty course
-       (insert (format "* gitolite-admin is dirty (remote changes = %s)
+       (insert (format (concat "* gitolite-admin is "
+			       (propertize "dirty" 'font-lock-face '(:foreground "red"))
+			       " (remote changes = %s)
   :PROPERTIES:
   :VISIBILITY: folded
   :END:
 git status:
-%s" n git-status))
+%s") n git-status))
        (insert "
 
 #+BEGIN_SRC emacs-lisp
@@ -820,13 +832,15 @@ git status:
 	 (insert (format "* Course is clean (remote changes = %s)\n" n))
 
        ;; Dirty course
-       (insert (format "* Course is dirty (remote changes = %s)
+       (insert (format (concat "* Course is "
+			       (propertize "dirty" 'font-lock-face '(:foreground "red"))
+			       " (remote changes = %s)
 
   :PROPERTIES:
   :VISIBILITY: folded
   :END:
 git status:
-%s" n git-status))
+%s") n git-status))
        
        (insert "
 
@@ -838,6 +852,24 @@ git status:
 #+END_SRC
 
 "))))
+  (insert "* Assignment directory statuses\n")
+  (dolist (label (ta-get-possible-assignments))
+    (with-current-directory
+     (expand-file-name
+      label ta-course-assignments-dir)
+          
+    (let ((git-status (shell-command-to-string "git status --porcelain")))
+      (if (string= "" git-status)
+	  (insert "** " label
+		  (if (-contains? (ta-get-assigned-assignments) label)
+		      " (assigned)"
+		    " (not assigned)")
+		  " is clean")
+	(insert "** " label " is " (propertize "dirty" 'font-lock-face '(:foreground "red")))))
+    (insert (format "\n[[file:%s][%s]]"
+		    (expand-file-name
+		     label ta-course-assignments-dir)
+		    label) "\n")))
 
     (insert "
 * Menu of options

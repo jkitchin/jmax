@@ -104,46 +104,33 @@ DATA should be obtained and modified from `tq-config-read-data'."
 `smtpmail-starttls-credentials', `smtpmail-smtp-service'."
 
   ;; Full name
-  (unless (and (boundp 'user-full-name) user-full-name (not (string= "" user-full-name)))
-    (let ((data (tq-config-read-data)))
-      (unless (gethash "user-full-name" data)
-	(puthash "user-full-name" (read-from-minibuffer "Enter your full name: ") data)
-	(tq-config-write-data data))
-      (setq user-full-name (gethash "user-full-name" data))))
+  (let ((data (tq-config-read-data)))
+    (unless (gethash "user-full-name" data)
+      (puthash "user-full-name" (read-from-minibuffer "Enter your full name: ") data)
+      (tq-config-write-data data))
+    (setq user-full-name (gethash "user-full-name" data)))
 
   ;; email address
-  (unless (and (boundp 'user-mail-address) user-mail-address)
-    (let ((data (tq-config-read-data)))
-      (unless (gethash "user-mail-address")
-	(puthash "user-mail-address" (read-from-minibuffer "Enter your email address: ") data)
-	(tq-config-write-data data))
-      (setq user-mail-address (gethash "user-mail-address" data))))
+  (let ((data (tq-config-read-data)))
+    (unless (gethash "user-mail-address")
+      (puthash "user-mail-address" (read-from-minibuffer "Enter your email address: ") data)
+      (tq-config-write-data data))
+    (setq user-mail-address (gethash "user-mail-address" data)))
   
   ;; the server to send mail from
   (unless (and (boundp 'smtpmail-smtp-server) smtpmail-smtp-server)
-    (setq smtpmail-smtp-server "smtp.andrew.cmu.edu"))
+    (setq smtpmail-smtp-server "relay.andrew.cmu.edu"))
 
-  ;; how to send mail
+  ;; how to send mail. We use smtp.
   (when (equal send-mail-function 'sendmail-query-once)
     (setq send-mail-function 'smtpmail-send-it))
   
-  ;; credentials we use with authentication.
-  (unless (and (boundp 'smtpmail-starttls-credentials) smtpmail-starttls-credentials)
-    (setq smtpmail-starttls-credentials '(("smtp.andrew.cmu.edu" 587 nil nil))))
-
   ;; service port number
   (unless (and (boundp 'smtpmail-smtp-service) smtpmail-smtp-service)
     (setq smtpmail-smtp-service 587))
 
-  (setq smtpmail-stream-type nil
-      starttls-use-gnutls t
-      starttls-gnutls-program "gnutls-cli")
-
   (unless (and (boundp 'mail-host-address) mail-host-address)
     (setq mail-host-address "andrew.cmu.edu"))
-
-  (unless (executable-find "python")
-    (error "I cannot find python. You cannot use techela."))	  
   
   ;; setup git if it is not. Only set these if they are not already set.
   (unless (executable-find "git")

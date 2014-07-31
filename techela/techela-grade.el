@@ -108,23 +108,23 @@ placed after the new link when it is done."
                        current-point (user-login-name)  current-line)))))
 
 
-(defun gb-assign-grade (lettergrade)
-  "Add LETTERGRADE to the feedback section."
-  (interactive
-   (list (ido-completing-read
-	  "Letter grade: "
-	  (mapcar (lambda (x) (car x)) gb-MULTIPLIERS)
-	  nil t)))
-  (goto-char (point-min))
-  (if (search-forward "#+GRADE:" (point-max) t)
-      (progn
-	(beginning-of-line)
-	(kill-line)
-	(insert (format "#+GRADE: %s" lettergrade)))
-    ;else no grade found yet
-    (goto-char (point-max))
-    (insert (format "\n#+GRADE: %s" lettergrade)))
-  (save-buffer))
+;; (defun gb-assign-grade (lettergrade)
+;;   "Add LETTERGRADE to the feedback section."
+;;   (interactive
+;;    (list (ido-completing-read
+;; 	  "Letter grade: "
+;; 	  (mapcar (lambda (x) (car x)) gb-MULTIPLIERS)
+;; 	  nil t)))
+;;   (goto-char (point-min))
+;;   (if (search-forward "#+GRADE:" (point-max) t)
+;;       (progn
+;; 	(beginning-of-line)
+;; 	(kill-line)
+;; 	(insert (format "#+GRADE: %s" lettergrade)))
+;;     ;else no grade found yet
+;;     (goto-char (point-max))
+;;     (insert (format "\n#+GRADE: %s" lettergrade)))
+;;   (save-buffer))
 
 
 
@@ -187,11 +187,17 @@ This assumes the assignment label is the filename you are in."
   (save-excursion
     (goto-char (point-min))
     (if (re-search-forward (format "#\\+%s:" tag) (point-max) 'end)
+	;; replace existing filetag
 	(progn
 	  (beginning-of-line)
 	  (kill-line)
 	  (insert (format "#+%s: %s" tag value)))
-      (insert (format "\n#+%s: %s" tag value)))))
+      ;; add new filetag
+      (if (eq (line-beginning-position) (point))
+	  ;; at beginning of line
+	  (insert (format "#+%s: %s" tag value))
+	;; at end of some line, so add a new line		  
+	(insert (format "\n#+%s: %s" tag value))))))
 
 
 (defun gb-get-filetag (tag)
