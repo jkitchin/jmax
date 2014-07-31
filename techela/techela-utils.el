@@ -144,7 +144,7 @@ it.  If you want to clone it somewhere else, temporarily define
       ;; shortens the list so the while loop eventually comes to an end
       (setq current-directory-list (cdr current-directory-list)))
     ;; return the filenames
-    org-files-list))'
+    org-files-list))
 
 
 (defun tq-search (regexp)
@@ -154,12 +154,9 @@ Opens all course files, then does the search."
   (interactive (list (read-regexp "Regexp: ")))
 
   (let ((org-files (files-in-below-directory tq-course-directory)))
-    (message "%s" org-files)
-  
+    ;; open all the files so we can use multi-occur
     (dolist (f org-files)
-      (message "opening %s" f)
       (find-file-noselect f))
-
     (multi-occur-in-matching-buffers ".*.org" regexp)))
   
 

@@ -866,7 +866,7 @@ git status:
 		    " (not assigned)")
 		  " is clean")
 	(insert "** " label " is " (propertize "dirty" 'font-lock-face '(:foreground "red")))))
-    (insert (format "\n[[file:%s][%s]]"
+    (insert (format "\n    [[file:%s][%s]]"
 		    (expand-file-name
 		     label ta-course-assignments-dir)
 		    label) "\n")))

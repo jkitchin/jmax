@@ -151,13 +151,14 @@ Check *techela log* for error messages."
 
 
 (defun tq-update ()
-  "Run git pull.  Refresh file currently visited."
+  "Update current visited file from git.
+If local changes have been made, they are commited to the local repo so a merge can be done."
   (interactive)
   (if (not (string= "" (shell-command-to-string
 			  (concat "git status --porcelain "
 				  (file-name-nondirectory
 				   (buffer-file-name))))))
-    ;; the file is dirty. We will commit the results. so we can
+      ;; the file is dirty. We will commit the results. so we can
       ;; pull. This may result in a conflict later that we have to merge.
       (progn
 	(message "It looks like you have made changes to this file. There may be conflicting changes when we merge the update with your changes. These will look like:
@@ -173,7 +174,7 @@ These will be committed so that future merges are possible. You should probably 
 	(mygit "git pull origin master")
 	;; and now we commit our changes. This will have
 	(shell-command "git commit -a -m \"accepting merge\""))
-  
+  ;; it looks like we were clean
   (mygit "git pull origin master")
   (revert-buffer t t)
   (techela-mode 1)))
