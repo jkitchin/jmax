@@ -306,7 +306,7 @@ This sets that repo to R access for USERID. We do not pull the assignment here."
 		     ta-root-dir))))
     (with-current-directory
      repo-dir
-     (let ((process-environment (cons GIT_SSH process-environment)))
+     (let ((process-environment (cons *GIT_SSH* process-environment)))
        (start-process-shell-command
 	"ta-return"
 	"*ta return*"
