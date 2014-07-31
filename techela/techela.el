@@ -113,10 +113,10 @@ The user id_rsa.pub key must be registered in the course."
 	     (progn
 	       (message "Remote changes found. Please wait while I get them.")
 	       (shell-command "git commit -am \"my changes\"")
-	       (shell-command "git pull"))
+	       (mygit "git pull"))
 	   ;; we were clean. Let's pull anyway to get remote changes.
 	   (message "Checking for remote changes")
-	   (shell-command "git pull"))
+	   (mygit "git pull"))
 	    
 	 ;; now, open the file
 	 (find-file (expand-file-name
