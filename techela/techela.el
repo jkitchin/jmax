@@ -111,9 +111,11 @@ The user id_rsa.pub key must be registered in the course."
 			       "git status --porcelain")))
 	     ;; There are some local changes. We commit them, and pull
 	     (progn
+	       (message "Remote changes found. Please wait while I get them.")
 	       (shell-command "git commit -am \"my changes\"")
 	       (shell-command "git pull"))
 	   ;; we were clean. Let's pull anyway to get remote changes.
+	   (message "Checking for remote changes")
 	   (shell-command "git pull"))
 	    
 	 ;; now, open the file
