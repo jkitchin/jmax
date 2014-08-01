@@ -243,7 +243,7 @@ repo: %s
 		 (buffer-file-name)
 		 (what-line)
 		 (thing-at-point 'line)
-		 (mygit "git config --get remote.origin.url" t))))
+		 (mygit "git config --get remote.origin.url"))))
 
     (compose-mail-other-frame)
     (message-goto-to)
@@ -328,7 +328,7 @@ Assignments are headings that are tagged with :assignment:.  The assignment is
 a link in the heading."
   (interactive)
   (with-temp-buffer
-    (insert-file-contents (expand-file-name "syllabus.org" ta-course-dir))
+    (insert-file-contents (expand-file-name "syllabus.org" tq-course-directory))
     (org-mode)
     (org-map-entries
      (lambda ()

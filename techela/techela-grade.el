@@ -237,7 +237,7 @@ This assumes the assignment label is the filename you are in."
      ["Insert footnote" gb-insert-footnote t]
      ["Insert comment" gb-insert-comment t]
      ["Insert typo" gb-feedback-typo t]
-     ["Assign grade" gb-assign-grade t]
+     ["Assign grade" gb-grade t]
      ["Save and close buffer" gb-save-and-close-buffer t]
  ))
 

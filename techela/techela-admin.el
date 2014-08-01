@@ -543,14 +543,14 @@ permissions of the repo to Read-only first."
 	  (with-current-directory
 	   repo-dir
 	   ;; should perhaps consider making sure we are clean before we pull?
-	   (let ((process-environment (cons GIT_SSH process-environment)))
+	   (let ((process-environment (cons *GIT_SSH* process-environment)))
 	     (start-process-shell-command "git-pull"  ; process anme
 					  "*git pull*" ; buffer for output
 					  "git pull")))		 
 	;; repo-dir did not exist. So we clone it.
 	(with-current-directory
 	 (file-name-directory repo-dir-name)
-	 (let ((process-environment (cons GIT_SSH process-environment)))
+	 (let ((process-environment (cons *GIT_SSH* process-environment)))
 	   (start-process-shell-command "git-clone"
 					"*git clone*"
 					(format "git clone %s@%s:%s"
@@ -581,7 +581,7 @@ This means go into each repo, commit all changes, and push them."
 		       ta-root-dir))))
       (with-current-directory
        repo-dir
-       (let ((process-environment (cons GIT_SSH process-environment)))
+       (let ((process-environment (cons *GIT_SSH* process-environment)))
 	 (start-process-shell-command
 	  "ta-return"
 	  "*ta return*"
