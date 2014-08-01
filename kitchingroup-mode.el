@@ -77,7 +77,7 @@
     ("org-mode"
      ["Toggle symbols" org-toggle-pretty-entities t]
      ["Toggle inline images" org-toggle-inline-images t]
-     ["Toggle LaTeX images" org-preview-latex-fragment t]
+     ["Toggle LaTeX images" org-toggle-latex-overlays t]
      ("editing"
       ["Insert citation" org-ref-insert-cite-link t]
       ["Insert ref link" org-ref-insert-ref-link t]
