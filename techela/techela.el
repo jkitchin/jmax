@@ -321,6 +321,20 @@ Messages\n==========\n")
   (interactive)
   (techela-mode -1))
 
+
+(defun tq-get-assigned-assignments ()
+  "Return a list of assignments from the syllabus.
+Assignments are headings that are tagged with :assignment:.  The assignment is
+a link in the heading."
+  (interactive)
+  (with-temp-buffer
+    (insert-file-contents (expand-file-name "syllabus.org" ta-course-dir))
+    (org-mode)
+    (org-map-entries
+     (lambda ()
+       (org-entry-get (point) "CUSTOM_ID"))
+     "assignment")))
+
 ;;;; menu and minor mode
 
 (require 'easymenu)
@@ -362,7 +376,7 @@ Messages\n==========\n")
 	  (mapcar
 	   (lambda (x)
 	     (vector x `(tq-get-assignment ,x) t))
-	   (ta-get-assigned-assignments))))
+	   (tq-get-assigned-assignments))))
 
 (provide 'techela)
 
