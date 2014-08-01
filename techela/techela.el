@@ -143,7 +143,7 @@ The user id_rsa.pub key must be registered in the course."
 
 
 (defun  tq-turn-it-in ()
-  "Save all buffers, add files in current git directory, commit them and push.
+  "Save all buffers, add files in current git directory, create a SYSTEM-INFO file, commit them and push.
 
 Check *techela log* for error messages."
   (interactive)
@@ -166,7 +166,8 @@ Check *techela log* for error messages."
 
 (defun tq-update ()
   "Update current visited file from git.
-If local changes have been made, they are commited to the local repo so a merge can be done."
+If local changes have been made, they are commited to the local
+repo so a merge can be done."
   (interactive)
   (if (not (string= "" (shell-command-to-string
 			  (concat "git status --porcelain "
@@ -315,7 +316,10 @@ Messages\n==========\n")
      (mygit "git push origin master"))))
 
 
-
+(defun tq-quit ()
+  "Quit techela"
+  (interactive)
+  (techela-mode -1))
 
 ;;;; menu and minor mode
 
@@ -334,18 +338,31 @@ Messages\n==========\n")
     ["Search course files" tq-search t]
     ["Course index" tq-index t]
     ["Course agenda" tq-agenda t]
+    ("Assignments")
 ;    ["Get grade report" tq-grade-report t]
     ["Email" tq-email t]
     ["Update current file" tq-update t]
     ["Send error report" tq-send-error-report t]
-))
+    ["Quit" tq-quit t]
+    ))
+
 
 (define-minor-mode techela-mode
   "Minor mode for techela
 
 \\{techela-mode-map}"
   :lighter " techela"
-  :keymap techela-mode-map)
+  :global t
+  :keymap techela-mode-map
+
+  ;; add dynamic assignments
+  (mapcar (lambda (x)
+	    (easy-menu-add-item techela-menu '("Assignments") x))
+	  ;; Make a list of vectors
+	  (mapcar
+	   (lambda (x)
+	     (vector x `(tq-get-assignment ,x) t))
+	   (ta-get-assigned-assignments))))
 
 (provide 'techela)
 

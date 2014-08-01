@@ -164,6 +164,7 @@ This assumes the assignment label is the filename you are in."
     (setq grade (reduce '+ (cl-mapcar (lambda (weight multiplier) (* weight multiplier))
 			  weights multipliers)))
     (goto-char (point-max))
+    (insert "\n* Grade\n")
     (cl-mapcar (lambda (category grade) (gb-set-filetag category grade))
 	       categories LGS)
     (gb-set-filetag "GRADE" (format "%1.3f" grade))
