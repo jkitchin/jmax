@@ -116,15 +116,37 @@ git with this information where needed."
       (puthash "user-mail-address" (read-from-minibuffer "Enter your email address: ") data)
       (tq-config-write-data data))
     (setq user-mail-address (gethash "user-mail-address" data)))
-  
-  ;; the server to send mail from
-  (unless (and (boundp 'smtpmail-smtp-server) smtpmail-smtp-server)
-    (setq smtpmail-smtp-server "relay.andrew.cmu.edu"))
 
-  ;; how to send mail. We use smtp.
+  ;; how to send mail
   (when (equal send-mail-function 'sendmail-query-once)
     (setq send-mail-function 'smtpmail-send-it))
-    
+
+  ;; this will clobber any user settings. For new students these are
+  ;; not likely to be set. I am not sure how to handle this generally.
+  (setq smtpmail-smtp-server "smtp.andrew.cmu.edu"
+	smtpmail-smtp-service 587
+	smtpmail-starttls-credentials '(("smtp.andrew.cmu.edu" 587 nil nil))
+	smtpmail-stream-type nil
+	starttls-use-gnutls t
+	starttls-gnutls-program "gnutls-cli")
+
+  (unless (and (boundp 'mail-host-address) mail-host-address)
+    (setq mail-host-address "andrew.cmu.edu"))
+
+  ;; Append a line to the ~/.authinfo for authentication with mail
+  ;; Users will be prompted for their andrew password
+  (unless (file-exists-p (expand-file-name "~/.authinfo"))
+    (with-temp-file (expand-file-name "~/.authinfo")))
+  
+  (let ((contents (with-temp-buffer
+		    (insert-file-contents
+		     (expand-file-name "~/.authinfo"))
+		    (buffer-string))))
+    (with-temp-file (expand-file-name "~/.authinfo")
+      (when contents (insert contents))
+      (goto-char (point-max))
+      (insert (format "\nmachine smtp.andrew.cmu.edu port 587 login %s" tq-userid))))
+
   ;; setup git if it is not. Only set these if they are not already set.
   (unless (executable-find "git")
     (error "I cannot find git.  You cannot use techela"))
