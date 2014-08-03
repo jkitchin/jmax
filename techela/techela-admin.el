@@ -401,7 +401,14 @@ assignment dir.
 
 2. Set repos to RW for students.
 
-3. Update the syllabus with the assignment."
+3. Update the syllabus with the assignment.
+
+The assignment must have POINTS, CATEGORY, RUBRIC and DUEDATE
+defined.  The syllabus must be in the right place:
+course/syllabus.org, and it must have a categories table, and an
+assignments section. This function updates the assignments
+section.
+"
   (interactive (list
 		(ido-completing-read
 		 "Label: "		 
@@ -475,7 +482,9 @@ assignment dir.
        ta-gitolite-admin-dir
        (mygit "git push"))
 
-      ;; Now, give them read access on the assignment
+      ;; Now, give them read access on the assignment. The assignment
+      ;; is created as a wild repo, so we do permissions different on
+      ;; these than on other types of repos.
       (shell-command (format "ssh org-course@techela.cheme.cmu.edu perms a/%s + READERS @students" label))
 
       )))
@@ -581,12 +590,15 @@ This means go into each repo, commit all changes, and push them."
 		       ta-root-dir))))
       (with-current-directory
        repo-dir
-       (let ((process-environment (cons *GIT_SSH* process-environment)))
-	 (start-process-shell-command
-	  "ta-return"
-	  "*ta return*"
-	  "git add * && git commit -am \"Returning\" && git push")))
-      (message "returned %s" userid))))
+       ;; only push if changes detected
+       (if (not (string= "" (shell-command-to-string "git status --porcelain")))
+	   (let ((process-environment (cons *GIT_SSH* process-environment)))
+	     (start-process-shell-command
+	      "ta-return"
+	      "*ta return*"
+	      "git add * && git commit -am \"Returning\" && git push")
+	     (message "returned %s" userid))
+	 (message "no changes detected for %s" userid))))))
 
 
 (defun ta-grade (label)
@@ -790,14 +802,22 @@ This will be in student-work/label/userid-label/userid-label.org."
  (interactive)
  (switch-to-buffer-other-frame (get-buffer-create "*techela-assignments*"))
  (erase-buffer)
- (mapcar (lambda (label)
-	   (let* ((label-org (concat label ".org"))
-		  (label-file (expand-file-name
-			       label-org
-			       (expand-file-name label ta-course-assignments-dir))))
-	     
-	     (insert (format "- [[file:%s][%s]]\n" label-file label ))))
-	 (ta-get-assigned-assignments))
+
+ (dolist (label (ta-get-assigned-assignments))
+   ;; get the directory if we do not have it.
+   (unless (file-exists-p (expand-file-name label ta-course-assignments-dir))
+     (unless (file-exists-p ta-course-assignments-dir)
+       (make-directory ta-course-assignments-dir t))
+     (with-current-directory
+      ta-course-assignments-dir
+      (mygit (format "git clone %s@%s:a/%s" ta-course-name ta-course-server label))))
+   
+   (let* ((org-file (concat label ".org"))
+	  (org-file-path (expand-file-name
+			  org-file
+			  (expand-file-name label ta-course-assignments-dir))))
+     (insert (format "- [[file:%s][%s]]\n" org-file-path label))))
+
  (org-mode))
 
 
@@ -876,6 +896,8 @@ git status:
 #+END_SRC
 
 "))))
+
+  ;;; now we get each assignment
   (insert "* Assignment directory statuses\n")
   (dolist (label (ta-get-possible-assignments))
     (with-current-directory
@@ -889,7 +911,17 @@ git status:
 		      " (assigned)"
 		    " (not assigned)")
 		  " is clean")
-	(insert "** " label " is " (propertize "dirty" 'font-lock-face '(:foreground "red")))))
+	(insert "** " label " is " (propertize "dirty\n" 'font-lock-face '(:foreground "red"))
+		(shell-command-to-string "git status")
+		(format "
+#+BEGIN_SRC emacs-lisp
+ (with-current-directory (expand-file-name \"%s\" ta-course-assignments-dir)
+   (mygit \"git add *\")
+   (mygit \"git commit -m \\\"committing everything\\\"\")
+   (mygit \"git push\"))
+#+END_SRC
+" label))
+		))
     (insert (format "\n    [[file:%s][%s]]"
 		    (expand-file-name
 		     label ta-course-assignments-dir)
@@ -898,11 +930,11 @@ git status:
     (insert "
 * Menu of options
 
-** Admin
+** Admin Actions
 
 - [[elisp:(find-file ta-gitolite-admin-dir)][Open the admin directory]]
 
-** Course
+** Course Actions
 
 - [[elisp:(find-file ta-course-dir)][Open the course directory]]
 
@@ -911,7 +943,7 @@ git status:
 - [[elisp:(find-file (expand-file-name \"roster.dat\" ta-gitolite-admin-dir))][Open the roster.dat]]   [[elisp:(find-file (expand-file-name \"roster.org\" ta-gitolite-admin-dir))][Open the roster.org]]
 - [[elisp:ta-update-roster][Update the roster]] (do this after you change roster.dat)
 
-** Assignments
+** Assignment Actions
 
 - [[elisp:(find-file ta-course-assignments-dir)][Open the assignments directory]]
 - [[elisp:(find-file ta-course-student-work-dir)][Open student work directory]]
@@ -919,26 +951,25 @@ git status:
 
 - [[elisp:ta-create-assignment][Create or edit an assignment]]
 - [[elisp:ta-create-assignment-repos][Create class repos for an assignment]] (no student access until you assign it.)
+
 - [[elisp:ta-assign-assignment to class][Assign an assignment]] (give students RW access)
-- [[elisp:ta-collect][Collect an assignment from class]] (change students to R access. Does not pull)
-- [[elisp:ta-pull-repos][Pull an assignment from class]] (get local copies of assignment)
+- [[elisp:ta-collect][Collect an assignment from class]] (change students to R access. Does not pull.)
+- [[elisp:ta-pull-repos][Pull an assignment from class]] (get local copies of assignment. Does not change permissions.)
 - [[elisp:ta-return][Return an assignment to class]] (push local copies to server)
 
-- [[elisp:ta-grade][Grade an assignment for class]] (create grading list)
+- [[elisp:ta-grade][Grade an assignment for class]] (collect and pull repos. create grading list)
 
-- [[elisp:ta-show-assigned-assignments][Show assigned assignments]]
+- [[elisp:ta-show-assigned-assignments][Show list of assigned assignments]]
 
-*** Individual student actions
+*** Individual Student Actions
 
-- [[elisp:ta-assign-to][Assign assignment to a student]]
-- [[elisp:ta-collect-from][Collect assignment from a student]]
-- [[elisp:ta-open-assignment][Open a student assignment]]
+- [[elisp:ta-assign-to][Assign assignment to a student. give RW access]]
+- [[elisp:ta-collect-from][Collect assignment from a student. Make R access]]
+- [[elisp:ta-open-assignment][Open a student assignment. Pulls first.]]
 - [[elisp:ta-return-to][Return your changes in an assignment to a student]]
 
 - [[elisp:ta-email][Email a student]]
 
-** TODO Reports
-Stay tuned for this.
 ")
     (goto-char (point-min))
     (org-mode))
