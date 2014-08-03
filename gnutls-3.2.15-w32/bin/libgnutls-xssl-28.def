@@ -1,0 +1,13 @@
+EXPORTS
+    xssl_client_init @1
+    xssl_cred_deinit @2
+    xssl_cred_init @3
+    xssl_deinit @4
+    xssl_flush @5
+    xssl_get_session @6
+    xssl_getdelim @7
+    xssl_printf @8
+    xssl_read @9
+    xssl_server_init @10
+    xssl_sinit @11
+    xssl_write @12
