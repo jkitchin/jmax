@@ -1,0 +1,2399 @@
+% \iffalse meta-comment
+% !TEX program  = pdflatex
+% !TEX encoding = ISO-8859-1
+%<*internal>
+\iffalse
+%</internal>
+%<*readme>
+----------------------------------------------------------------
+rsc --- BibTeX styles for Royal Society of Chemistry and Wiley 
+  journals
+E-mail: joseph.wright@morningstar2.co.uk
+Released under the LaTeX Project Public License v1.3c or later
+See http://www.latex-project.org/lppl.txt
+----------------------------------------------------------------
+
+The rsc package provides BibTeX style files to produce
+bibliographies in accordance with the guidelines of the Royal
+Society of Chemistry and Wiley chemistry-related journals. The
+styles require the use of natbib.  In addition, a short LaTeX 
+package is included; this provides a convenient user interface to 
+the customisation hooks made available by the BibTeX styles.
+%</readme>
+%<*internal>
+\fi
+\def\nameofplainTeX{plain}
+\ifx\fmtname\nameofplainTeX\else
+  \expandafter\begingroup
+\fi
+%</internal>
+%<*install>
+\input docstrip.tex
+\keepsilent
+\askforoverwritefalse
+\preamble
+----------------------------------------------------------------
+rsc --- BibTeX styles for Royal Society of Chemistry and Wiley 
+  journals
+E-mail: joseph.wright@morningstar2.co.uk
+Released under the LaTeX Project Public License v1.3c or later
+See http://www.latex-project.org/lppl.txt
+----------------------------------------------------------------
+
+\endpreamble
+\postamble
+
+Copyright (C) 2006-2009,2011 by
+  Joseph Wright <joseph.wright@morningstar2.co.uk>
+  
+It may be distributed and/or modified under the conditions of
+the LaTeX Project Public License (LPPL), either version 1.3c of
+this license or (at your option) any later version.  The latest
+version of this license is in the file:
+
+   http://www.latex-project.org/lppl.txt
+
+This work is "maintained" (as per LPPL maintenance status) by
+  Joseph Wright.
+
+This work consists of the file  rsc.dtx
+          and the derived files rsc.pdf,                                
+                                rsc.ins,
+                                rsc.sty,
+                                rsc.bib and
+                                rsc-demo.tex.
+
+                                
+\endpostamble
+\usedir{tex/latex/rsc}
+\generate{
+  \file{\jobname.sty}{\from{\jobname.dtx}{package}}
+}
+\usedir{bibtex/bst/rsc}
+\generate{
+  \file{rsc.bst}{\from{\jobname.dtx}{bst,rsc}}
+  \file{angew.bst}{\from{\jobname.dtx}{bst,angew}}
+}
+%</install>
+%<install>\endbatchfile
+%<*internal>
+\usedir{source/latex/rsc}
+\generate{
+  \file{\jobname.ins}{\from{\jobname.dtx}{install}}
+}
+\nopreamble\nopostamble
+\usedir{doc/latex/rsc}
+\generate{
+  \file{README.txt}{\from{\jobname.dtx}{readme}}
+  \file{rsc-demo.tex}{\from{\jobname.dtx}{demo}}
+  \file{rsc.bib}{\from{\jobname.dtx}{bib}}
+}
+\ifx\fmtname\nameofplainTeX
+  \expandafter\endbatchfile
+\else
+  \expandafter\endgroup
+\fi
+%</internal>
+%<*package>
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{rsc}
+  [2011/01/04 v3.1e Support for RSC and Wiley journals]
+%</package>
+%<*driver>
+\documentclass[a4paper]{ltxdoc}
+\usepackage[T1]{fontenc}
+\usepackage{array,booktabs,lmodern}
+\usepackage[usedoi,linkdoi]{rsc}
+\usepackage[osf]{mathpazo}
+\usepackage[scaled=0.95]{helvet}
+\usepackage[final]{listings,microtype}
+\usepackage[numbered]{hypdoc}
+\EnableCrossrefs
+\CodelineIndex
+\RecordChanges
+\begin{document}
+  \DocInput{\jobname.dtx}
+\end{document}
+%</driver>
+% \fi
+%
+%\GetFileInfo{\jobname.sty}
+%
+%\makeatletter
+%
+%^^A \DescribeOption is in l3doc but not ltxdoc
+%\newcommand*{\DescribeOption}{^^A
+%  \leavevmode
+%  \@bsphack
+%  \begingroup
+%    \MakePrivateLetters
+%    \Describe@Option
+%}
+%\newcommand*{\Describe@Option}[1]{^^A
+%    \endgroup
+%  \marginpar{^^A
+%    \raggedleft
+%    \PrintDescribeEnv{#1}^^A
+%  }%
+%  \SpecialOptionIndex{#1}^^A
+%  \@esphack
+%  \ignorespaces
+%}
+%\newcommand*{\SpecialOptionIndex}[1]{^^A
+%  \@bsphack
+%  \index{^^A
+%    #1\actualchar{\protect\ttfamily#1} (option)\encapchar usage^^A
+%  }^^A
+%  \index{^^A
+%    options:\levelchar#1\actualchar{\protect\ttfamily#1}
+%    \encapchar usage^^A
+%  }^^A
+%  \@esphack
+%}
+%
+%^^A For creating examples with nice highlighting of code, and so
+%^^A on; based on the system used in the listings source (lstsample).
+%\lst@RequireAspects{writefile}
+%\newsavebox{\LaTeXdemo@box}
+%\lstnewenvironment{LaTeXdemo}[1][code and example]{^^A
+%  \global\let\lst@intname\@empty
+%  \expandafter\let\expandafter\LaTeXdemo@end
+%    \csname LaTeXdemo@#1@end\endcsname
+%  \@nameuse{LaTeXdemo@#1}^^A
+%}{^^A
+%  \LaTeXdemo@end
+%}
+%\newcommand*\LaTeXdemo@new[3]{^^A
+%  \expandafter\newcommand\expandafter*\expandafter
+%    {\csname LaTeXdemo@#1\endcsname}{#2}^^A
+%  \expandafter\newcommand\expandafter*\expandafter
+%    {\csname LaTeXdemo@#1@end\endcsname}{#3}^^A
+%}
+%\newcommand*\LaTeXdemo@common{^^A
+%  \setkeys{lst}{
+%    basicstyle   = \small\ttfamily,
+%    basewidth    = 0.51em,
+%    gobble       = 3,
+%    keywordstyle = \color{blue},
+%    language     = [LaTeX]{TeX},
+%    moretexcs    = {
+%    }
+%  }^^A 
+%}
+%\newcommand*\LaTeXdemo@input{^^A
+%  \MakePercentComment
+%  \catcode`\^^M=10\relax
+%  \small
+%  \begingroup
+%    \setkeys{lst}{
+%      SelectCharTable=\lst@ReplaceInput{\^\^I}{\lst@ProcessTabulator}
+%    }^^A
+%    \leavevmode 
+%      \input{\jobname.tmp}^^A
+%  \endgroup
+%  \MakePercentIgnore
+%}
+%\LaTeXdemo@new{code and example}{^^A
+%  \setbox\LaTeXdemo@box=\hbox\bgroup
+%    \lst@BeginAlsoWriteFile{\jobname.tmp}^^A
+%    \LaTeXdemo@common
+%}{^^A
+%    \lst@EndWriteFile
+%  \egroup
+%  \begin{center}
+%    \ifdim\wd\LaTeXdemo@box>0.48\linewidth\relax
+%      \hbox to\linewidth{\box\LaTeXdemo@box\hss}^^A
+%        \begin{minipage}{\linewidth}
+%          \LaTeXdemo@input
+%        \end{minipage}
+%    \else
+%      \begin{minipage}{0.48\linewidth}
+%        \LaTeXdemo@input
+%      \end{minipage}
+%      \hfill
+%      \begin{minipage}{0.48\linewidth}
+%        \hbox to\linewidth{\box\LaTeXdemo@box\hss}^^A
+%      \end{minipage}
+%    \fi
+%  \end{center}
+%}
+%\LaTeXdemo@new{code only}{^^A
+%  \LaTeXdemo@common
+%}{^^A
+%}
+%
+%\providecommand*{\eTeX}{\ensuremath{\varepsilon}-\TeX}
+%\providecommand*{\file}{\texttt}
+%\providecommand*{\opt}{\texttt}
+%\providecommand*{\pkg}{\textsf}
+%
+%\makeatother
+%
+%\title{^^A
+%  \textsf{rsc} --- \texorpdfstring{\BibTeX}{BibTeX} styles for
+%    Royal Society of Chemistry and Wiley journals\thanks{^^A
+%    This file describes version \fileversion, last revised 
+%    \filedate.^^A
+%  }^^A
+%}
+%\author{^^A
+%  Joseph Wright\thanks{E-mail: joseph.wright@morningstar2.co.uk}^^A
+%}
+%\date{Released \filedate}
+%
+%\maketitle
+%
+%\changes{v1.0}{2006/11/08}{Initial release of packaged 
+%  \texttt{rsc.bst}}
+%\changes{v2.0}{2007/07/21}{First re-write of package}
+%\changes{v3.0}{2008/07/20}{Second re-write of package}
+%\changes{v3.1}{2009/04/24}{\pkg{mciteplus} package optional}
+%\changes{v3.1}{2009/04/24}{Demonstration file included}
+%\changes{v3.1d}{2011/01/04}{New \opt{linkdoi} option}
+%\changes{v3.1e}{2011/01/05}{Option to skip loading \pkg{mciteplus}}
+%
+%\begin{abstract}
+% The \pkg{rsc} package provides \BibTeX\ style files to produce
+% bibliographies in accordance with the guidelines of the Royal
+% Society of Chemistry and Wiley chemistry-related journals. The
+% styles require the use of \pkg{natbib}.  In addition, a short 
+% \LaTeX\ package is included; this provides a convenient user 
+% interface to the customisation hooks made available by the 
+% \BibTeX\ styles.
+%\end{abstract}
+%
+%\begin{multicols}{2}
+%  \tableofcontents
+%\end{multicols}
+%
+%\section{Introduction}
+% Although synthetic chemists do not, in the main, use \LaTeX\ for
+% the preparation of journal articles, it would be nice to be able to
+% use it for reports.  The package \pkg{achemso} provides for a
+% \BibTeX\ style and other support for reports in the style of the
+% American Chemical Society.  The aim of the \pkg{rsc} package is to
+% provide similar support for the style favoured by the Royal Society
+% of Chemistry.  The package also provides support for the style used
+% in Wiley-published journals.
+%
+% As of version 3, this bundle requires \pkg{natbib}; the package
+% \pkg{mciteplus} is also supported but not required.  These two 
+% packages make creating bibliographies much easier for chemists.  
+% 
+%\section{Installation}
+%
+% The entire bundle is supplied with the TDS-ready ZIP file,
+% \file{rsc.tds.zip}.  Simply unzip this into your local texmf
+% tree and run your hash program (\texttt{texhash} for \TeX{}Live or
+% \texttt{initextmf -u} for MiK\TeX).
+%
+% To extract the bundle of files from \file{rsc.dtx}, run 
+% (pdf)\TeX\ on \file{rsc.dtx}. This will produce all of the package
+% files, and also \file{README.txt}.  To extract the
+% files and build the documentation, run (pdf)\LaTeX\ on 
+% \texttt{rsc.dtx}.  The files can then be installed as above.
+%
+%\section{Using the styles}
+%
+% The styles are used in the normal way for \BibTeX\ styles, as the
+% argument to the \cs{bibliographystyle} macro.  As \pkg{natbib}
+% is required, it must of course be loaded. Citations can then be 
+% given as normal:
+%\begin{LaTeXdemo}
+%  Some standard citations
+%    \cite{Abernethy2003,Cotton1999}.
+%  Some \textsf{natbib}-specific features:
+%    \citet{Abernethy2003} have said something,
+%    as reported by \citeauthor{Cotton1999},
+%    in \citeyear{Abernethy2003}.
+%\end{LaTeXdemo}
+%
+% If the \pkg{mciteplus} package is available, multiple citations can
+% be combined into a single list:
+%\begin{LaTeXdemo}
+%  A multiple citation
+%    \cite{Arduengo1992,*Arduengo1994}.\\
+%\end{LaTeXdemo}
+%
+% To make life slightly easier for the user, a small \LaTeX\ package
+% accompanies the \BibTeX\ files.  It automatically loads the support
+% packages, and handles customisation (see the next section).
+%\begin{LaTeXdemo}[code only]
+%  \documentclass{article}
+%  \usepackage{rsc}
+%  \begin{document}
+%  % Document body here
+%  \bibliographystyle{rsc} % or angew
+%  \bibliography{your-bibtex-database}
+%  \end{document}
+%\end{LaTeXdemo}
+%
+%\section{Customising the styles: the 
+%  \texorpdfstring{\LaTeX}{LaTeX} package}
+% Both of the styles provide a small number of control hooks to
+% modify the output behaviour.  These can be altered directly, using
+% a mechanism similar to that used by \pkg{IEEEtrans}.  However, for
+% most users, this is overly complex.  A short \LaTeX\ package is
+% therefore provided, which provides high-level access to the
+% customisation.
+%
+%\DescribeOption{maxnames}
+%\DescribeOption{usetitle}
+%\DescribeOption{usedoi}
+%\DescribeOption{linkdoi}
+% The \opt{maxnames} option sets whether and when a long list of
+% authors is truncated, and takes an integer value.  Giving the value
+% \opt{0} means that no truncation occurs, otherwise the list is
+% truncated if the number of names exceeds the given value.  The
+% \opt{usetitle} and \opt{usedoi} options are simple Boolean
+% switches.  The \opt{usetitle} option sets whether to include the
+% titles of journal articles in the bibliography.  The default is
+% \opt{false}; the only \textsc{rsc} journal using article titles is
+% \emph{Photochemical \& Photobiological Sciences}. The \opt{usedoi}
+% option forces the use of \textsc{doi} information in cases where it
+% would not normally be present (for example journal articles with
+% page ranges available). This is intended to make it easier for
+% readers to find journal information. The related
+% \opt{linkdoi} option will include a hyperlink for each \textsc{doi},
+% so that the \textsc{doi} can be clicked on to resolve the
+% original reference.
+%
+%\DescribeOption{super}
+% The \opt{super} Boolean option turns on superscript citations, and
+% is \opt{true} by default.  It also causes the \pkg{natmove} package
+% to be loaded if available (\pkg{natmove} is part of the
+% \pkg{achemso} bundle).  This ensures that citations appear
+% \emph{after} punctuation even if given before in the text.  This
+% documentation has been compiled using \pkg{natmove}: see the input
+% of the example citations in the previous section.
+% 
+%\DescribeOption{mciteplus}
+% The \pkg{rsc} package normally loads the support package
+% \pkg{mciteplus}. This can be controlled using the \opt{mciteplus}
+% option: loading \pkg{rsc} with \opt{mciteplus=false} will skip loading
+% \pkg{mciteplus}.
+% 
+%\section{Demonstration file}
+%
+% This bundle includes the demonstration file \file{rsc-demo.tex}. The
+% file shows how to create a submission to the RSC, using only standard
+% \LaTeX\ tools. Note that the demonstration does \emph{not} aim to look
+% like a published paper: this is not required for submission. The
+% demonstration file should be installed in the \file{doc/latex/rsc}
+% directory.
+%  
+%\StopEventually{^^A
+%  \bibliographystyle{rsc}
+%  \PrintChanges
+%  \PrintIndex
+%  \bibliography{rsc}
+%}
+%
+%\section{Implementation}
+%
+%\begin{macro}{\ifrsc@super}
+%\begin{macro}{\ifrsc@usetitle}
+%\begin{macro}{\ifrsc@usedoi}
+%\begin{macro}{\ifrsc@linkdoi}
+%\begin{macro}{\ifrsc@mciteplus}
+%\begin{macro}{\rsc@maxauthors}
+% To make life easier for the user, the control values for the
+% bibliography are converted into \LaTeX\ package options using
+% \pkg{kvoptions}.
+%    \begin{macrocode}
+%<*package>
+\RequirePackage{kvoptions}
+\SetupKeyvalOptions{
+  family = rsc,
+  prefix = rsc@
+}
+\DeclareBoolOption{linkdoi}
+\DeclareBoolOption{mciteplus}
+\DeclareBoolOption{super}
+\DeclareBoolOption{usetitle}
+\DeclareBoolOption{usedoi}
+\DeclareStringOption{maxauthors}
+\setkeys{rsc}{
+  linkdoi    = false,
+  mciteplus  = true,
+  maxauthors = 0,
+  usetitle   = false,
+  usedoi     = false,
+  super      = true
+}
+\ProcessKeyvalOptions{rsc}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%
+% Citation support is loaded.
+%    \begin{macrocode}
+\ifrsc@super
+  \RequirePackage[sort&compress,numbers,super]{natbib}
+  \IfFileExists{natmove.sty}{%
+    \RequirePackage{natmove}}{}
+\else
+  \RequirePackage[sort&compress,numbers]{natbib}
+\fi
+%    \end{macrocode}
+%
+%\begin{macro}{\rsc@bib@file}
+%\begin{macro}{\rsc@bib@message}
+%\begin{macro}{\rsc@bib@name}
+% Some information or creating the control file for \BibTeX\ is set up.
+%    \begin{macrocode}
+\newwrite\rsc@bib@file
+\newcommand*{\rsc@bib@message}{%
+  This is an auxiliary file used by the `rsc' package.^^J%
+  This file may safely be deleted. It will be recreated as
+  required.^^J
+}
+\newcommand*{\rsc@bib@name}{rsc-\jobname.bib}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%\end{macro}
+%\begin{macro}{\rsc@bib@write}
+%\begin{macro}{\rsc@bib@write@aux}
+% The control information for \BibTeX\ needs to be written to a special
+% file. The main writing macro is quite simple. Actually writing the
+% information is left to the code for \cs{bibliography}, so that this
+% only happens if needed.
+%    \begin{macrocode}
+\newcommand*{\rsc@bib@write}{%
+  \if@filesw
+    \expandafter\rsc@bib@write@aux
+  \fi
+}
+\AtBeginDocument{\rsc@bib@write}
+\newcommand*{\rsc@bib@write@aux}{%
+  \immediate\openout\rsc@bib@file\rsc@bib@name\relax
+  \immediate\write\rsc@bib@file{\rsc@bib@message}%
+  \edef\@tempa##1##2{%
+    \space\space##1\space = \space"##2",^^J%
+  }%
+  \immediate\write\rsc@bib@file{%
+    @Control\string{%
+      rsc-control,^^J%
+      \@tempa{ctrl-use-title}{%
+        \ifrsc@usetitle yes\else no\fi
+      }%
+      \@tempa{ctrl-use-doi-all}{%
+        \ifrsc@usedoi yes\else no\fi
+      }%
+      \@tempa{ctrl-link-doi}{%
+        \ifrsc@linkdoi yes\else no\fi
+      }%
+      \@tempa{ctrl-etal-number}{\rsc@maxauthors}%
+    \string}^^J%
+  }%
+  \immediate\write\@auxout{%
+    \string\citation\string{rsc-control\string}%
+  }%
+  \AtEndDocument{%
+    \immediate\closeout\rsc@bib@file\relax
+  }%
+}
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+%
+% The \pkg{mciteplus} package allows the construction of lists of
+% references with sub-letters. However, it might not be available, and
+% so it is only loaded if available: the \file{.bst} files should work
+% either way.
+%    \begin{macrocode}
+\IfFileExists{mciteplus.sty}{%
+  \ifrsc@mciteplus
+    \RequirePackage{mciteplus}
+  \fi  
+}{}
+%    \end{macrocode}
+%
+%\begin{macro}{\rsc@bibliography}
+%\begin{macro}{\bibliography}
+% The \cs{bibliography} macro is now patched so that everything works
+% correctly. 
+%    \begin{macrocode}
+\AtBeginDocument{%
+  \let\rsc@bibliography\bibliography
+  \renewcommand*{\bibliography}[1]{%
+    \rsc@bibliography{rsc-\jobname,#1}%
+  }%
+}
+%</package>
+%    \end{macrocode}
+%\end{macro}
+%\end{macro}
+% 
+%\Finale
+%
+%\iffalse
+%<*demo>
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% This is a (brief) model paper for submission to the RSC using
+%% standard LaTeX packages
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass[a4paper]{article}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% A few core packages which are really essential
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage[T1]{fontenc} % Modern font encoding
+\usepackage{float}       % For creating charts, graphs and schemes
+\usepackage{helvet}      % Helvetica font for sans serif
+\usepackage{mathptmx}    % Times font ("Word-like")
+\usepackage{rsc}         % Loads natbib, etc.
+\usepackage{setspace}    % For double-spacing 
+\AtBeginDocument{\doublespacing}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% New floats are created for standard chemistry graphics
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newfloat{chart}{htbp}{loc}
+\newfloat{graph}{htbp}{loh}
+\newfloat{scheme}{htbp}{los}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Place any additional packages needed here.  Only include packages
+%% which are essential, to avoid problems later.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage[version=3]{mhchem} % Formula subscripts using \ce{}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% If issues arise when submitting your manuscript, you may want to
+%% un-comment the next line.  This provides information on the
+%% version of every file you have used.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%\listfiles
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Place any additional macros here.  Please use \newcommand* where
+%% possible, and avoid layout-changing macros (which are not used
+%% when typesetting).
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand*{\mycommand}[1]{\texttt{\emph{#1}}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Meta-data block
+%% ---------------
+%% Give details for all authors here, using the standard LaTeX 
+%% method.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\author{%
+  Andrew N. Other\thanks{%
+    Department of Chemistry, Unknown University, Unknown Town%
+  }%
+  \and
+  I. Ken Groupleader\thanks{%
+    Department of Chemistry, Unknown University, Unknown Town,
+    E-mail: \texttt{i.k.groupleader@unknown.uu}
+  }%
+  \and
+  Susanne K. Laborator\thanks{%
+    Lead Discovery, BigPharma, Big Town, USA
+  }%
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% The document title should be given as usual
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\title{A demonstration for submission to the RSC}
+
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Make a title, of course
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\maketitle
+
+\begin{abstract}
+  This is an example document for writing a submission to the
+  Royal Society of Chemistry. It does not seek to reproduce the
+  layout of a published paper, but instead shows how the standard
+  \LaTeX\ tools can be used to create a manuscript.
+\end{abstract}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Start the main part of the manuscript here.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Introduction}
+This is a paragraph of text to fill the introduction of the
+demonstration file.  
+
+\section{Results and discussion}
+
+\subsection{Outline}
+
+The document layout should follow the style of the journal concerned.
+Consult the appropriate Instructions for Authors to see what is 
+required. Some journals, for example, do not allow sections in
+articles.
+
+\subsection{References}
+
+The rsc bibliography style requires the \textsf{natbib} package,
+which is loaded automatically by the \textsf{rsc} package.
+References can be made using the normal method; if the
+\textsf{natmove} package is available, citations can be placed 
+before any punctuation, and they will be moved as necessary 
+\cite{Mena2000,Abernethy2003}. The \textsf{natmove} package is
+part of the \textsf{achemso} bundle. 
+
+The use of \textsf{natbib} allows the use of the various citation
+commands of that package: \citeauthor{Abernethy2003} have shown
+something, in \citeyear{Cotton1999}, or as given by
+Ref.~\citenum{Mena2000}. If you encounter problems with the 
+citation macros, please check that your copy of \textsf{natbib} 
+is up to date.
+
+Multiple citations to be combined into a list can be given as
+a single citation.  This uses the \textsf{mciteplus} package
+\cite{Arduengo1992,*Eisenstein2005,*Arduengo1994}.  Citations
+other than the first of the list should be indicated with a star.
+If the \textsf{mciteplus} package is not installed, the standard
+bibliography tools will still work but starred references will be
+ignored.
+
+\subsection{Floats}
+
+Setting up new float types is demonstrated in the premable, where
+charts, graphs and schemes are defined.  As illustrated, the float 
+is ``here'' if possible (Scheme~\ref{sch:example}).
+\begin{scheme}
+  \centering
+  Your scheme graphic would go here: \texttt{.eps} format\\
+  for \LaTeX\, or \texttt{.pdf} (or \texttt{.png}) for pdf\LaTeX\\
+  \textsc{ChemDraw} files are best saved as \texttt{.eps} files;\\
+  these can be scaled without loss of quality, and can be\\
+  converted to \texttt{.pdf} files easily using \texttt{eps2pdf}.\\
+  %\includegraphics{graphic}
+  \caption{An example scheme}
+  \label{sch:example}
+\end{scheme}
+
+\begin{figure}
+  \centering
+  As well as the standard float types \texttt{table}\\
+  and \texttt{figure}, the premable defines\\
+  \texttt{scheme}, \texttt{chart} and \texttt{graph}.
+  \caption{An example figure}
+  \label{fgr:example}
+\end{figure}
+
+Charts, figures and schemes do not necessarily have to be labelled or
+captioned.  However, tables should always have a title. It is
+possible to include a number and label for a graphic without any
+title, using an empty argument to the \texttt{\textbackslash caption}
+macro.
+
+The use of the different floating environments is not required, but
+it is intended to make document preparation easier for authors. In
+general, you should place your graphics where they make logical
+sense; the production process will move them if needed.
+
+\subsection{Math(s)}
+
+This file does not load any particular additional support for 
+mathematics.  If the author \emph{needs} things like 
+\textsf{amsmath}, they should be loaded in the preamble.  However,
+the basics should work fine.  Some inline material $ y = mx + c$
+followed by some display. \[ A = \pi r^2 \]
+
+It is possible to label equations in the usual way.
+\begin{equation}
+  \frac{\mathrm{d}}{\mathrm{d}x} r^2 = 2r
+\end{equation}
+This can also be used to have equations containing graphical
+content.
+\begin{equation}
+  \textrm{Some content}
+  %\includegraphics{graphic}
+  \label{eqn:graphic}
+\end{equation}
+
+\section{Experimental}
+
+The usual experimental details should appear here.  This could
+include a table, which can be referenced as Table~\ref{tbl:example}. 
+Do not worry about the appearance of the table: this will be altered 
+during production.
+\begin{table}
+  \centering
+  \caption{An example table}
+  \label{tbl:example}
+  \begin{tabular}{ll}
+    \hline
+    Header one & Header two \\
+    \hline
+    Entry one & Entry two \\
+    Entry three & Entry four \\
+    Entry five & Entry five \\
+    Entry seven & Entry eight \\
+    \hline
+  \end{tabular}
+\end{table}
+
+Adding notes to tables can be complicated.  Perhaps the easiest
+method is to generate these using the basic
+\texttt{\textbackslash textsuperscript} and
+\texttt{\textbackslash emph} macros, as illustrated
+(\ref{tbl:notes}).
+\begin{table}
+  \caption{A table with notes}
+  \label{tbl:notes}
+  \begin{tabular}{ll}
+    \hline
+    Header one & Header two \\
+    \hline
+    Entry one\textsuperscript{\emph{a}}
+      & Entry two \\
+    Entry three\textsuperscript{\emph{b}}
+      & Entry four \\
+  \hline
+  \end{tabular}
+
+  \textsuperscript{\emph{a}} Some text;
+  \textsuperscript{\emph{b}} Some more text.
+\end{table}
+
+The example file also loads the \textsf{mhchem} package, so
+that formulas are easy to input: \texttt{\textbackslash
+\ce\{H2SO4\}} gives \ce{H2SO4}.  See the use in the
+bibliography file (when using titles in the references
+section).
+
+The use of new commands should be limited to simple things which will
+not interfere with the production process.  For example,
+\texttt{\textbackslash mycommand} has been defined in this example,
+to give italic, monospaced text: \mycommand{some text}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% The appropriate \bibliographystyle and \bibliography commands
+%% should be placed here.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\bibliographystyle{rsc}
+\bibliography{rsc}
+
+\end{document}
+%</demo>
+%<*bst>
+ENTRY
+  { address
+    author
+    booktitle
+    chapter
+    ctrl-use-title
+    ctrl-etal-number
+    ctrl-link-doi
+    ctrl-use-doi-all
+    doi
+    edition
+    editor
+    howpublished
+    institution
+    journal
+    key
+    note
+    number
+    organization
+    pages
+    publisher
+    school
+    series
+    title
+    type
+    url
+    volume
+    year
+  }
+  {}
+  { label
+    extra.label
+    short.list
+  }
+
+INTEGERS { output.state before.all mid.sentence }
+INTEGERS { after.sentence after.block after.item }
+INTEGERS { author.or.editor }
+
+FUNCTION {init.state.consts}
+{ #0 'before.all :=
+  #1 'mid.sentence :=
+  #2 'after.sentence :=
+  #3 'after.block :=
+  #4 'after.item :=
+}
+
+INTEGERS { is.use.title etal.number use.doi.all link.doi }
+
+%% #0 turns off the display of the title for articles
+%% #1 enables
+FUNCTION {default.is.use.title} { #0 }
+
+%% The number of names that force "et al." to be used
+FUNCTION {default.etal.number} { #0 }
+
+%% #0 turns off the display of the DOI for articles
+%% #1 enables
+FUNCTION {default.use.doi.all} { #0 }
+
+%% #0 turns off hyperlinks for DOI 
+%% #1 enables
+FUNCTION {default.link.doi} { #0 }
+
+FUNCTION {add.comma}
+{ ", " * }
+
+STRINGS { s t }
+
+FUNCTION {output.nonnull}
+{ 's :=
+  output.state mid.sentence =
+    { add.comma write$ }
+    { output.state after.block =
+      { add.comma write$
+        newline$
+        "\newblock " write$
+      }
+      { output.state before.all =
+          'write$
+          { output.state after.item =
+            { " " * write$ }
+            { add.period$ " " * write$ }
+          if$
+          }
+        if$
+        }
+      if$
+      mid.sentence 'output.state :=
+    }
+  if$
+  s
+}
+
+FUNCTION {output}
+{ duplicate$ empty$
+    'pop$
+    'output.nonnull
+  if$
+}
+
+FUNCTION {output.check}
+{ 't :=
+  duplicate$ empty$
+    { pop$ "Empty " t * " in " * cite$ * warning$ }
+    'output.nonnull
+  if$
+}
+
+INTEGERS { would.add.period.textlen }
+
+FUNCTION {would.add.period}
+{ duplicate$
+  add.period$
+  text.length$
+  'would.add.period.textlen :=
+  duplicate$
+  text.length$
+  would.add.period.textlen =
+    { #0 }
+    { #1 }
+  if$
+}
+
+FUNCTION {fin.entry}
+{ would.add.period
+    { "\relax" * write$ newline$
+      "\mciteBstWouldAddEndPuncttrue" write$ newline$
+      "\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}"
+      write$ newline$
+      "{\mcitedefaultendpunct}{\mcitedefaultseppunct}\relax"
+    }
+    { "\relax" * write$ newline$
+      "\mciteBstWouldAddEndPunctfalse" write$ newline$
+      "\mciteSetBstMidEndSepPunct{\mcitedefaultmidpunct}"
+      write$ newline$
+      "{}{\mcitedefaultseppunct}\relax"
+    }
+  if$
+  write$
+  newline$
+  "\EndOfBibitem" write$
+}
+
+FUNCTION {not}
+{   { #0 }
+    { #1 }
+  if$
+}
+
+FUNCTION {and}
+{   'skip$
+    { pop$ #0 }
+  if$
+}
+
+FUNCTION {or}
+{   { pop$ #1 }
+    'skip$
+  if$
+}
+
+FUNCTION {field.or.null}
+{ duplicate$ empty$
+    { pop$ "" }
+    'skip$
+  if$
+}
+
+FUNCTION {emphasize}
+{ duplicate$ empty$
+    { pop$ "" }
+    { "\emph{" swap$ * "}" * }
+  if$
+}
+
+FUNCTION {boldface}
+{ duplicate$ empty$
+    { pop$ "" }
+    { "\textbf{" swap$ * "}" * }
+  if$
+}
+
+FUNCTION {paren}
+{ duplicate$ empty$
+    { pop$ "" }
+    { "(" swap$ * ")" * }
+  if$
+}
+
+FUNCTION {bbl.and}
+{ "and" }
+
+FUNCTION {bbl.chapter}
+%<rsc>{ "ch." }
+%<angew>{ "Chapter" }
+
+FUNCTION {bbl.doi}
+%<rsc>{ "DOI:" }
+%<angew>{ "DOI" }
+
+FUNCTION {bbl.editor}
+%<rsc>{ "ed." }
+%<angew>{ "Ed.:" }
+
+%<angew>FUNCTION {bbl.editors}
+%<angew>{ "Eds.:" }
+
+FUNCTION {bbl.edition}
+%<rsc>{ "edn." }
+%<angew>{ "ed." }
+
+FUNCTION {bbl.etal}
+{ "et~al." emphasize }
+
+FUNCTION {bbl.in}
+{ "in" }
+
+FUNCTION {bbl.inpress}
+{ "in press" }
+
+
+FUNCTION {bbl.msc}
+%<rsc>{ "M.Sc. thesis" }
+%<angew>{ "MSc thesis" }
+
+FUNCTION {bbl.page}
+{ "p." }
+
+FUNCTION {bbl.pages}
+{ "pp." }
+
+FUNCTION {bbl.phd}
+%<rsc>{ "Ph.D. thesis" }
+%<angew>{ "PhD thesis" }
+
+FUNCTION {bbl.submitted}
+{ "submitted for publication" }
+
+FUNCTION {bbl.techreport}
+{ "Technical Report" }
+
+FUNCTION {bbl.volume}
+%<rsc>{ "vol." }
+%<angew>{ "Vol." }
+
+FUNCTION {bbl.first}
+{ "1st" }
+
+FUNCTION {bbl.second}
+{ "2nd" }
+
+FUNCTION {bbl.third}
+{ "3rd" }
+
+FUNCTION {bbl.fourth}
+{ "4th" }
+
+FUNCTION {bbl.fifth}
+{ "5th" }
+
+FUNCTION {bbl.st}
+{ "st" }
+
+FUNCTION {bbl.nd}
+{ "nd" }
+
+FUNCTION {bbl.rd}
+{ "rd" }
+
+FUNCTION {bbl.th}
+{ "th" }
+
+FUNCTION {eng.ord}
+{ duplicate$ "1" swap$ *
+  #-2 #1 substring$ "1" =
+     { bbl.th * }
+     { duplicate$ #-1 #1 substring$
+       duplicate$ "1" =
+         { pop$ bbl.st * }
+         { duplicate$ "2" =
+             { pop$ bbl.nd * }
+             { "3" =
+                 { bbl.rd * }
+                 { bbl.th * }
+               if$
+             }
+           if$
+          }
+       if$
+     }
+   if$
+}
+
+INTEGERS{ l }
+
+FUNCTION{string.length}
+{ #1 'l :=
+  { duplicate$ duplicate$ #1 l substring$ = not }
+    { l #1 + 'l := }
+  while$
+  pop$ l
+}
+
+STRINGS{replace find text}
+
+INTEGERS{find_length}
+
+FUNCTION{find.replace}
+{ 'replace :=
+  'find :=
+  'text :=
+  find  string.length 'find_length :=
+  ""
+  { text empty$ not }
+    { text #1 find_length substring$ find =
+      { replace *
+        text #1 find_length + global.max$ substring$ 'text :=
+      }
+      { text #1 #1 substring$ *
+        text #2 global.max$ substring$ 'text :=
+      }
+      if$
+    }
+  while$
+}
+
+FUNCTION {chr.to.value}
+{ chr.to.int$ #48 -
+  duplicate$ duplicate$
+  #0 < swap$ #9 > or
+    { #48 + int.to.chr$
+      " is not a number..." *
+      warning$
+     pop$ #0
+    }
+    {}
+  if$
+}
+
+FUNCTION{is.a.digit}
+{ duplicate$ "" =
+    {pop$ #0}
+    {chr.to.int$ #48 - duplicate$
+     #0 < swap$ #9 > or not}
+  if$
+}
+
+FUNCTION{is.a.number}
+{
+  { duplicate$ #1 #1 substring$ is.a.digit }
+    {#2 global.max$ substring$}
+  while$
+  "" =
+}
+
+FUNCTION {extract.num}
+{ duplicate$ 't :=
+  "" 's :=
+  { t empty$ not }
+  { t #1 #1 substring$
+    t #2 global.max$ substring$ 't :=
+    duplicate$ is.a.number
+      { s swap$ * 's := }
+      { pop$ "" 't := }
+    if$
+  }
+  while$
+  s empty$
+    'skip$
+    { pop$ s }
+  if$
+}
+
+FUNCTION {bibinfo.check}
+{ swap$
+  duplicate$ missing$
+    { pop$ pop$
+      ""
+    }
+    { duplicate$ empty$
+        {
+          swap$ pop$
+        }
+        { swap$
+          pop$
+        }
+      if$
+    }
+  if$
+}
+
+FUNCTION {convert.edition}
+{ extract.num "l" change.case$ 's :=
+  s "first" = s "1" = or
+    { bbl.first 't := }
+    { s "second" = s "2" = or
+        { bbl.second 't := }
+        { s "third" = s "3" = or
+            { bbl.third 't := }
+            { s "fourth" = s "4" = or
+                { bbl.fourth 't := }
+                { s "fifth" = s "5" = or
+                    { bbl.fifth 't := }
+                    { s #1 #1 substring$ is.a.number
+                        { s eng.ord 't := }
+                        { edition 't := }
+                      if$
+                    }
+                  if$
+                }
+              if$
+            }
+          if$
+        }
+      if$
+    }
+  if$
+  t
+}
+
+FUNCTION {tie.or.space.connect}
+{ duplicate$ text.length$ #3 <
+    { "~" }
+    { " " }
+  if$
+  swap$ * *
+}
+
+FUNCTION {space.connect}
+{ " " swap$ * * }
+
+INTEGERS { nameptr namesleft numnames }
+
+FUNCTION {format.names}
+{ 's :=
+  #1 'nameptr :=
+  s num.names$ 'numnames :=
+  numnames 'namesleft :=
+  numnames etal.number > etal.number #0 > and
+    { s #1 "{f.~}{vv~}{ll}{, jj}" format.name$ 't :=
+      t bbl.etal space.connect
+    }
+    {
+      { namesleft #0 > }
+        { s nameptr "{f.~}{vv~}{ll}{, jj}" format.name$ 't :=
+          nameptr #1 >
+            { namesleft #1 >
+              { add.comma t * }
+              { numnames #2 >
+                { "" * }
+                'skip$
+              if$
+              t "others" =
+                { bbl.etal space.connect }
+%<rsc>                { bbl.and space.connect t space.connect }
+%<angew>                { add.comma t * }
+              if$
+              }
+            if$
+            }
+          't
+        if$
+        nameptr #1 + 'nameptr :=
+        namesleft #1 - 'namesleft :=
+        }
+    while$
+  }
+  if$
+}
+
+FUNCTION {format.authors}
+{ author empty$
+    { "" }
+    { #1 'author.or.editor :=
+      author format.names }
+  if$
+}
+
+FUNCTION {strip.comma}
+{ duplicate$
+  string.length 'find_length :=
+  duplicate$
+  find_length #1 - #1 substring$
+  "," =
+    { #1 find_length #2 - substring$
+      " " *
+    }
+    'skip$
+  if$
+}
+
+FUNCTION {format.editors}
+{ editor empty$
+    { "" }
+    { #2 'author.or.editor :=
+%<rsc>      bbl.editor " " * *
+%<rsc>      editor format.names
+%<angew>      strip.comma
+%<angew>      editor num.names$ #1 >
+%<angew>        { bbl.editors }
+%<angew>       { bbl.editor }
+%<angew>      if$
+%<angew>      " " *
+%<angew>      editor format.names * paren
+    }
+  if$
+}
+
+FUNCTION {format.doi}
+{ use.doi.all
+    { doi empty$
+        'skip$
+        { 
+          link.doi
+            {
+              "\href{http://dx.doi.org/"
+              doi *
+              "}{" *
+              bbl.doi doi tie.or.space.connect *
+              "}" *
+            }
+            { bbl.doi doi tie.or.space.connect }
+          if$
+          output 
+        }
+      if$
+    }
+    'skip$
+  if$
+}
+
+FUNCTION {n.separate.multi}
+{ 't :=
+  ""
+  #0 'numnames :=
+  t text.length$ #4 > t is.a.number and
+    {
+      { t empty$ not }
+      { t #-1 #1 substring$ is.a.number
+          { numnames #1 + 'numnames := }
+          { #0 'numnames := }
+        if$
+        t #-1 #1 substring$ swap$ *
+        t #-2 global.max$ substring$ 't :=
+        numnames #4 =
+          { duplicate$ #1 #1 substring$ swap$
+            #2 global.max$ substring$
+            "\," swap$ * *
+            #1 'numnames :=
+          }
+          'skip$
+        if$
+      }
+      while$
+    }
+    { t swap$ * }
+  if$
+}
+
+FUNCTION {format.bvolume}
+{ volume empty$
+    { "" }
+    { bbl.volume volume tie.or.space.connect }
+  if$
+}
+
+FUNCTION {format.title.noemph}
+{ 't :=
+  t empty$
+    { "" }
+    { t }
+  if$
+}
+
+FUNCTION {format.title}
+{ 't :=
+  t empty$
+    { "" }
+    { t emphasize }
+  if$
+}
+
+FUNCTION {format.url}
+{ url empty$
+    { "" }
+    { "\url{" url * "}" * }
+  if$
+}
+
+FUNCTION {format.title.vol}
+{ 't :=
+  t empty$
+    { "" }
+    { t emphasize }
+  if$
+  volume empty$
+    'skip$
+    { format.bvolume emphasize
+      swap$ add.comma swap$ *
+    }
+  if$
+  }
+
+FUNCTION {format.full.names}
+{'s :=
+  #1 'nameptr :=
+  s num.names$ 'numnames :=
+  numnames 'namesleft :=
+    { namesleft #0 > }
+    { s nameptr
+      "{vv~}{ll}" format.name$ 't :=
+      nameptr #1 >
+        {
+          namesleft #1 >
+            { ", " * t * }
+            {
+              numnames #2 >
+                { "," * }
+                'skip$
+              if$
+              t "others" =
+                { bbl.etal * }
+                { bbl.and space.connect t space.connect }
+              if$
+            }
+          if$
+        }
+        't
+      if$
+      nameptr #1 + 'nameptr :=
+      namesleft #1 - 'namesleft :=
+    }
+  while$
+}
+
+FUNCTION {author.editor.full}
+{ author empty$
+    { editor empty$
+        { "" }
+        { editor format.full.names }
+      if$
+    }
+    { author format.full.names }
+  if$
+}
+
+FUNCTION {author.full}
+{ author empty$
+    { "" }
+    { author format.full.names }
+  if$
+}
+
+FUNCTION {editor.full}
+{ editor empty$
+    { "" }
+    { editor format.full.names }
+  if$
+}
+
+FUNCTION {make.full.names}
+{ type$ "book" =
+  type$ "inbook" =
+  or
+    'author.editor.full
+    { type$ "proceedings" =
+        'editor.full
+        'author.full
+      if$
+    }
+  if$
+}
+
+FUNCTION {output.bibitem} { newline$
+  "\bibitem[" write$
+  label write$
+  ")" make.full.names duplicate$ short.list =
+     { pop$ }
+     { * }
+   if$
+  "]{" * write$
+  cite$ write$
+  "}" write$
+  newline$
+  ""
+  before.all 'output.state :=
+}
+
+FUNCTION {n.dashify} { 't :=
+  ""
+    { t empty$ not }
+    { t #1 #1 substring$ "-" =
+    { t #1 #2 substring$ "--" = not
+        { "--" *
+          t #2 global.max$ substring$ 't :=
+        }
+        {   { t #1 #1 substring$ "-" = }
+        { "-" *
+          t #2 global.max$ substring$ 't :=
+        }
+          while$
+        }
+      if$
+    }
+    { t #1 #1 substring$ *
+      t #2 global.max$ substring$ 't :=
+    }
+      if$
+    }
+  while$
+}
+
+FUNCTION {format.date}
+{ year empty$
+    { "" }
+%<rsc>    'year
+%<angew>    { year boldface }
+  if$
+}
+
+FUNCTION {format.bdate}
+{ year empty$
+    { "There's no year in " cite$ * warning$ }
+%<rsc>    'year
+%<angew>    { year boldface }
+  if$
+}
+
+FUNCTION {either.or.check}
+{ empty$
+    'pop$
+    { "Can't use both " swap$ * " fields in "
+      * cite$ * warning$ }
+  if$
+}
+
+FUNCTION {format.edition}
+{ edition duplicate$ empty$
+    'skip$
+    { convert.edition
+      bbl.edition bibinfo.check
+      " " * bbl.edition *
+    }
+  if$
+}
+
+INTEGERS { multiresult }
+
+FUNCTION {multi.page.check}
+{ 't :=
+  #0 'multiresult :=
+    { multiresult not
+      t empty$ not
+      and
+    }
+    { t #1 #1 substring$
+      duplicate$ "-" =
+      swap$ duplicate$ "," =
+      swap$ "+" =
+      or or
+        { #1 'multiresult := }
+        { t #2 global.max$ substring$ 't := }
+      if$
+    }
+  while$
+  multiresult
+}
+
+FUNCTION {format.pages}
+{ pages empty$
+    { "" }
+    { pages multi.page.check
+      { bbl.pages pages n.dashify tie.or.space.connect }
+      { bbl.page pages tie.or.space.connect }
+    if$
+    }
+  if$
+}
+
+FUNCTION {format.pages.required}
+{ pages empty$
+    { ""
+      "There are no page numbers for " cite$ * warning$
+      output
+    }
+    { pages multi.page.check
+      { bbl.pages pages n.dashify tie.or.space.connect }
+      { bbl.page pages tie.or.space.connect }
+    if$
+    }
+  if$
+}
+
+FUNCTION {format.pages.nopp}
+{ pages empty$
+    { ""
+      "There are no page numbers for " cite$ * warning$
+      output
+    }
+    { pages multi.page.check
+      { pages n.dashify space.connect }
+      { pages space.connect }
+    if$
+    }
+  if$
+}
+
+FUNCTION {format.pages.patent}
+{ pages empty$
+    { "There is no patent number for " cite$ * warning$ }
+    { pages multi.page.check
+      { pages n.dashify }
+%<rsc>      { pages n.separate.multi }
+%<angew>      { pages }
+      if$
+    }
+  if$
+}
+
+FUNCTION {format.vol.pages}
+%<rsc>{ volume boldface field.or.null
+%<angew>{ volume emphasize field.or.null
+  duplicate$ empty$
+    { pop$ format.pages.required }
+    { add.comma pages n.dashify * }
+  if$
+}
+
+FUNCTION {format.chapter.pages}
+{ chapter empty$
+    'format.pages
+    { type empty$
+    { bbl.chapter }
+    { type "l" change.case$ }
+      if$
+      chapter tie.or.space.connect
+      pages empty$
+    'skip$
+    { add.comma format.pages * }
+      if$
+    }
+  if$
+}
+
+FUNCTION {format.title.in}
+{ 's :=
+%<angew>  after.item 'output.state :=
+  s empty$
+    { "" }
+    { editor empty$
+      { bbl.in s format.title space.connect }
+      { bbl.in s format.title space.connect
+      add.comma format.editors *
+      }
+    if$
+    }
+  if$
+}
+
+FUNCTION {format.title.vol.in}
+{ 's :=
+  after.item 'output.state :=
+  s empty$
+    { "" }
+    { editor empty$
+      { bbl.in s format.title.vol space.connect }
+      { bbl.in s format.title.vol space.connect
+      add.comma format.editors *
+      }
+    if$
+    }
+  if$
+}
+
+FUNCTION {format.pub.address}
+{ publisher empty$
+    { "" }
+    { address empty$
+        { publisher }
+        { publisher add.comma address *}
+      if$
+    }
+  if$
+}
+
+FUNCTION {empty.misc.check}
+{ author empty$ title empty$ howpublished empty$
+  year empty$ note empty$ url empty$
+  and and and and and
+    { "all relevant fields are empty in " cite$ * warning$ }
+    'skip$
+  if$
+}
+
+FUNCTION {empty.doi.note}
+{ doi empty$ note empty$ and
+    { "Need either a note or DOI for " cite$ * warning$ }
+    'skip$
+  if$
+}
+
+FUNCTION {format.thesis.type}
+{ type empty$
+    'skip$
+    { pop$
+      type emphasize
+    }
+  if$
+}
+
+FUNCTION {article}
+{ output.bibitem
+  format.authors "author" output.check
+  is.use.title
+    { title format.title.noemph "title" output.check }
+    'skip$
+  if$
+%<rsc>  journal emphasize "journal" output.check
+%<angew>
+%<angew>  journal "," "" find.replace emphasize
+%<angew>  "journal" output.check
+%<angew>  after.item 'output.state :=
+  format.date "year" output.check
+  volume empty$
+    { "" format.pages.nopp output }
+    { format.vol.pages output }
+  if$
+  format.doi
+  fin.entry
+}
+
+FUNCTION {book}
+{ output.bibitem
+  author empty$
+%<rsc>    { title format.title "title" output.check
+%<angew>    { title format.title.vol "title" output.check
+      editor empty$
+        { "Need either an author or editor for "
+          cite$ * warning$ }
+        { "" format.editors * "editor" output.check }
+      if$
+    }
+    { format.authors output
+      "author and editor" editor either.or.check
+%<rsc>      title format.title "title" output.check
+%<angew>      title format.title.vol "title" output.check
+    }
+  if$
+  format.pub.address "publisher" output.check
+  format.edition output
+  format.bdate "year" output.check
+%<rsc>  format.bvolume output
+  pages empty$
+    'skip$
+    { format.pages output }
+  if$
+  format.doi
+  fin.entry
+}
+
+FUNCTION {booklet}
+{ output.bibitem
+  format.authors output
+  title format.title "title" output.check
+  howpublished output
+  address output
+  format.date output
+  format.doi
+  fin.entry
+}
+
+FUNCTION {inbook}
+{ output.bibitem
+  author empty$
+%<rsc>    { title format.title "title" output.check
+%<angew>    { title format.title.vol "title" output.check
+      editor empty$
+      { "Need at least an author or an editor for "
+        cite$ * warning$ }
+      { "" format.editors * "editor" output.check }
+    if$
+    }
+    { format.authors output
+%<rsc>      title format.title.in "title" output.check
+%<angew>      title format.title.vol.in "title" output.check
+    }
+  if$
+  format.pub.address "publisher" output.check
+  format.edition output
+  format.bdate "year" output.check
+%<rsc>  format.bvolume output
+  format.chapter.pages "chapter and pages" output.check
+  format.doi
+  fin.entry
+}
+
+FUNCTION {incollection}
+{ output.bibitem
+  author empty$
+%<rsc>    { booktitle format.title "booktitle" output.check
+%<angew>    { booktitle format.title.vol "booktitle" output.check
+      editor empty$
+      { "Need at least an author or an editor for "
+        cite$ * warning$ }
+      { "" format.editors * "editor" output.check }
+    if$
+    }
+    { format.authors output
+%<rsc>      booktitle format.title.in "booktitle" output.check
+%<angew>      booktitle format.title.vol.in "booktitle" output.check
+    }
+  if$
+  format.pub.address "publisher" output.check
+  format.edition output
+  format.bdate "year" output.check
+%<rsc>  format.bvolume output
+  format.chapter.pages "chapter and pages" output.check
+  format.doi
+  fin.entry
+}
+
+FUNCTION {inpress}
+{ output.bibitem
+  format.authors "author" output.check
+  journal emphasize "journal" output.check
+  bbl.inpress output
+  format.doi
+  fin.entry
+}
+
+FUNCTION {inproceedings}
+{ output.bibitem
+  format.authors "author" output.check
+%<rsc>  booktitle format.title.noemph "booktitle" output.check
+%<angew>  booktitle format.title "booktitle" output.check
+  address output
+  format.date "year" output.check
+  pages empty$
+    'skip$
+    { format.pages output }
+  if$
+  format.doi
+  fin.entry
+}
+
+FUNCTION {manual}
+{ output.bibitem
+  author empty$
+    { organization empty$
+      'skip$
+      { organization output
+        address output
+      }
+      if$
+    }
+    { format.authors output }
+  if$
+%<rsc>  title format.title "title" output.check
+%<angew>  title format.title.noemph "title" output.check
+  author empty$
+    { organization empty$
+      { address output }
+      'skip$
+    if$
+    }
+    { organization output
+      address output
+    }
+  if$
+  format.edition output
+  format.date output
+  format.doi
+  fin.entry
+}
+
+FUNCTION {mastersthesis}
+{ output.bibitem
+  format.authors "author" output.check
+%<rsc>  bbl.msc emphasize format.thesis.type output
+%<angew>  bbl.msc format.thesis.type output
+  school "school" output.check
+  address output
+  format.date "year" output.check
+  format.doi
+  fin.entry
+}
+
+FUNCTION {misc}
+{ output.bibitem
+  format.authors output
+  title empty$
+    'skip$
+    { title format.title output }
+  if$
+  howpublished output
+%<rsc>  year output
+%<angew>  format.date output
+  format.url output
+  note output
+  format.doi
+  fin.entry
+  empty.misc.check
+}
+
+FUNCTION {patent}
+{ output.bibitem
+  organization empty$
+    { format.authors "author and organization" output.check }
+    { author empty$
+        { organization }
+        {  format.authors organization paren space.connect }
+      if$
+      "author and organization" output.check
+    }
+  if$
+  journal emphasize "journal" output.check
+  format.pages.patent "pages" output.check
+  format.date "year" output.check
+  format.doi
+  fin.entry
+}
+
+FUNCTION {phdthesis}
+{ output.bibitem
+  format.authors "author" output.check
+%<rsc>  bbl.phd emphasize format.thesis.type output
+%<angew>  bbl.phd format.thesis.type output
+  school "school" output.check
+  address output
+  format.date "year" output.check
+  format.doi
+  fin.entry
+}
+
+FUNCTION {proceedings}
+{ output.bibitem
+%<rsc>  title format.title.noemph "title" output.check
+%<angew>  title format.title "title" output.check
+  address output
+  format.date "year" output.check
+  pages empty$
+    'skip$
+    { format.pages output }
+  if$
+  format.doi
+  fin.entry
+}
+
+FUNCTION {techreport}
+{ output.bibitem
+  format.authors "author" output.check
+  title format.title "title" output.check
+  institution
+  type empty$
+    'bbl.techreport
+    'type
+  if$
+  space.connect
+  number empty$
+    { "t" change.case$ }
+    { number tie.or.space.connect }
+  if$
+  output
+  format.pub.address output
+  format.date "year" output.check
+  format.doi
+  fin.entry
+}
+
+FUNCTION {unpublished}
+{ output.bibitem
+  format.authors "author" output.check
+  journal empty$
+    'skip$
+    { journal emphasize "journal" output.check }
+  if$
+  doi empty$
+    {  note output }
+    {
+%<rsc>       format.date output
+       bbl.doi doi tie.or.space.connect output
+   }
+  if$
+  fin.entry
+  empty.doi.note
+}
+
+INTEGERS { a b }
+
+FUNCTION {mult}
+{ 'a :=
+  'b :=
+  b #0 <
+    {#-1 #0 b - 'b :=}
+    {#1}
+  if$
+  #0
+  {b #0 >}
+    { a +
+      b #1 - 'b :=
+    }
+  while$
+  swap$
+    'skip$
+    {#0 swap$ -}
+    if$
+}
+
+FUNCTION {str.to.int.aux}
+{ {duplicate$ empty$ not}
+    { swap$ #10 mult 'a :=
+      duplicate$ #1 #1 substring$
+      chr.to.value a +
+      swap$
+     #2 global.max$ substring$
+    }
+  while$
+  pop$
+}
+
+FUNCTION {str.to.int}
+{ duplicate$ #1 #1 substring$ "-" =
+    {#1 swap$ #2 global.max$ substring$}
+    {#0 swap$}
+  if$
+  #0 swap$ str.to.int.aux
+  swap$
+    {#0 swap$ -}
+    {}
+  if$
+}
+
+FUNCTION {yes.no.to.int}
+{ "l" change.case$ duplicate$
+    "yes" =
+    { pop$  #1 }
+    { duplicate$ "no" =
+        { pop$ #0 }
+        { "unknown Boolean " quote$ * swap$ * quote$ *
+          " in " * cite$ * warning$
+          #0
+        }
+      if$
+    }
+  if$
+}
+
+FUNCTION {Control}
+{ ctrl-use-title
+  empty$
+    { skip$ }
+    { ctrl-use-title
+      yes.no.to.int
+      'is.use.title := }
+  if$
+  ctrl-etal-number
+  empty$
+    { skip$ }
+    { ctrl-etal-number
+      str.to.int
+      'etal.number := }
+  if$
+  ctrl-use-doi-all
+  empty$
+    { skip$ }
+    { ctrl-use-doi-all
+      yes.no.to.int
+      'use.doi.all := }
+  if$
+  ctrl-link-doi
+  empty$
+    { skip$ }
+    { ctrl-link-doi
+      yes.no.to.int
+      'link.doi := }
+  if$
+}
+
+FUNCTION {conference} {inproceedings}
+
+FUNCTION {other} {patent}
+
+FUNCTION {default.type} {misc}
+
+MACRO {jan} {"January"}
+MACRO {feb} {"February"}
+MACRO {mar} {"March"}
+MACRO {apr} {"April"}
+MACRO {may} {"May"}
+MACRO {jun} {"June"}
+MACRO {jul} {"July"}
+MACRO {aug} {"August"}
+MACRO {sep} {"September"}
+MACRO {oct} {"October"}
+MACRO {nov} {"November"}
+MACRO {dec} {"December"}
+
+READ
+
+FUNCTION {initialize.controls}
+{ default.is.use.title 'is.use.title :=
+  default.etal.number 'etal.number :=
+  default.use.doi.all 'use.doi.all :=
+  default.link.doi 'link.doi :=
+}
+
+INTEGERS { len }
+
+FUNCTION {chop.word}
+{ 's :=
+  'len :=
+  s #1 len substring$ =
+    { s len #1 + global.max$ substring$ }
+    's
+  if$
+}
+
+FUNCTION {format.lab.names}
+{ 's :=
+  s #1 "{vv~}{ll}" format.name$
+  s num.names$ duplicate$
+  #2 >
+    { pop$ bbl.etal space.connect }
+    { #2 <
+        'skip$
+        { s #2 "{ff }{vv }{ll}{ jj}" format.name$ "others" =
+            { bbl.etal space.connect }
+            { bbl.and space.connect s #2 "{vv~}{ll}"
+              format.name$ space.connect }
+          if$
+        }
+      if$
+    }
+  if$
+}
+
+FUNCTION {author.key.label}
+{ author empty$
+    { key empty$
+        { cite$ #1 #3 substring$ }
+        'key
+      if$
+    }
+    { author format.lab.names }
+  if$
+}
+
+FUNCTION {author.editor.key.label}
+{ author empty$
+    { editor empty$
+        { key empty$
+            { cite$ #1 #3 substring$ }
+            'key
+          if$
+        }
+        { editor format.lab.names }
+      if$
+    }
+    { author format.lab.names }
+  if$
+}
+
+FUNCTION {author.key.organization.label}
+{ author empty$
+    { key empty$
+        { organization empty$
+            { cite$ #1 #3 substring$ }
+            { "The " #4 organization chop.word #3
+              text.prefix$ }
+          if$
+        }
+        'key
+      if$
+    }
+    { author format.lab.names }
+  if$
+}
+
+FUNCTION {editor.key.organization.label}
+{ editor empty$
+    { key empty$
+        { organization empty$
+            { cite$ #1 #3 substring$ }
+            { "The " #4 organization chop.word #3
+              text.prefix$ }
+          if$
+        }
+        'key
+      if$
+    }
+    { editor format.lab.names }
+  if$
+}
+
+FUNCTION {calc.short.authors}
+{ type$ "book" =
+  type$ "inbook" =
+  or
+    'author.editor.key.label
+    { type$ "proceedings" =
+        'editor.key.organization.label
+        { type$ "manual" =
+            'author.key.organization.label
+            'author.key.label
+          if$
+        }
+      if$
+    }
+  if$
+  'short.list :=
+}
+
+FUNCTION {calc.label}
+{ calc.short.authors
+  short.list
+  "("
+  *
+  year duplicate$ empty$
+  short.list key field.or.null = or
+     { pop$ "" }
+     'skip$
+  if$
+  *
+  'label :=
+}
+
+ITERATE {calc.label}
+
+STRINGS { longest.label last.label next.extra }
+
+INTEGERS { longest.label.width last.extra.num number.label }
+
+FUNCTION {initialize.longest.label}
+{ "" 'longest.label :=
+  #0 int.to.chr$ 'last.label :=
+  "" 'next.extra :=
+  #0 'longest.label.width :=
+  #0 'last.extra.num :=
+  #0 'number.label :=
+}
+
+FUNCTION {forward.pass}
+{ last.label label =
+    { last.extra.num #1 + 'last.extra.num :=
+      last.extra.num int.to.chr$ 'extra.label :=
+    }
+    { "a" chr.to.int$ 'last.extra.num :=
+      "" 'extra.label :=
+      label 'last.label :=
+    }
+  if$
+  number.label #1 + 'number.label :=
+}
+
+EXECUTE {initialize.longest.label}
+
+ITERATE {forward.pass}
+
+FUNCTION {begin.bib}
+{ preamble$ empty$
+    'skip$
+    { preamble$ write$ newline$ }
+  if$
+  "\providecommand*{\mcitethebibliography}{\thebibliography}"
+  write$ newline$
+  "\csname @ifundefined\endcsname{endmcitethebibliography}"
+  write$ newline$
+  "{\let\endmcitethebibliography\endthebibliography}{}"
+  write$ newline$
+  "\begin{mcitethebibliography}{"  number.label int.to.str$  * "}" *
+  write$ newline$
+  "\providecommand*{\natexlab}[1]{#1}"
+  write$ newline$
+  "\providecommand*{\mciteSetBstSublistMode}[1]{}"
+  write$ newline$  
+  "\providecommand*{\mciteSetBstMaxWidthForm}[2]{}"
+  write$ newline$
+  "\providecommand*{\mciteBstWouldAddEndPuncttrue}"
+  write$ newline$      
+  "  {\def\EndOfBibitem{\unskip.}}"
+  write$ newline$   
+  "\providecommand*{\mciteBstWouldAddEndPunctfalse}"
+  write$ newline$      
+  "  {\let\EndOfBibitem\relax}"
+  write$ newline$ 
+  "\providecommand*{\mciteSetBstMidEndSepPunct}[3]{}"
+  write$ newline$
+  "\providecommand*{\mciteSetBstSublistLabelBeginEnd}[3]{}"
+  write$ newline$
+  "\providecommand*{\EndOfBibitem}{}"
+  write$ newline$
+  "\mciteSetBstSublistMode{f}"
+  write$ newline$
+  "\mciteSetBstMaxWidthForm{subitem}"
+  write$ newline$
+%<rsc>  "{(\emph{\alph{mcitesubitemcount}})}"
+%<angew>  "{\alph{mcitesubitemcount})}"
+  write$ newline$
+  "\mciteSetBstSublistLabelBeginEnd{\mcitemaxwidthsubitemform\space}"
+  write$ newline$
+  "{\relax}{\relax}"
+  write$ newline$
+}
+
+EXECUTE {begin.bib}
+
+EXECUTE {init.state.consts}
+
+ITERATE {call.type$}
+
+FUNCTION {end.bib}
+{ newline$
+  "\end{mcitethebibliography}" write$ newline$
+}
+
+EXECUTE {end.bib}
+%</bst>
+%<*bib>
+@ARTICLE{Abernethy2003,
+  author = {Colin D. Abernethy and Gareth M. Codd and Mark D. Spicer
+    and Michelle K. Taylor},
+  title = {{A} highly stable {N}-heterocyclic carbene complex of
+    trichloro-oxo-vanadium(\textsc{v}) displaying novel
+    {C}l---{C}(carbene) bonding interactions},
+  journal = {{J}. {A}m. {C}hem. {S}oc.},
+  year = {2003},
+  volume = {125},
+  pages = {1128--1129},
+  number = {5},
+  doi = {10.1021/ja0276321},
+}
+
+@MISC{ACS2007,
+  url = {http://pubs.acs.org/books/references.shtml},
+}
+
+@ARTICLE{Arduengo1992,
+  author = {Arduengo, III, Anthony J. and H. V. Rasika Dias and
+    Richard L. Harlow and Michael Kline},
+  title = {{E}lectronic stabilization of nucleophilic carbenes},
+  journal = {{J}.~{A}m.\ {C}hem.\ {S}oc.},
+  year = {1992},
+  volume = {114},
+  pages = {5530--5534},
+  number = {14},
+  doi = {10.1021/ja00040a007},
+}
+
+@ARTICLE{Arduengo1994,
+  author = {Arduengo, III, Anthony J. and Siegfried F. Gamper and
+    Joseph C. Calabrese	and Fredric Davidson},
+  title = {{L}ow-coordinate carbene complexes of nickel(0) and
+    platinum(0)},
+  journal = {{J}.~{A}m.\ {C}hem. {S}oc.},
+  year = {1994},
+  volume = {116},
+  pages = {4391--4394},
+  number = {10},
+  doi = {10.1021/ja00089a029},
+}
+
+@ARTICLE{Eisenstein2005,
+  author = {Appelhans, Leah N. and Zuccaccia, Daniele and Kovacevic,
+    Anes and Chianese, Anthony R. and Miecznikowski, John R. and
+    Macchioni, Aleco and Clot, Eric and Eisenstein, Odile and
+    Crabtree, Robert H.},
+  title = {{A}n anion-dependent switch in selectivity results from a
+    change of {C}---{H} activation mechanism in the reaction of an
+    imidazolium salt with \ce{IrH5(PPh3)2}},
+  journal = {{J}.~{A}m.\ {C}hem. {S}oc.},
+  year = {2005},
+  volume = {127},
+  pages = {16299--16311},
+  number = {46},
+  doi = {10.1021/ja055317j},
+}
+
+@BOOK{Coghill2006,
+  title = {{T}he {ACS} {S}tyle {G}uide},
+  publisher = {{O}xford {U}niversity {P}ress, {I}nc. and
+               {T}he {A}merican {C}hemical {S}ociety},
+  year = {2006},
+  editor = {Coghill, Anne M. and Garson, Lorrin R.},
+  address = {{N}ew {Y}ork},
+  edition = {3},
+  subtitle = {{E}ffective {C}ommunication of {S}cientific
+    {I}nformation},
+}
+
+@BOOK{Cotton1999,
+  title = {{A}dvanced {I}norganic {C}hemistry},
+  publisher = {Wiley},
+  year = {1999},
+  author = {Cotton, Frank Albert and Wilkinson, Geoffrery and
+    Murillio, Carlos A. and Bochmann, Manfred},
+  address = {Chichester},
+  edition = {6},
+}
+
+@ARTICLE{Mena2000,
+  author = {Angel Abarca and Pilar G\'omez-Sal and Avelino Mart\'in
+    and Miguel Mena and Josep Mar\'ia Poblet and Carlos Y\'elamos},
+  title = {{A}mmonolysis of mono(pentamethylcyclopentadienyl)
+    titanium(\textsc{iv}) derivatives},
+  journal = {Inorg. Chem.},
+  year = {2000},
+  volume = {39},
+  pages = {642--651},
+  number = {4},
+  doi = {10.1021/ic9907718},
+}
+%</bib>
+%\fi

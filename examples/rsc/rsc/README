@@ -1,0 +1,14 @@
+----------------------------------------------------------------
+rsc --- BibTeX styles for Royal Society of Chemistry and Wiley
+  journals
+E-mail: joseph.wright@morningstar2.co.uk
+Released under the LaTeX Project Public License v1.3c or later
+See http://www.latex-project.org/lppl.txt
+----------------------------------------------------------------
+
+The rsc package provides BibTeX style files to produce
+bibliographies in accordance with the guidelines of the Royal
+Society of Chemistry and Wiley chemistry-related journals. The
+styles require the use of natbib.  In addition, a short LaTeX
+package is included; this provides a convenient user interface to
+the customisation hooks made available by the BibTeX styles.

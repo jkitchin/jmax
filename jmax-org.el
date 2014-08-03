@@ -399,35 +399,65 @@ citecolor=blue,filecolor=blue,menucolor=blue,urlcolor=blue"
 	       ("\\paragraph{%s}" . "\\paragraph*{%s}")
 	       ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
 
-;; the real source is in the org-file. whenever the org file is newer
-;; we build the el file.
 
-(if (or
-     (not (file-exists-p "org-ref.el"))
-     (< (float-time (nth 5 (file-attributes "org-ref.el")))
-	(float-time (nth 5 (file-attributes "org-ref.org")))))
-    (progn
-      (org-babel-tangle-file (expand-file-name "org-ref.org" starter-kit-dir))
-      (load-file (expand-file-name "org-ref.el" starter-kit-dir)))
-  (require 'org-ref))
+;;;;;;; org path
+(defvar org-load-path 
+  (list (file-name-as-directory
+	 (expand-file-name "org" starter-kit-dir)))
+  "List of directories to find org-files that
+  `org-babel-load-file' can load code from")
 
-(if (or
-     (not (file-exists-p "doi-utils.el"))
-     (< (float-time (nth 5 (file-attributes "doi-utils.el")))
-	(float-time (nth 5 (file-attributes "doi-utils.org")))))
-    (progn
-      (org-babel-tangle-file (expand-file-name "doi-utils.org" starter-kit-dir))
-      (load-file (expand-file-name "doi-utils.el" starter-kit-dir)))
-  (require 'doi-utils))
+(defun org-require (feature)
+  "Load a FEATURE from an org-file.
+FEATURE is a symbol, and it is loaded from an org-file by the name of FEATURE.org, that is in the `org-load-path'. The FEATURE is loaded from `org-babel-load-file'."
+  (let ((org-file (concat (symbol-name feature) ".org"))
+	(path))
 
-(if (or
-     (not (file-exists-p "org-show.el"))
-     (< (float-time (nth 5 (file-attributes "org-show.el")))
-	(float-time (nth 5 (file-attributes "org-show.org")))))
-    (progn
-      (org-babel-tangle-file (expand-file-name "org-show.org" starter-kit-dir))
-      (load-file (expand-file-name "org-show.el" starter-kit-dir)))
-  (require 'org-show))
+    ;; find the org-file
+    (catch 'result
+      (loop for dir in org-load-path do
+	    (when (file-exists-p
+		   (setq path
+			 (expand-file-name
+			  org-file
+			  dir)))
+	      (throw 'result path))))
+    (let ((default-directory (file-name-directory path)))
+      (org-babel-load-file path))))
+
+(org-require 'org-ref)
+(org-require 'doi-utils)
+(org-require 'org-show)
+
+;; ;; the real source is in the org-file. whenever the org file is newer
+;; ;; we build the el file.
+
+;; (if (or
+;;      (not (file-exists-p "org-ref.el"))
+;;      (< (float-time (nth 5 (file-attributes "org-ref.el")))
+;; 	(float-time (nth 5 (file-attributes "org-ref.org")))))
+;;     (progn
+;;       (org-babel-tangle-file (expand-file-name "org-ref.org" starter-kit-dir))
+;;       (load-file (expand-file-name "org-ref.el" starter-kit-dir)))
+;;   (require 'org-ref))
+
+;; (if (or
+;;      (not (file-exists-p "doi-utils.el"))
+;;      (< (float-time (nth 5 (file-attributes "doi-utils.el")))
+;; 	(float-time (nth 5 (file-attributes "doi-utils.org")))))
+;;     (progn
+;;       (org-babel-tangle-file (expand-file-name "doi-utils.org" starter-kit-dir))
+;;       (load-file (expand-file-name "doi-utils.el" starter-kit-dir)))
+;;   (require 'doi-utils))
+
+;; (if (or
+;;      (not (file-exists-p "org-show.el"))
+;;      (< (float-time (nth 5 (file-attributes "org-show.el")))
+;; 	(float-time (nth 5 (file-attributes "org-show.org")))))
+;;     (progn
+;;       (org-babel-tangle-file (expand-file-name "org-show.org" starter-kit-dir))
+;;       (load-file (expand-file-name "org-show.el" starter-kit-dir)))
+;;   (require 'org-show))
 
 (require 'ox-cmu-qualifier)
 (require 'ox-cmu-ms-report)
@@ -456,6 +486,8 @@ citecolor=blue,filecolor=blue,menucolor=blue,urlcolor=blue"
 
 (add-to-list 'org-export-filter-headline-functions 'sa-ignore-headline)
 (add-to-list 'org-export-filter-headline-functions 'headline-nonumber)
+
+
 
 
 (message "jmax-org.el loaded")
