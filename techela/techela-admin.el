@@ -585,7 +585,8 @@ This means go into each repo, commit all changes, and push them."
 	 (start-process-shell-command
 	  "ta-return"
 	  "*ta return*"
-	  "git add * && git commit -am \"Returning\" && git push"))))))
+	  "git add * && git commit -am \"Returning\" && git push")))
+      (message "returned %s" userid))))
 
 
 (defun ta-grade (label)
@@ -615,6 +616,12 @@ This is not fast.
     (if (file-exists-p grading-file)
 	(find-file grading-file)
       ;; else, we have to make one
+      (unless (file-exists-p (expand-file-name
+			      "gradebook"
+			      ta-gitolite-admin-dir))
+	(make-directory (expand-file-name
+			      "gradebook"
+			      ta-gitolite-admin-dir) t))
       (find-file grading-file)
       (insert "#+TITLE: Grading
 #+AUTHOR: " (user-full-name) "
@@ -675,21 +682,30 @@ We do not check if our local copy is up to date first.  we probably should."
 
 
 (defun ta-summarize (label)
-  "Insert a summary of grades for assignment LABEL"
+  "Insert a summary of grades for assignment LABEL."
   (forward-line 2)
-  (insert "| userid | grade |\n|-\n")
+  (insert (format "#+tblname: summary-%s\n" label)
+	  "| userid | grade |\n|-\n")
   (dolist (userid (sort (ta-get-userids) 'string-lessp))
-    (let* ((repo (f-filename (ta-get-repo-name label userid)))	  
+    (let* ((label-dir (file-name-as-directory
+		      (expand-file-name
+		       label
+		       ta-course-student-work-dir)))
+	   (repo (f-filename (ta-get-repo-name label userid)))	  
 	   (repo-dir (file-name-as-directory
 			 (expand-file-name
 			  repo
-			  ta-root-dir)))
+			  label-dir)))
 	   (org-file (expand-file-name
 		      (concat label ".org") repo-dir))
 	   (grade))
-
+      (message "label-dir %s
+repo %s
+repo-dir %s
+org-file %s" label-dir repo repo-dir org-file)
+      (message "looking at %s" org-file)
       (setq grade (gb-get-grade org-file))
-      (insert (format "| %15s | %s |\n" userid grade))))
+      (insert (format "| %15s | %s |\n" (format "[[%s][%s]]" (file-relative-name org-file) userid) grade))))
   (insert "\n\n")
   ;; realign table
   (previous-line 3)
@@ -783,6 +799,14 @@ This will be in student-work/label/userid-label/userid-label.org."
 	     (insert (format "- [[file:%s][%s]]\n" label-file label ))))
 	 (ta-get-assigned-assignments))
  (org-mode))
+
+
+(defun ta-save-commit-and-push ()
+  "Save current buffer, commit changes, and push."
+  (interactive)
+  (save-buffer)
+  (mygit (format "git commit %s -m \"save changes\"" (buffer-file-name)))
+  (mygit "git push"))
 
 
 (defun ta-status ()
@@ -918,6 +942,7 @@ Stay tuned for this.
 ")
     (goto-char (point-min))
     (org-mode))
+
 
   
 (provide 'techela-admin)
