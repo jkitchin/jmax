@@ -208,8 +208,15 @@ Make sure ssh is available. Generate ~/.ssh/techela_id key and
       (message-goto-subject)
       (insert (format "[%s] %s pubkey" tq-current-course tq-userid))
       (mml-attach-file (expand-file-name (format "~/.ssh/%s.pub" tq-userid)))
+      (message-goto-body)
+      ;; let's get some user/computer information
+      (tq-insert-system-info)
+      (insert (with-temp-buffer
+		(insert-file-contents "SYSTEM-INFO")
+		(buffer-string)))
+      (delete-file "SYSTEM-INFO")
       (message-send-and-exit)
-      (message "Your techela key has been sent to the course instructor. It is saved in ~/.ssh/%s and ~/.ssh/%s.pub. Do not delete these, as they give you access to the class. Please wait for a reply with further directions" tq-userid tq-userid)))
+      (message "Your techela key has been sent to the course instructor. It is saved in ~/.ssh/%s and ~/.ssh/%s.pub. Do not delete these, as they give you access to the class. Please wait for a reply with further directions." tq-userid tq-userid)))
     )
 
 (defun ta-describe ()

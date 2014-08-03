@@ -322,6 +322,28 @@ Messages\n==========\n")
   (techela-mode -1))
 
 
+(defun tq-submit-by-email ()
+  "Submit contents of current `default-directory' as a zip file attached to an email.
+This is normally only done after the deadline, when you cannot push to the git repo, or when there is some issue with the git server. There must be extenuating circumstances for this to be used."
+  (interactive)
+  (unless (executable-find "zip")
+    (error "Could not find a zip executable."))
+  
+  (let ((zip-name (file-name-sans-extension
+		   (file-name-nondirectory
+		    (buffer-file-name)))))
+    (tq-insert-system-info)
+    (shell-command (format "zip -v -r %s *"
+			   zip-name))
+    (message-mail)
+    (mml-attach-file (concat zip-name ".zip"))
+    (message-goto-to)
+    (insert "jkitchin@andrew.cmu.edu")
+    (message-goto-subject)
+    (insert (format "[%s email turnin]" tq-current-course))
+    ;(message-send-and-exit)
+    ))
+
 (defun tq-get-assigned-assignments ()
   "Return a list of assignments from the syllabus.
 Assignments are headings that are tagged with :assignment:.  The assignment is
@@ -334,6 +356,8 @@ a link in the heading."
      (lambda ()
        (org-entry-get (point) "CUSTOM_ID"))
      "assignment")))
+
+
 
 ;;;; menu and minor mode
 

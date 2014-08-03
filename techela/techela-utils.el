@@ -96,11 +96,13 @@ it.  If you want to clone it somewhere else, temporarily define
   "Create a SYSTEM-INFO file containing system info."
   (interactive)
   (with-temp-file "SYSTEM-INFO"
+    (insert "Created on: " (current-time-string) "\n")
     (insert (format "Name: %s\n" user-full-name))
     (insert (format "Userid = %s\n" tq-userid))
     (insert (format "Email: %s\n" user-mail-address))
     (insert "System name: " (system-name))
     (insert (format "\n%s" system-type))
+    ;; some information about ip addresses and mac address
     (insert (shell-command-to-string ifconfig-program))))
 
 ;; http://www.gnu.org/software/emacs/manual/html_node/eintr/Files-List.html
