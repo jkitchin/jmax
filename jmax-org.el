@@ -402,6 +402,18 @@ citecolor=blue,filecolor=blue,menucolor=blue,urlcolor=blue"
 	       ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
 
 
+(add-to-list 'org-latex-classes
+	     '("article-no-defaults"                          ;class-name
+	       "\\documentclass{article}
+ [NO-DEFAULT-PACKAGES]
+ [PACKAGES]
+ [EXTRA]" ;;header-string
+	       ("\\section{%s}" . "\\section*{%s}")
+	       ("\\subsection{%s}" . "\\subsection*a{%s}")
+	       ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+	       ("\\paragraph{%s}" . "\\paragraph*{%s}")
+	       ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+
 ;;;;;;; org path
 (defvar org-load-path 
   (list (file-name-as-directory
@@ -415,7 +427,7 @@ FEATURE is a symbol, and it is loaded from an org-file by the name of FEATURE.or
   (let ((org-file (concat (symbol-name feature) ".org"))
 	(path))
 
-    ;; find the org-file
+    ;; find the org-fileo
     (catch 'result
       (loop for dir in org-load-path do
 	    (when (file-exists-p
