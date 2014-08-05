@@ -373,35 +373,36 @@ a link in the heading."
 ")
   (dolist (label (tq-get-assigned-assignments))
     ;; check if we need to update
-    (with-current-directory
-     (expand-file-name label tq-root-directory)
-     (when (> (tq-get-num-incoming-changes) 0)
-       (mygit "git pull origin master")))    
+    (when (file-exists-p (expand-file-name label tq-root-directory))
+      (with-current-directory
+       (expand-file-name label tq-root-directory)
+       (when (> (tq-get-num-incoming-changes) 0)
+	 (mygit "git pull origin master")))    
     
-    ;; The student assignment will be in root/label
-    (let* ((fname (expand-file-name (concat label "/" label ".org") tq-root-directory))
-	   (grade) 
-	   (points) (category))
+      ;; The student assignment will be in root/label/label.org
+      (let* ((fname (expand-file-name (concat label "/" label ".org") tq-root-directory))
+	     (grade) 
+	     (points)
+	     (category))
 
-      (when (file-exists-p fname)
-	(setq grade (gb-get-grade fname)))    
+	(when (file-exists-p fname)
+	  (setq grade (gb-get-grade fname)))    
 
-      (with-current-buffer (find-file-noselect
-			    (expand-file-name "syllabus.org"
-					      tq-course-directory))
-	(save-restriction
-	  (widen)
-	  (beginning-of-buffer)
-	  ;; This link relies on a CUSTOM_ID
-	  (org-open-link-from-string (format "[[#%s]]" label))
-	  (setq points (org-entry-get (point) "POINTS"))
-	  (setq category (org-entry-get (point) "CATEGORY"))))
-      
-      (insert (format "|[[%s][%s]]|  %10s|%20s|%20s|\n" fname label grade points category))))
-  (previous-line)
-  (org-ctrl-c-ctrl-c)
-  (goto-char (point-min))
-  )
+	(with-current-buffer (find-file-noselect
+			      (expand-file-name "syllabus.org"
+						tq-course-directory))
+	  (save-restriction
+	    (widen)
+	    (beginning-of-buffer)
+	    ;; This link relies on a CUSTOM_ID
+	    (org-open-link-from-string (format "[[#%s]]" label))
+	    (setq points (org-entry-get (point) "POINTS"))
+	    (setq category (org-entry-get (point) "CATEGORY"))))
+	
+	(insert (format "|[[%s][%s]]|  %10s|%20s|%20s|\n" fname label grade points category))))
+    (previous-line)
+    (org-ctrl-c-ctrl-c)
+    (goto-char (point-min))))
 
 ;;;; menu and minor mode
 
