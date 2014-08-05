@@ -380,8 +380,11 @@ a link in the heading."
     
     ;; The student assignment will be in root/label
     (let* ((fname (expand-file-name (concat label "/" label ".org") tq-root-directory))
-	   (grade (gb-get-grade fname))
+	   (grade) 
 	   (points) (category))
+
+      (when (file-exists-p fname)
+	(setq grade (gb-get-grade fname)))    
 
       (with-current-buffer (find-file-noselect
 			    (expand-file-name "syllabus.org"
@@ -393,7 +396,6 @@ a link in the heading."
 	  (org-open-link-from-string (format "[[#%s]]" label))
 	  (setq points (org-entry-get (point) "POINTS"))
 	  (setq category (org-entry-get (point) "CATEGORY"))))
-
       
       (insert (format "|[[%s][%s]]|  %10s|%20s|%20s|\n" fname label grade points category))))
   (previous-line)
@@ -440,7 +442,10 @@ a link in the heading."
     ;; see if we can get the grade
     ;; The student assignment will be in root/label
     (let* ((fname (expand-file-name (concat label "/" label ".org") tq-root-directory))
-	   (grade (gb-get-grade fname)))
+	   (grade))
+
+      (when (file-exists-p fname)
+	(setq grade (gb-get-grade fname)))
       
       (easy-menu-add-item
        techela-menu '("Assignments")

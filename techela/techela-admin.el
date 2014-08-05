@@ -955,9 +955,10 @@ git status:
 - [[elisp:ta-assign-assignment to class][Assign an assignment]] (give students RW access)
 - [[elisp:ta-collect][Collect an assignment from class]] (change students to R access. Does not pull.)
 - [[elisp:ta-pull-repos][Pull an assignment from class]] (get local copies of assignment. Does not change permissions.)
-- [[elisp:ta-return][Return an assignment to class]] (push local copies to server)
+
 
 - [[elisp:ta-grade][Grade an assignment for class]] (collect and pull repos. create grading list)
+- [[elisp:ta-return][Return an assignment to class]] (push local copies to server)
 
 - [[elisp:ta-show-assigned-assignments][Show list of assigned assignments]]
 
