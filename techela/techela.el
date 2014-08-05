@@ -361,7 +361,7 @@ a link in the heading."
 
 
 (defun tq-grade-report ()
-  "Open *grade report* with a summary of the graded assignments."
+  "Generate a *grade report* buffer with a summary of the graded assignments."
   (interactive)
   (switch-to-buffer "*grade report*")
   (erase-buffer)
@@ -372,37 +372,38 @@ a link in the heading."
 |--------------------------------------------------------
 ")
   (dolist (label (tq-get-assigned-assignments))
-    ;; check if we need to update
-    (if (file-exists-p (expand-file-name label tq-root-directory))
-	(progn
-	  (with-current-directory
-	   (expand-file-name label tq-root-directory)
-	   (when (> (tq-get-num-incoming-changes) 0)
-	     (mygit "git pull origin master")))    
+    (let ((grade) 
+	  (points)
+	  (category)
+	  (fname))
+      (with-current-buffer (find-file-noselect
+			    (expand-file-name "syllabus.org"
+					      tq-course-directory))
+	(save-restriction
+	  (widen)
+	  (beginning-of-buffer)
+	  ;; This link relies on a CUSTOM_ID
+	  (org-open-link-from-string (format "[[#%s]]" label))
+	  (setq points (org-entry-get (point) "POINTS"))
+	  (setq category (org-entry-get (point) "CATEGORY"))))
+      
+      ;; check if we need to update
+      (if (file-exists-p (expand-file-name label tq-root-directory))
+	  (progn
+	    (with-current-directory
+	     (expand-file-name label tq-root-directory)
+	     (when (> (tq-get-num-incoming-changes) 0)
+	       (mygit "git pull origin master")))    
 	  
-	  ;; The student assignment will be in root/label/label.org
-	  (let* ((fname (expand-file-name (concat label "/" label ".org") tq-root-directory))
-		 (grade) 
-		 (points)
-		 (category))
-	    
+	    ;; The student assignment will be in root/label/label.org
+	    (setq fname (expand-file-name (concat label "/" label ".org") tq-root-directory))
+	      
 	    (when (file-exists-p fname)
 	      (setq grade (gb-get-grade fname)))    
-	    
-	    (with-current-buffer (find-file-noselect
-				  (expand-file-name "syllabus.org"
-						    tq-course-directory))
-	      (save-restriction
-		(widen)
-		(beginning-of-buffer)
-		;; This link relies on a CUSTOM_ID
-		(org-open-link-from-string (format "[[#%s]]" label))
-		(setq points (org-entry-get (point) "POINTS"))
-		(setq category (org-entry-get (point) "CATEGORY"))))
-	    
-	    (insert (format "|[[%s][%s]]|  %10s|%20s|%20s|\n" fname label grade points category))))
+	      	    
+	    (insert (format "|[[%s][%s]]|  %10s|%20s|%20s|\n" fname label grade points category)))
       ;; no dir found
-      (insert (format "|%s|not found|%20s|%20s|\n" label points category))))
+      (insert (format "|%s|not found|%20s|%20s|\n" label points category)))))
     (previous-line)
     (org-ctrl-c-ctrl-c)
     (goto-char (point-min)))
