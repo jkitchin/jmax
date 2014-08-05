@@ -405,8 +405,8 @@ a link in the heading."
       (easy-menu-add-item
        techela-menu '("Assignments")
        (vector (concat label
-		       (when grade (format " (%s)" grade))
-		       `(tq-get-assignment ,label) t))))))
+		       (when grade (format " (%s)" grade)))
+		       `(tq-get-assignment ,label) t)))))
 
 (provide 'techela)
 
