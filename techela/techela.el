@@ -398,7 +398,7 @@ a link in the heading."
   (dolist (label (tq-get-assigned-assignments))
     ;; see if we can get the grade
     ;; The student assignment will be in root/label
-    (let* ((fname (expand-file-name label tq-root-directory))
+    (let* ((fname (expand-file-name (concat label "/" label ".org") tq-root-directory))
 	   (grade (when (and (file-exists-p fname) (file-readable-p fname))
 		    (with-temp-buffer
 		      (insert-file-contents fname)
