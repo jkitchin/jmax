@@ -367,7 +367,7 @@ a link in the heading."
   (erase-buffer)
   (org-mode)
   (insert "#+TITLE: Grade report\n")
-  (dolist (label tq-get-assigned-assignments)
+  (dolist (label (tq-get-assigned-assignments))
     ;; check if we need to update
     (with-current-directory
      (expand-file-name label tq-root-directory)
