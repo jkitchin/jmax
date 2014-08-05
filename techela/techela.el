@@ -366,7 +366,11 @@ a link in the heading."
   (switch-to-buffer "*grade report*")
   (erase-buffer)
   (org-mode)
-  (insert "#+TITLE: Grade report\n")
+  (insert "#+TITLE: Grade report
+
+|label |   score  |             points  |       category|
+|--------------------------------------------------------
+")
   (dolist (label (tq-get-assigned-assignments))
     ;; check if we need to update
     (with-current-directory
@@ -391,7 +395,11 @@ a link in the heading."
 	  (setq category (org-entry-get (point) "CATEGORY"))))
 
       
-      (insert (format "[[%s][%s]]  %10s%20s%20s\n" fname label grade points category)))))
+      (insert (format "|[[%s][%s]]|  %10s|%20s|%20s|\n" fname label grade points category))))
+  (previous-line)
+  (org-ctrl-c-ctrl-c)
+  (goto-char (point-min))
+  )
 
 ;;;; menu and minor mode
 
