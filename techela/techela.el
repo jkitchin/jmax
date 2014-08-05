@@ -381,7 +381,7 @@ a link in the heading."
 
       (with-current-buffer (find-file-noselect
 			    (expand-file-name "syllabus.org"
-					      ta-course-dir))
+					      tq-course-directory))
 	(save-restriction
 	  (widen)
 	  (beginning-of-buffer)
