@@ -18,6 +18,7 @@
 (require 'f)
 (require 'techela-utils)
 (require 'techela-setup)
+(require 'techela-grade)
 
 (defvar tq-git-server "techela.cheme.cmu.edu"
   "The git server where techela courses are served.")
@@ -359,6 +360,38 @@ a link in the heading."
      "assignment")))
 
 
+(defun tq-grade-report ()
+  "Open *grade report* with a summary of the assignments"
+  (interactive)
+  (switch-to-buffer "*grade report*")
+  (erase-buffer)
+  (org-mode)
+  (insert "#+TITLE: Grade report\n")
+  (dolist (label tq-get-assigned-assignments)
+    ;; check if we need to update
+    (with-current-directory
+     (expand-file-name label tq-root-directory)
+     (when (> (tq-get-num-incoming-changes) 0)
+       (mygit "git pull origin master")))    
+    
+    ;; The student assignment will be in root/label
+    (let* ((fname (expand-file-name (concat label "/" label ".org") tq-root-directory))
+	   (grade (gb-get-grade fname))
+	   (points) (category))
+
+      (with-current-buffer (find-file-noselect
+			    (expand-file-name "syllabus.org"
+					      ta-course-dir))
+	(save-restriction
+	  (widen)
+	  (beginning-of-buffer)
+	  ;; This link relies on a CUSTOM_ID
+	  (org-open-link-from-string (format "[[#%s]]" label))
+	  (setq points (org-entry-get (point) "POINTS"))
+	  (setq category (org-entry-get (point) "CATEGORY"))))
+
+      
+      (insert (format "[[%s][%s]]  %10s%20s%20s\n" fname label grade points category)))))
 
 ;;;; menu and minor mode
 
@@ -378,7 +411,7 @@ a link in the heading."
     ["Course index" tq-index t]
     ["Course agenda" tq-agenda t]
     ("Assignments")
-;    ["Get grade report" tq-grade-report t]
+    ["Get grade report" tq-grade-report t]
     ["Email instructor" tq-email t]
     ["Update current file" tq-update t]
     ["Send error report" tq-send-error-report t]
@@ -386,7 +419,6 @@ a link in the heading."
     ))
 
 
-(require 'techela-grade)
 (define-minor-mode techela-mode
   "Minor mode for techela
 
