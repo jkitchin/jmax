@@ -835,7 +835,7 @@ This will be in student-work/label/userid-label/userid-label.org."
 2. ../course"
   (interactive)
 
-  (switch-to-buffer-other-frame (get-buffer-create "*techela-admin*"))
+  (switch-to-buffer (get-buffer-create "*techela-admin*"))
   (erase-buffer)
   (insert "#+STARTUP: showall\n")
 

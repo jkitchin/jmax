@@ -108,26 +108,6 @@ placed after the new link when it is done."
                        current-point (user-login-name)  current-line)))))
 
 
-;; (defun gb-assign-grade (lettergrade)
-;;   "Add LETTERGRADE to the feedback section."
-;;   (interactive
-;;    (list (ido-completing-read
-;; 	  "Letter grade: "
-;; 	  (mapcar (lambda (x) (car x)) gb-MULTIPLIERS)
-;; 	  nil t)))
-;;   (goto-char (point-min))
-;;   (if (search-forward "#+GRADE:" (point-max) t)
-;;       (progn
-;; 	(beginning-of-line)
-;; 	(kill-line)
-;; 	(insert (format "#+GRADE: %s" lettergrade)))
-;;     ;else no grade found yet
-;;     (goto-char (point-max))
-;;     (insert (format "\n#+GRADE: %s" lettergrade)))
-;;   (save-buffer))
-
-
-
 (defun gb-grade ()
   "Run a rubric function to insert the grade.
 This assumes the assignment label is the filename you are in."
