@@ -399,10 +399,17 @@ a link in the heading."
     ;; see if we can get the grade
     ;; The student assignment will be in root/label
     (let* ((fname (expand-file-name label tq-root-directory))
-	   (grade (gb-get-grade fname)))
-    (easy-menu-add-item
-     techela-menu '("Assignments")
-     (vector (concat label (when grade (format " (%s)" grade)) `(tq-get-assignment ,label) t))))))
+	   (grade (when (and (file-exists-p fname) (file-readable-p fname))
+		    (with-temp-buffer
+		      (insert-file-contents fname)
+		      (org-mode)
+		      (gb-get-filetag "GRADE")))))
+      
+      (easy-menu-add-item
+       techela-menu '("Assignments")
+       (vector (concat label
+		       (when grade (format " (%s)" grade))
+		       `(tq-get-assignment ,label) t))))))
 
 (provide 'techela)
 
