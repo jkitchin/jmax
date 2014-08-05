@@ -386,6 +386,7 @@ a link in the heading."
     ))
 
 
+(require 'techela-grade)
 (define-minor-mode techela-mode
   "Minor mode for techela
 
@@ -399,11 +400,7 @@ a link in the heading."
     ;; see if we can get the grade
     ;; The student assignment will be in root/label
     (let* ((fname (expand-file-name (concat label "/" label ".org") tq-root-directory))
-	   (grade (when (and (file-exists-p fname) (file-readable-p fname))
-		    (with-temp-buffer
-		      (insert-file-contents fname)
-		      (org-mode)
-		      (gb-get-filetag "GRADE")))))
+	   (grade (gb-get-grade fname)))
       
       (easy-menu-add-item
        techela-menu '("Assignments")
