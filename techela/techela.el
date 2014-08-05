@@ -201,7 +201,7 @@ These will be committed so that future merges are possible. You should probably 
           (
            ;; deadlines
           (tags-todo "+DEADLINE>=\"<today>\""
-                     ((org-agenda-overriding-header "Upcoming Deadlines")
+                     ((org-agenda-overriding-header "Press q to quit\nUpcoming Deadlines")
 		      ))
 
           ;; now the agenda
@@ -238,12 +238,12 @@ These will be committed so that future merges are possible. You should probably 
 ======================================================
 file: %s
 line %s: %s
-repo: %s
+repo remote origin: %s
 ======================================================"
 		 (buffer-file-name)
 		 (what-line)
 		 (thing-at-point 'line)
-		 (mygit "git config --get remote.origin.url"))))
+		 (nth 1 (mygit "git config --get remote.origin.url")))))
 
     (compose-mail-other-frame)
     (message-goto-to)
@@ -266,7 +266,7 @@ repo: %s
    (message-goto-subject)
    (insert (format "[%s] debug report" tq-current-course))
    (message-goto-body)
-   (insert "Tell match-end what you were doing. Then press C-c C-c to send the message.
+   (insert "Tell me what you were doing. Then press C-c C-c to send the message.
 
 
 Messages\n==========\n")
@@ -341,8 +341,9 @@ This is normally only done after the deadline, when you cannot push to the git r
     (insert "jkitchin@andrew.cmu.edu")
     (message-goto-subject)
     (insert (format "[%s email turnin]" tq-current-course))
-    ;(message-send-and-exit)
+    (message-send-and-exit)
     ))
+
 
 (defun tq-get-assigned-assignments ()
   "Return a list of assignments from the syllabus.
@@ -378,7 +379,7 @@ a link in the heading."
     ["Course agenda" tq-agenda t]
     ("Assignments")
 ;    ["Get grade report" tq-grade-report t]
-    ["Email" tq-email t]
+    ["Email instructor" tq-email t]
     ["Update current file" tq-update t]
     ["Send error report" tq-send-error-report t]
     ["Quit" tq-quit t]
@@ -394,13 +395,14 @@ a link in the heading."
   :keymap techela-mode-map
 
   ;; add dynamic assignments
-  (mapcar (lambda (x)
-	    (easy-menu-add-item techela-menu '("Assignments") x))
-	  ;; Make a list of vectors
-	  (mapcar
-	   (lambda (x)
-	     (vector x `(tq-get-assignment ,x) t))
-	   (tq-get-assigned-assignments))))
+  (dolist (label (tq-get-assigned-assignments))
+    ;; see if we can get the grade
+    ;; The student assignment will be in root/label
+    (let* ((fname (expand-file-name label tq-root-directory))
+	   (grade (gb-get-grade fname)))
+    (easy-menu-add-item
+     techela-menu '("Assignments")
+     (vector (concat label (when grade (format " (%s)" grade)) `(tq-get-assignment ,label) t))))))
 
 (provide 'techela)
 
