@@ -8,9 +8,6 @@
 ;; coursename@techela.cheme.cmu.edu:course.
 ;; See README.org and FAQ.org
 ;;
-;; TODO: Reports
-;; Student grade report
-;; Assignment summary
 ;; Participation summary
 ;; tagged assignment summary (ta-show-performance tag-expression)
 ;;     TAG-EXPRESSION should select the assignments, then we aggregate
@@ -82,6 +79,11 @@ to, and that is saved in custom.el."
 				  (expand-file-name
 				   "assignments"
 				   ta-root-dir))
+
+	ta-course-solutions-dir (file-name-as-directory
+				 (expand-file-name
+				  "solutions"
+				  ta-root-dir))
 	;; public facing course
 	ta-course-dir (file-name-as-directory
 		       (expand-file-name
@@ -103,6 +105,12 @@ to, and that is saved in custom.el."
   ;; Check that we have everything in place
   (unless (file-exists-p ta-root-dir)
     (make-directory ta-root-dir t))
+
+  (unless (file-exists-p ta-course-solutions-dir)
+    (make-directory ta-course-solutions-dir t))
+
+  (unless (file-exists-p ta-course-assignments-dir)
+    (make-directory ta-course-assignments-dir t))
 
   ;; where common class repos will be
   (unless (file-exists-p ta-course-class-work-dir)
@@ -349,7 +357,78 @@ This sets that repo to R access for USERID. We do not pull the assignment here."
       (goto-char (point-max))
       ;; insert a due date.
       (org-time-stamp '()))))
-		      
+
+(defun ta-create-solution (label)
+  "Create or edit a solution LABEL.
+This creates the repo if needed, and copies the assignment to the
+solution directory. It does not give students access to the
+solution. It also does not commit or push your work for you. You
+need to run `ta-release-solution' to give students access to the
+solution."
+  (interactive (list
+    (ido-completing-read "Label: " (ta-get-possible-assignments))))
+
+  (let ((solution-dir (file-name-as-directory
+		       (expand-file-name
+			label
+			ta-course-solutions-dir))))
+    (unless (file-exists-p solution-dir)
+      ;; no dir found. create the repo and directory. It is a wild
+      ;; repo on gitolite.
+      (with-current-directory
+       ta-course-solutions-dir
+       (mygit (format "git clone %s@%s:s/%s"
+		      ta-course-name ta-course-server label))
+       ;; now, copy assignment org in as basis for solution
+       (copy-file (expand-file-name
+		   (concat label ".org")
+		   (expand-file-name
+		    label
+		    ta-course-assignments-dir))
+		  (expand-file-name
+		   (concat label ".org")
+		   solution-dir))))
+
+    ;; open the file
+    (find-file (expand-file-name
+		(concat label ".org")
+		solution-dir))))
+
+(defun ta-release-solution (label)
+  "Give students read access to the solution LABEL.
+See also `ta-close-solution'.
+"
+  (interactive (list
+    (ido-completing-read "Label: " (ta-get-possible-assignments))))
+  (let ((solution-repo-dir (file-name-as-directory
+			    (expand-file-name
+			     label
+			     ta-course-solutions-dir))))
+    (if (file-exists-p solution-repo-dir)
+	(with-current-directory
+	 solution-repo-dir
+	 ;; make sure we push the most recent work
+	 (progn
+	   (unless (string= "" (shell-command-to-string "git status --porcelain"))
+	     (mygit "git add *")
+	     (mygit "git commit -am \"committing solution\"")
+	     (mygit "git push"))
+	    
+	   (shell-command
+	    (format "ssh %s@%s perms s/%s + READERS @students" ta-course-name ta-course-server label)))
+	 (error "%s not found" (expand-file-name
+				label
+				ta-course-solutions-dir))))))
+
+
+(defun ta-close-solution (label)
+  "Close student access to the solution LABEL."
+  (interactive (list
+    (ido-completing-read "Label: " (ta-get-possible-assignments))))
+  (shell-command
+   (format "ssh org-course@techela.cheme.cmu.edu perms s/%s - READERS @students" label)))
+
+
 ;;; These are class functions which should efficiently operate on each entry of the roster.
 
 (defun ta-create-assignment-repos (label)
@@ -898,35 +977,61 @@ git status:
 "))))
 
   ;;; now we get each assignment
-  (insert "* Assignment directory statuses\n")
+  (insert "* Assignment statuses
+  :PROPERTIES:
+  :VISIBILITY: folded
+  :END:
+")
   (dolist (label (ta-get-possible-assignments))
+    (insert "** " label "\n")
+    ;; check assignment status
     (with-current-directory
-     (expand-file-name
-      label ta-course-assignments-dir)
-          
-    (let ((git-status (shell-command-to-string "git status --porcelain")))
-      (if (string= "" git-status)
-	  (insert "** " label
-		  (if (-contains? (ta-get-assigned-assignments) label)
-		      " (assigned)"
-		    " (not assigned)")
-		  " is clean")
-	(insert "** " label " is " (propertize "dirty\n" 'font-lock-face '(:foreground "red"))
-		(shell-command-to-string "git status")
-		(format "
+     (expand-file-name label ta-course-assignments-dir)
+
+     ;; Assignment status
+     (let ((git-status (shell-command-to-string "git status --porcelain")))
+       (if (string= "" git-status)
+	   (insert label
+		   (if (-contains? (ta-get-assigned-assignments) label)
+		       " (assigned)"
+		     " (not assigned)")
+		   " is clean")
+	 (insert label " is " (propertize "dirty\n" 'font-lock-face '(:foreground "red"))
+		 (shell-command-to-string "git status")
+		 (format "
 #+BEGIN_SRC emacs-lisp
  (with-current-directory (expand-file-name \"%s\" ta-course-assignments-dir)
    (mygit \"git add *\")
    (mygit \"git commit -m \\\"committing everything\\\"\")
    (mygit \"git push\"))
 #+END_SRC
-" label))
-		))
+" label))))
     (insert (format "\n    [[file:%s][%s]]"
 		    (expand-file-name
 		     label ta-course-assignments-dir)
-		    label) "\n")))
+		    label) "\n"))
 
+    ;; now we need solution status
+    (if (file-exists-p (expand-file-name label ta-course-solutions-dir))
+	(with-current-directory
+	 (expand-file-name label ta-course-solutions-dir)	 
+	 (if (string= "" (shell-command-to-string "git status --porcelain"))
+	     (insert "Solution is clean")
+	   (insert"Solution is "
+		  (propertize "dirty\n" 'font-lock-face '(:foreground "red"))
+		  (shell-command-to-string "git status")
+		  (format "
+#+BEGIN_SRC emacs-lisp
+ (with-current-directory (expand-file-name \"%s\" ta-course-solutions-dir)
+   (mygit \"git add *\")
+   (mygit \"git commit -m \\\"committing everything\\\"\")
+   (mygit \"git push\"))
+#+END_SRC
+" label))))
+      (insert "No solution found"))
+    (insert (format "  [[elisp:(ta-create-solution \"%s\")][Create/edit solution]]\n" label)))
+	  
+    ;; now menu options
     (insert "
 * Menu of options
 
@@ -961,6 +1066,9 @@ git status:
 - [[elisp:ta-return][Return an assignment to class]] (push local copies to server)
 
 - [[elisp:ta-show-assigned-assignments][Show list of assigned assignments]]
+
+- [[elisp:ta-create-solution][Create or edit solution]]
+- [[elisp:ta-release-solution][Release/update a solution]]  [[elisp:ta-close-solution][Close a solution]]
 
 *** Individual Student Actions
 

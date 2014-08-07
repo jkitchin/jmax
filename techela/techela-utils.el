@@ -203,7 +203,26 @@ Opens all course files, then does the search."
 	(let ((link (pop *index-links*)))
 	  (insert (format "%s %s\n\n" (car link) (cdr link)))))))) 
     
-    
+(defun tq-increase-text-size ()
+  "Increase text size."
+  (interactive)
+  (set-face-attribute 'default nil :height
+		      (truncate (* 1.1 (face-attribute 'default :height)))))
+
+(defun tq-decrease-text-size ()
+  "Decrease text size."
+  (interactive)
+  (set-face-attribute 'default nil :height
+		      (truncate (* 0.9 (face-attribute 'default :height)))))
+
+(defun tq-present ()
+  "set font size larger and set latex fragment size larger"
+  (interactive)
+  (set-face-attribute 'default nil :height 150)
+  (plist-put org-format-latex-options :scale 1.5))
+
+(global-set-key (kbd "C--") 'tq-decrease-text-size)
+(global-set-key (kbd "C-=") 'tq-increase-text-size)
 
 (provide 'techela-utils)
 

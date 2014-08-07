@@ -4,13 +4,6 @@
 ;; A techela course has a course-name, and is served on a techela server at
 ;; git clone course-name@techela.cheme.cmu.edu:course
 ;;
-;; Students must send their id_rsa.pub key to the course admin to
-;; access the course.
-;;
-;; TODO: Dynamic assignment menu showing students assignments and
-;; grades/due dates
-;;
-;; TODO: Student grade report
 
 ;;; Code:
 
@@ -40,7 +33,7 @@
 
 The course should exist at COURSE@techela.cheme.cmu.edu:course
 
-The user id_rsa.pub key must be registered in the course."
+The user ssh.pub key must be registered in the course."
   (interactive
    (list
     (ido-completing-read
@@ -141,6 +134,8 @@ The user id_rsa.pub key must be registered in the course."
 		  tq-userid
 		  label))))
       (techela-mode 1))))
+
+
 
 
 (defun  tq-turn-it-in ()
@@ -286,12 +281,32 @@ Messages\n==========\n")
 	   
 ;;;; links
 
-;; This is a personal assignment
+;; This downloads the assignment repo for the student to work in
 (org-add-link-type
  "assignment"
  (lambda (arg)
    (tq-get-assignment arg)))
 
+;; download the solution
+(org-add-link-type
+ "solution"
+ (lambda (label)
+   (with-current-directory
+    tq-root-directory
+    (unless (file-exists-p "solutions")
+      (make-directory "solutions"))
+    (with-current-directory
+     "solutions"
+     (if (file-exists-p label)
+	 ;; we have the solution
+	 (progn
+	   (find-file (concat label "/" label ".org"))
+	   ;; update just for good measure
+	   (tq-update))
+       ;; no file
+       (mygit (format "git clone s/%s" label))
+       (find-file (concat label "/" label ".org")))))))
+       
 
 ;; these will usually be in class or optional exercises. This is a
 ;; link for clarity of intention for students.
