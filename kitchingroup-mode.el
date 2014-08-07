@@ -97,7 +97,7 @@
      ["sort bibtex file" bibtex-sort-buffer t]
      ["extract bibtex entries from org" org-ref-extract-bibtex-entries t]
      ["build bibliography pdf from bib file" org-ref-build-full-bibliography t]
-     ["find bad citations" org-ref-bib-find-bad-citations t]
+     ["find bad citations" org-ref-find-bad-citations t]
      )))
 
 
