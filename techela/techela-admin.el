@@ -831,7 +831,6 @@ a link in the heading."
   (interactive)
   (with-temp-buffer
     (insert-file-contents (expand-file-name "syllabus.org" ta-course-dir))
-    (org-mode)
     (org-map-entries
      (lambda ()
        (org-entry-get (point) "CUSTOM_ID"))
@@ -983,7 +982,6 @@ git status:
   :END:
 ")
   (dolist (label (ta-get-possible-assignments))
-    (insert "** " label "\n")
     ;; check assignment status
     (with-current-directory
      (expand-file-name label ta-course-assignments-dir)
@@ -991,12 +989,12 @@ git status:
      ;; Assignment status
      (let ((git-status (shell-command-to-string "git status --porcelain")))
        (if (string= "" git-status)
-	   (insert label
+	   (insert "** " label
 		   (if (-contains? (ta-get-assigned-assignments) label)
 		       " (assigned)"
 		     " (not assigned)")
 		   " is clean")
-	 (insert label " is " (propertize "dirty\n" 'font-lock-face '(:foreground "red"))
+	 (insert "** " label " is " (propertize "dirty\n" 'font-lock-face '(:foreground "red"))
 		 (shell-command-to-string "git status")
 		 (format "
 #+BEGIN_SRC emacs-lisp
@@ -1008,8 +1006,9 @@ git status:
 " label))))
     (insert (format "\n    [[file:%s][%s]]"
 		    (expand-file-name
-		     label ta-course-assignments-dir)
-		    label) "\n"))
+		     (concat label ".org") (expand-file-name
+		     label ta-course-assignments-dir))
+		    (concat label ".org")) "\n"))
 
     ;; now we need solution status
     (if (file-exists-p (expand-file-name label ta-course-solutions-dir))
