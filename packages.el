@@ -27,7 +27,7 @@
 	'eimp
 	;'icicles
 	'org 'org-plus-contrib
-	;'elpy
+	'elpy
 	'jedi 'jedi-direx
 	'f ; file functions https://github.com/rejeep/f.el
 	's ; string functions
