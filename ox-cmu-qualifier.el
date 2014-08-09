@@ -66,7 +66,9 @@
 (format "\\begin{abstract}\n%s\n\\end{abstract}\n" (org-export-data abstract info))
 "
 \\maketitle
-
+\\thispagestyle{empty}
+\\clearpage
+\\setcounter{page}{1}
 "
 contents
 "\n\\end{document}"
