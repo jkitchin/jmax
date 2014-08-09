@@ -47,6 +47,11 @@ and MacTeX from http://www.tug.org/mactex.
 
 After that, I was able to clone jmax as described above, and I used the jmax-mac.sh script to open emacs configured to use jmax.
 
+
+#+BEGIN_SRC sh
+brew install emacs --with-gnutls --with-imagemagick --with-librsvg --with-x --use-git-head --HEAD --cocoa
+#+END_SRC
+
 * Customization
 These files contain variables with paths specific to your computer. You probably need to change them.
 
