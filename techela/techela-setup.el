@@ -17,21 +17,17 @@
 
 ;;; Code:
 
-(defvar tq-config-file (expand-file-name "~/.techela")
+(defvar tq-config-file nil
   "Location of the configuration file for techela.")
 
 
 (defun tq-config-read-data ()
-  "Read and return the data in `tq-config-file'.
-Data is returned as nested a-lists."
+  "Read and return the data in `tq-config-file'."
   (if (file-exists-p tq-config-file)
       (let ((json-object-type 'hash-table))
 	(json-read-file tq-config-file))
     ;; no file exists, return an empty hash
-    (let ((my-hash (make-hash-table :test 'equal)))
-      (puthash "user" (make-hash-table :test 'equal) my-hash)
-      (puthash "admin" (make-hash-table :test 'equal) my-hash)
-      my-hash)))
+    (make-hash-table :test 'equal)))
 
 
 (defun tq-config-write-data (data)
@@ -42,59 +38,65 @@ DATA should be obtained and modified from `tq-config-read-data'."
 
 
 (defun tq-config-get-user-courses ()
-  "Get list of courses the user is registered for."
-  (let* ((data (tq-config-read-data))
-	 (user-data (gethash "user" data))
-	 (results))
-    (maphash (lambda (key value) (add-to-list 'results key)) user-data)
-    results))
+  "Get a list of available courses."
+  '("org-course" "f14-06625"))
 
+;; (defun tq-config-get-user-courses ()
+;;   "Get list of courses the user is registered for."
+;;   (let* ((data (tq-config-read-data))
+;; 	 (user-data (gethash "user" data))
+;; 	 (results))
+;;     (maphash (lambda (key value) (add-to-list 'results key)) user-data)
+;;     results))
 
 (defun tq-config-get-admin-courses ()
-  "Get list of courses the user is registered for."
-  (let* ((data (tq-config-read-data))
-	 (user-data (gethash "admin" data))
-	 (results))
-    (maphash (lambda (key value) (add-to-list 'results key)) user-data)
-    results))
+  '("org-course" "f14-06625"))
+
+;; (defun tq-config-get-admin-courses ()
+;;   "Get list of courses the user is registered for."
+;;   (let* ((data (tq-config-read-data))
+;; 	 (user-data (gethash "admin" data))
+;; 	 (results))
+;;     (maphash (lambda (key value) (add-to-list 'results key)) user-data)
+;;     results))
 
 
-(defun tq-config-set-user-course (course userid root-dir)
-  "Add (COURSE USERID ROOT-DIR) to `tq-config-file'."
-  (let* ((data (tq-config-read-data)))
-    (if (gethash course (gethash "user" data))
-	(progn
-	  (puthash "userid" userid (gethash course (gethash "user" data)))
-	  (puthash "root-dir" root-dir (gethash course (gethash "user" data))))
-      ;; add course.
-      (puthash course (make-hash-table :test 'equal) (gethash "user" data))
-      (puthash "userid" userid (gethash course (gethash "user" data)))
-      (puthash "root-dir" root-dir (gethash course (gethash "user" data))))
-    (tq-config-write-data data)))
+;; (defun tq-config-set-user-course (course userid root-dir)
+;;   "Add (COURSE USERID ROOT-DIR) to `tq-config-file'."
+;;   (let* ((data (tq-config-read-data)))
+;;     (if (gethash course (gethash "user" data))
+;; 	(progn
+;; 	  (puthash "userid" userid (gethash course (gethash "user" data)))
+;; 	  (puthash "root-dir" root-dir (gethash course (gethash "user" data))))
+;;       ;; add course.
+;;       (puthash course (make-hash-table :test 'equal) (gethash "user" data))
+;;       (puthash "userid" userid (gethash course (gethash "user" data)))
+;;       (puthash "root-dir" root-dir (gethash course (gethash "user" data))))
+;;     (tq-config-write-data data)))
 
 
-(defun tq-config-get-user-course (course)
-  "Return hash-table for a user COURSE."
-  (gethash course (gethash "user" (tq-config-read-data))))
+;; (defun tq-config-get-user-course (course)
+;;   "Return hash-table for a user COURSE."
+;;   (gethash course (gethash "user" (tq-config-read-data))))
 
 
-(defun tq-config-get-admin-course (course)
-  "Return hash-table for a admin COURSE."
-  (gethash course (gethash "admin" (tq-config-read-data))))
+;; (defun tq-config-get-admin-course (course)
+;;   "Return hash-table for a admin COURSE."
+;;   (gethash course (gethash "admin" (tq-config-read-data))))
 
 
-(defun tq-config-set-admin-course (course userid root-dir)
-  "Add (COURSE USERID ROOT-DIR) to `tq-config-file'."
-  (let* ((data (tq-config-read-data)))
-    (if (gethash course (gethash "admin" data))
-	(progn
-	  (puthash "userid" userid (gethash course (gethash "admin" data)))
-	  (puthash "root-dir" root-dir (gethash course (gethash "admin" data))))
-      ;; add course.
-      (puthash course (make-hash-table :test 'equal) (gethash "admin" data))
-      (puthash "userid" userid (gethash course (gethash "admin" data)))
-      (puthash "root-dir" root-dir (gethash course (gethash "admin" data))))
-    (tq-config-write-data data)))
+;; (defun tq-config-set-admin-course (course userid root-dir)
+;;   "Add (COURSE USERID ROOT-DIR) to `tq-config-file'."
+;;   (let* ((data (tq-config-read-data)))
+;;     (if (gethash course (gethash "admin" data))
+;; 	(progn
+;; 	  (puthash "userid" userid (gethash course (gethash "admin" data)))
+;; 	  (puthash "root-dir" root-dir (gethash course (gethash "admin" data))))
+;;       ;; add course.
+;;       (puthash course (make-hash-table :test 'equal) (gethash "admin" data))
+;;       (puthash "userid" userid (gethash course (gethash "admin" data)))
+;;       (puthash "root-dir" root-dir (gethash course (gethash "admin" data))))
+;;     (tq-config-write-data data)))
 
 
 (defun ta-setup-user ()
@@ -142,10 +144,13 @@ git with this information where needed."
 		    (insert-file-contents
 		     (expand-file-name "~/.authinfo"))
 		    (buffer-string))))
-    (with-temp-file (expand-file-name "~/.authinfo")
-      (when contents (insert contents))
-      (goto-char (point-max))
-      (insert (format "\nmachine smtp.andrew.cmu.edu port 587 login %s" tq-userid))))
+    (unless (string-match "smtp\.andrew\.cmu\.edu" contents)
+      (with-temp-file (expand-file-name "~/.authinfo")
+	(when contents (insert contents))
+	(goto-char (point-max))
+	(insert
+	 (format
+	  "\nmachine smtp.andrew.cmu.edu port 587 login %s" tq-userid)))))
 
   ;; setup git if it is not. Only set these if they are not already set.
   (unless (executable-find "git")
@@ -163,43 +168,68 @@ git with this information where needed."
 
 (defun ta-setup-ssh ()
   "Setup ssh for use with techela.
-Make sure ssh is available. Generate ~/.ssh/techela_id key and
-~/.ssh/techela_config. Email key to instructor."
+Make sure ssh is available. Generate ssh key, config and wrapper script. Email key to instructor."
   (interactive)
 
   (unless (executable-find "ssh")
     (error "I cannot find ssh.  You cannot use techela"))
 
-  ;; check for ~/.ssh
-  (unless (file-exists-p
-	   (expand-file-name "~/.ssh"))
-    (make-directory (expand-file-name "~/.ssh") t))
+  ;; check for tq-root-directory
+  (unless (file-exists-p tq-root-directory)
+    (make-directory tq-root-directory t))
 
-  ;; now we know the ~/.ssh directory exists, check
+  ;; now we know the tq-root-directory directory exists, check
   ;; for userid and userid.pub, and make a pair if needed
-  (let ((keydir (expand-file-name "~/.ssh")))
-    ;; here we look for the existence of ~/.ssh/userid which is a private ssh key
-    (unless (file-exists-p (expand-file-name tq-userid keydir))
-      ;; we make one with no password
-      (shell-command (format "ssh-keygen -t rsa -f %s -N \"\""
-			     (expand-file-name tq-userid keydir)))
+  
+  ;; here we look for the existence of tq-root-directory/userid.pub which is a private ssh key
+  (unless (file-exists-p (expand-file-name
+			  (concat tq-userid ".pub")
+			  tq-root-directory))
+    ;; we make one with no password
+    (shell-command (format "ssh-keygen -t rsa -f %s -N \"\""
+			   (expand-file-name
+			    tq-userid
+			    tq-root-directory)))
 
-      ;; Now we add this to the config file. first make sure there is a file.
-      (shell-command (format "touch %s" (expand-file-name "~/.ssh/techela-config")))
+    ;; Now we add this to the config file. first make sure there is a file.
+    (let ((ssh-config (expand-file-name
+		       "techela-config"
+		       tq-root-directory)))
+      
+      (shell-command (format "touch %s" ssh-config))
 
       ;; now append an entry to a config file that techela_ssh uses
       (let ((contents (with-temp-buffer
 			(insert-file-contents
-			 (expand-file-name "~/.ssh/techela-config"))
+			 ssh-config)
 			(buffer-string)))
 	    (entry (format  "Host %s
   User %s
-  IdentityFile ~/.ssh/%s
-" tq-git-server tq-current-course tq-userid)))
-	(with-temp-file (expand-file-name "~/.ssh/techela-config")
+  IdentityFile %s
+" tq-git-server tq-current-course 
+(expand-file-name tq-userid tq-root-directory))))
+	(with-temp-file ssh-config
 	  (insert contents)
 	  (goto-char (point-max))
 	  (insert entry)))
+
+      ;; create the techela_ssh script we need to use
+      (with-temp-file (expand-file-name
+		       "techela_ssh"
+		       tq-root-directory)
+	(insert
+	 (format "#!/bin/bash
+
+# custom ssh for running git in batch mode for techela with the user-key
+exec ssh -F %s -o \"BatchMode yes\" \"$@\"
+# end"
+		 (expand-file-name "techela-config" tq-root-directory))))
+
+      ;; make the script executable
+      (set-file-modes (expand-file-name
+		       "techela_ssh"
+		       tq-root-directory) #o755)
+      
 
       ;; now create an email and send the key to the instructor
       (compose-mail)
@@ -207,16 +237,18 @@ Make sure ssh is available. Generate ~/.ssh/techela_id key and
       (insert "jkitchin@andrew.cmu.edu")
       (message-goto-subject)
       (insert (format "[%s] %s pubkey" tq-current-course tq-userid))
-      (mml-attach-file (expand-file-name (format "~/.ssh/%s.pub" tq-userid)))
+      (mml-attach-file (expand-file-name
+			  (concat tq-userid ".pub")
+			  tq-root-directory))
       (message-goto-body)
-      ;; let's get some user/computer information
+      ;; let us get some user/computer information
       (tq-insert-system-info)
       (insert (with-temp-buffer
 		(insert-file-contents "SYSTEM-INFO")
 		(buffer-string)))
       (delete-file "SYSTEM-INFO")
       (message-send-and-exit)
-      (message "Your techela key has been sent to the course instructor. It is saved in ~/.ssh/%s and ~/.ssh/%s.pub. Do not delete these, as they give you access to the class. Please wait for a reply with further directions." tq-userid tq-userid)))
+      (message "Your techela key has been sent to the course instructor. It is saved in ~/techela/%s/%s and ~/techela/%s/%s.pub. Do not delete these, as they give you access to the class. Please wait for a reply with further directions." tq-current-course tq-userid tq-current-course tq-userid)))
     )
 
 (defun ta-describe ()

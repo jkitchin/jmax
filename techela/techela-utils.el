@@ -6,7 +6,10 @@
 
 ;;; Code:
 
-(defvar *GIT_SSH* (format "GIT_SSH=%s" (expand-file-name "techela/techela_ssh" starter-kit-dir)))
+(defvar *GIT_SSH* nil
+  "the wrapper script for ssh")
+
+;;  (format "GIT_SSH=%s" (expand-file-name "techela/techela_ssh" starter-kit-dir)))
 
 (defvar tq-debug nil "Whether to debug or not.  non-nil triggers some debug action.")
 
@@ -46,6 +49,12 @@ script that runs ssh in batch mode.
 
 returns (status output)"
   (interactive "sgit command: ")
+  (setq *GIT_SSH*
+	(format
+	 "GIT_SSH=%s"
+	 (expand-file-name
+	  "techela_ssh" 
+	  tq-root-directory)))
   (let ((process-environment (cons *GIT_SSH* process-environment))
         (status) (output))
     (when (get-buffer "*mygit-process*") (kill-buffer "*mygit-process*"))

@@ -17,7 +17,7 @@
   "The git server where techela courses are served.")
 
 (defvar tq-root-directory nil
-  "Location to clone the course and student work to.  This location is not a git repository.")
+  "Location to clone the course and student work to.  This location is not a git repository, but will be the name of the course.")
 
 (defvar tq-course-directory nil
   "Directory where the course content is.  This will be a git repository.  It is inside `tq-root-directory'.")
@@ -29,7 +29,9 @@
 (defvar tq-course-files nil "list of org-files that constitute the course")
 
 (defun techela (course)
-  "Open the syllabus for COURSE.
+  "Open COURSE.
+If you have not registered for the course, you will be prompted
+for setup information.
 
 The course should exist at COURSE@techela.cheme.cmu.edu:course
 
@@ -37,51 +39,47 @@ The user ssh.pub key must be registered in the course."
   (interactive
    (list
     (ido-completing-read
-     "Course name: "
+     "Course name: " 
      (tq-config-get-user-courses))))
   
   ;; Set this for the current session
   (setq tq-current-course course)
 
   ;; initialize to nil, just in case they were previously set
-  (setq tq-root-directory nil
-	tq-course-directory nil)
+  (setq tq-root-directory (file-name-as-directory
+			   (expand-file-name
+			    course
+			    (expand-file-name "~/techela"))))
+
+  (setq tq-course-directory (expand-file-name "course" tq-root-directory)
+	tq-config-file (expand-file-name ".techela" tq-root-directory))
+
+  ;; make root directory if needed, including parents
+  (unless (file-exists-p tq-root-directory)
+    (make-directory tq-root-directory t))
   
   ;; load directories to variables if they exist
-  (let ((course-hash (tq-config-get-user-course course)))
-    (if course-hash
-	(setq tq-root-directory (gethash "root-dir" course-hash)
-	      tq-course-directory (expand-file-name "course" tq-root-directory)
-	      tq-userid (gethash "userid" course-hash))
-    ;; else no entry get info and add one.
-      (setq tq-root-directory	    
-	    (file-name-as-directory
-	     (expand-file-name
-	      (format "~/techela/%s" course)))
-	  tq-course-directory (file-name-as-directory
-			       (expand-file-name "course" tq-root-directory))
-	  tq-userid (read-from-minibuffer "Enter userid: "))
-
-    (tq-config-set-user-course course tq-userid tq-root-directory))
+  (let ((data (tq-config-read-data)))
+   
+    (unless (setq tq-userid (gethash "userid" data))
+      (setq tq-userid (read-from-minibuffer "Enter userid: "))
+      (puthash "userid" tq-userid data)
+      (tq-config-write-data data))
 
     (ta-setup-user)
     (ta-setup-ssh)
-
-    ;; make root directory if needed, including parents
-    (unless (file-exists-p tq-root-directory)
-      (make-directory tq-root-directory t))
 
     ;; clone course if we need it. This will be in a repo called "course"
     ;; do not clone if the directory exists.
     (unless (and tq-course-directory (file-exists-p tq-course-directory))
       (let ((default-directory (file-name-as-directory tq-root-directory)))
 	(mygit (format "git clone git://%s/course" tq-git-server)))))
-
+  
   ;; finally open the syllabus
   (find-file (expand-file-name "syllabus.org" tq-course-directory))
   (toggle-read-only)
-  (techela-mode)
 
+  (techela-mode)
   (setq org-id-extra-files (files-in-below-directory tq-course-directory))
 
   ;; let user know if an update is needed
@@ -315,6 +313,13 @@ Messages\n==========\n")
  (lambda (arg)
    (tq-get-assignment arg)))
 
+;; index link for techela
+(org-add-link-type
+ "index"
+ (lambda (path)
+   (tq-index)
+   (occur path)))
+
 
 ;; Link to record answers. ans:label::data
 ;; save in tq-userid-label-data.dat
@@ -366,9 +371,8 @@ This is normally only done after the deadline, when you cannot push to the git r
 Assignments are headings that are tagged with :assignment:.  The assignment is
 a link in the heading."
   (interactive)
-  (with-temp-buffer
-    (insert-file-contents (expand-file-name "syllabus.org" tq-course-directory))
-    (org-mode)
+  (save-current-buffer
+    (find-file  (expand-file-name "syllabus.org" tq-course-directory))
     (org-map-entries
      (lambda ()
        (org-entry-get (point) "CUSTOM_ID"))
@@ -461,10 +465,12 @@ a link in the heading."
   (dolist (label (tq-get-assigned-assignments))
     ;; see if we can get the grade
     ;; The student assignment will be in root/label
-    (let* ((fname (expand-file-name (concat label "/" label ".org") tq-root-directory))
+    (let* ((fname (expand-file-name
+		   (concat label "/" label ".org") tq-root-directory))
 	   (grade))
 
       (when (file-exists-p fname)
+	(message "getting grade for %s" fname)
 	(setq grade (gb-get-grade fname)))
       
       (easy-menu-add-item

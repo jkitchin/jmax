@@ -8,10 +8,6 @@
 ;; coursename@techela.cheme.cmu.edu:course.
 ;; See README.org and FAQ.org
 ;;
-;; Participation summary
-;; tagged assignment summary (ta-show-performance tag-expression)
-;;     TAG-EXPRESSION should select the assignments, then we aggregate
-;;     the scores
 
 (require 'cl-lib)
 (require 'csv)
@@ -31,39 +27,49 @@
 (defvar ta-course-dir nil "Derived variable absolute path to the public course file.")
 (defvar ta-course-student-work-dir nil "Derived variable to the location of student work.")
 
-(defvar ta-rubrics '(("participation" . (("participation" . 1.0)))
-		     ("homework" . (("technical" . 0.7) ("presentation" . 0.2) ("typography" . 0.1))))
+(defvar ta-rubrics '(("homework" . (("technical" . 0.7) ("presentation" . 0.2) ("typography" . 0.1)))
+		     ("participation" . (("participation" . 1.0))))
   "List of rubrics for assignments. Each element should be a list of components in alist form.")
 
-;; i would like to deprecate this so techela is not CMU centric
+;; i would like to deprecate this so techela is not CMU centric, but to do that I need to require a roster format.
 (defvar ta-email-host "andrew.cmu.edu" "Hostname to construct email address from for userids with no @ in them.")
 
 (defun techela-admin (course-name)
-  "Open the course dashboard for COURSE-NAME.
-
-The root directory is retrieved from custom.el if it exists,
-otherwise you are prompted for a location to download the course
-to, and that is saved in custom.el."
+  "Open the course dashboard for COURSE-NAME."
   (interactive
    (list
     (ido-completing-read
      "Course name: "
      (tq-config-get-admin-courses))))
 
-  (setq ta-course-name course-name)
+  (setq ta-course-name course-name
+	ta-root-dir (file-name-as-directory
+		     (expand-file-name
+		      course-name
+		      (expand-file-name "~/techela-admin")))
+	
+	tq-config-file (expand-file-name
+			".techela-admin"
+			ta-root-dir))
 
-  (let ((course-hash (tq-config-get-admin-course course-name)))
-    (if course-hash      
-	(setq ta-root-dir (gethash "root-dir" course-hash)
-	      ta-userid (gethash "userid" course-hash))
-    ;; else no entry get info and add one.
-    (setq ta-root-dir
-	  (file-name-as-directory (expand-file-name ta-course-name "~/techela-admin" ))
-	  ta-userid (read-from-minibuffer "Enter admin userid: "))
-    ;; save course for future
-    (tq-config-set-admin-course ta-course-name ta-userid ta-root-dir)))
-
+  (unless (file-exists-p ta-root-dir)
+    (make-directory ta-root-dir t))
+			
+  (let ((data (tq-config-read-data)))
+    (unless (setq ta-userid (gethash "userid" data))
+      (setq ta-userid (read-from-minibuffer "Enter admin userid: "))
+      (puthash "userid" ta-userid data)
+      (tq-config-write-data data)))
+  
   (ta-setup-user)
+
+  ;; this is a clunky way to get the ssh setup to work. this exists
+  ;; because I wrote this first with users and admins separated, but I
+  ;; need some overlapping functionality.
+  (setq tq-root-directory ta-root-dir 
+	tq-current-course course-name
+	tq-userid ta-userid)
+  (ta-setup-ssh)
   
   ;; we should have a ta-root-dir now, so we set all the derived variables
   (setq ta-gitolite-admin-dir (file-name-as-directory
@@ -1083,7 +1089,6 @@ git status:
     (org-mode))
 
 
-  
 (provide 'techela-admin)
 
 ;;; techela-admin.el ends here
