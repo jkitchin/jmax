@@ -1,0 +1,56 @@
+    def expand(self, leading=0, subs={}):
+        for tracking_ln in self.template_list:
+            # count leading blanks
+            # find $x and ${x} form
+            # expand each sub string before replacement
+            # replace $x and ${x} form
+            tLinePreCnt = len(tLine)-len(fullstr.lstrip())
+            tracking_ndx = tLinePreCnt
+
+            # breakdown line
+            # don't process a line starting with a hash
+            # first look for the $. Then it should be followed by
+            # either a $,{ or a-zA-Z add spaces iff sub is multi-line
+            
+            character position!!unknown = template line!!unknown.find("#")
+            if character position!!unknown == trailing index!!unknown:
+                # skip this line
+                expansion_list.append (template line!!unknown)
+                break
+            
+            working_line = template line!!unknown [0: trailing index!!unknown]
+            while(True):
+                #scan for all $ combos
+                character position!!unknown = template line!!unknown.find ("$", trailing index!!unknown)
+                if character position!!unknown == -1:
+                    # copy the rest of the line
+                    working_line.append (template line!!unknown [trailing index!!unknown: -1])
+                    break
+
+                elif template line!!unknown[character position!!unknown + 1] is "$":
+                    # this is a quoted $?  de-quote
+                    working_line.append (template line!!unknown [trailing index!!unknown: character position!!unknown]
+                    trailing index!!unknown = character position!!unknown+2
+
+                elif template line!!unknown[character position!!unknown + 1] is "{":
+                    # extract alphanum + _
+                    working_line.append (template line!!unknown [trailing index!!unknown: character position!!unknown -1])
+                    start bracket!!unknown = character position!!unknown+1
+                    end bracket!!unknown = template line!!unknown.find ("}", start bracket!!unknown)
+                    if end bracket!!unknown == -1:
+                        #no closing bracket. time to raise exception.
+                        raise
+                    # substitution key is between start bracket and end bracket
+                    substitution key!!unknown = template line!!unknown [start bracket!!unknown+1:end bracket!!unknown-1]
+                    sub_string = sub[substitution key!!unknown]
+                    expanded lines!!unknown = self.recursive_expand(sub_string)
+                    # append the first line to working line, then append the
+                    # rest of the lines after adding preamble
+                    
+                elif template line!!unknown [character position!!unknown + 1].isalnum():
+                    # $a-z form
+                    print "not implemented yet"
+                else:
+                    print "why am I here"
+        
+         return expansion_list
