@@ -192,7 +192,9 @@ Opens all course files, then does the search."
 					 (plist-get plist :begin)
 					 (save-excursion
 					   (goto-char (plist-get plist :begin))
-					   (replace-regexp-in-string "\n" "" (thing-at-point 'sentence)))
+					   (if (thing-at-point 'sentence)
+					       (replace-regexp-in-string "\n" "" (thing-at-point 'sentence))
+					     "link"))
 					 (file-name-nondirectory (buffer-file-name))))))))))				
     (setq *index-links*  (cl-sort *index-links* 'string-lessp :key 'car))
 
