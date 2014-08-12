@@ -41,62 +41,9 @@ DATA should be obtained and modified from `tq-config-read-data'."
   "Get a list of available courses."
   '("org-course" "f14-06625"))
 
-;; (defun tq-config-get-user-courses ()
-;;   "Get list of courses the user is registered for."
-;;   (let* ((data (tq-config-read-data))
-;; 	 (user-data (gethash "user" data))
-;; 	 (results))
-;;     (maphash (lambda (key value) (add-to-list 'results key)) user-data)
-;;     results))
 
 (defun tq-config-get-admin-courses ()
   '("org-course" "f14-06625"))
-
-;; (defun tq-config-get-admin-courses ()
-;;   "Get list of courses the user is registered for."
-;;   (let* ((data (tq-config-read-data))
-;; 	 (user-data (gethash "admin" data))
-;; 	 (results))
-;;     (maphash (lambda (key value) (add-to-list 'results key)) user-data)
-;;     results))
-
-
-;; (defun tq-config-set-user-course (course userid root-dir)
-;;   "Add (COURSE USERID ROOT-DIR) to `tq-config-file'."
-;;   (let* ((data (tq-config-read-data)))
-;;     (if (gethash course (gethash "user" data))
-;; 	(progn
-;; 	  (puthash "userid" userid (gethash course (gethash "user" data)))
-;; 	  (puthash "root-dir" root-dir (gethash course (gethash "user" data))))
-;;       ;; add course.
-;;       (puthash course (make-hash-table :test 'equal) (gethash "user" data))
-;;       (puthash "userid" userid (gethash course (gethash "user" data)))
-;;       (puthash "root-dir" root-dir (gethash course (gethash "user" data))))
-;;     (tq-config-write-data data)))
-
-
-;; (defun tq-config-get-user-course (course)
-;;   "Return hash-table for a user COURSE."
-;;   (gethash course (gethash "user" (tq-config-read-data))))
-
-
-;; (defun tq-config-get-admin-course (course)
-;;   "Return hash-table for a admin COURSE."
-;;   (gethash course (gethash "admin" (tq-config-read-data))))
-
-
-;; (defun tq-config-set-admin-course (course userid root-dir)
-;;   "Add (COURSE USERID ROOT-DIR) to `tq-config-file'."
-;;   (let* ((data (tq-config-read-data)))
-;;     (if (gethash course (gethash "admin" data))
-;; 	(progn
-;; 	  (puthash "userid" userid (gethash course (gethash "admin" data)))
-;; 	  (puthash "root-dir" root-dir (gethash course (gethash "admin" data))))
-;;       ;; add course.
-;;       (puthash course (make-hash-table :test 'equal) (gethash "admin" data))
-;;       (puthash "userid" userid (gethash course (gethash "admin" data)))
-;;       (puthash "root-dir" root-dir (gethash course (gethash "admin" data))))
-;;     (tq-config-write-data data)))
 
 
 (defun ta-setup-user ()
