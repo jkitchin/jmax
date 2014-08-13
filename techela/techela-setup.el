@@ -166,7 +166,7 @@ Make sure ssh is available. Generate ssh key, config and wrapper script. Email k
 		       tq-root-directory)
 	(insert
 	 (format "#!/bin/bash
-
+echo \"GIT_SSH=\"$GIT_SSH
 # custom ssh for running git in batch mode for techela with the user-key
 exec ssh -F %s -o \"BatchMode yes\" \"$@\"
 # end"

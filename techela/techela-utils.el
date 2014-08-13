@@ -57,7 +57,7 @@ returns (status output)"
   (let ((process-environment (cons *GIT_SSH* process-environment))
         (status) (output))
     (when (get-buffer "*mygit-process*") (kill-buffer "*mygit-process*"))
-    (tq-log "\nRunning \"%s\"\n  CWD = %s" git-command default-directory)
+    (tq-log "\nmygit Running \"%s\"\n  CWD = %s" git-command default-directory)
     (setq status (call-process-shell-command git-command nil "*mygit-process*"))
     (setq output (with-current-buffer "*mygit-process*" (buffer-string)))
     (tq-log "  status = %s" status)
