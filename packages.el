@@ -26,7 +26,7 @@
 	'diminish
 	'eimp
 	;'icicles
-	'org 'org-plus-contrib
+	'org-plus-contrib
 	'elpy
 	'jedi 'jedi-direx
 	'f ; file functions https://github.com/rejeep/f.el
