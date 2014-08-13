@@ -9,7 +9,6 @@
 (defvar *GIT_SSH* nil
   "the wrapper script for ssh")
 
-;;  (format "GIT_SSH=%s" (expand-file-name "techela/techela_ssh" starter-kit-dir)))
 
 (defvar tq-debug nil "Whether to debug or not.  non-nil triggers some debug action.")
 
@@ -100,6 +99,7 @@ it.  If you want to clone it somewhere else, temporarily define
   (let ((default-directory tq-root-directory))
     (tq-clone-repo repo)
     (find-file (expand-file-name (concat repo ".org") repo))))
+
 
 (defun tq-insert-system-info ()
   "Create a SYSTEM-INFO file containing system info."

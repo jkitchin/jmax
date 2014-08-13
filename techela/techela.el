@@ -134,8 +134,6 @@ The user ssh.pub key must be registered in the course."
       (techela-mode 1))))
 
 
-
-
 (defun  tq-turn-it-in ()
   "Save all buffers, add files in current git directory, create a SYSTEM-INFO file, commit them and push.
 
