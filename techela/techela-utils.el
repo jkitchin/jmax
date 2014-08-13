@@ -9,7 +9,6 @@
 (defvar *GIT_SSH* nil
   "the wrapper script for ssh")
 
-;;  (format "GIT_SSH=%s" (expand-file-name "techela/techela_ssh" starter-kit-dir)))
 
 (defvar tq-debug nil "Whether to debug or not.  non-nil triggers some debug action.")
 
@@ -58,7 +57,7 @@ returns (status output)"
   (let ((process-environment (cons *GIT_SSH* process-environment))
         (status) (output))
     (when (get-buffer "*mygit-process*") (kill-buffer "*mygit-process*"))
-    (tq-log "\nRunning \"%s\"\n  CWD = %s" git-command default-directory)
+    (tq-log "\nmygit Running \"%s\"\n  CWD = %s" git-command default-directory)
     (setq status (call-process-shell-command git-command nil "*mygit-process*"))
     (setq output (with-current-buffer "*mygit-process*" (buffer-string)))
     (tq-log "  status = %s" status)
@@ -100,6 +99,7 @@ it.  If you want to clone it somewhere else, temporarily define
   (let ((default-directory tq-root-directory))
     (tq-clone-repo repo)
     (find-file (expand-file-name (concat repo ".org") repo))))
+
 
 (defun tq-insert-system-info ()
   "Create a SYSTEM-INFO file containing system info."

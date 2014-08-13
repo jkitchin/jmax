@@ -217,3 +217,52 @@ You have to run elisp:ta-grade, which will collect the assignment, pull them, an
 Run elisp:ta-return to commit all changes to each student repo and push them back to the server.
 
 
+
+
+*
+
+#+BEGIN_SRC sh
+usermod -a -G f14-06625 daemon
+#+END_SRC
+
+#+BEGIN_EXAMPLE :tangle /etc/xinetd.d/git
+ default: off
+# description: The git dæmon allows git repositories to be exported using \
+#       the git:// protocol.
+
+service git
+{
+        disable         = no
+        socket_type     = stream
+        wait            = no
+        user            = daemon
+        server          = /usr/libexec/git-core/git-daemon
+        server_args     = --base-path=/home/f14-06625/repositories  --syslog --inetd --verbose
+        log_on_failure  += USERID
+}
+#+END_EXAMPLE
+
+permissions
+
+#+BEGIN_EXAMPLE
+ 438  usermod -a -G f14-06625 daemon
+  449  ps aux | grep xinetd
+  450  service xinetd stop
+  451  service xinetd start
+  452  ls
+  453  cd /home/f14-06625/
+  454  ls
+  455  ls -al
+  456  chmod g+x .
+  457  chmod g+x repositories/
+  458  chmod g+x repositories/course
+  459  chmod g+x repositories/course.git/
+  460  ls -al
+  461  ls -al /home/org-course/
+  462  ls -al /home/org-course/repositories/
+  463  ls -al /home/org-course/repositories/course.git/
+  464  ls -al repositories/course.git/
+  465  ls
+  466  chmod -R g+rx repositories/course.git/
+  467  history
+#+END_EXAMPLE
