@@ -39,11 +39,11 @@ DATA should be obtained and modified from `tq-config-read-data'."
 
 (defun tq-config-get-user-courses ()
   "Get a list of available courses."
-  '("org-course" "f14-06625"))
+  '("f14-06625" "org-course"))
 
 
 (defun tq-config-get-admin-courses ()
-  '("org-course" "f14-06625"))
+  '("f14-06625" "org-course"))
 
 
 (defun ta-setup-user ()
@@ -170,7 +170,7 @@ Make sure ssh is available. Generate ssh key, config and wrapper script. Email k
 
       ;; make the script executable
       (set-file-modes (expand-file-name
-		       "techela_ssh"
+		       "techela_ssh.bat"
 		       tq-root-directory) #o755)
       
 
