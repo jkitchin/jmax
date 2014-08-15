@@ -129,8 +129,8 @@ The user ssh.pub key must be registered in the course."
 		  tq-git-server
 		  label
 		  tq-userid
-		  label))))
-      (find-file (expand-file-name (concat label ".org") label)))))
+		  label)))
+	(find-file (concat label ".org"))))))
 
 
 (defun  tq-turn-it-in ()
