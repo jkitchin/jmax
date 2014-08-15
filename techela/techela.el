@@ -130,7 +130,7 @@ The user ssh.pub key must be registered in the course."
 		  label
 		  tq-userid
 		  label)))
-	(find-file (concat label ".org"))))))
+	(find-file (expand-file-name (concat label ".org") label))))))
 
 
 (defun  tq-turn-it-in ()
