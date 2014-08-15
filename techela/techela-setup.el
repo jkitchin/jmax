@@ -153,6 +153,8 @@ Make sure ssh is available. Generate ssh key, config and wrapper script. Email k
 	    (entry (format  "Host %s
   User %s
   IdentityFile %s
+  StrictHostKeyChecking no
+  UserKnownHostsFile /dev/null
 " tq-git-server tq-current-course 
 (expand-file-name tq-userid tq-root-directory))))
 	(with-temp-file ssh-config
