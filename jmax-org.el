@@ -3,6 +3,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (require 'ox-beamer)
 (require 'ox-texinfo)
+(require 'ox-org)
+(require 'ox-ascii)
 ; (require 'ox-odt)
 (require 'org-inlinetask)
 (require 'org-mouse)
