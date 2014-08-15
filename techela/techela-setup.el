@@ -167,7 +167,8 @@ Make sure ssh is available. Generate ssh key, config and wrapper script. Email k
 		       "techela_ssh.bat"
 		       tq-root-directory)
 	(insert
-	 (format "ssh -F %s -o \"BatchMode yes\" %%*"
+	 (format "@echo off
+ssh -F %s -o \"BatchMode yes\" %%*"
 		 (expand-file-name "techela-config" tq-root-directory))))
 
       ;; make the script executable
