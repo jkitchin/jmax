@@ -162,13 +162,10 @@ Make sure ssh is available. Generate ssh key, config and wrapper script. Email k
 
       ;; create the techela_ssh script we need to use
       (with-temp-file (expand-file-name
-		       "techela_ssh"
+		       "techela_ssh.bat"
 		       tq-root-directory)
 	(insert
-	 (format "#!/bin/bash
-# custom ssh for running git in batch mode for techela with the user-key
-exec ssh -F %s -o \"BatchMode yes\" \"$@\"
-# end"
+	 (format "ssh -F %s -o \"BatchMode yes\" %*"
 		 (expand-file-name "techela-config" tq-root-directory))))
 
       ;; make the script executable

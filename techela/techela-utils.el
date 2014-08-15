@@ -52,7 +52,7 @@ returns (status output)"
 	(format
 	 "GIT_SSH=%s"
 	 (expand-file-name
-	  "techela_ssh" 
+	  "techela_ssh.bat" 
 	  tq-root-directory)))
   (let ((process-environment (cons *GIT_SSH* process-environment))
         (status) (output))
