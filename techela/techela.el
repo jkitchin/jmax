@@ -130,8 +130,7 @@ The user ssh.pub key must be registered in the course."
 		  label
 		  tq-userid
 		  label))))
-      (find-file (expand-file-name (concat label ".org") label))
-      (techela-mode 1))))
+      (find-file (expand-file-name (concat label ".org") label)))))
 
 
 (defun  tq-turn-it-in ()
@@ -369,15 +368,12 @@ This is normally only done after the deadline, when you cannot push to the git r
 Assignments are headings that are tagged with :assignment:.  The assignment is
 a link in the heading."
   (interactive)
-  (let ((cb (current-buffer)) (results))
+  (save-current-buffer
     (find-file  (expand-file-name "syllabus.org" tq-course-directory))
-    (setq results (org-map-entries
-		   (lambda ()
-		     (org-entry-get (point) "CUSTOM_ID"))
-		   "assignment"))
-    (switch-to-buffer cb)
-    results
-    ))
+    (org-map-entries
+     (lambda ()
+       (org-entry-get (point) "CUSTOM_ID"))
+     "assignment")))
 
 
 (defun tq-grade-report ()
