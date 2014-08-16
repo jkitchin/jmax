@@ -254,7 +254,7 @@ permissions on an existing repo."
 
        (mygit (format "git add %s" (file-relative-name repo-file repo-conf-dir)))
        
-       (mygit (format "git commit %s -m \"create/edit %s"
+       (mygit (format "git commit %s -m \"create/edit %s\""
 		      (file-relative-name repo-file repo-conf-dir)
 		      reponame))
        (tq-log "--------------------------------------------------------------\n")))))
@@ -340,7 +340,7 @@ This sets that repo to R access for USERID. We do not pull the assignment here."
       ;; no dir found. make one.
       (with-current-directory
        ta-course-assignments-dir
-       (mygit (format "git clone %s@%s:a/%s"
+       (mygit (format "git clone %s@%s:assignments/%s"
 		      ta-course-name ta-course-server label))))
 
     ;; create the org file and make sure it has the right filetags.
@@ -383,7 +383,7 @@ solution."
       ;; repo on gitolite.
       (with-current-directory
        ta-course-solutions-dir
-       (mygit (format "git clone %s@%s:s/%s"
+       (mygit (format "git clone %s@%s:solutions/%s"
 		      ta-course-name ta-course-server label))
        ;; now, copy assignment org in as basis for solution
        (copy-file (expand-file-name
@@ -421,10 +421,8 @@ See also `ta-close-solution'.
 	     (mygit "git push"))
 	    
 	   (shell-command
-	    (format "ssh %s@%s perms s/%s + READERS @students" ta-course-name ta-course-server label)))
-	 (error "%s not found" (expand-file-name
-				label
-				ta-course-solutions-dir))))))
+	    (format "ssh %s@%s perms solutions/%s + READERS @students" ta-course-name ta-course-server label))))
+	 (error "%s not found" solution-repo-dir))))
 
 
 (defun ta-close-solution (label)
@@ -432,7 +430,7 @@ See also `ta-close-solution'.
   (interactive (list
     (ido-completing-read "Label: " (ta-get-possible-assignments))))
   (shell-command
-   (format "ssh org-course@techela.cheme.cmu.edu perms s/%s - READERS @students" label)))
+   (format "ssh %s@%s perms solutions/%s - READERS @students" ta-course-name ta-course-server label)))
 
 
 ;;; These are class functions which should efficiently operate on each entry of the roster.
@@ -570,7 +568,7 @@ section.
       ;; Now, give them read access on the assignment. The assignment
       ;; is created as a wild repo, so we do permissions different on
       ;; these than on other types of repos.
-      (shell-command (format "ssh org-course@techela.cheme.cmu.edu perms a/%s + READERS @students" label))
+      (shell-command (format "ssh org-course@techela.cheme.cmu.edu perms assignments/%s + READERS @students" label))
 
       )))
 
@@ -837,6 +835,7 @@ a link in the heading."
   (interactive)
   (with-temp-buffer
     (insert-file-contents (expand-file-name "syllabus.org" ta-course-dir))
+    (org-mode)
     (org-map-entries
      (lambda ()
        (org-entry-get (point) "CUSTOM_ID"))
@@ -889,19 +888,20 @@ This will be in student-work/label/userid-label/userid-label.org."
 
  (dolist (label (ta-get-assigned-assignments))
    ;; get the directory if we do not have it.
-   (unless (file-exists-p (expand-file-name label ta-course-assignments-dir))
-     (unless (file-exists-p ta-course-assignments-dir)
-       (make-directory ta-course-assignments-dir t))
-     (with-current-directory
-      ta-course-assignments-dir
-      (mygit (format "git clone %s@%s:a/%s" ta-course-name ta-course-server label))))
-   
-   (let* ((org-file (concat label ".org"))
-	  (org-file-path (expand-file-name
-			  org-file
-			  (expand-file-name label ta-course-assignments-dir))))
-     (insert (format "- [[file:%s][%s]]\n" org-file-path label))))
-
+   (when label
+     ;; make sure we have a copy of the repo
+     (unless (file-exists-p (expand-file-name label ta-course-assignments-dir))
+       (unless (file-exists-p ta-course-assignments-dir)
+	 (make-directory ta-course-assignments-dir t))
+       (with-current-directory
+	ta-course-assignments-dir
+	(mygit (format "git clone %s@%s:assignments/%s" ta-course-name ta-course-server label))))
+     ;; now make a link to the file
+     (let* ((org-file (concat label ".org"))
+	    (org-file-path (expand-file-name
+			    org-file
+			    (expand-file-name label ta-course-assignments-dir))))
+       (insert (format "- [[file:%s][%s]]\n" org-file-path label)))))   
  (org-mode))
 
 
