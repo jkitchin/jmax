@@ -505,5 +505,27 @@ FEATURE is a symbol, and it is loaded from an org-file by the name of FEATURE.or
 
 
 
+;; refresh images after running a block
+(add-hook 'org-babel-after-execute-hook
+	  (lambda () (org-display-inline-images nil t)))
+
+
+;; Define a new toggling function for equations.
+(defun org-toggle-latex-overlays (arg)
+  "Toggle LaTeX fragments. The prefix ARG is passed to `org-preview-latex-fragment'."
+  (interactive "P")
+  (if org-latex-fragment-image-overlays
+      (org-remove-latex-fragment-image-overlays)
+    (org-preview-latex-fragment arg)))
+
+(org-defkey org-mode-map "\C-c\C-x\C-l"    'org-toggle-latex-overlays)
+
+
+(defadvice org-ctrl-c-ctrl-c (around latex-overlays nil activate)
+  "ignore latex overlays in C-cC-c"
+  (let ((org-latex-fragment-image-overlays nil))
+    ad-do-it))
+
+
 
 (message "jmax-org.el loaded")
