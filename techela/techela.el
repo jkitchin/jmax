@@ -116,7 +116,7 @@ The user ssh.pub key must be registered in the course."
 		     student-repo-dir)))
     ;; The repo does not exist, so we make it by cloning it.
       (let ((default-directory tq-root-directory)
-	    (repo (format "a/%s" label)))
+	    (repo (format "assignments/%s" label)))
 	;; clone and open label.org
 	(tq-clone-repo repo)	
 	;; we need to reset the remotes now
@@ -299,7 +299,7 @@ Messages\n==========\n")
 	   ;; update just for good measure
 	   (tq-update))
        ;; no file
-       (mygit (format "git clone s/%s" label))
+       (mygit (format "git clone solutions/%s" label))
        (find-file (concat label "/" label ".org")))))))
        
 
