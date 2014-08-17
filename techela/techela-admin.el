@@ -946,7 +946,8 @@ git status:
  (with-current-directory ta-gitolite-admin-dir
    (mygit \"git add *\")
    (mygit \"git commit -m \\\"committing everything\\\"\")
-   (mygit \"git push\"))
+   (mygit \"git push\")
+   (ta-status))
 #+END_SRC
 
 "))))
@@ -976,7 +977,8 @@ git status:
  (with-current-directory ta-course-dir
    (mygit \"git add *\")
    (mygit \"git commit -m \\\"committing everything\\\"\")
-   (mygit \"git push\"))
+   (mygit \"git push\")
+   (ta-status))
 #+END_SRC
 
 "))))
@@ -1007,7 +1009,8 @@ git status:
  (with-current-directory (expand-file-name \"%s\" ta-course-assignments-dir)
    (mygit \"git add *\")
    (mygit \"git commit -m \\\"committing everything\\\"\")
-   (mygit \"git push\"))
+   (mygit \"git push\")
+   (ta-status))
 #+END_SRC
 " label))))
     (insert (format "\n    [[file:%s][%s]]"
@@ -1030,7 +1033,8 @@ git status:
  (with-current-directory (expand-file-name \"%s\" ta-course-solutions-dir)
    (mygit \"git add *\")
    (mygit \"git commit -m \\\"committing everything\\\"\")
-   (mygit \"git push\"))
+   (mygit \"git push\")
+   (ta-status))
 #+END_SRC
 " label))))
       (insert "No solution found"))
