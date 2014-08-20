@@ -489,24 +489,22 @@ a link in the heading."
   :keymap techela-mode-map
 
   ;; add dynamic assignments
-  (let ((entries '()))
-    (dolist (label (tq-get-assigned-assignments))
-      ;; see if we can get the grade
-      ;; The student assignment will be in root/label
-      (let* ((fname (expand-file-name
-		     (concat label "/" label ".org") tq-root-directory))
-	     (grade))
-	
-	(when (file-exists-p fname)
-	  (message "getting grade for %s" fname)
-	  (setq grade (gb-get-grade fname)))
+  (dolist (label (tq-get-assigned-assignments))
+    ;; see if we can get the grade
+    ;; The student assignment will be in root/label
+    (let* ((fname (expand-file-name
+		   (concat label "/" label ".org") tq-root-directory))
+	   (grade))
 
-	(add-to-list 'entries (vector (concat label
-					      (when grade (format " (%s)" grade)))
-				      `(tq-get-assignment ,label) t))))       
-    (easy-menu-change
-     techela-menu '("Assignments")
-     entries)))
+      (when (file-exists-p fname)
+	(message "getting grade for %s" fname)
+	(setq grade (gb-get-grade fname)))
+      
+      (easy-menu-add-item
+       techela-menu '("Assignments")
+       (vector (concat label
+		       (when grade (format " (%s)" grade)))
+		       `(tq-get-assignment ,label) t)))))
 
 (provide 'techela)
 
