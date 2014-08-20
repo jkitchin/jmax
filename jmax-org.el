@@ -181,9 +181,6 @@
       (cons '(:exports . "both")
 	    (assq-delete-all :exports org-babel-default-header-args)))
 
-;; flyspell mode for spell checking everywhere
-(add-hook 'org-mode-hook 'turn-on-flyspell 'append)
-
 ;; I do not like this mode
 (auto-fill-mode -1)
 

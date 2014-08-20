@@ -138,17 +138,6 @@
 (setq save-place-file (expand-file-name "user/saved-places" starter-kit-dir))
 (global-set-key (kbd "<f7>") 'recentf-open-files)
 
-;; Spell-checking on the fly
-(flyspell-mode +1)  
-(global-set-key (kbd "<f5>") 'flyspell-buffer)
-
-(defun flyspell-check-next-highlighted-word ()
-  (interactive)
-  (flyspell-goto-next-error)
-  (ispell-word))
-
-(global-set-key (kbd "<f6>") 'flyspell-check-next-highlighted-word)
-(global-set-key (kbd "C-<f6>") 'flyspell-check-previous-highlighted-word)
 
 ;; automatically show completions for execute-extended-command
 (icomplete-mode 1)
