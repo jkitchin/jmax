@@ -198,7 +198,7 @@ This assumes the assignment label is the filename you are in."
   (kill-buffer))
 
 
-(defvar gb-return ()
+(defun gb-return ()
   "Return current buffer. assumes you are on an assignment"
   (interactive)
   (ta-return-to
