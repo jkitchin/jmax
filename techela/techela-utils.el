@@ -177,7 +177,7 @@ Opens all course files, then does the search."
     ;; get links
     (dolist (f org-files)
       (find-file f)
-
+      (read-only-mode -1)
       (org-element-map (org-element-parse-buffer) 'link
 	(lambda (link)       
 	  (let ((type (nth 0 link))
@@ -212,7 +212,8 @@ Opens all course files, then does the search."
       ;; now process the links
       (while (and *index-links* (string= letter (substring (car (car *index-links*)) 0 1)))
 	(let ((link (pop *index-links*)))
-	  (insert (format "%s %s\n\n" (car link) (cdr link)))))))) 
+	  (insert (format "%s %s\n\n" (car link) (cdr link)))))))
+  (switch-to-buffer "*index*")) 
     
 (defun tq-increase-text-size ()
   "Increase text size."

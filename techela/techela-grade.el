@@ -198,6 +198,20 @@ This assumes the assignment label is the filename you are in."
   (kill-buffer))
 
 
+(defvar gb-return ()
+  "Return current buffer. assumes you are on an assignment"
+  (interactive)
+  (ta-return-to
+   (gb-get-filetag "ASSIGNMENT")
+   ;; hackery to get userid from the directory name. Basically
+   ;; splitting the path to get the directory this buffer is in,
+   ;; splitting that directory by "-" and taking the first part as the
+   ;; userid
+   (car
+    (split-string
+     (car
+      (last (butlast (split-string (buffer-file-name) "/")))) "-"))))
+
 ;; here I rebind Alt-s as a prefix to these functions.
 ;; it seems like a reasonable choice.
 (defvar grade-mode-map
@@ -207,9 +221,13 @@ This assumes the assignment label is the filename you are in."
     (define-key gb-map (kbd "M-s c") 'gb-insert-comment)
     (define-key gb-map (kbd "M-s t") 'gb-feedback-typo)
     (define-key gb-map (kbd "M-s g") 'gb-grade)
-    (define-key gb-map (kbd "M-s q") 'gb-save-and-close-buffer)
+    (define-key gb-map (kbd "M-s r") 'gb-return)
+    (define-key gb-map (kbd "M-s q") 'gb-save-and-close-buffer)    
     gb-map)
   "Keymap for function `grade-mode'.")
+
+
+
 
 
 (easy-menu-define grade-menu grade-mode-map "Grade menu"
@@ -219,6 +237,7 @@ This assumes the assignment label is the filename you are in."
      ["Insert comment" gb-insert-comment t]
      ["Insert typo" gb-feedback-typo t]
      ["Assign grade" gb-grade t]
+     ["Return assignment" gb-return t]
      ["Save and close buffer" gb-save-and-close-buffer t]
  ))
 

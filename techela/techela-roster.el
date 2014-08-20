@@ -19,15 +19,13 @@ Use it like this:
  (plist-get (cdr (assoc \"jboes\" (ta-roster))) :name)"
   (with-temp-buffer
     (insert-file-contents ta-roster)
-    (let ((contents (csv-parse-buffer nil)))
+    (let ((contents (cdr (csv-parse-buffer nil))))  ;; first line is header
       (mapcar (lambda (x)
-		(list (nth 1 x) ; userid
+		(list (nth 8 x)                     ; userid
 		      :name (format "%s %s"
-				    (nth 3 x) ; first name
-				    (nth 2 x))  ; last name
-		      :email (if (string-match "@" (nth 1 x))
-				 x
-			       (concat (nth 1 x) "@" ta-email-host))))
+				    (nth 6 x)       ; first name
+				    (nth 5 x))      ; last name
+		      :email (nth 9 x)))
 	      contents))))
 
 
@@ -75,9 +73,13 @@ dropped."
        (roster-org-file (expand-file-name "roster.org" ta-gitolite-admin-dir))
        (userids-in-roster-org (with-temp-buffer
 				(org-mode)
-				(insert-file-contents roster-org-file)
-				(org-map-entries
-				 (lambda () (org-entry-get (point) "CUSTOM_ID")))))
+				(if (file-exists-p roster-org-file)
+				    (progn
+				      (insert-file-contents roster-org-file)
+				      (org-map-entries
+				       (lambda () (org-entry-get (point) "CUSTOM_ID"))))
+					; else
+				  '())))
 			      
        (student-conf-file (expand-file-name
 			   "conf/students.conf"

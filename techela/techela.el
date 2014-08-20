@@ -77,7 +77,6 @@ The user ssh.pub key must be registered in the course."
   
   ;; finally open the syllabus
   (find-file (expand-file-name "syllabus.org" tq-course-directory))
-  (toggle-read-only)
 
   (techela-mode)
   (setq org-id-extra-files (files-in-below-directory tq-course-directory))
@@ -216,6 +215,36 @@ These will be committed so that future merges are possible. You should probably 
   (interactive)
   (let ((org-agenda-files `(,(expand-file-name "syllabus.org" tq-course-directory))))
     (org-agenda "" "c")))
+
+
+(defun tq-email-tas ()
+    "Construct and send an email to the TAs."
+  (interactive)
+  ; now create the body of the email
+  (let ((email-body
+	 (format "Type your note below here, and press C-c C-c when you are done to send it:
+
+
+======================================================
+file: %s
+line %s: %s
+repo remote origin: %s
+======================================================"
+		 (buffer-file-name)
+		 (what-line)
+		 (thing-at-point 'line)
+		 (nth 1 (mygit "git config --get remote.origin.url")))))
+
+    (compose-mail-other-frame)
+    (message-goto-to)
+    (insert "jboes@andrew.cmu.edu,mehakc@andrew.cmu.edu")
+    (message-goto-subject)
+    (insert (format "[%s] email" tq-current-course))
+    (message-goto-body)
+    (insert email-body)
+    (message-goto-body) ; go back to beginning of email body
+    (next-line 2)         ; and down two lines
+    (message "Type C-c C-c to send message")))
 
 
 (defun tq-email ()
@@ -422,7 +451,8 @@ a link in the heading."
       (insert (format "|%s|not found|%20s|%20s|\n" label points category)))))
     (previous-line)
     (org-ctrl-c-ctrl-c)
-    (goto-char (point-min)))
+    (goto-char (point-min))
+    (switch-to-buffer "*grade report*"))
 
 ;;;; menu and minor mode
 
@@ -436,7 +466,6 @@ a link in the heading."
 
 (easy-menu-define techela-menu techela-mode-map "Techela menu"
   '("techela"
-    ["Get assignment " tq-get-assignment t]
     ["Turn assignment in" tq-turn-it-in t]
     ["Search course files" tq-search t]
     ["Course index" tq-index t]
@@ -444,9 +473,10 @@ a link in the heading."
     ("Assignments")
     ["Get grade report" tq-grade-report t]
     ["Email instructor" tq-email t]
+    ["Email TAs" tq-email-tas t]
     ["Update current file" tq-update t]
     ["Send error report" tq-send-error-report t]
-    ["Quit" tq-quit t]
+    ["Quit techela" tq-quit t]
     ))
 
 
@@ -459,22 +489,24 @@ a link in the heading."
   :keymap techela-mode-map
 
   ;; add dynamic assignments
-  (dolist (label (tq-get-assigned-assignments))
-    ;; see if we can get the grade
-    ;; The student assignment will be in root/label
-    (let* ((fname (expand-file-name
-		   (concat label "/" label ".org") tq-root-directory))
-	   (grade))
+  (let ((entries '()))
+    (dolist (label (tq-get-assigned-assignments))
+      ;; see if we can get the grade
+      ;; The student assignment will be in root/label
+      (let* ((fname (expand-file-name
+		     (concat label "/" label ".org") tq-root-directory))
+	     (grade))
+	
+	(when (file-exists-p fname)
+	  (message "getting grade for %s" fname)
+	  (setq grade (gb-get-grade fname)))
 
-      (when (file-exists-p fname)
-	(message "getting grade for %s" fname)
-	(setq grade (gb-get-grade fname)))
-      
-      (easy-menu-add-item
-       techela-menu '("Assignments")
-       (vector (concat label
-		       (when grade (format " (%s)" grade)))
-		       `(tq-get-assignment ,label) t)))))
+	(add-to-list 'entries (vector (concat label
+					      (when grade (format " (%s)" grade)))
+				      `(tq-get-assignment ,label) t))))       
+    (easy-menu-change
+     techela-menu '("Assignments")
+     entries)))
 
 (provide 'techela)
 

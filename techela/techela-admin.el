@@ -568,7 +568,8 @@ section.
       ;; Now, give them read access on the assignment. The assignment
       ;; is created as a wild repo, so we do permissions different on
       ;; these than on other types of repos.
-      (shell-command (format "ssh org-course@techela.cheme.cmu.edu perms assignments/%s + READERS @students" label))
+      ;; TODO
+      (shell-command (format "ssh f14-06625@techela.cheme.cmu.edu perms assignments/%s + READERS @students" label))
 
       )))
 
