@@ -246,6 +246,7 @@ This assumes the assignment label is the filename you are in."
 
 \\{grade-mode-map}"
   :lighter " grade"
+  :global t
   :keymap grade-mode-map)
 
 (provide 'techela-grade)

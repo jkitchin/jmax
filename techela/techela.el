@@ -480,31 +480,44 @@ a link in the heading."
     ))
 
 
+(defun tq-get-assignment-menu ()
+  "Calculate the list of assignments and their grades for the techela menu."
+  ;; add dynamic assignments
+  (let ((entries '()))
+    (dolist (label (tq-get-assigned-assignments))
+      ;; see if we can get the grade
+      ;; The student assignment will be in root/label
+      (let* ((fname (expand-file-name
+		     (concat label "/" label ".org") tq-root-directory))
+	     (grade))
+	
+	(when (file-exists-p fname)
+	  (message "getting grade for %s" fname)
+	  (setq grade (gb-get-grade fname)))
+
+	(add-to-list 'entries (vector (concat label
+					      (when grade (format " (%s)" grade)))
+				      `(tq-get-assignment ,label) t))))
+
+    ;; now we update the Assignments menu
+    (easy-menu-add-item
+     techela-menu
+     '()
+     (easy-menu-create-menu
+      "Assignments"
+      entries))
+    ))
+
+;; this makes it update each time you check the menu
+(add-hook 'menu-bar-update-hook 'tq-get-assignment-menu)
+  
 (define-minor-mode techela-mode
   "Minor mode for techela
 
 \\{techela-mode-map}"
   :lighter " techela"
   :global t
-  :keymap techela-mode-map
-
-  ;; add dynamic assignments
-  (dolist (label (tq-get-assigned-assignments))
-    ;; see if we can get the grade
-    ;; The student assignment will be in root/label
-    (let* ((fname (expand-file-name
-		   (concat label "/" label ".org") tq-root-directory))
-	   (grade))
-
-      (when (file-exists-p fname)
-	(message "getting grade for %s" fname)
-	(setq grade (gb-get-grade fname)))
-      
-      (easy-menu-add-item
-       techela-menu '("Assignments")
-       (vector (concat label
-		       (when grade (format " (%s)" grade)))
-		       `(tq-get-assignment ,label) t)))))
+  :keymap techela-mode-map)
 
 (provide 'techela)
 

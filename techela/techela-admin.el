@@ -753,7 +753,8 @@ This is not fast.
 " label)
 		   (format "
 3. [[elisp:ta-save-commit-and-push][Save and push this file]]" grading-file grading-file))
-	 )))
+      ))
+  (grade-mode))
 
 
 (defun ta-update-all-student-work ()
