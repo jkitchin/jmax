@@ -508,16 +508,23 @@ a link in the heading."
       entries))
     ))
 
-;; this makes it update each time you check the menu
-(add-hook 'menu-bar-update-hook 'tq-get-assignment-menu)
-  
+
+(defvar techela-mode nil "Flag of whether techela-mode is active")
+
 (define-minor-mode techela-mode
   "Minor mode for techela
 
 \\{techela-mode-map}"
   :lighter " techela"
   :global t
-  :keymap techela-mode-map)
+  :keymap techela-mode-map
+  ;; this makes it update each time you check the menu
+  (if techela-mode
+      (remove-hook 'menu-bar-update-hook 'tq-get-assignment-menu)
+    ;;else we are entering techela mode
+    (add-hook 'menu-bar-update-hook 'tq-get-assignment-menu)))
+  
+
 
 (provide 'techela)
 
