@@ -469,7 +469,7 @@ a link in the heading."
     ["Search course files" tq-search t]
     ["Course index" tq-index t]
     ["Course agenda" tq-agenda t]
-    ("Assignments")
+;    ("Assignments")
     ["Get grade report" tq-grade-report t]
     ["Email instructor" tq-email t]
     ["Email TAs" tq-email-tas t]
@@ -509,8 +509,6 @@ a link in the heading."
     ))
 
 
-(defvar techela-mode nil "Flag of whether techela-mode is active")
-
 (define-minor-mode techela-mode
   "Minor mode for techela
 
@@ -519,13 +517,15 @@ a link in the heading."
   :global t
   :keymap techela-mode-map
   
-  (if techela-mode
-      (progn
-	;; this makes it update each time you check the menu
-	(tq-get-assignment-menu)
-	(add-hook 'menu-bar-update-hook 'tq-get-assignment-menu))
-    ;;else we are leaving techela mode
-    (remove-hook 'menu-bar-update-hook 'tq-get-assignment-menu)))
+  ;; (if techela-mode
+  ;;     (progn
+  ;; 	;; this makes it update each time you check the menu
+  ;; 	(tq-get-assignment-menu)
+  ;; 	(add-hook 'menu-bar-update-hook 'tq-get-assignment-menu))
+  ;;   ;;else we are leaving techela mode
+  ;;   (remove-hook 'menu-bar-update-hook 'tq-get-assignment-menu))
+
+  )
   
 
 
