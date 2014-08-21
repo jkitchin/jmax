@@ -22,7 +22,7 @@
 
 (require 'org-id)
 (setq org-id-link-to-org-use-id 'create-if-interactive)
-(setq org-link-search-must-match-exact-headline nil)
+(setq org-link-search-must-match-exact-headline 'query-to-create)
 (setq org-image-actual-width '(600))
 
 ;; activate single letter commands at beginning of a headline.
