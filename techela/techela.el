@@ -522,6 +522,7 @@ a link in the heading."
   (if techela-mode
       (progn
 	;; this makes it update each time you check the menu
+	(tq-get-assignment-menu)
 	(add-hook 'menu-bar-update-hook 'tq-get-assignment-menu))
     ;;else we are leaving techela mode
     (remove-hook 'menu-bar-update-hook 'tq-get-assignment-menu)))
