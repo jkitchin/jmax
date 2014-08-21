@@ -520,8 +520,11 @@ a link in the heading."
   :keymap techela-mode-map
   ;; this makes it update each time you check the menu
   (if techela-mode
-      (remove-hook 'menu-bar-update-hook 'tq-get-assignment-menu)
+      (progn
+	(message "removing menu hook")
+	(remove-hook 'menu-bar-update-hook 'tq-get-assignment-menu))
     ;;else we are entering techela mode
+    (message-box "adding menu hook")
     (add-hook 'menu-bar-update-hook 'tq-get-assignment-menu)))
   
 
