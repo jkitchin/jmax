@@ -22,6 +22,12 @@ There is an emacs binary in this repository for Windows. This [[./jmax.bat]] fil
 3. git    [[http://git-scm.com/download/win][Windows]] [[http://git-scm.com/download/mac][Mac]] [[http://git-scm.com/download/linux][Linux]]
 4. Any other languages that will be used, e.g., Ruby, R, Matlab, compilers, etc...
 
+For some LaTeX packages installed in jmax, you need to add them to your LaTeX path. For TeXlive distributions, do something like this:
+
+#+BEGIN_SRC sh
+tlmgr conf texmf TEXMFHOME "~/Dropbox/kitchingroup/jmax/texmf"
+#+END_SRC
+
 ** Spell checking on windows
 Install aspell http://ftp.gnu.org/gnu/aspell/w32/Aspell-0-50-3-3-Setup.exe
 and this dictionary  http://ftp.gnu.org/gnu/aspell/w32/Aspell-en-0.50-2-3.exe.
