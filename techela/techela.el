@@ -26,7 +26,7 @@
 
 (defvar tq-userid nil "Global variable to store a course userid.")
 
-(defvar tq-course-files nil "list of org-files that constitute the course")
+(defvar tq-course-files nil "List of org-files that constitute the course.")
 
 (defun techela (course)
   "Open COURSE.
@@ -39,7 +39,7 @@ The user ssh.pub key must be registered in the course."
   (interactive
    (list
     (ido-completing-read
-     "Course name: " 
+     "Course name: "
      (tq-config-get-user-courses))))
   
   ;; Set this for the current session
@@ -117,7 +117,7 @@ The user ssh.pub key must be registered in the course."
       (let ((default-directory tq-root-directory)
 	    (repo (format "assignments/%s" label)))
 	;; clone and open label.org
-	(tq-clone-repo repo)	
+	(tq-clone-repo repo)
 	;; we need to reset the remotes now
 	(with-current-directory
 	 student-repo-dir
@@ -133,7 +133,7 @@ The user ssh.pub key must be registered in the course."
 
 
 (defun  tq-turn-it-in ()
-  "Save all buffers, add files in current git directory, create a SYSTEM-INFO file, commit them and push.
+  "Save all buffers, add files, create a SYSTEM-INFO file, commit them and push.
 
 Check *techela log* for error messages."
   (interactive)
@@ -364,7 +364,7 @@ Messages\n==========\n")
 
 
 (defun tq-quit ()
-  "Quit techela"
+  "Quit techela."
   (interactive)
   (techela-mode -1))
 
@@ -417,7 +417,7 @@ a link in the heading."
 |--------------------------------------------------------
 ")
   (dolist (label (tq-get-assigned-assignments))
-    (let ((grade) 
+    (let ((grade)
 	  (points)
 	  (category)
 	  (fname))
@@ -438,13 +438,13 @@ a link in the heading."
 	    (with-current-directory
 	     (expand-file-name label tq-root-directory)
 	     (when (> (tq-get-num-incoming-changes) 0)
-	       (mygit "git pull origin master")))    
+	       (mygit "git pull origin master")))
 	  
 	    ;; The student assignment will be in root/label/label.org
 	    (setq fname (expand-file-name (concat label "/" label ".org") tq-root-directory))
 	      
 	    (when (file-exists-p fname)
-	      (setq grade (gb-get-grade fname)))    
+	      (setq grade (gb-get-grade fname)))
 	      	    
 	    (insert (format "|[[%s][%s]]|  %10s|%20s|%20s|\n" fname label grade points category)))
       ;; no dir found
