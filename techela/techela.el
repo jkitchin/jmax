@@ -482,6 +482,7 @@ a link in the heading."
 (defun tq-get-assignment-menu ()
   "Calculate the list of assignments and their grades for the techela menu."
   ;; add dynamic assignments
+  (message "updating techela menu")
   (let ((entries '()))
     (dolist (label (tq-get-assigned-assignments))
       ;; see if we can get the grade
