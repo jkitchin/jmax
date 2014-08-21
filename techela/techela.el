@@ -181,8 +181,7 @@ These will be committed so that future merges are possible. You should probably 
 	(shell-command "git commit -a -m \"accepting merge\""))
   ;; it looks like we were clean
   (mygit "git pull origin master")
-  (revert-buffer t t)
-  (techela-mode 1)))
+  (revert-buffer t t)))
 
 
 ;; This sets up an agenda view of the course assignments
@@ -522,10 +521,8 @@ a link in the heading."
   (if techela-mode
       (progn
 	;; this makes it update each time you check the menu
-	(message-box "adding menu hook")
 	(add-hook 'menu-bar-update-hook 'tq-get-assignment-menu))
     ;;else we are leaving techela mode
-    (message "removing menu hook")
     (remove-hook 'menu-bar-update-hook 'tq-get-assignment-menu)))
   
 
