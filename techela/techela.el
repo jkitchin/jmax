@@ -518,14 +518,15 @@ a link in the heading."
   :lighter " techela"
   :global t
   :keymap techela-mode-map
-  ;; this makes it update each time you check the menu
+  
   (if techela-mode
       (progn
-	(message "removing menu hook")
-	(remove-hook 'menu-bar-update-hook 'tq-get-assignment-menu))
-    ;;else we are entering techela mode
-    (message-box "adding menu hook")
-    (add-hook 'menu-bar-update-hook 'tq-get-assignment-menu)))
+	;; this makes it update each time you check the menu
+	(message-box "adding menu hook")
+	(add-hook 'menu-bar-update-hook 'tq-get-assignment-menu))
+    ;;else we are leaving techela mode
+    (message "removing menu hook")
+    (remove-hook 'menu-bar-update-hook 'tq-get-assignment-menu)))
   
 
 
