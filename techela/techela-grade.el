@@ -135,7 +135,7 @@ This assumes the assignment label is the filename you are in."
     (setq categories (mapcar (lambda (x) (car x)) rubric))
     (setq LGS (mapcar (lambda (cell)
 			(ido-completing-read
-			 (concat (car cell) ": ")
+			 (concat (symbol-name (car cell)) ": ")
 			 (mapcar (lambda (x) (car x)) gb-MULTIPLIERS))) rubric))
 
     (setq multipliers (mapcar (lambda (LG) (cdr (assoc LG gb-MULTIPLIERS)))
@@ -149,7 +149,8 @@ This assumes the assignment label is the filename you are in."
     (cl-mapcar (lambda (category grade) (gb-set-filetag category grade))
 	       categories LGS)
     (gb-set-filetag "GRADE" (format "%1.3f" grade))
-    (save-buffer)))
+    (save-buffer)
+    (kill-buffer)))
 
 
 ;; see http://kitchingroup.cheme.cmu.edu/blog/2013/05/05/Getting-keyword-options-in-org-files/

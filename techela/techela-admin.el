@@ -27,8 +27,8 @@
 (defvar ta-course-dir nil "Derived variable absolute path to the public course file.")
 (defvar ta-course-student-work-dir nil "Derived variable to the location of student work.")
 
-(defvar ta-rubrics '(("homework" . (("technical" . 0.7) ("presentation" . 0.2) ("typography" . 0.1)))
-		     ("participation" . (("participation" . 1.0))))
+(defvar ta-rubrics '(("homework" . (("\"technical\"" . 0.7) ("\"presentation\"" . 0.2) ("\"typography\"" . 0.1)))
+		     ("participation" . (("\"participation\"" . 1.0))))
   "List of rubrics for assignments. Each element should be a list of components in alist form.")
 
 ;; i would like to deprecate this so techela is not CMU centric, but to do that I need to require a roster format.
