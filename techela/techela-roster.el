@@ -20,13 +20,15 @@ Use it like this:
   (with-temp-buffer
     (insert-file-contents ta-roster)
     (let ((contents (cdr (csv-parse-buffer nil))))  ;; first line is header
-      (mapcar (lambda (x)
-		(list (nth 8 x)                     ; userid
-		      :name (format "%s %s"
-				    (nth 6 x)       ; first name
-				    (nth 5 x))      ; last name
-		      :email (nth 9 x)))
-	      contents))))
+      (cons '("instructor"
+	      :name "Instructor account" :email "jkitchin@andrew.cmu.edu")
+	    (mapcar (lambda (x)
+		      (list (nth 8 x)                     ; userid
+			    :name (format "%s %s"
+					  (nth 6 x)       ; first name
+					  (nth 5 x))      ; last name
+			    :email (nth 9 x)))
+		    contents)))))
 
 
 (defun ta-have-user-pubkey-p (userid)
@@ -69,7 +71,8 @@ dropped."
   (interactive)
   (let*
       ((roster (ta-roster))
-       (new-roster-userids (mapcar (lambda (x) (car x)) roster))
+       ;; instructor is just test account that acts like a student
+       (new-roster-userids (cons "instructor" (mapcar (lambda (x) (car x)) roster)))
        (roster-org-file (expand-file-name "roster.org" ta-gitolite-admin-dir))
        (userids-in-roster-org (with-temp-buffer
 				(org-mode)
@@ -117,6 +120,7 @@ dropped."
 			  (cdr (assoc userid roster))
 			  :name)"\n")
 	  (forward-line)
+	  (org-set-tags-to (replace-regexp-in-string "-" "_" ta-course-name))
 	  (org-entry-put (point) "CUSTOM_ID" userid)
 	  (org-entry-put (point) "EMAIL" (if (string-match "@" userid)
 					     userid
@@ -164,7 +168,7 @@ dropped."
      )))
 
 
-(defun ta-add-roster-note (userid note)
+(defun ta-add-roster-note (note userid)
   "Add a NOTE to the USERID entry in roster.org."
   (interactive
    (list

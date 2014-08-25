@@ -166,7 +166,53 @@ Opens all course files, then does the search."
     (dolist (f org-files)
       (find-file-noselect f))
     (multi-occur-in-matching-buffers ".*.org" regexp)))
-  
+
+
+(defun tq-toc ()
+  "Generate a table of contents from the syllabus."
+  (interactive)
+  (let ((*org-files* '()))
+    (set-buffer (find-file-noselect (expand-file-name "syllabus.org" tq-course-directory)))
+    (org-open-link-from-string "[[#schedule]]")
+    (save-restriction
+      (org-narrow-to-subtree)
+      (org-element-map (org-element-parse-buffer) 'link
+	(lambda (link)       
+	  (let ((type (nth 0 link))
+		(plist (nth 1 link)))
+	    (when (equal (plist-get plist ':type) "file")
+	      (add-to-list '*org-files* 
+			   (expand-file-name (plist-get plist :path)) t))))))
+
+    (switch-to-buffer "*techela toc*")
+    (erase-buffer)
+    (insert "#+TITLE: Table of Contents\n")
+    (dolist (f *org-files*)
+      (set-buffer (find-file-noselect f))
+      (org-map-entries
+       (lambda ()
+	 (let* ((components (org-heading-components))
+		(p (point))
+		(h (nth 4 components)))
+
+	   ;; remove links in headlines
+	   (setq h (replace-regexp-in-string "\\[" "" h))
+	   (setq h (replace-regexp-in-string "\\]" "" h))
+	   
+	   (with-current-buffer   (get-buffer-create "*techela toc*")
+	     (dotimes (i (nth 0 components))
+	       (insert "*"))
+	     
+	     (insert " " 
+		     (format "[[elisp:(progn (find-file \"%s\")(goto-char %s))][%s]]"
+			     f ; the filename
+			     p ; where we are in the file
+			     h ) ;the headline
+		     "\n"))))))
+
+    (switch-to-buffer "*techela toc*")
+    (org-mode)))
+
 
 (defun tq-index ()
   "Generate a temporary index buffer from the course files."

@@ -467,6 +467,7 @@ a link in the heading."
   '("techela"
     ["Turn assignment in" tq-turn-it-in t]
     ["Search course files" tq-search t]
+    ["Table of contents" tq-toc t]
     ["Course index" tq-index t]
     ["Course agenda" tq-agenda t]
 ;    ("Assignments")
