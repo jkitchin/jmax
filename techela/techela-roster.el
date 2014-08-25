@@ -56,7 +56,7 @@ Use it like this:
      (format
       "%15s missing  %s\n"
       userid
-      (format "[[elisp:(progn (ta-email \"%s\")(message-goto-subject)(insert \"(%s) Missing ssh pub key\")(message-goto-body)(insert \"Dear %s,\\n\\nI need you to email me your ~/.ssh/id_rsa.pub key. See http://bit.ly/pubkey for directions.\\n\\nThanks,\\nProfessor Kitchin\\n\"))][Email %s]]"
+      (format "[[elisp:(progn (ta-email \"%s\")(message-goto-subject)(insert \"(%s) Missing ssh pub key\")(message-goto-body)(insert \"Dear %s,\\n\\nI need you to run M-x techela to generate and send my your ssh.pub key. Please see me or the TAs if you need help.\\n\\nThanks,\\nProfessor Kitchin\\n\"))][Email %s]]"
 	      userid
 	      ta-course-name (plist-get (cdr (assoc userid (ta-roster))) :name) userid)))))
   (org-mode))

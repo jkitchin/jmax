@@ -143,7 +143,7 @@ Make sure ssh is available. Generate ssh key, config and wrapper script. Email k
 		       "techela-config"
 		       tq-root-directory)))
       
-      (shell-command (format "touch %s" ssh-config))
+      (shell-command (format "touch \"%s\"" ssh-config))
 
       ;; now append an entry to a config file that techela_ssh uses
       (let ((contents (with-temp-buffer
