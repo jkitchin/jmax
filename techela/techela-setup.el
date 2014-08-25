@@ -133,7 +133,7 @@ Make sure ssh is available. Generate ssh key, config and wrapper script. Email k
 			  (concat tq-userid ".pub")
 			  tq-root-directory))
     ;; we make one with no password
-    (shell-command (format "ssh-keygen -t rsa -f %s -N \"\""
+    (shell-command (format "ssh-keygen -t rsa -f \"%s\" -N \"\""
 			   (expand-file-name
 			    tq-userid
 			    tq-root-directory)))
