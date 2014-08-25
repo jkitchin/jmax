@@ -152,7 +152,7 @@ Make sure ssh is available. Generate ssh key, config and wrapper script. Email k
 			(buffer-string)))
 	    (entry (format  "Host %s
   User %s
-  IdentityFile %s
+  IdentityFile \"%s\"
   StrictHostKeyChecking no
   UserKnownHostsFile /dev/null
 " tq-git-server tq-current-course 
@@ -169,7 +169,7 @@ Make sure ssh is available. Generate ssh key, config and wrapper script. Email k
 	(insert
 	 (format "#!/bin/bash
 # custom ssh for running git in batch mode for techela with the user-key
-exec ssh -F %s -o \"BatchMode yes\" \"$@\"
+exec ssh -F \"%s\" -o \"BatchMode yes\" \"$@\"
 # end" (expand-file-name "techela-config" tq-root-directory))))
 
       ;; make the script executable
