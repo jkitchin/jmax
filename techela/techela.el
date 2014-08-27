@@ -155,6 +155,7 @@ Check *techela log* for error messages."
 
 (defun tq-update-course ()
   "update everything in the course."
+  (interactive)
   (save-some-buffers t) ;;save all buffers
   (mygit "git commit -am \"my changes\"")
   (mygit "git pull origin master")

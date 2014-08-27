@@ -112,7 +112,7 @@ placed after the new link when it is done."
   "Run a rubric function to insert the grade.
 This assumes the assignment label is the filename you are in."
   (interactive)
-  (save-excursion
+  (save-window-excursion
     (let ((rubric)
 	  (label (file-name-sans-extension
 		  (file-name-nondirectory (buffer-name))))

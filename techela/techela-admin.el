@@ -637,7 +637,7 @@ permissions of the repo to Read-only first."
 	   repo-dir
 	   ;; should perhaps consider making sure we are clean before we pull?
 	   (let ((process-environment (cons *GIT_SSH* process-environment)))
-	     (start-process-shell-command "git-pull"  ; process anme
+	     (start-process-shell-command "git-pull"  ; process name
 					  "*git pull*" ; buffer for output
 					  "git pull")))		 
 	;; repo-dir did not exist. So we clone it.
@@ -672,17 +672,20 @@ This means go into each repo, commit all changes, and push them."
 		      (expand-file-name
 		       repo-name
 		       ta-root-dir))))
-      (with-current-directory
-       repo-dir
-       ;; only push if changes detected
-       (if (not (string= "" (shell-command-to-string "git status --porcelain")))
-	   (let ((process-environment (cons *GIT_SSH* process-environment)))
-	     (start-process-shell-command
-	      "ta-return"
-	      "*ta return*"
-	      "git add * && git commit -am \"Returning\" && git push")
-	     (message "returned %s" userid))
-	 (message "no changes detected for %s" userid))))))
+      (when
+	  (file-exists-p
+	   repo-dir)
+	(with-current-directory
+	 repo-dir
+	 ;; only push if changes detected
+	 (if (not (string= "" (shell-command-to-string "git status --porcelain")))
+	     (let ((process-environment (cons *GIT_SSH* process-environment)))
+	       (start-process-shell-command
+		"ta-return"
+		"*ta return*"
+		"git add * && git commit -am \"Returning\" && git push")
+	       (message "returned %s" userid))
+	   (message "no changes detected for %s" userid)))))))
 
 
 (defun ta-grade (label)
@@ -705,6 +708,13 @@ This is not fast.
   ;; now pull them
   (ta-pull-repos label)
   (message "%s has been pulled" label)
+
+  ;; the pull commands are asynchronous. right now we do not have a
+  ;; way to tell when they finish. this is a hack to give it some time
+  ;; to finish.
+  ;; TODO figure out how to tell when processes are done
+  (sleep-for 5)
+  
   ;; Now, make org-file
   (let ((grading-file (expand-file-name
 		       (format "gradebook/grading-%s.org" label)
