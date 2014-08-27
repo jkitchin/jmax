@@ -911,6 +911,7 @@ This will be in student-work/label/userid-label/userid-label.org."
   "Save current buffer, commit changes, and push."
   (interactive)
   (save-buffer)
+  (mygit (format "git add %s" (buffer-file-name)))
   (mygit (format "git commit %s -m \"save changes\"" (buffer-file-name)))
   (mygit "git push"))
 
@@ -1093,6 +1094,47 @@ git status:
 ")
     (goto-char (point-min))
     (org-mode))
+
+
+
+(defun counts (list)
+  "Return an alist of counts for each element of the list"
+  (let ((counts '())
+	place)
+    (dolist (el list)   
+      (setq place (assoc el  counts))
+    (if place
+	(setf (cdr place) (+ 1 (cdr place)))
+      (setq counts (cons `(,el . 1) counts))))
+    counts))
+
+(defun tq-collect-responses (assignment label)
+  "Collect responses for the ASSIGNMENT and LABEL.
+Insert an org-table at point."
+  (interactive "sAssignment: \nsLabel: ")
+  ;; collect repos. we do not change permissions with this, in case
+  ;; you want to do updates
+  (ta-pull-repos assignment)
+
+  ;; now we get the files. they are in student-work/assignment/*/label.dat
+  (let* ((files (f-entries ta-course-student-work-dir
+			  (lambda (f)
+			    (s-ends-with?
+			     (concat label ".dat")
+			     (file-name-nondirectory f)
+			     ))
+			  t)) ; recursive
+	 (responses (mapcar (lambda (f)
+			      (with-temp-buffer
+				(insert-file-contents f)
+				(s-trim (buffer-string))))
+			    files))
+	 (COUNTS (counts responses)))
+    (insert "| category | count |\n|-")
+    (dolist (c COUNTS)
+      (insert (format "| %s | %s |\n" (car c) (cdr c))))
+    (previous-line)
+    (org-ctrl-c-ctrl-c)))
 
 
 (provide 'techela-admin)

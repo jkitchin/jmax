@@ -173,11 +173,14 @@ Your changes
 Changes on the server
 >>>>>>>> some-random-git hash characters
 These will be committed so that future merges are possible. You should probably keep the server version to avoid future conflicts.")
-	(shell-command (concat "git commit -m \"my changes\" " (file-name-nondirectory
-								(buffer-file-name))))
 
+	;; first, we commit our changes.
+	(shell-command (concat "git commit -am \"my changes\""))
+
+	;; now get remotes
 	(mygit "git pull origin master")
-	;; and now we commit our changes. This will have
+	;; and now we commit our changes. This may result in
+	;; conflicts. We will just accept them and move on.
 	(shell-command "git commit -a -m \"accepting merge\""))
   ;; it looks like we were clean
   (mygit "git pull origin master")

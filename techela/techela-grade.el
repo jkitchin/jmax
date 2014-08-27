@@ -112,45 +112,55 @@ placed after the new link when it is done."
   "Run a rubric function to insert the grade.
 This assumes the assignment label is the filename you are in."
   (interactive)
-  (let ((rubric)
-	(label (file-name-sans-extension
-		(file-name-nondirectory (buffer-name))))
-	(cb (current-buffer))
-	(tbuf (find-file-noselect (expand-file-name "syllabus.org" ta-course-dir))))
-    (unless (-contains? (ta-get-assigned-assignments) label)
-      (error "%s is not an assignment" label))
-    
-    ;; get the rubric from the syllabus, to make sure it has not been
-    ;; altered by a student
-    (set-buffer tbuf)
-    (goto-char (point-min))
-    (org-open-link-from-string
-     ;; there must be a section with a custom_id in the syllabus
-     (format "[[#%s]]" label) tbuf)
-    (setq rubric (read (org-entry-get (point) "RUBRIC")))
-    (set-buffer cb)
-    (kill-buffer tbuf)
-    
-    ;; Now, loop over rubric
-    (setq categories (mapcar (lambda (x) (car x)) rubric))
-    (setq LGS (mapcar (lambda (cell)
-			(ido-completing-read
-			 (concat (symbol-name (car cell)) ": ")
-			 (mapcar (lambda (x) (car x)) gb-MULTIPLIERS))) rubric))
+  (save-excursion
+    (let ((rubric)
+	  (label (file-name-sans-extension
+		  (file-name-nondirectory (buffer-name))))
+	  (cb (current-buffer))
+	  (tbuf (find-file-noselect (expand-file-name "syllabus.org" ta-course-dir))))
+      (unless (-contains? (ta-get-assigned-assignments) label)
+	(error "%s is not an assignment" label))
+      
+      ;; get the rubric from the syllabus, to make sure it has not been
+      ;; altered by a student
+      (set-buffer tbuf)
+      (goto-char (point-min))
+      (org-open-link-from-string
+       ;; there must be a section with a custom_id in the syllabus
+       (format "[[#%s]]" label) tbuf)
+      (setq rubric (read (org-entry-get (point) "RUBRIC")))
+      (set-buffer cb)
+      (kill-buffer tbuf)
+      
+      ;; Now, loop over rubric
+      (setq categories (mapcar (lambda (x) (car x)) rubric))
+      (setq LGS (mapcar (lambda (cell)
+			  (ido-completing-read
+			   (concat
+			    (cond
+			     ((symbolp (car cell))
+			      (symbol-name (car cell)))
+			     ((stringp (car cell))
+			      (car cell)))
+			    ": ")
+			   (mapcar (lambda (x) (car x)) gb-MULTIPLIERS))) rubric))
 
-    (setq multipliers (mapcar (lambda (LG) (cdr (assoc LG gb-MULTIPLIERS)))
-			      LGS))
-    (setq weights (mapcar (lambda (x) (cdr x)) rubric))
-    (setq grade (reduce '+ (cl-mapcar (lambda (weight multiplier) (* weight multiplier))
-			  weights multipliers)))
+      (setq multipliers (mapcar (lambda (LG) (cdr (assoc LG gb-MULTIPLIERS)))
+				LGS))
+      (setq weights (mapcar (lambda (x) (cdr x)) rubric))
+      (setq grade (reduce '+ (cl-mapcar (lambda (weight multiplier) (* weight multiplier))
+					weights multipliers)))
 
-    (goto-char (point-max))
-    (org-open-link-from-string "[[*Grade]]")    
-    (cl-mapcar (lambda (category grade) (gb-set-filetag category grade))
-	       categories LGS)
-    (gb-set-filetag "GRADE" (format "%1.3f" grade))
-    (save-buffer)
-    (kill-buffer)))
+      (goto-char (point-min))
+      (unless (re-search-forward "* Grade" (point-max) 'end)
+	(insert "\n* Grade\n"))
+      
+					; (org-open-link-from-string "[[*Grade]]")    
+      (cl-mapcar (lambda (category grade) (gb-set-filetag category grade))
+		 categories LGS)
+      (gb-set-filetag "GRADE" (format "%1.3f" grade))
+      (save-buffer)
+      (kill-buffer))))
 
 
 ;; see http://kitchingroup.cheme.cmu.edu/blog/2013/05/05/Getting-keyword-options-in-org-files/
@@ -212,6 +222,7 @@ This assumes the assignment label is the filename you are in."
     (split-string
      (car
       (last (butlast (split-string (buffer-file-name) "/")))) "-"))))
+
 
 ;; here I rebind Alt-s as a prefix to these functions.
 ;; it seems like a reasonable choice.
