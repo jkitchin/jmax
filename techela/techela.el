@@ -153,6 +153,12 @@ Check *techela log* for error messages."
   
   (message "Woohoo! You turned it in!"))
 
+(defun tq-update-course ()
+  "update everything in the course."
+  (save-some-buffers t) ;;save all buffers
+  (mygit "git commit -am \"my changes\"")
+  (mygit "git pull origin master")
+  (mygit "git commit -am \"accepting merge\""))
 
 (defun tq-update ()
   "Update current visited file from git.
