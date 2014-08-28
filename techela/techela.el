@@ -337,7 +337,10 @@ Messages\n==========\n")
 	   ;; update just for good measure
 	   (tq-update))
        ;; no file
-       (mygit (format "git clone solutions/%s" label))
+       (mygit (format "git clone %s@%s:solutions/%s"
+		      tq-current-course
+		      tq-git-server
+		      label))
        (find-file (concat label "/" label ".org")))))))
        
 
