@@ -234,8 +234,8 @@ Opens all course files, then does the search."
 			   (cons (plist-get plist :path)
 				 (format "[[elisp:(progn (switch-to-buffer \"%s\")(goto-char %s))][%s]] (%s)"
 								 
-					 (current-buffer)
-					 (plist-get plist :begin)
+					 (current-buffer)          ;; buffer name
+					 (plist-get plist :begin)  ;; position of link
 					 (save-excursion
 					   (goto-char (plist-get plist :begin))
 					   (if (thing-at-point 'sentence)

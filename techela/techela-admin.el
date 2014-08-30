@@ -616,8 +616,9 @@ permissions of the repo to Read-only first."
 		 nil ; predicate
 		 t ; require match
 		 )))
-  (dolist (userid (ta-get-userids))
-    (let* ((repo-name (ta-get-repo-name label userid))
+  (mapcar
+   (lambda (userid)
+         (let* ((repo-name (ta-get-repo-name label userid))
 	   (repo-dir-name (expand-file-name
 		       repo-name
 		       ta-root-dir))
@@ -649,7 +650,43 @@ permissions of the repo to Read-only first."
 					(format "git clone %s@%s:%s"
 						ta-course-name
 						ta-course-server
-						repo-name))))))))
+						repo-name)))))))
+   (ta-get-userids)))
+
+  ;; (dolist (userid (ta-get-userids))
+  ;;   (let* ((repo-name (ta-get-repo-name label userid))
+  ;; 	   (repo-dir-name (expand-file-name
+  ;; 		       repo-name
+  ;; 		       ta-root-dir))
+  ;; 	   (repo-dir (file-name-as-directory
+  ;; 		      (expand-file-name
+  ;; 		       repo-name
+  ;; 		       ta-root-dir))))
+
+  ;;     ;; make sure we have the root dir to work in up to the repo, but
+  ;;     ;; not including. Later we clone it if it does not exist.
+  ;;     (unless (file-exists-p repo-dir-name)
+  ;; 	(make-directory  (file-name-directory repo-dir-name) t))
+      
+  ;;     (if (file-exists-p repo-dir)
+  ;; 	  ;; we have a copy fo the work so we pull it.
+  ;; 	  (with-current-directory
+  ;; 	   repo-dir
+  ;; 	   ;; should perhaps consider making sure we are clean before we pull?
+  ;; 	   (let ((process-environment (cons *GIT_SSH* process-environment)))
+  ;; 	     (start-process-shell-command "git-pull"  ; process name
+  ;; 					  "*git pull*" ; buffer for output
+  ;; 					  "git pull")))		 
+  ;; 	;; repo-dir did not exist. So we clone it.
+  ;; 	(with-current-directory
+  ;; 	 (file-name-directory repo-dir-name)
+  ;; 	 (let ((process-environment (cons *GIT_SSH* process-environment)))
+  ;; 	   (start-process-shell-command "git-clone"
+  ;; 					"*git clone*"
+  ;; 					(format "git clone %s@%s:%s"
+  ;; 						ta-course-name
+  ;; 						ta-course-server
+  ;; 						repo-name))))))))
 
 
 (defun ta-return (label)
@@ -705,8 +742,13 @@ This is not fast.
   (ta-collect label)
   (message "%s has been collected" label)
   
-  ;; now pull them
+  ;; now pull them and wait for them to finish
+  ;(let ((processes (ta-pull-repos label)))
+  ;  (while (-any-p 'process-live-p  processes)
+  ;    (sleep-for 1)))
+
   (ta-pull-repos label)
+  
   (message "%s has been pulled" label)
 
   ;; the pull commands are asynchronous. right now we do not have a
