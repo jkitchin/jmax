@@ -6,7 +6,7 @@
 
 (require 'ox-html)
 
-(defvar bf-root-dir "~/Dropbox/blogofile-jkitchin.github.com/"
+(defvar bf-root-dir "~/blogofile-jkitchin.github.com/"
   "Directory where all the files are stored")
 
 (defvar bf-blog-directory (concat bf-root-dir "org/")
