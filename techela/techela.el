@@ -84,7 +84,7 @@ The user ssh.pub key must be registered in the course."
   ;; let user know if an update is needed
   (when (> (tq-get-num-incoming-changes) 0)
     (message "%s is out of date. Please wait while I update it" course)
-    (tq-update)))
+    (tq-update-course)))
 
 
 (defun tq-get-assignment (label)
@@ -154,9 +154,10 @@ Check *techela log* for error messages."
   (message "Woohoo! You turned it in!"))
 
 (defun tq-update-course ()
-  "update everything in the course."
+  "update everything in the current directory."
   (interactive)
   (save-some-buffers t) ;;save all buffers
+  (mygit "git add *")
   (mygit "git commit -am \"my changes\"")
   (mygit "git pull origin master")
   (mygit "git commit -am \"accepting merge\""))
@@ -470,6 +471,11 @@ a link in the heading."
 
 (require 'easymenu)
 
+(defun tq-open-syllabus ()
+  "Open the course syllabus."
+  (interactive)
+  (find-file (expand-file-name "syllabus.org" tq-course-directory))
+
 (defvar techela-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "C-c e") 'tq-email)
@@ -478,6 +484,7 @@ a link in the heading."
 
 (easy-menu-define techela-menu techela-mode-map "Techela menu"
   '("techela"
+    ["Open syllabus" tq-open-syllabus t]
     ["Turn assignment in" tq-turn-it-in t]
     ["Search course files" tq-search t]
     ["Table of contents" tq-toc t]
