@@ -275,14 +275,6 @@
 ;; Load up org mode
 (load-file (expand-file-name "jmax-org.el" starter-kit-dir))
 
-;; We load all .el files in the user directory. No order is guaranteed.
-(add-to-list 'load-path user-dir)
-(when (file-exists-p user-dir)
-  (mapc 'load (directory-files user-dir 't "^[^#].*el$")))
-
-
-
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;; 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -310,5 +302,9 @@
 (add-to-list 'load-path (expand-file-name "techela" starter-kit-dir))
 (require 'techela)
 
+;; We load all .el files in the user directory. No order is guaranteed.
+(add-to-list 'load-path user-dir)
+(when (file-exists-p user-dir)
+  (mapc 'load (directory-files user-dir 't "^[^#].*el$")))
 
 (provide 'jmax)
