@@ -601,8 +601,19 @@ This does not pull the repos. See `ta-pull-repos'.
   ;; push the repo permission changes all at once.
   (with-current-directory
    ta-gitolite-admin-dir
-   (mygit "git push")))
+   (mygit "git push"))
 
+  ;; change state of assignment in syllabus
+  (set-buffer (find-file-noselect (expand-file-name "syllabus.org" ta-course-dir)))
+  (org-open-link-from-string (format "[[#%s]]" label))
+  (org-todo "COLLECTED")
+  (save-buffer)
+
+  ;; push change
+  (with-current-directory
+   ta-course-dir
+   (mygit "git commit syllabus.org -m \"collection\"")
+   (mygit "git push")))
 
 (defun ta-pull-repos (label)
   "Pull the assignment LABEL repo for each student.  This is not
@@ -616,9 +627,9 @@ permissions of the repo to Read-only first."
 		 nil ; predicate
 		 t ; require match
 		 )))
-  (mapcar
-   (lambda (userid)
-         (let* ((repo-name (ta-get-repo-name label userid))
+
+  (dolist (userid (ta-get-userids))
+    (let* ((repo-name (ta-get-repo-name label userid))
 	   (repo-dir-name (expand-file-name
 		       repo-name
 		       ta-root-dir))
@@ -627,8 +638,7 @@ permissions of the repo to Read-only first."
 		       repo-name
 		       ta-root-dir))))
 
-      ;; make sure we have the root dir to work in up to the repo, but
-      ;; not including. Later we clone it if it does not exist.
+      ;; make sure path to repo exists
       (unless (file-exists-p repo-dir-name)
 	(make-directory  (file-name-directory repo-dir-name) t))
       
@@ -636,58 +646,17 @@ permissions of the repo to Read-only first."
 	  ;; we have a copy fo the work so we pull it.
 	  (with-current-directory
 	   repo-dir
-	   ;; should perhaps consider making sure we are clean before we pull?
-	   (let ((process-environment (cons *GIT_SSH* process-environment)))
-	     (start-process-shell-command "git-pull"  ; process name
-					  "*git pull*" ; buffer for output
-					  "git pull")))		 
+	   (mygit "git pull"))
+	
 	;; repo-dir did not exist. So we clone it.
 	(with-current-directory
 	 (file-name-directory repo-dir-name)
-	 (let ((process-environment (cons *GIT_SSH* process-environment)))
-	   (start-process-shell-command "git-clone"
-					"*git clone*"
-					(format "git clone %s@%s:%s"
-						ta-course-name
-						ta-course-server
-						repo-name)))))))
-   (ta-get-userids)))
-
-  ;; (dolist (userid (ta-get-userids))
-  ;;   (let* ((repo-name (ta-get-repo-name label userid))
-  ;; 	   (repo-dir-name (expand-file-name
-  ;; 		       repo-name
-  ;; 		       ta-root-dir))
-  ;; 	   (repo-dir (file-name-as-directory
-  ;; 		      (expand-file-name
-  ;; 		       repo-name
-  ;; 		       ta-root-dir))))
-
-  ;;     ;; make sure we have the root dir to work in up to the repo, but
-  ;;     ;; not including. Later we clone it if it does not exist.
-  ;;     (unless (file-exists-p repo-dir-name)
-  ;; 	(make-directory  (file-name-directory repo-dir-name) t))
-      
-  ;;     (if (file-exists-p repo-dir)
-  ;; 	  ;; we have a copy fo the work so we pull it.
-  ;; 	  (with-current-directory
-  ;; 	   repo-dir
-  ;; 	   ;; should perhaps consider making sure we are clean before we pull?
-  ;; 	   (let ((process-environment (cons *GIT_SSH* process-environment)))
-  ;; 	     (start-process-shell-command "git-pull"  ; process name
-  ;; 					  "*git pull*" ; buffer for output
-  ;; 					  "git pull")))		 
-  ;; 	;; repo-dir did not exist. So we clone it.
-  ;; 	(with-current-directory
-  ;; 	 (file-name-directory repo-dir-name)
-  ;; 	 (let ((process-environment (cons *GIT_SSH* process-environment)))
-  ;; 	   (start-process-shell-command "git-clone"
-  ;; 					"*git clone*"
-  ;; 					(format "git clone %s@%s:%s"
-  ;; 						ta-course-name
-  ;; 						ta-course-server
-  ;; 						repo-name))))))))
-
+	 (mygit (format "git clone %s@%s:%s"
+			ta-course-name
+			ta-course-server
+			repo-name)))))
+    (message "pulled %s" userid)))
+	
 
 (defun ta-return (label)
   "Return assignment LABEL for each student.
@@ -722,7 +691,23 @@ This means go into each repo, commit all changes, and push them."
 		"*ta return*"
 		"git add * && git commit -am \"Returning\" && git push")
 	       (message "returned %s" userid))
-	   (message "no changes detected for %s" userid)))))))
+	   (message "no changes detected for %s" userid))))))
+
+
+  ;; change state of assignment in syllabus
+  (set-buffer (find-file-noselect
+	       (expand-file-name "syllabus.org" ta-course-dir)))
+  (org-open-link-from-string (format "[[#%s]]" label))
+  (org-todo "GRADED")
+  (save-buffer)
+
+  ;; push change
+  (with-current-directory
+   ta-course-dir
+   (mygit "git commit syllabus.org -m \"collection\"")
+   (mygit "git push")))
+
+  
 
 
 (defun ta-grade (label)
@@ -1162,14 +1147,15 @@ git status:
 
 (defun tq-collect-responses (assignment label)
   "Collect responses for the ASSIGNMENT and LABEL.
-Insert an org-table at point."
+."
   (interactive "sAssignment: \nsLabel: ")
   ;; collect repos. we do not change permissions with this, in case
   ;; you want to do updates
   (ta-pull-repos assignment)
 
   ;; now we get the files. they are in student-work/assignment/*/label.dat
-  (let* ((files (f-entries ta-course-student-work-dir
+  (let* ((files (f-entries (expand-file-name
+			    assignment ta-course-student-work-dir)
 			  (lambda (f)
 			    (s-ends-with?
 			     (concat label ".dat")
@@ -1181,13 +1167,13 @@ Insert an org-table at point."
 				(insert-file-contents f)
 				(s-trim (buffer-string))))
 			    files))
-	 (COUNTS (counts responses)))
-    (insert "| category | count |\n|-")
+	 (COUNTS (counts responses))
+	 (result '()))
+    (add-to-list 'result '("category" "count") t)
+        (add-to-list 'result 'hline t)
     (dolist (c COUNTS)
-      (insert (format "| %s | %s |\n" (car c) (cdr c))))
-    (previous-line)
-    (org-ctrl-c-ctrl-c)))
-
+      (add-to-list 'result (list (car c) (cdr c)) t))
+    result))
 
 (provide 'techela-admin)
 
