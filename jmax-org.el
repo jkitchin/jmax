@@ -359,12 +359,12 @@ start  empty title path
 	("" "wasysym" t)
 	("" "amssymb" t)
 	("" "amsmath" t)
-	("version=3" "mhchem" t)
-	("numbers,super,sort&compress" "natbib" t)
+	("version=3" "mhchem" nil)
+	("numbers,super,sort&compress" "natbib" nil)
 	("" "natmove" nil)
-	("" "url" t)
+	("" "url" nil)
 	("" "minted" nil)
-	("" "underscore" t)	
+	("" "underscore" nil)	
 	("linktocpage,pdfstartview=FitH,colorlinks,
 linkcolor=blue,anchorcolor=blue,
 citecolor=blue,filecolor=blue,menucolor=blue,urlcolor=blue"
