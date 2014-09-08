@@ -1,0 +1,16 @@
+#+TITLE: Making publication quality plots in matplotlib
+#+AUTHOR: John Kitchin
+
+* Basic plotting
+
+** Subfigures
+** Double y-axis
+
+* Reading external data
+** Excel
+** csv
+** numpy arrays
+
+* Plot customizations
+** Figure size
+** Legend
