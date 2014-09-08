@@ -138,6 +138,16 @@
      ta-root-dir
      (mygit (format "git clone %s@%s:course" ta-course-name ta-course-server))))
 
+  (setq techela-filelist
+	`(("gitolite-admin" . ,(expand-file-name "gitolite-admin" ta-root-dir))
+	  ("gradebook" . ,(expand-file-name
+			   "gradebook"
+			   (expand-file-name "gitolite-admin" ta-root-dir)))
+	  ("course" . ,(expand-file-name "course" ta-root-dir))
+	  ("student-work" . ,(expand-file-name "student-work" ta-root-dir))
+	  ("syllabus" . ,(expand-file-name "syllabus.org" ta-course-dir))	
+	  ))
+  
   ;; open with the status view
   (ta-status))
 
@@ -1153,7 +1163,7 @@ git status:
 		    (expand-file-name "~/techela-admin"))))))
 	  (result)
 	  (n-commits) (n-modified) (n-untracked)
-	  (link (format "[[elisp:(with-current-directory \"%s\" (eshell))][%s]]"
+	  (link (format "[[elisp:(with-current-directory \"%s\" (ansi-term \"/bin/bash\"))][%s]]"
 			dir userid))
 	  (status) ; clean/dirty
 	  (s-commits) ; local/remote commits
@@ -1189,17 +1199,14 @@ git status:
 
 	   (insert (format
 		    "- %20s %s %s %s %s\n"
-		    userid
+		    link
 		    status
 		    s-commits
 		    s-modified
 		    s-untracked))	   	  	   		 
-	    ))
+	    )
 	;; missing directory
-	(insert (format "- %20s Missing\n" link))
-
-	)
-      )
+	(insert (format "- %20s Missing\n" link)))))
     (org-mode)
     ) 
     
@@ -1211,16 +1218,8 @@ git status:
 	  "Open:"
 	  (mapcar
 	   (lambda (x) (car x))
-	   `(
-	     ("gitolite-admin" . ,(expand-file-name "gitolite-admin" ta-root-dir))
-	     ("gradebook" . ,(expand-file-name
-			      "gradebook"
-			      (expand-file-name "gitolite-admin" ta-root-dir)))
-	     ("course" . ,(expand-file-name "course" ta-root-dir))
-	     ("student-work" . ,(expand-file-name "student-work" ta-root-dir))
-	     ("syllabus" . ,(expand-file-name "syllabus.org" ta-course-dir))	
-	     )))))
-	   
+	   techela-filelist
+	   ))))	   
   (find-file (cdr (assoc openCode techela-filelist))))
   
 
