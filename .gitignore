@@ -69,3 +69,10 @@ ltxpng
 themes
 /org-mode-bleeding-edge/
 /English
+/org/*.el
+/org/upload_bibtex_citeulike.py
+TAGS
+Pymacs
+examples/cmu-letter
+examples/cmu-memo
+devel
