@@ -727,20 +727,8 @@ This is not fast.
   (ta-collect label)
   (message "%s has been collected" label)
   
-  ;; now pull them and wait for them to finish
-  ;(let ((processes (ta-pull-repos label)))
-  ;  (while (-any-p 'process-live-p  processes)
-  ;    (sleep-for 1)))
-
-  (ta-pull-repos label)
-  
+  (ta-pull-repos label)  
   (message "%s has been pulled" label)
-
-  ;; the pull commands are asynchronous. right now we do not have a
-  ;; way to tell when they finish. this is a hack to give it some time
-  ;; to finish.
-  ;; TODO figure out how to tell when processes are done
-  (sleep-for 5)
   
   ;; Now, make org-file
   (let ((grading-file (expand-file-name
@@ -761,7 +749,10 @@ This is not fast.
 #+DATE: " (format-time-string "[%Y-%m-%d %a]" (current-time)) "
 
 * Grading for " label " [/]\n")
-      (dolist (userid (sort (ta-get-userids) 'string-lessp))
+      ;; randomize the userids so they get graded in a different order
+      ;; each time. This is to reduce systematic variation in which
+      ;; students get graded first and last.
+      (dolist (userid (shuffle (ta-get-userids)))
 	(let* ((repo-name (ta-get-repo-name label userid))
 	       (repo-dir (file-name-as-directory
 			  (expand-file-name
@@ -1134,46 +1125,111 @@ git status:
 
 
 
-(defun counts (list)
-  "Return an alist of counts for each element of the list"
-  (let ((counts '())
-	place)
-    (dolist (el list)   
-      (setq place (assoc el  counts))
-    (if place
-	(setf (cdr place) (+ 1 (cdr place)))
-      (setq counts (cons `(,el . 1) counts))))
-    counts))
 
-(defun tq-collect-responses (assignment label)
-  "Collect responses for the ASSIGNMENT and LABEL.
-."
-  (interactive "sAssignment: \nsLabel: ")
-  ;; collect repos. we do not change permissions with this, in case
-  ;; you want to do updates
-  (ta-pull-repos assignment)
+(require 'techela-git)
+(defun ta-repos-status (label)
+  "List status of repos for assignment label."
+  (interactive (list
+		(ido-completing-read
+		 "Label: "
+		 (ta-get-assigned-assignments)
+		 nil ; predicate
+		 t ; require match
+		 )))
 
-  ;; now we get the files. they are in student-work/assignment/*/label.dat
-  (let* ((files (f-entries (expand-file-name
-			    assignment ta-course-student-work-dir)
-			  (lambda (f)
-			    (s-ends-with?
-			     (concat label ".dat")
-			     (file-name-nondirectory f)
-			     ))
-			  t)) ; recursive
-	 (responses (mapcar (lambda (f)
-			      (with-temp-buffer
-				(insert-file-contents f)
-				(s-trim (buffer-string))))
-			    files))
-	 (COUNTS (counts responses))
-	 (result '()))
-    (add-to-list 'result '("category" "count") t)
-        (add-to-list 'result 'hline t)
-    (dolist (c COUNTS)
-      (add-to-list 'result (list (car c) (cdr c)) t))
-    result))
+  (switch-to-buffer
+   (get-buffer-create (format "* %s repos *" label)))
+  (erase-buffer)
+  
+  (dolist (userid (ta-get-userids))
+    (let* ((dir (expand-file-name
+		 (format "%s-%s" userid label)
+		 (expand-file-name
+		  label
+		  (expand-file-name
+		   "student-work"
+		   (expand-file-name
+		    ta-course-name
+		    (expand-file-name "~/techela-admin"))))))
+	  (result)
+	  (n-commits) (n-modified) (n-untracked)
+	  (link (format "[[elisp:(with-current-directory \"%s\" (eshell))][%s]]"
+			dir userid))
+	  (status) ; clean/dirty
+	  (s-commits) ; local/remote commits
+	  (s-modified)
+	  (s-untracked)	  
+	  )
+      (if (file-exists-p dir)
+	  
+	  (with-current-directory
+	   dir
+	   ;; c
+	   (setq result (shell-command-to-string "git status --porcelain")
+		 n-commits (ta-git-n-commits)  ; (local remote)	   
+		 n-modified (ta-git-n-modified-files)
+		 n-untracked (ta-git-n-untracked-files))
+
+	   (if (string= "" result)
+	       (setq status (propertize " clean"
+					'font-lock-face
+					'(:foreground "forestgreen")))
+	     (setq status (propertize " dirty"
+				      'font-lock-face
+				      '(:foreground "red"))))
+
+	   (setq s-commits
+		 (format
+		  "  Local %s Remote %s" 
+		  (nth 0 n-commits)
+		  (nth 1 n-commits)))
+
+	   (setq s-modified (format "  Modified=%s" n-modified)
+		 s-untracked (format "  Untracked=%s" n-untracked))
+
+	   (insert (format
+		    "- %20s %s %s %s %s\n"
+		    userid
+		    status
+		    s-commits
+		    s-modified
+		    s-untracked))	   	  	   		 
+	    ))
+	;; missing directory
+	(insert (format "- %20s Missing\n" link))
+
+	)
+      )
+    (org-mode)
+    ) 
+    
+
+(defun techela-open-file-fast (openCode)
+  "Prompt to open a file from a pre-defined set in `my-filelist."
+  (interactive
+   (list (ido-completing-read
+	  "Open:"
+	  (mapcar
+	   (lambda (x) (car x))
+	   `(
+	     ("gitolite-admin" . ,(expand-file-name "gitolite-admin" ta-root-dir))
+	     ("gradebook" . ,(expand-file-name
+			      "gradebook"
+			      (expand-file-name "gitolite-admin" ta-root-dir)))
+	     ("course" . ,(expand-file-name "course" ta-root-dir))
+	     ("student-work" . ,(expand-file-name "student-work" ta-root-dir))
+	     ("syllabus" . ,(expand-file-name "syllabus.org" ta-course-dir))	
+	     )))))
+	   
+  (find-file (cdr (assoc openCode techela-filelist))))
+  
+
+(defalias 'to 'techela-open-file-fast 
+  "alias for `techela-open-file-fast'")
+
+
+
+
 
 (provide 'techela-admin)
 

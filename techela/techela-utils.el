@@ -276,11 +276,91 @@ Opens all course files, then does the search."
 (defun tq-present ()
   "set font size larger and set latex fragment size larger"
   (interactive)
+  (hl-line-mode)
+  (global-linum-mode)
   (set-face-attribute 'default nil :height 150)
   (plist-put org-format-latex-options :scale 1.5))
 
 (global-set-key (kbd "C--") 'tq-decrease-text-size)
 (global-set-key (kbd "C-=") 'tq-increase-text-size)
+
+
+(defun tq-clean-line-endings ()
+  "Remove ^M from lines in buffer.
+This seems to happen to some students because of the mix of
+dos/mac and unix line endings."
+  (interactive)
+  (goto-char (point-min))
+  (while (search-forward "" nil t)
+    (replace-match "")))
+
+
+(defun swap (LIST el1 el2)
+  "in LIST swap indices EL1 and EL2 in place.
+LIST is modified."
+  (let ((tmp (elt LIST el1)))
+    (setf (elt LIST el1) (elt LIST el2))
+    (setf (elt LIST el2) tmp)))
+
+
+(defun shuffle (LIST)
+  "Shuffle the elements in LIST.
+shuffling is done in place."
+  (loop for i in (reverse (number-sequence 1 (1- (length LIST))))
+	do (let ((j (random (+ i 1))))
+	     (swap LIST i j)))
+  LIST)
+
+
+
+(defun counts (list)
+  "Return an alist of counts for each element of the list.
+((element . count))"
+  (let ((counts '())
+	place)
+    (dolist (el list)   
+      (setq place (assoc el  counts))
+    (if place
+	(setf (cdr place) (+ 1 (cdr place)))
+      (setq counts (cons `(,el . 1) counts))))
+    counts))
+
+
+(defun tq-collect-responses (assignment label)
+  "Collect responses for the ASSIGNMENT and LABEL within ASSIGNMENT."
+  (interactive "sAssignment: \nsLabel: ")
+  ;; pull repos. we do not change permissions with this, in case
+  ;; you want to do updates
+  ;; this is a slow, serial step
+  (ta-pull-repos assignment)
+
+  ;; now we get the files. they are in ~/techela-admin/course-name/student-work/assignment/*/label.dat
+  (let* ((student-work-dir (expand-file-name
+			    "student-work"
+			    (expand-file-name			     
+			     tq-course
+			     (epand-file-name "~/techela-admin"))))
+	 (files (f-entries (expand-file-name
+			    assignment student-work-dir)
+			  (lambda (f)
+			    (s-ends-with?
+			     (concat label ".dat")
+			     (file-name-nondirectory f)
+			     ))
+			  t)) ; recursive
+	 (responses (mapcar (lambda (f)
+			      (with-temp-buffer
+				(insert-file-contents f)
+				(s-trim (buffer-string))))
+			    files))
+	 (COUNTS (counts responses))
+	 (result '()))
+    (add-to-list 'result '("category" "count") t)
+        (add-to-list 'result 'hline t)
+    (dolist (c COUNTS)
+      (add-to-list 'result (list (car c) (cdr c)) t))
+    result))
+
 
 (provide 'techela-utils)
 
