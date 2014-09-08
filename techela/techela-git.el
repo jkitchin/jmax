@@ -25,23 +25,24 @@
   "return number of untracked files.
 These are files with ?? in them from git status --porcelain"
   (interactive)
-  (length
-   (loop for line in (split-string
-		      (shell-command-to-string "git status --porcelain")
-		      "\n")
-	 when (string-match "^\?\?" line) collect line)))
-  
+  (let ((n 0))
+    (dolist (line (split-string
+		   (shell-command-to-string "git status --porcelain")
+		   "\n"))
+      (when (string-match "^\\?\\?" line)
+	(setq n (+ 1 n))))
+    n))
 
 (defun ta-git-n-modified-files ()
   "return number of modified, but uncommitted files.
 These are files with M in them from git status --porcelain"
     (let ((n 0))
-    (dolist (line (split-string
-		   (shell-command-to-string "git status --porcelain")
-		   "\n"))
-      (when (string-match "^ M" line)
-	(setq n (+ 1 n))))
-    n))
+      (dolist (line (split-string
+		     (shell-command-to-string "git status --porcelain")
+		     "\n"))
+	(when (string-match "^ M" line)
+	  (setq n (+ 1 n))))
+      n))
 
 ; (ta-git-n-commits)
 ; (ta-git-n-untracked-files)
