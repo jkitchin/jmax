@@ -332,14 +332,14 @@ shuffling is done in place."
   ;; pull repos. we do not change permissions with this, in case
   ;; you want to do updates
   ;; this is a slow, serial step
-  (ta-pull-repos assignment)
+  ;;(ta-pull-repos assignment)
 
   ;; now we get the files. they are in ~/techela-admin/course-name/student-work/assignment/*/label.dat
   (let* ((student-work-dir (expand-file-name
 			    "student-work"
 			    (expand-file-name			     
-			     tq-course
-			     (epand-file-name "~/techela-admin"))))
+			     tq-current-course
+			     (expand-file-name "~/techela-admin"))))
 	 (files (f-entries (expand-file-name
 			    assignment student-work-dir)
 			  (lambda (f)
