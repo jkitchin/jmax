@@ -75,16 +75,18 @@ The user ssh.pub key must be registered in the course."
       (let ((default-directory (file-name-as-directory tq-root-directory)))
 	(mygit (format "git clone git://%s/course" tq-git-server)))))
   
-  ;; finally open the syllabus
-  (find-file (expand-file-name "syllabus.org" tq-course-directory))
-
-  (techela-mode)
-  (setq org-id-extra-files (files-in-below-directory tq-course-directory))
-
   ;; let user know if an update is needed
   (when (> (tq-get-num-incoming-changes) 0)
     (message "%s is out of date. Please wait while I update it" course)
-    (tq-update-course)))
+    (tq-update-course))
+
+  ;; finally open the syllabus, with current version from server.
+  (mygit "git checkout origin/master -- syllabus.org")
+  (find-file (expand-file-name "syllabus.org" tq-course-directory))
+  (read-only-mode 1)
+  
+  (techela-mode)
+  (setq org-id-extra-files (files-in-below-directory tq-course-directory)))
 
 
 (defun tq-get-assignment (label)
