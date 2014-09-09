@@ -240,7 +240,7 @@ exec ssh -F \"%s\" -o \"BatchMode yes\" \"$@\"
 
 ")
 
-(insert (format "\n~%s.pub contains:
+(insert (format "\n%s.pub contains:
 #+BEGIN====================================================================
 " tq-userid))
 (insert-file-contents (expand-file-name (format "~/techela/%s/%s.pub"
