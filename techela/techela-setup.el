@@ -208,6 +208,7 @@ exec ssh -F \"%s\" -o \"BatchMode yes\" \"$@\"
 
   (insert (format "System: %s" system-type) "\n")
   (insert (format "Window system: %s" window-system) "\n")
+  (insert (format "temporary-file-directory = %s\n" temporary-file-directory))
   (insert "~/ located at: " (expand-file-name "~/") "\n")
   (insert "git located at: " (executable-find "git") "\n")
   (insert "ssh located at: " (executable-find "ssh") "\n")
@@ -219,27 +220,32 @@ exec ssh -F \"%s\" -o \"BatchMode yes\" \"$@\"
     (insert "jmax tag: " (shell-command-to-string "git tag")))
 
   
-  (insert "\n~/.techela contains:
+  (insert "\n.techela contains:
 #+BEGIN====================================================================
 ")
-  (insert-file-contents (expand-file-name "~/.techela"))
+  (insert-file-contents (expand-file-name
+			 (format"~/techela/%s/.techela" tq-current-course)))
   (goto-char (point-max))
   (insert "\n#+END====================================================================
 
 ")
-  (insert "\n~/.ssh/techela-config contains:
+  (insert "\ntechela-config contains:
 #+BEGIN====================================================================
 ")
-  (insert-file-contents (expand-file-name "~/.ssh/techela-config"))
+  (insert-file-contents (expand-file-name
+			 (format "~/techela/%s/techela-config"
+				 tq-current-course)))
   (goto-char (point-max))
   (insert "\n#+END====================================================================
 
 ")
 
-(insert (format "\n~/.ssh/%s.pub contains:
+(insert (format "\n~%s.pub contains:
 #+BEGIN====================================================================
 " tq-userid))
-  (insert-file-contents (expand-file-name (format "~/.ssh/%s.pub" tq-userid)))
+(insert-file-contents (expand-file-name (format "~/techela/%s/%s.pub"
+						tq-current-course
+						tq-userid)))
   (goto-char (point-max))
   (insert "\n#+END====================================================================
 
@@ -250,6 +256,7 @@ exec ssh -F \"%s\" -o \"BatchMode yes\" \"$@\"
   (shell-command "rm ~/.techela")
   (shell-command "rm -fr ~/techela")
   (shell-command "rm ~/.ssh/techela*"))
+
 
 (provide 'techela-setup)
 
