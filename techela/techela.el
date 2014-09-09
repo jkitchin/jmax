@@ -81,8 +81,12 @@ The user ssh.pub key must be registered in the course."
     (tq-update-course))
 
   ;; finally open the syllabus, with current version from server.
-  (mygit "git checkout origin/master -- syllabus.org")
+  (with-current-directory
+   tq-course-directory
+   (mygit "git checkout origin/master -- syllabus.org"))
   (find-file (expand-file-name "syllabus.org" tq-course-directory))
+  (tq-clean-line-endings)
+  (save-buffer)
   (read-only-mode 1)
   
   (techela-mode)
