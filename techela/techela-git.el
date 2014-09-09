@@ -44,8 +44,29 @@ These are files with M in them from git status --porcelain"
 	  (setq n (+ 1 n))))
       n))
 
-; (ta-git-n-commits)
-; (ta-git-n-untracked-files)
-; (ta-git-n-modified-files)
+
+(defun ta-git-tracked-p ()
+  "Return if the file the buffer is visiting is tracked by git.
+
+git ls-files filename returns an empty string if filename is not under git control
+"
+  (interactive)
+  (not (string=
+	""
+	(shell-command-to-string
+	 (format "git ls-files %s"
+		 (file-name-nondirectory
+		  (buffer-file-name)))))))
+
+(defun ta-git-modified-p ()
+  "Return if the file the buffer is visiting has been modified"
+  (when (ta-git-tracked-p)
+    (save-buffer)
+    (string-match
+     "^ M"
+     (shell-command-to-string
+      (format "git status --porcelain %s"
+	      (file-name-nondirectory
+	       (buffer-file-name)))))))
 
 (provide 'techela-git)
