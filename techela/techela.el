@@ -138,7 +138,7 @@ The user ssh.pub key must be registered in the course."
 	(find-file (expand-file-name (concat label ".org") label))))))
 
 
-(defun  tq-turn-it-in ()
+(defun tq-turn-it-in ()
   "Save all buffers, add files, create a SYSTEM-INFO file, commit them and push.
 
 Check *techela log* for error messages."
@@ -155,9 +155,9 @@ Check *techela log* for error messages."
 
   (unless (= 0 (car (mygit "git push -u origin master")))
     (switch-to-buffer "*techela log*")
-    (error "Problem pushing to server.  Check the logs"))
-  
+    (error "Problem pushing to server.  Check the logs"))  
   (message "Woohoo! You turned it in!"))
+
 
 (defun tq-update-course ()
   "update everything in the current directory."
@@ -166,7 +166,9 @@ Check *techela log* for error messages."
   (mygit "git add *")
   (mygit "git commit -am \"my changes\"")
   (mygit "git pull origin master")
-  (mygit "git commit -am \"accepting merge\""))
+  (mygit "git commit -am \"accepting merge\"")
+  (revert-buffer t t))
+
 
 ;; TODO - this needs better git logic, using functions from techela-git
 ;; we need to check if the file is tracked, and whether it is dirty
