@@ -45,7 +45,7 @@ These are files with M in them from git status --porcelain"
       n))
 
 
-(defun ta-git-tracked-p ()
+(defun ta-git-buffer-tracked-p ()
   "Return if the file the buffer is visiting is tracked by git.
 
 git ls-files filename returns an empty string if filename is not under git control
@@ -58,9 +58,17 @@ git ls-files filename returns an empty string if filename is not under git contr
 		 (file-name-nondirectory
 		  (buffer-file-name)))))))
 
-(defun ta-git-modified-p ()
-  "Return if the file the buffer is visiting has been modified"
-  (when (ta-git-tracked-p)
+
+(defun ta-git-buffer-modified-p ()
+  "Return if the file the buffer is visiting has been modified.
+
+Save the buffer first.
+git status --porcelain filename
+returns \" M filename
+\" when the file is modified.
+"
+  (interactive)
+  (when (ta-git-buffer-tracked-p)
     (save-buffer)
     (string-match
      "^ M"
