@@ -1189,16 +1189,23 @@ git status:
 				      '(:foreground "red"))))
 
 	   (setq s-commits
-		 (format
-		  "  Local %s Remote %s" 
-		  (nth 0 n-commits)
-		  (nth 1 n-commits)))
-
+		 (concat
+		  (format "%s%s"
+			  (if (not (= 0 (nth 0 n-commits)))
+			      (propertize "  Local " 'font-lock-face '(:foreground "red"))
+			    "  Local ")
+			  (nth 0 n-commits))
+		  (format "%s%s"
+			  (if (not (= 0 (nth 0 n-commits)))
+			      (propertize "  Remote " 'font-lock-face '(:foreground "red"))
+			    "  Remote ")
+			  (nth 1 n-commits))))
+		  		 		
 	   (setq s-modified (format "  Modified=%s" n-modified)
 		 s-untracked (format "  Untracked=%s" n-untracked))
 
 	   (insert (format
-		    "- %20s %s %s %s %s\n"
+		    "- %-20s %s %s %s %s\n"
 		    link
 		    status
 		    s-commits
