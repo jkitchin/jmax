@@ -168,6 +168,8 @@ Check *techela log* for error messages."
   (mygit "git pull origin master")
   (mygit "git commit -am \"accepting merge\""))
 
+;; TODO - this needs better git logic, using functions from techela-git
+;; we need to check if the file is tracked, and whether it is dirty
 (defun tq-update ()
   "Update current visited file from git.
 If local changes have been made, they are commited to the local
