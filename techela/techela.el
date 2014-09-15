@@ -484,7 +484,8 @@ a link in the heading."
 (defun tq-open-syllabus ()
   "Open the course syllabus."
   (interactive)
-  (find-file (expand-file-name "syllabus.org" tq-course-directory)))
+  (find-file (expand-file-name "syllabus.org" tq-course-directory))
+  (read-only-mode 1))
 
 (defvar techela-mode-map
   (let ((map (make-sparse-keymap)))
