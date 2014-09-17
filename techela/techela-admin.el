@@ -693,16 +693,18 @@ This means go into each repo, commit all changes, and push them."
 	   repo-dir)
 	(with-current-directory
 	 repo-dir
+	 
 	 ;; only push if changes detected
-	 (if (not (string= "" (shell-command-to-string "git status --porcelain")))
-	     (let ((process-environment (cons *GIT_SSH* process-environment)))
-	       (start-process-shell-command
-		"ta-return"
-		"*ta return*"
-		"git add * && git commit -am \"Returning\" && git push")
+	 (if (or (> (ta-git-n-untracked-files) 0) ; we have untracked files
+		 (> (ta-git-n-modified-files) 0)  ; we have modified files
+		 (> (nth 0 (ta-git-n-commits)) 0)) ; local is ahead of remote
+	     (progn
+	       (message "returning %s" userid)
+	       (mygit "git add *")
+	       (mygit "git commit -am \"Returning\"")
+	       (mygit "git push")
 	       (message "returned %s" userid))
 	   (message "no changes detected for %s" userid))))))
-
 
   ;; change state of assignment in syllabus
   (set-buffer (find-file-noselect
