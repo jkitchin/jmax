@@ -12,6 +12,15 @@
     (insert content)
     (message-goto-to)))
 
+(defun email-buffer ()
+  "Send region as the body of an email."
+  (interactive)
+  (let ((content (buffer-string)))
+    (compose-mail)
+    (message-goto-body)
+    (insert content)
+    (message-goto-to)))
+
 (defvar *email-heading-point* nil
   "global variable to store point in for returning")
 
