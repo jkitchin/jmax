@@ -846,7 +846,23 @@ org-file %s" label-dir repo repo-dir org-file)
   (insert "\n\n")
   ;; realign table
   (previous-line 3)
-  (org-ctrl-c-ctrl-c))
+  (org-ctrl-c-ctrl-c)
+
+  (forward-line 3)
+  (insert (format "
+#+BEGIN_SRC python :var data=%s
+import matplotlib.pyplot as plt
+grades = [x[1] for x in data if x[1] is not 'nil']
+
+plt.hist(grades, 20)
+plt.savefig('%s.png')
+# [[./%s-hist.png]]
+
+import numpy as np
+print('Average grade = {}'.format(np.mean(grades)))
+print('Std Dev = {}'.format(np.std(grades)))
+#+END_SRC" label label label))
+  )
 
 
 (defun ta-get-categories ()
