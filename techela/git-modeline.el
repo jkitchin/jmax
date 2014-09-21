@@ -70,6 +70,7 @@
 
 
 (defun git-remote-status ()
+  "Get commits relative to remote, returns propertized string"
   (interactive)
   (let* (;; get the branch we are on.
 	 (branch (s-trim
