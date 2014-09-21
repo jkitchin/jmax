@@ -1,10 +1,19 @@
+;;; git-modeline.el --- Provide git repo summary in modeline
 
+
+
+;;; Commentary:
+;; 
+
+;;; Code:
 
 (defun in-git-p ()
+  "Return if in a git repo or not."
   (not (string-match "^fatal" (shell-command-to-string "git rev-parse --git-dir"))))
 
 
 (defun git-parse-status ()
+  "Get git status and return a propertized string."
   (interactive)
   (let ((U 0)   ; untracked files
 	(M 0)   ; modified files
@@ -37,26 +46,26 @@
     ;; construct propertized string
     (concat
      "("
-     (propertize 
+     (propertize
       (format "M:%d" M)
       'face (list ':foreground (if (> M 0)
 				   "red"
 				 "forest green"))
       'help-echo M-files)
      "|"
-     (propertize 
+     (propertize
       (format "U:%d" U)
       'face (list ':foreground (if (> U 0)
 				   "red"
 				 "forest green"))
       'help-echo U-files)
      "|"
-     (propertize 
+     (propertize
       (format "O:%d" O)
       'face (list ':foreground (if (> O 0)
 				   "red"
 				 "forest green"))
-      'help-echo O-files)		    
+      'help-echo O-files)
      ") ")))
 
 
@@ -88,12 +97,12 @@
       'face (list :foreground "magenta"))
      "|"
      (format "↑%s|↓%s" local remotes)
-     "]"))) 
+     "]")))
 
 
-(defvar git-modeline-last-update (float-time) "Last time we updated")
-(defvar git-modeline-update-interval 15 "Minimum time between update in seconds")
-(defvar git-modeline "" "Last value of the modeline")
+(defvar git-modeline-last-update (float-time) "Last time we updated.")
+(defvar git-modeline-update-interval 15 "Minimum time between update in seconds.")
+(defvar git-modeline "" "Last value of the modeline.")
 
 
 (define-minor-mode git-mode
@@ -103,12 +112,12 @@
 				  ;; check if enough time has elapsed for an update!
 				  (> (- (float-time) git-modeline-last-update)
 				     git-modeline-update-interval)
-				  ;; we are updating				  
+				  ;; we are updating
 				  (setq git-modeline
 					(if (not (in-git-p))
-					    ""					 
+					    ""
 					  (setq  git-modeline-last-update (float-time))
-					  (concat 
+					  (concat
 					   (git-remote-status)
 					   (git-parse-status))))
 				
@@ -121,8 +130,12 @@
       ;; remove from modeline
       (setq mode-line-format
 	    (-remove (lambda (x)
-		       (equal x git-modeline)) 					
-		     mode-line-format))))) 
+		       (equal x git-modeline))
+		     mode-line-format)))))
      
 
-(provide 'git-modeline) 
+(provide 'git-modeline)
+
+(provide 'git-modeline)
+
+;;; git-modeline.el ends here
