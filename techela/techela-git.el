@@ -176,19 +176,22 @@ The strategy is to check git status --porcelain first, and get the repo into a c
   (interactive)
   
   (save-some-buffers t t) ; make sure all files are saved.
-  ;; first clean the repo
-  (ta-git-make-repo-clean)
+  (with-current-directory
+   (s-trim
+    (shell-command-to-string "git rev-parse --show-toplevel"))
+   ;; first clean the repo
+   (ta-git-make-repo-clean)
+   
+   ;; Next we are going to fetch
+   (mygit "git fetch")
 
-  ;; Next we are going to fetch
-  (mygit "git fetch")
+   ;; then merge, we assume with origin/master
+   (mygit "git merge origin/master -m \"merging origin/master in\"")
 
-  ;; then merge, we assume with origin/master
-  (mygit "git merge origin/master -m \"merging origin/master in\"")
-
-  ;; there may be merge conflicts. we take them, and make the repo
-  ;; clean again.
-  (ta-git-make-repo-clean)
-  (revert-buffer t t) ;; update this buffer
-  )
+   ;; there may be merge conflicts. we take them, and make the repo
+   ;; clean again.
+   (ta-git-make-repo-clean)
+   (revert-buffer t t) ;; update this buffer
+   ))
 
 (provide 'techela-git)
