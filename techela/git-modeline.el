@@ -101,6 +101,25 @@
      "]")))
 
 
+(require 'easymenu)
+
+(defvar git-mode-map
+  (let ((map (make-sparse-keymap)))
+    map)
+  "Keymap for git-mode.")
+
+(defun git-mode-add ()
+  "add file associated with current buffer"
+  (interactive)
+  (shell-command
+   (format "git add %s" (buffer-file-name))))
+
+(easy-menu-define git-menu git-mode-map "Git Menu"
+  '("git"
+    ["git add" git-mode-add t]
+    ["git commit" '() t]))
+
+
 (defvar git-modeline-last-update (float-time) "Last time we updated.")
 (defvar git-modeline-update-interval 15 "Minimum time between update in seconds.")
 (defvar git-modeline "" "Last value of the modeline.")
@@ -135,7 +154,11 @@
 		     mode-line-format)))))
      
 
-(provide 'git-modeline)
+(defun git-modeline-find-file-hook ()
+  "Turn git-mode on when opening a file"
+  (when (in-git-p) (git-mode 1)))
+
+(add-hook 'find-file-hook 'git-modeline-find-file-hook)
 
 (provide 'git-modeline)
 
