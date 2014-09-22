@@ -111,13 +111,21 @@
 (defun git-mode-add ()
   "add file associated with current buffer"
   (interactive)
+  (save-buffer)
   (shell-command
    (format "git add %s" (buffer-file-name))))
+
+(defun git-mode-commit (commit-message)
+  "commit file associated with buffer"
+  (interactive "sCommit message: ")
+  (save-buffer)
+  (shell-command
+   (format "git commit %s -m \"%s\"" (buffer-file-name) commit-message)))
 
 (easy-menu-define git-menu git-mode-map "Git Menu"
   '("git"
     ["git add" git-mode-add t]
-    ["git commit" '() t]))
+    ["git commit" git-mode-commit t]))
 
 
 (defvar git-modeline-last-update (float-time) "Last time we updated.")
