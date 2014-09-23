@@ -166,8 +166,7 @@ Check *techela log* for error messages."
   (mygit "git add *")
   (mygit "git commit -am \"my changes\"")
   (mygit "git pull origin master")
-  (mygit "git commit -am \"accepting merge\"")
-  (revert-buffer t t))
+  (mygit "git commit -am \"accepting merge\""))
 
 
 ;; TODO - this needs better git logic, using functions from techela-git
