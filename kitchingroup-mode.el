@@ -105,7 +105,7 @@
   "Minor mode for kitchingroup
 
 \\{kitchingroup-mode-map}"
-  :lighter " KG"
+;  :lighter " KG"
   :global t
   :keymap kitchingroup-mode-map)
 
