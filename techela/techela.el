@@ -76,14 +76,14 @@ The user ssh.pub key must be registered in the course."
 	(mygit (format "git clone git://%s/course" tq-git-server)))))
   
   ;; let user know if an update is needed
-  (when (> (tq-get-num-incoming-changes) 0)
-    (message "%s is out of date. Please wait while I update it" course)
-    (tq-update-course))
-
-  ;; finally open the syllabus, with current version from server.
   (with-current-directory
-   tq-course-directory
-   (mygit "git checkout origin/master -- syllabus.org"))
+     tq-course-directory
+     (when (> (tq-get-num-incoming-changes) 0)
+       (message "%s is out of date. Please wait while I update it" course)
+       (tq-update-course)
+       (mygit "git checkout origin/master -- syllabus.org")))
+
+  ;; now open syllabus
   (find-file (expand-file-name "syllabus.org" tq-course-directory))
   (tq-clean-line-endings)
   (save-buffer)
@@ -163,10 +163,12 @@ Check *techela log* for error messages."
   "update everything in the current directory."
   (interactive)
   (save-some-buffers t) ;;save all buffers
-  (mygit "git add *")
-  (mygit "git commit -am \"my changes\"")
-  (mygit "git pull origin master")
-  (mygit "git commit -am \"accepting merge\""))
+  (with-current-directory
+   tq-course-directory
+   (mygit "git add *")
+   (mygit "git commit -am \"my changes\"")
+   (mygit "git pull origin master")
+   (mygit "git commit -am \"accepting merge\"")))
 
 
 ;; TODO - this needs better git logic, using functions from techela-git
