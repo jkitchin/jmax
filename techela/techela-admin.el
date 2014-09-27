@@ -850,7 +850,7 @@ org-file %s" label-dir repo repo-dir org-file)
 
   (forward-line 3)
   (insert (format "
-#+BEGIN_SRC python :var data=%s
+#+BEGIN_SRC python :var data=summary-%s
 import matplotlib.pyplot as plt
 grades = [x[1] for x in data if x[1] is not 'nil']
 
@@ -861,7 +861,7 @@ plt.savefig('%s.png')
 import numpy as np
 print('Average grade = {}'.format(np.mean(grades)))
 print('Std Dev = {}'.format(np.std(grades)))
-#+END_SRC" label label label))
+#+END_SRC\n" label label label))
   )
 
 
@@ -1123,6 +1123,9 @@ git status:
 - [[elisp:ta-pull-repos][Update student repos]] (pulls them all locally.)
 
 - [[elisp:ta-create-assignment][Create or edit an assignment]]
+- [[elisp:ta-create-solution][Create or edit solution]]
+- [[elisp:ta-release-solution][Release/update a solution]]  [[elisp:ta-close-solution][Close a solution]]
+
 - [[elisp:ta-create-assignment-repos][Create class repos for an assignment]] (no student access until you assign it.)
 
 - [[elisp:ta-assign-assignment to class][Assign an assignment]] (give students RW access)
@@ -1135,8 +1138,6 @@ git status:
 
 - [[elisp:ta-show-assigned-assignments][Show list of assigned assignments]]
 
-- [[elisp:ta-create-solution][Create or edit solution]]
-- [[elisp:ta-release-solution][Release/update a solution]]  [[elisp:ta-close-solution][Close a solution]]
 
 *** Individual Student Actions
 
