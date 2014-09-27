@@ -28,6 +28,32 @@
 
 (defvar tq-course-files nil "List of org-files that constitute the course.")
 
+(defun tq-check-internet ()
+  (cond
+   ((string= system-type "windows-nt")
+    (unless (= 0
+	       (shell-command "ping -n 1 techela.cheme.cmu.edu"))
+       (message-box "Unable to contact techela.cheme.cmu.edu.
+Check your internet connection.")
+       (error "Unable to contact techela.cheme.cmu.edu. Check your internet connection"))
+    t)
+   
+   ((string= system-type "darwin")
+    (unless (= 0
+	       (shell-command "ping -c 1 techela.cheme.cmu.edu"))
+      (message-box "Unable to contact techela.cheme.cmu.edu.
+Check your internet connection")
+      (error "Unable to contact techela.cheme.cmu.edu. Check your internet connection."))
+    t)
+   
+   (t ;; all other systems
+    (unless (= 0
+	       (shell-command "ping -c 1 techela.cheme.cmu.edu"))
+      (message-box "Unable to contact techela.cheme.cmu.edu.
+Check your internet connection")
+      (error "Unable to contact techela.cheme.cmu.edu. Check your internet connection."))
+    t)))
+    
 (defun techela (course)
   "Open COURSE.
 If you have not registered for the course, you will be prompted
@@ -41,6 +67,8 @@ The user ssh.pub key must be registered in the course."
     (ido-completing-read
      "Course name: "
      (tq-config-get-user-courses))))
+
+  (tq-check-internet)
   
   ;; Set this for the current session
   (setq tq-current-course course)
@@ -162,6 +190,7 @@ Check *techela log* for error messages."
 (defun tq-update-course ()
   "update everything in the current directory."
   (interactive)
+  (tq-check-internet)
   (save-some-buffers t) ;;save all buffers
   (with-current-directory
    tq-course-directory
@@ -178,6 +207,7 @@ Check *techela log* for error messages."
 If local changes have been made, they are commited to the local
 repo so a merge can be done."
   (interactive)
+  (tq-check-internet)
   (if (not (string= "" (shell-command-to-string
 			  (concat "git status --porcelain "
 				  (file-name-nondirectory
@@ -330,12 +360,14 @@ Messages\n==========\n")
 (org-add-link-type
  "assignment"
  (lambda (arg)
+   (tq-check-internet)
    (tq-get-assignment arg)))
 
 ;; download the solution
 (org-add-link-type
  "solution"
  (lambda (label)
+   (tq-check-internet)
    (with-current-directory
     tq-root-directory
     (unless (file-exists-p "solutions")
@@ -361,6 +393,7 @@ Messages\n==========\n")
 (org-add-link-type
  "exercise"
  (lambda (arg)
+     (tq-check-internet)
    (tq-get-assignment arg)))
 
 ;; index link for techela
@@ -397,6 +430,7 @@ Messages\n==========\n")
   "Submit contents of current `default-directory' as a zip file attached to an email.
 This is normally only done after the deadline, when you cannot push to the git repo, or when there is some issue with the git server. There must be extenuating circumstances for this to be used."
   (interactive)
+  (tq-check-internet)
   (unless (executable-find "zip")
     (error "Could not find a zip executable."))
   
