@@ -1,3 +1,8 @@
+
+(require 'git-modeline)
+
+
+
 (defun ta-git-n-commits ()
   "returns how many commits differ locally and remotely.
 
@@ -177,6 +182,8 @@ The strategy is to check git status --porcelain first, and get the repo into a c
   
   (save-some-buffers t t) ; make sure all files are saved.
   (with-current-directory
+   ;; this switches us to the top git level which is where all the
+   ;; paths are relative to.
    (s-trim
     (shell-command-to-string "git rev-parse --show-toplevel"))
    ;; first clean the repo
