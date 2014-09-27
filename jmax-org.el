@@ -535,4 +535,190 @@ FEATURE is a symbol, and it is loaded from an org-file by the name of FEATURE.or
 
 
 
+
+(defun org-py-check ()
+  "Run python check programs on a source block.
+Opens a buffer with links to what is found. This function installs pyflakes, pep8 and pylint if needed."
+  (interactive)
+  (let ((eop (org-element-at-point))
+	(temporary-file-directory ".")
+        (cb (current-buffer))
+	(n) ; for line number
+	(content) ; error on line
+	(pb "*org pycheck*")
+	(pyflakes-status nil)
+	(link)
+	(tempfile))
+
+    (unless (executable-find "pyflakes")
+      (if (executable-find "pip")
+	  (shell-command "python -c \"import pip; pip.main(['install','pyflakes'])\"")
+	(shell-command "python -c \"from setuptools.command import easy_install; easy_install.main(['-U','pyflakes'])\"")))
+    
+    (unless (executable-find "pep8")
+      (if (executable-find "pip")
+	  (shell-command "python -c \"import pip; pip.main(['install','pep8'])\"")
+	(shell-command "python -c \"from setuptools.command import easy_install; easy_install.main(['-U','pep8'])\"")))
+
+    (unless (executable-find "pylint")
+      (if (executable-find "pip")
+	  (shell-command "python -c \"import pip; pip.main(['install','pylint'])\"")
+	(shell-command "python -c \"from setuptools.command import easy_install; easy_install.main(['pylint'])\"")))
+
+    ;; rm buffer if it exists
+    (when (get-buffer pb) (kill-buffer pb))
+    
+    ;; only run if in a python code-block
+    (when (and (eq 'src-block (car eop))
+	       (string= "python" (org-element-property :language eop)))
+
+      ;; tempfile for the code
+      (setq tempfile (make-temp-file "pychecker" nil ".py"))
+      ;; create code file
+      (with-temp-file tempfile
+	(insert (org-element-property :value eop)))
+      
+      (let ((status (shell-command
+		     (format "pyflakes %s" (file-name-nondirectory tempfile))))
+	    (output (delete "" (split-string
+				(with-current-buffer "*Shell Command Output*"
+				  (buffer-string)) "\n"))))
+	(setq pyflakes-status status)
+	(kill-buffer "*Shell Command Output*")
+	(when output
+	  (set-buffer (get-buffer-create pb))
+	  (insert (format "\n* pyflakes output (status=%s)
+pyflakes checks your code for errors. You should probably fix all of these.
+
+" status))
+	  (dolist (line output)
+	    ;; get the line number
+	    (if 
+		(string-match (format "^%s:\\([0-9]*\\):\\(.*\\)"
+				      (file-name-nondirectory tempfile))
+			      line)
+		(progn
+		  (setq n (match-string 1 line))
+		  (setq content (match-string 2 line))
+		  (setq link (format "[[elisp:(progn (switch-to-buffer-other-window \"%s\")(goto-char %s)(forward-line %s))][%s]]\n"
+				     cb
+				     (org-element-property :begin eop)
+				     n
+				     (format "Line %s: %s" n content))))
+	      ;; no match, just insert line
+	      (setq link (concat line "\n")))
+	    (insert link))))
+
+      (let ((status (shell-command
+		     (format "pep8 %s" (file-name-nondirectory tempfile))))
+	    (output (delete "" (split-string
+				(with-current-buffer "*Shell Command Output*"
+				  (buffer-string)) "\n"))))
+	(kill-buffer "*Shell Command Output*")
+	(when output
+	  (set-buffer (get-buffer-create pb))
+	  (insert (format "\n\n* pep8 output (status = %s)\n" status))
+	  (insert "pep8 is the [[http://legacy.python.org/dev/peps/pep-0008][officially recommended style]] for writing Python code. Fixing these will usually make your code more readable and beautiful. Your code will probably run if you do not fix them, but, it will be ugly.
+
+")
+	  (dolist (line output)
+	    ;; get the line number
+	    (if 
+		(string-match (format "^%s:\\([0-9]*\\):\\(.*\\)"
+				      (file-name-nondirectory tempfile))
+			      line)
+		(progn
+		  (setq n (match-string 1 line))
+		  (setq content (match-string 2 line))
+		  (setq link (format "[[elisp:(progn (switch-to-buffer-other-window \"%s\")(goto-char %s)(forward-line %s))][%s]]\n"
+				     cb
+				     (org-element-property :begin eop)
+				     n
+				     (format "Line %s: %s" n content))))
+	      ;; no match, just insert line
+	      (setq link (concat line "\n")))
+	    (insert link))))
+
+      ;; pylint
+      (let ((status (shell-command
+		     (concat
+		      "pylint "
+		      "-r no "  ; no reports
+		      ;; we are not usually writing programs where it
+		      ;; makes sense to be too formal on variable
+		      ;; names.
+		      "--disable=invalid-name " 
+		      ;; don't usually have modules, which triggers
+		      ;; this when there is not string at the top
+		      "--disable=missing-docstring " 
+		      ;; superfluous-parens is raised with print(),
+		      ;; which I am promoting for python3
+		      ;; compatibility.
+		      "--disable=superfluous-parens ";
+		      (file-name-nondirectory tempfile))))
+	    (output (delete "" (split-string
+				(with-current-buffer "*Shell Command Output*"
+				  (buffer-string)) "\n"))))
+	(setq output (delete
+		      "No config file found, using default configuration"
+		      output))
+	
+	(kill-buffer "*Shell Command Output*")
+	(when output
+	  (set-buffer (get-buffer-create pb))
+	  (insert (format "\n\n* pylint (status = %s)\n" status))
+	  (insert "pylint checks your code for errors, style and convention. It is complementary to pyflakes and pep8, and usually more detailed.
+
+")
+
+	  (dolist (line output)
+	    ;; pylint gives a line and column number
+	    (if 
+		(string-match "[A-Z]:\\s-+\\([0-9]*\\),\\s-*\\([0-9]*\\):\\(.*\\)"			      
+			      line)
+		(let ((line-number (match-string 1 line))
+		      (column-number (match-string 2 line))
+		      (content (match-string 3 line)))
+		     
+		  (setq link (format "[[elisp:(progn (switch-to-buffer-other-window \"%s\")(goto-char %s)(forward-line %s)(forward-line 0)(forward-char %s))][%s]]\n"
+				     cb
+				     (org-element-property :begin eop)
+				     line-number
+				     column-number
+				     line)))
+	      ;; no match, just insert line
+	      (setq link (concat line "\n")))
+	    (insert link))))
+    
+      (when (get-buffer pb)
+	;; open the buffer
+	(switch-to-buffer-other-window pb)
+	(goto-char (point-min))
+	(insert "Press q to close the window\n")
+	(org-mode)       
+	(org-cycle '(64))  ; open everything
+	;; make read-only and press q to quit
+	(setq buffer-read-only t)
+	(use-local-map (copy-keymap org-mode-map))
+	(local-set-key "q" #'(lambda () (interactive) (kill-buffer)))
+
+	(unless (= 0 pyflakes-status)
+	  (forward-line 4)
+	  (message "pyflakes exited non-zero. please fix errors"))
+	(switch-to-buffer-other-window cb))
+      ;; final cleanup and delete file     
+      (delete-file tempfile)
+      )))
+
+; let this run before we run a code block
+(defadvice org-babel-execute:python (around pychecker nil activate)
+  "check python block for syntax and style errors before running"
+  ;; we ignore errors so this does not affect people missing the
+  ;; executables pep8, pylint and pyflakes, or who have installation
+  ;; errors.
+  (ignore-errors
+    (org-py-check))
+  (save-window-excursion
+    ad-do-it))
+
 (message "jmax-org.el loaded")
