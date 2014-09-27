@@ -39,7 +39,6 @@
 	)
 
        (t
-        (message "detected other in %s" line)
 	(setq O (+ 1 O))
 	(setq O-files (concat O-files "\n" line)))))
       
@@ -100,13 +99,37 @@
      (format "↑%s|↓%s" local remotes)
      "]")))
 
-
 (require 'easymenu)
 
+;; this is the modeline menu. It seems to take over the whole mode-line.
 (defvar git-mode-map
   (let ((map (make-sparse-keymap)))
+    (define-key map [mode-line down-mouse-1] (make-sparse-keymap))
     map)
   "Keymap for git-mode.")
+
+(define-key git-mode-map 
+   (vconcat [mode-line down-mouse-1]
+     (list 1))
+   (cons "git push" (lambda ()
+		      (interactive)
+		      (mygit "git push"))))
+
+(define-key git-mode-map 
+   (vconcat [mode-line down-mouse-1]
+     (list 2))
+   (cons "git pull" (lambda ()
+		      (interactive)
+		      (mygit "git pull"))))
+
+(define-key git-mode-map 
+   (vconcat [mode-line down-mouse-1]
+     (list 3))
+   (cons "eshell" (lambda ()
+		      (interactive)
+		      (eshell))))
+
+;; Top Menu functions
 
 (defun git-mode-add ()
   "add file associated with current buffer"
@@ -125,7 +148,15 @@
 (easy-menu-define git-menu git-mode-map "Git Menu"
   '("git"
     ["git add" git-mode-add t]
-    ["git commit" git-mode-commit t]))
+    ["git commit" git-mode-commit t]
+    ["git status" (lambda ()
+		    (interactive) (message
+				   (shell-command-to-string "git status"))) t]
+    ["git hist" (lambda ()
+		  (interactive)
+		  (message "%s" (shell-command-to-string			   
+			    "git log -5 --pretty=format:\"\%h \%ad | \%s\%d [\%an]\" --graph --date=short"))) t]
+    ))
 
 
 (defvar git-modeline-last-update (float-time) "Last time we updated.")
@@ -135,7 +166,7 @@
 
 (define-minor-mode git-mode
   "minor mode to put git repo status in modeline"
-  nil nil nil
+  :keymap git-mode-map
   (let ((git-modeline '(:eval (if
 				  ;; check if enough time has elapsed for an update!
 				  (> (- (float-time) git-modeline-last-update)
