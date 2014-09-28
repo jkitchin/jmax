@@ -134,11 +134,17 @@ The user ssh.pub key must be registered in the course."
 	 student-repo-dir
 	 (if (not (string= "" (shell-command-to-string
 			       "git status --porcelain")))
-	     ;; There are some local changes. We commit them, and pull
+	     ;; There are some local changes. We commit them, pull,
+	     ;; and commit merges if there are any
 	     (progn
-	       (message "Remote changes found. Please wait while I get them.")
-	       (shell-command "git commit -am \"my changes\"")
-	       (mygit "git pull"))
+	       (message "Local changes found. Please wait while I save them.")
+	       (mygit "git add *")
+	       (mygit "git commit -am \"my changes\"")
+	       (mygit "git pull")
+	       ;; save any merge issues
+	       (mygit "git add *")
+	       (mygit "git commit -am \"merging my changes\"")
+	       )
 	   ;; we were clean. Let's pull anyway to get remote changes.
 	   (message "Checking for remote changes")
 	   (mygit "git pull"))
