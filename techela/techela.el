@@ -187,6 +187,8 @@ Check *techela log* for error messages."
       (switch-to-buffer "*techela log*")
       (error "Problem committing.  Check the logs")))
 
+  (mygit "git tag -a turned_in -m \"Tagging version turned in\"")
+
   (unless (= 0 (car (mygit "git push -u origin master")))
     (switch-to-buffer "*techela log*")
     (error "Problem pushing to server.  Check the logs"))  
