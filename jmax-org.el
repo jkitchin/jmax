@@ -655,6 +655,13 @@ pyflakes checks your code for errors. You should probably fix all of these.
 		      ;; which I am promoting for python3
 		      ;; compatibility.
 		      "--disable=superfluous-parens ";
+
+		      ;; these do not seem important for my work.
+		      "--disable=too-many-locals ";
+
+		      ;; this is raised in solving odes and is
+		      ;; unimportant for us.
+		      "--disable=unused-argument ";
 		      (file-name-nondirectory tempfile))))
 	    (output (delete "" (split-string
 				(with-current-buffer "*Shell Command Output*"
