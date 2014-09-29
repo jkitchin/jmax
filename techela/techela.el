@@ -238,6 +238,8 @@ Changes on the server
 These will be committed so that future merges are possible. You should probably keep the server version to avoid future conflicts.")
 
 	;; first, we commit our changes.
+	(save-some-buffers t)
+	(mygit "git add *")
 	(shell-command (concat "git commit -am \"my changes\""))
 
 	;; now get remotes
