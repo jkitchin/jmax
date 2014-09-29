@@ -195,6 +195,7 @@ Check *techela log* for error messages."
   (mygit "git tag -a turned_in -m \"Tagging version turned in\"")
 
   (unless (= 0 (car (mygit "git push -u origin master")))
+    (mygit "git commit --amend -m \"*** TURNING IN FAILED ***.\"")
     (switch-to-buffer "*techela log*")
     (error "Problem pushing to server.  Check the logs"))  
   (message "Woohoo! You turned it in!"))
