@@ -662,10 +662,17 @@ pyflakes checks your code for errors. You should probably fix all of these.
 		      ;; this is raised in solving odes and is
 		      ;; unimportant for us.
 		      "--disable=unused-argument ";
+
+		      ;; this is the file to check.
 		      (file-name-nondirectory tempfile))))
+
+	    ;; remove empty strings
 	    (output (delete "" (split-string
 				(with-current-buffer "*Shell Command Output*"
 				  (buffer-string)) "\n"))))
+
+	;; also remove this line so the output is empty if nothing
+	;; comes up
 	(setq output (delete
 		      "No config file found, using default configuration"
 		      output))
