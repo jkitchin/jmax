@@ -285,8 +285,13 @@
 uses the dos command:
 start  empty title path
 "
-       (shell-command
-	(concat "start \"title\" " (shell-quote-argument path)) t))
+       (cond
+	((string= "windows-nt" system-type)
+	 (shell-command
+	  (concat "start \"title\" " (shell-quote-argument path)) t))
+	((string= "darwin" system-type)
+	 (shell-command
+	  (concat "open " (shell-quote-argument path)) t))))
 
 (org-add-link-type
  "msx"
