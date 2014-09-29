@@ -535,6 +535,31 @@ FEATURE is a symbol, and it is loaded from an org-file by the name of FEATURE.or
 
 
 
+(defvar jmax-pylint-options
+  '(
+    "-r no "  ; no reports
+    ;; we are not usually writing programs where it
+    ;; makes sense to be too formal on variable
+    ;; names.
+    "--disable=invalid-name " 
+    ;; don't usually have modules, which triggers
+    ;; this when there is not string at the top
+    "--disable=missing-docstring " 
+    ;; superfluous-parens is raised with print(),
+    ;; which I am promoting for python3
+    ;; compatibility.
+    "--disable=superfluous-parens ";
+    
+    ;; these do not seem important for my work.
+    "--disable=too-many-locals ";
+    
+    ;; this is raised in solving odes and is
+    ;; unimportant for us.
+    "--disable=unused-argument ";
+    "--disable=unused-wildcard-import "
+    "--disable=redefined-outer-name "
+    )
+  "List of options to use with pylint.")
 
 (defun org-py-check ()
   "Run python check programs on a source block.
@@ -643,26 +668,7 @@ pyflakes checks your code for errors. You should probably fix all of these.
       (let ((status (shell-command
 		     (concat
 		      "pylint "
-		      "-r no "  ; no reports
-		      ;; we are not usually writing programs where it
-		      ;; makes sense to be too formal on variable
-		      ;; names.
-		      "--disable=invalid-name " 
-		      ;; don't usually have modules, which triggers
-		      ;; this when there is not string at the top
-		      "--disable=missing-docstring " 
-		      ;; superfluous-parens is raised with print(),
-		      ;; which I am promoting for python3
-		      ;; compatibility.
-		      "--disable=superfluous-parens ";
-
-		      ;; these do not seem important for my work.
-		      "--disable=too-many-locals ";
-
-		      ;; this is raised in solving odes and is
-		      ;; unimportant for us.
-		      "--disable=unused-argument ";
-		      "--disable=unused-wildcard-import "
+		      (mapconcat 'identity jmax-pylint-options " ")
 		      ;; this is the file to check.
 		      (file-name-nondirectory tempfile))))
 
