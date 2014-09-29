@@ -662,7 +662,7 @@ pyflakes checks your code for errors. You should probably fix all of these.
 		      ;; this is raised in solving odes and is
 		      ;; unimportant for us.
 		      "--disable=unused-argument ";
-
+		      "--disable=unused-wildcard-import "
 		      ;; this is the file to check.
 		      (file-name-nondirectory tempfile))))
 
@@ -724,6 +724,9 @@ pyflakes checks your code for errors. You should probably fix all of these.
       (delete-file tempfile)
       )))
 
+(defvar jmax-run-pycheck t
+  "determine if we run pycheck before running")
+
 ; let this run before we run a code block
 (defadvice org-babel-execute:python (around pychecker nil activate)
   "check python block for syntax and style errors before running"
@@ -731,7 +734,8 @@ pyflakes checks your code for errors. You should probably fix all of these.
   ;; executables pep8, pylint and pyflakes, or who have installation
   ;; errors.
   (ignore-errors
-    (org-py-check))
+    (when jmax-run-pycheck
+      (org-py-check)))
   (save-window-excursion
     ad-do-it))
 
