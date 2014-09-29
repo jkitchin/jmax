@@ -35,7 +35,7 @@
 	       (shell-command "ping -n 1 techela.cheme.cmu.edu"))
        (message-box "Unable to contact techela.cheme.cmu.edu.
 Check your internet connection.")
-       (error "Unable to contact techela.cheme.cmu.edu. Check your internet connection"))
+       (message "Unable to contact techela.cheme.cmu.edu. Check your internet connection"))
     t)
    
    ((string= system-type "darwin")
