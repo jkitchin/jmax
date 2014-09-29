@@ -29,30 +29,35 @@
 (defvar tq-course-files nil "List of org-files that constitute the course.")
 
 (defun tq-check-internet ()
-  (cond
-   ((string= system-type "windows-nt")
-    (unless (= 0
-	       (shell-command "ping -n 1 techela.cheme.cmu.edu"))
-       (message-box "Unable to contact techela.cheme.cmu.edu.
+  "Use ping to see if the server is available"
+  (if (executable-find "ping")
+      (cond
+       ((string= system-type "windows-nt")
+	(unless (= 0
+		   (shell-command "ping -n 1 techela.cheme.cmu.edu"))
+	  (message-box "Unable to contact techela.cheme.cmu.edu.
 Check your internet connection.")
-       (message "Unable to contact techela.cheme.cmu.edu. Check your internet connection"))
-    t)
-   
-   ((string= system-type "darwin")
-    (unless (= 0
-	       (shell-command "ping -c 1 techela.cheme.cmu.edu"))
-      (message-box "Unable to contact techela.cheme.cmu.edu.
+	  (message "Unable to contact techela.cheme.cmu.edu. Check your internet connection"))
+	t)
+       
+       ((string= system-type "darwin")
+	(unless (= 0
+		   (shell-command "ping -c 1 techela.cheme.cmu.edu"))
+	  (message-box "Unable to contact techela.cheme.cmu.edu.
 Check your internet connection")
-      (error "Unable to contact techela.cheme.cmu.edu. Check your internet connection."))
-    t)
-   
-   (t ;; all other systems
-    (unless (= 0
-	       (shell-command "ping -c 1 techela.cheme.cmu.edu"))
-      (message-box "Unable to contact techela.cheme.cmu.edu.
+	  (error "Unable to contact techela.cheme.cmu.edu. Check your internet connection."))
+	t)
+       
+       (t ;; all other systems
+	(unless (= 0
+		   (shell-command "ping -c 1 techela.cheme.cmu.edu"))
+	  (message-box "Unable to contact techela.cheme.cmu.edu.
 Check your internet connection")
-      (error "Unable to contact techela.cheme.cmu.edu. Check your internet connection."))
-    t)))
+	  (error "Unable to contact techela.cheme.cmu.edu. Check your internet connection."))
+	t))
+    ;; no ping found !
+    (message "You have no ping executable! I cannot check for internet connectivity.")
+    ))
     
 (defun techela (course)
   "Open COURSE.
