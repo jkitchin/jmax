@@ -510,7 +510,15 @@ a link in the heading."
 	    (with-current-directory
 	     (expand-file-name label tq-root-directory)
 	     (when (> (tq-get-num-incoming-changes) 0)
-	       (mygit "git pull origin master")))
+	       ;; make us clean first
+	       (save-some-buffers t) ; save everything
+	       (mygit "git add *") ; add anything new
+	       (mygit "git commit -am \"my changes\"")
+	       ;; then pull
+	       (mygit "git pull origin master")
+	       ;; accept conflicts if there are any
+	       (mygit "git commit -am \"accepting merge\""))
+	       ))
 	  
 	    ;; The student assignment will be in root/label/label.org
 	    (setq fname (expand-file-name (concat label "/" label ".org") tq-root-directory))
