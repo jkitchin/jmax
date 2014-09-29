@@ -520,7 +520,7 @@ a link in the heading."
 	       (mygit "git pull origin master")
 	       ;; accept conflicts if there are any
 	       (mygit "git commit -am \"accepting merge\""))
-	       ))
+	       )
 	  
 	    ;; The student assignment will be in root/label/label.org
 	    (setq fname (expand-file-name (concat label "/" label ".org") tq-root-directory))
