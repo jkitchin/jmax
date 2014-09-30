@@ -632,11 +632,12 @@ pyflakes checks your code for errors. You should probably fix all of these.
 			    line)
 	      (setq n (match-string 1 line))
 	      (setq content (match-string 2 line))
-	      (setq link (format "[[elisp:(progn (switch-to-buffer-other-window \"%s\")(goto-char %s)(forward-line %s))][%s]]\n"
+	      (setq link (format "[[elisp:(progn (switch-to-buffer-other-window \"%s\")(goto-char %s)(forward-line %s))][%s]] %s\n"
 				 cb
 				 (org-element-property :begin eop)
 				 n
-				 (format "Line %s: %s" n content))))
+				 (format "Line %s:" n)
+				 content)))
 	     ;; Some windows machines have another format with a column number
 	     ;; these seem to run v0.4.0
 	     ;; file.py:1(6): mesg
