@@ -1,16 +1,22 @@
+;;; techela-git.el --- Scripting git in emacs for techela
+
+
+;;; Commentary:
+;; 
 
 (require 'git-modeline)
 
 
 
-(defun ta-git-n-commits ()
-  "returns how many commits differ locally and remotely.
+;;; Code:
 
-(0 0) means you are up to date as far as commits go
-(n 0) means you are ahead of the remote and need to push
-(0 n) means you are behind the remote and need to pull
-(m n) means there is a divergence, and a pull and push will be required.
-"
+(defun ta-git-n-commits ()
+  "Return how many commits differ locally and remotely.
+
+\(0 0) means you are up to date as far as commits go
+\(n 0) means you are ahead of the remote and need to push
+\(0 n) means you are behind the remote and need to pull
+\(m n) means there is a divergence, and a pull and push will be required."
   (interactive)
   ;; see what is on remote
   (mygit "git fetch")
@@ -27,7 +33,7 @@
 
 
 (defun ta-git-n-untracked-files ()
-  "return number of untracked files.
+  "Return number of untracked files.
 These are files with ?? in them from git status --porcelain"
   (interactive)
   (let ((n 0))
@@ -38,8 +44,9 @@ These are files with ?? in them from git status --porcelain"
 	(setq n (+ 1 n))))
     n))
 
+
 (defun ta-git-n-modified-files ()
-  "return number of modified, but uncommitted files.
+  "Return number of modified, but uncommitted files.
 These are files with M in them from git status --porcelain"
     (let ((n 0))
       (dolist (line (split-string
@@ -53,8 +60,7 @@ These are files with M in them from git status --porcelain"
 (defun ta-git-buffer-tracked-p ()
   "Return if the file the buffer is visiting is tracked by git.
 
-git ls-files filename returns an empty string if filename is not under git control
-"
+git ls-files filename returns an empty string if filename is not under git control"
   (interactive)
   (not (string=
 	""
@@ -70,8 +76,7 @@ git ls-files filename returns an empty string if filename is not under git contr
 Save the buffer first.
 git status --porcelain filename
 returns \" M filename
-\" when the file is modified.
-"
+\" when the file is modified."
   (interactive)
   (when (ta-git-buffer-tracked-p)
     (save-buffer)
@@ -91,13 +96,12 @@ returns \" M filename
     ("D" "U")
     ("A" "A")
     ("U" "U"))
-  "List of XY states a file can be in that indicate an unmerged state")
+  "List of XY states a file can be in that indicate an unmerged state.")
 
 (defun ta-git-make-repo-clean ()
   "Handle every line in git status --porcelain and leave repo in clean state.
 
-This may happen before or after a merge. Before a merge, we handle each line. After a merge, we add everything at once, and then commit the merge.
-"
+This may happen before or after a merge.  Before a merge, we handle each line.  After a merge, we add everything at once, and then commit the merge."
   (interactive)
 
   (let* ((merge-p nil)
@@ -105,7 +109,7 @@ This may happen before or after a merge. Before a merge, we handle each line. Af
 		      (split-string
 		       (shell-command-to-string "git status --porcelain") "\n")
 		      when (not (string= "" line))
-		      collect		    
+		      collect
 		      (let* ((X (substring line 0 1))
 			     (Y (substring line 1 2))
 			     (PATHS (split-string (substring line 3)))
@@ -176,8 +180,7 @@ This may happen before or after a merge. Before a merge, we handle each line. Af
 
 This is tricky because we cannot just pull a file. We have to save all files, commit them, then pull. It may be the case that this causes a merge conflict, which we then need to address.
 
-The strategy is to check git status --porcelain first, and get the repo into a clean state. Then we do the pull. Then, we check again and get back to a clean state if needed.
-"
+The strategy is to check git status --porcelain first, and get the repo into a clean state. Then we do the pull. Then, we check again and get back to a clean state if needed."
   (interactive)
   
   (save-some-buffers t t) ; make sure all files are saved.
@@ -202,3 +205,5 @@ The strategy is to check git status --porcelain first, and get the repo into a c
    ))
 
 (provide 'techela-git)
+
+;;; techela-git.el ends here
