@@ -986,19 +986,41 @@ This will be in student-work/label/userid-label/userid-label.org."
    ta-gitolite-admin-dir
    (let* ((git-status (shell-command-to-string "git status --porcelain"))
 	  (clean (string= "" git-status))
-	  (n (tq-get-num-incoming-changes)))
+	  (commits (ta-git-n-commits))
+	  (nlocal (nth 0 commits))
+	  (nremote (nth 1 commits)))
+     
      (if clean
-	 (insert (format "* gitolite-admin is clean (remote changes = %s)\n" n))
+	 (progn
+	   (insert (format "* gitolite-admin is clean %s\n"
+			   (format "(↑%s|↓%s)" nlocal nremote)))
+	   (when (> nlocal 0)
+	     (insert "#+BEGIN_SRC emacs-lisp
+ (with-current-directory ta-gitolite-admin-dir
+   (mygit \"git push\")
+   (ta-status))
+#+END_SRC
 
-       ;; Dirty course
+"))
+
+	   (when (> nremote 0)
+	     (insert "#+BEGIN_SRC emacs-lisp
+ (with-current-directory ta-gitolite-admin-dir
+   (mygit \"git pull\")
+   (ta-status))
+#+END_SRC
+
+")))
+	   
+       ;; Dirty folder
        (insert (format (concat "* gitolite-admin is "
 			       (propertize "dirty" 'font-lock-face '(:foreground "red"))
-			       " (remote changes = %s)
+			       " %s
   :PROPERTIES:
   :VISIBILITY: folded
   :END:
 git status:
-%s") n git-status))
+%s") (format "(↑%s|↓%s)" nlocal nremote) git-status))
        (insert "
 
 #+BEGIN_SRC emacs-lisp
@@ -1011,28 +1033,51 @@ git status:
 
 "))))
 
+  ;; Now check the course directory status
   (with-current-directory
    ta-course-dir
    (let* ((git-status (shell-command-to-string "git status --porcelain"))
 	  (clean (string= "" git-status))
-	  (n (tq-get-num-incoming-changes)))
-     (if clean
-	 (insert (format "* Course is clean (remote changes = %s)\n" n))
+	  (commits (ta-git-n-commits))
+	  (nlocal (nth 0 commits))
+	  (nremote (nth 1 commits)))
 
+     (if clean
+	 (progn
+	   (insert (format "* Course is clean %s\n"
+			   (format "(↑%s|↓%s)" nlocal nremote)))
+	   (when (> nlocal 0)
+	     (insert "#+BEGIN_SRC emacs-lisp
+ (with-current-directory ta-course-dir
+   (mygit \"git push\")
+   (ta-status))
+#+END_SRC
+
+"))
+
+	   (when (> nremote 0)
+	     (insert "#+BEGIN_SRC emacs-lisp
+ (with-current-directory ta-course-dir
+   (mygit \"git pull\")
+   (ta-status))
+#+END_SRC
+
+")))
        ;; Dirty course
        (insert (format (concat "* Course is "
 			       (propertize "dirty" 'font-lock-face '(:foreground "red"))
-			       " (remote changes = %s)
+			       " %s
 
   :PROPERTIES:
   :VISIBILITY: folded
   :END:
 git status:
-%s") n git-status))
+%s") (format "(↑%s|↓%s)" nlocal nremote) git-status))
        
        (insert "
 
 #+BEGIN_SRC emacs-lisp
+;; do this with caution!!!
  (with-current-directory ta-course-dir
    (mygit \"git add *\")
    (mygit \"git commit -m \\\"committing everything\\\"\")
@@ -1042,28 +1087,47 @@ git status:
 
 "))))
 
-  ;;; now we get each assignment
+  ;;; now we get each assignment and solution
   (insert "* Assignment statuses
   :PROPERTIES:
   :VISIBILITY: folded
   :END:
 ")
   (dolist (label (ta-get-possible-assignments))
+    (message "assignment = %s" label)
     ;; check assignment status
-    (with-current-directory
-     (expand-file-name label ta-course-assignments-dir)
+    (let ((git-assignment-status)
+	  (git-solution-status)
+	  (header "")
+	  (body ""))
 
-     ;; Assignment status
-     (let ((git-status (shell-command-to-string "git status --porcelain")))
-       (if (string= "" git-status)
-	   (insert "** " label
-		   (if (-contains? (ta-get-assigned-assignments) label)
-		       " (assigned)"
-		     " (not assigned)")
-		   " is clean")
-	 (insert "** " label " is " (propertize "dirty\n" 'font-lock-face '(:foreground "red"))
-		 (shell-command-to-string "git status")
-		 (format "
+      (setq header (format "** %s %s" label
+
+			   (if (-contains? (ta-get-assigned-assignments) label)
+			       (propertize " (assigned)" 'font-lock-face '(:foreground "forestgreen"))
+			     " (not assigned)")))
+      
+      ;; get assignment status
+      (with-current-directory
+       (expand-file-name label ta-course-assignments-dir)
+       (setq git-assignment-status (shell-command-to-string "git status --porcelain"))
+
+       ;; link to the assignment.
+       (setq body (concat
+		   body
+		   (format "\n  assignment [[file:%s][%s]]\n"
+			   (expand-file-name
+			    (concat label ".org") (expand-file-name
+						   label ta-course-assignments-dir))
+			   (concat label ".org"))))
+       
+       (if (string= "" git-assignment-status)
+	   (setq header (concat header " clean |"))
+	 (setq header (concat header " " (propertize "dirty" 'font-lock-face '(:foreground "red")) " |"))
+	 (setq body (concat
+		     body
+		     (shell-command-to-string "git status")
+		     (format "
 #+BEGIN_SRC emacs-lisp
  (with-current-directory (expand-file-name \"%s\" ta-course-assignments-dir)
    (mygit \"git add *\")
@@ -1071,23 +1135,30 @@ git status:
    (mygit \"git push\")
    (ta-status))
 #+END_SRC
-" label))))
-    (insert (format "\n    [[file:%s][%s]]"
-		    (expand-file-name
-		     (concat label ".org") (expand-file-name
-		     label ta-course-assignments-dir))
-		    (concat label ".org")) "\n"))
+" label)
+	 "\n"))))	     
+	 
+      ;; solution
+      (if (file-exists-p (expand-file-name label ta-course-solutions-dir))
+	  (with-current-directory
+	   (expand-file-name label ta-course-solutions-dir)
+	   (setq git-solution-status (shell-command-to-string "git status --porcelain"))
+	   (setq body (concat
+		       body
+		       (format "\n  solution [[file:%s][%s]]\n"
+			       (expand-file-name
+				(concat label ".org") (expand-file-name
+						       label ta-course-solutions-dir))
+			       (concat label ".org"))))
+	   
+	   (if (string= "" git-solution-status)
+	       (setq header (concat header " solution clean |"))
+	     (setq header (concat header " solution " (propertize "dirty" 'font-lock-face '(:foreground "red")) " |"))
 
-    ;; now we need solution status
-    (if (file-exists-p (expand-file-name label ta-course-solutions-dir))
-	(with-current-directory
-	 (expand-file-name label ta-course-solutions-dir)	 
-	 (if (string= "" (shell-command-to-string "git status --porcelain"))
-	     (insert "Solution is clean")
-	   (insert"Solution is "
-		  (propertize "dirty\n" 'font-lock-face '(:foreground "red"))
-		  (shell-command-to-string "git status")
-		  (format "
+	     (setq body (concat
+			 body			 
+			 (shell-command-to-string "git status")
+			 (format "
 #+BEGIN_SRC emacs-lisp
  (with-current-directory (expand-file-name \"%s\" ta-course-solutions-dir)
    (mygit \"git add *\")
@@ -1095,9 +1166,17 @@ git status:
    (mygit \"git push\")
    (ta-status))
 #+END_SRC
-" label))))
-      (insert "No solution found"))
-    (insert (format "  [[elisp:(ta-create-solution \"%s\")][Create/edit solution]]\n" label)))
+" label)))))
+	;; no solution found
+	(setq header (concat header " no solution"))
+	(setq body (concat
+		    body
+		    (format "  [[elisp:(ta-create-solution \"%s\")][Create/edit solution]]\n" label))))
+
+      ;; for each assignment
+      (insert header "\n" body "\n")
+      )
+    )
 	  
     ;; now menu options
     (insert "
