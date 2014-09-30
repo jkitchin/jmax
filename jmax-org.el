@@ -638,8 +638,8 @@ pyflakes checks your code for errors. You should probably fix all of these.
 				 n
 				 (format "Line %s:" n)
 				 content)))
-	     ;; Some windows machines have another format with a column number
-	     ;; these seem to run v0.4.0
+	     ;; Sometimes there is a column number
+	     ;; it seems to be for certain kinds of errors
 	     ;; file.py:1(6): mesg
 	     ;; "file.py:\\([0-9]*\\)(\\([0-9]*\\)):\\(.*\\)"
 	     ((string-match (format "^%s:\\([0-9]*\\)(\\([0-9]*\\)):\\(.*\\)"
@@ -649,11 +649,12 @@ pyflakes checks your code for errors. You should probably fix all of these.
 	      (setq n (match-string 1 line))
 	      (setq cn (match-string 2 line))
 	      (setq content (match-string 3 line))
-	      (setq link (format "[[elisp:(progn (switch-to-buffer-other-window \"%s\")(goto-char %s)(forward-line %s)(forward-char %s))][Jump to]] %s\n"
+	      (setq link (format "[[elisp:(progn (switch-to-buffer-other-window \"%s\")(goto-char %s)(forward-line %s)(forward-char %s))][Line %s:]] %s\n"
 				 cb
 				 (org-element-property :begin eop)
 				 n
 				 cn
+				 n
 				 line)))
 	     ;; no match, just insert line
 	     (t
