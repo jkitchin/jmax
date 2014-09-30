@@ -574,6 +574,7 @@ Opens a buffer with links to what is found. This function installs pyflakes, pep
 	(temporary-file-directory ".")
         (cb (current-buffer))
 	(n) ; for line number
+	(cn) ; column number
 	(content) ; error on line
 	(pb "*org pycheck*")
 	(pyflakes-status nil)
@@ -603,7 +604,7 @@ Opens a buffer with links to what is found. This function installs pyflakes, pep
 	       (string= "python" (org-element-property :language eop)))
 
       ;; tempfile for the code
-      (setq tempfile (make-temp-file "pychecker" nil ".py"))
+      (setq tempfile (make-temp-file "org-py-check" nil ".py"))
       ;; create code file
       (with-temp-file tempfile
 	(insert (org-element-property :value eop)))
@@ -623,20 +624,40 @@ pyflakes checks your code for errors. You should probably fix all of these.
 " status))
 	  (dolist (line output)
 	    ;; get the line number
-	    (if 
-		(string-match (format "^%s:\\([0-9]*\\):\\(.*\\)"
-				      (file-name-nondirectory tempfile))
-			      line)
-		(progn
-		  (setq n (match-string 1 line))
-		  (setq content (match-string 2 line))
-		  (setq link (format "[[elisp:(progn (switch-to-buffer-other-window \"%s\")(goto-char %s)(forward-line %s))][%s]]\n"
-				     cb
-				     (org-element-property :begin eop)
-				     n
-				     (format "Line %s: %s" n content))))
-	      ;; no match, just insert line
-	      (setq link (concat line "\n")))
+	    (cond
+	     ;; this works on my Mac with pyflakes v0.8.1
+	     ;; file.py:1: mesg
+	     ((string-match (format "^%s:\\([0-9]*\\):\\(.*\\)"
+				    (file-name-nondirectory tempfile))
+			    line)
+	      (setq n (match-string 1 line))
+	      (setq content (match-string 2 line))
+	      (setq link (format "[[elisp:(progn (switch-to-buffer-other-window \"%s\")(goto-char %s)(forward-line %s))][%s]]\n"
+				 cb
+				 (org-element-property :begin eop)
+				 n
+				 (format "Line %s: %s" n content))))
+	     ;; Some windows machines have another format with a column number
+	     ;; these seem to run v0.4.0
+	     ;; file.py:1(6): mesg
+	     ;; "file.py:\\([0-9]*\\)(\\([0-9]*\\)):\\(.*\\)"
+	     ((string-match (format "^%s:\\([0-9]*\\)(\\([0-9]*\\)):\\(.*\\)"
+				    (file-name-nondirectory tempfile))
+			    line)
+	      ;; do more stuff
+	      (setq n (match-string 1 line))
+	      (setq cn (match-string 2 line))
+	      (setq content (match-string 3 line))
+	      (setq link (format "[[elisp:(progn (switch-to-buffer-other-window \"%s\")(goto-char %s)(forward-line %s)(forward-char %s))][Jump to]] %s\n"
+				 cb
+				 (org-element-property :begin eop)
+				 n
+				 cn
+				 line)))
+	     ;; no match, just insert line
+	     (t
+	      (setq link (concat line "\n"))))
+	    
 	    (insert link))))
 
       (let ((status (shell-command
