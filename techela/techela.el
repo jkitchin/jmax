@@ -560,13 +560,19 @@ a link in the heading."
     ["Table of contents" tq-toc t]
     ["Course index" tq-index t]
     ["Course agenda" tq-agenda t]
-;    ("Assignments")
+    ;;    ("Assignments") this was originally a place for a dynamic
+    ;; menu of assignments and grades, but I never got it to perform
+    ;; well. There were too many updates to the menu and it caused
+    ;; poor performance.
     ["Get grade report" tq-grade-report t]
     ["Email instructor" tq-email t]
     ["Email TAs" tq-email-tas t]
     ["Update current file" tq-update t]
     ["Send error report" tq-send-error-report t]
     ["Quit techela" tq-quit t]
+    ["Turn on pycheck" jmax-activate-pycheck t]
+    ["Turn off pycheck" jmax-deactivate-pycheck t]
+    ["Run pycheck" org-py-check t]
     ))
 
 
