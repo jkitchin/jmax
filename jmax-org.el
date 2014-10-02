@@ -563,6 +563,8 @@ FEATURE is a symbol, and it is loaded from an org-file by the name of FEATURE.or
     "--disable=unused-argument ";
     "--disable=unused-wildcard-import "
     "--disable=redefined-outer-name "
+    ;; this is triggered a lot from fsolve
+    "--disable=unbalanced-tuple-unpacking "
     )
   "List of options to use with pylint.")
 
@@ -772,5 +774,20 @@ pyflakes checks your code for errors. You should probably fix all of these.
       (org-py-check)))
   (save-window-excursion
     ad-do-it))
+
+(defun jmax-activate-pycheck ()
+  "turn on jmax-run-pycheck"
+  (interactive)
+  (setq jmax-run-pycheck t)
+  (ad-activate 'org-babel-execute:python)
+  (message "org-py-check is active"))
+
+(defun jmax-deactivate-pycheck ()
+  "turn off jmax-run-pycheck"
+  (interactive)
+  (setq jmax-run-pycheck nil)
+  (ad-deactivate 'org-babel-execute:python)
+  (message "org-py-check is deactivated for this session"))
+
 
 (message "jmax-org.el loaded")
