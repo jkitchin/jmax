@@ -685,11 +685,12 @@ pyflakes checks your code for errors. You should probably fix all of these.
 		(progn
 		  (setq n (match-string 1 line))
 		  (setq content (match-string 2 line))
-		  (setq link (format "[[elisp:(progn (switch-to-buffer-other-window \"%s\")(goto-char %s)(forward-line %s))][%s]]\n"
+		  (setq link (format "[[elisp:(progn (switch-to-buffer-other-window \"%s\")(goto-char %s)(forward-line %s))][%s]] %s\n"
 				     cb
 				     (org-element-property :begin eop)
 				     n
-				     (format "Line %s: %s" n content))))
+				     (format "Line %s: " n)
+				     content)))
 	      ;; no match, just insert line
 	      (setq link (concat line "\n")))
 	    (insert link))))
@@ -772,8 +773,26 @@ pyflakes checks your code for errors. You should probably fix all of these.
   (ignore-errors
     (when jmax-run-pycheck
       (org-py-check)))
+  
   (save-window-excursion
-    ad-do-it))
+    ;; execute the block as normal
+    ad-do-it
+    ;; modify the pycheck buffer if it exists with any errors
+    (when (get-buffer "*org pycheck*")
+      (switch-to-buffer "*org pycheck*")
+      (when (get-buffer "*Org-Babel Error Output*")
+	(let ((err (with-current-buffer "*Org-Babel Error Output*"
+		     (buffer-string))))
+	  (when (not (string= err ""))
+	
+	    (goto-char (point-min))
+	    (forward-line)
+	    (setq buffer-read-only nil)
+	    (insert "\n* Org-Babel Error Output\n")
+	    (insert err)
+	    (setq buffer-read-only t)))))
+    ))
+
 
 (defun jmax-activate-pycheck ()
   "turn on jmax-run-pycheck"
@@ -781,6 +800,7 @@ pyflakes checks your code for errors. You should probably fix all of these.
   (setq jmax-run-pycheck t)
   (ad-activate 'org-babel-execute:python)
   (message "org-py-check is active"))
+
 
 (defun jmax-deactivate-pycheck ()
   "turn off jmax-run-pycheck"
