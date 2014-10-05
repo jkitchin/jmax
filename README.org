@@ -95,7 +95,7 @@ file:jmax.el does most of the setup that is not related to org-mode. It provides
 ** Scientific manuscript preparation
 See [[./examples]] for many examples of preparing scientific manuscripts for submission to ACS, APS, Elsevier and Springer journals.
 
-We have a pretty decent way of handling citations and references provided by [[file:org-ref.el]]. This file sets up how bibtex keys are made and provides a lot of new links for org-mode for citations, references, labels, and bibliography files. 
+We have a pretty decent way of handling citations and references provided by [[file:org/org-ref.org]]. This file sets up how bibtex keys are made and provides a lot of new links for org-mode for citations, references, labels, and bibliography files. 
 
 See this example for the basics [[file:examples/technical-documents-in-org.org]].
 
