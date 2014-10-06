@@ -28,6 +28,7 @@
 (defvar ta-course-student-work-dir nil "Derived variable to the location of student work.")
 
 (defvar ta-rubrics '(("homework" . (("\"technical\"" . 0.7) ("\"presentation\"" . 0.2) ("\"typography\"" . 0.1)))
+		     ("exam" . (("\"technical\"" . 0.7) ("\"presentation\"" . 0.3)))
 		     ("participation" . (("\"participation\"" . 1.0))))
   "List of rubrics for assignments. Each element should be a list of components in alist form.")
 
@@ -395,15 +396,25 @@ solution."
        ta-course-solutions-dir
        (mygit (format "git clone %s@%s:solutions/%s"
 		      ta-course-name ta-course-server label))
-       ;; now, copy assignment org in as basis for solution
-       (copy-file (expand-file-name
-		   (concat label ".org")
-		   (expand-file-name
-		    label
-		    ta-course-assignments-dir))
-		  (expand-file-name
-		   (concat label ".org")
-		   solution-dir))))
+       
+       ;; now, copy assignment org in as basis for solution unless it now exists.
+       (let ((assign-org (expand-file-name
+			  (concat label ".org")
+			  (expand-file-name
+			   label
+			   ta-course-assignments-dir)))
+	     (soln-org (expand-file-name
+			(concat label ".org")
+			solution-dir)))
+	 ;; we use the soln-org
+	 (unless (file-exists-p soln-org)
+	   (copy-directory (expand-file-name
+			    label
+			    ta-course-assignments-dir) ;; assignment dir
+			   solution-dir
+			   nil ; keep-time
+			   t ; create parents
+			   t))))) ; copy contents only
 
     ;; open the file
     (find-file (expand-file-name
@@ -792,6 +803,11 @@ This is not fast.
 2. [[elisp:(ta-return \"%s\")][Return the assignments]]
 " label)
 		   (format "
+3. Check status
+
+
+")
+		   (format "
 3. [[elisp:ta-save-commit-and-push][Save and push this file]]" grading-file grading-file))
       ))
   (grade-mode))
@@ -855,13 +871,15 @@ import matplotlib.pyplot as plt
 grades = [x[1] for x in data if x[1] is not 'nil']
 
 plt.hist(grades, 20)
-plt.savefig('%s.png')
+plt.savefig('%s-hist.png')
 # [[./%s-hist.png]]
 
 import numpy as np
 print('Average grade = {}'.format(np.mean(grades)))
 print('Std Dev = {}'.format(np.std(grades)))
 #+END_SRC\n" label label label))
+  (previous-line 2)
+  (org-ctrl-c-ctrl-c) ; execute that code block.
   )
 
 
@@ -1021,6 +1039,15 @@ This will be in student-work/label/userid-label/userid-label.org."
   :END:
 git status:
 %s") (format "(↑%s|↓%s)" nlocal nremote) git-status))
+
+       (when (> nremote 0)
+	 (insert "#+BEGIN_SRC emacs-lisp
+ (with-current-directory ta-gitolite-admin-dir
+   (mygit \"git pull\")
+   (ta-status))
+#+END_SRC
+
+"))
        (insert "
 
 #+BEGIN_SRC emacs-lisp
@@ -1203,7 +1230,7 @@ git status:
 
 - [[elisp:ta-create-assignment][Create or edit an assignment]]
 - [[elisp:ta-create-solution][Create or edit solution]]
-- [[elisp:ta-release-solution][Release/update a solution]]  [[elisp:ta-close-solution][Close a solution]]
+- [[elisp:ta-release-solution][Release a solution (give students read-access)]]  [[elisp:ta-close-solution][Close a solution (remove read access)]]
 
 - [[elisp:ta-create-assignment-repos][Create class repos for an assignment]] (no student access until you assign it.)
 
