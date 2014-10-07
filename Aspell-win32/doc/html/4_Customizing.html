@@ -1,0 +1,919 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with LaTeX2HTML 99.2beta8 (1.43)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>4. Customizing Aspell</TITLE>
+<META NAME="description" CONTENT="4. Customizing Aspell">
+<META NAME="keywords" CONTENT="manual">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="LaTeX2HTML v99.2beta8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="manual.css">
+
+<LINK REL="next" HREF="5_Working.html">
+<LINK REL="previous" HREF="3_Basic.html">
+<LINK REL="up" HREF="manual.html">
+<LINK REL="next" HREF="5_Working.html">
+</HEAD>
+
+<BODY >
+<!--Navigation Panel-->
+<A NAME="tex2html373"
+  HREF="5_Working.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html369"
+  HREF="manual.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html363"
+  HREF="3_Basic.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html371"
+  HREF="Contents.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html374"
+  HREF="5_Working.html">5. Working With Dictionaries</A>
+<B> Up:</B> <A NAME="tex2html370"
+  HREF="manual.html">GNU Aspell 0.50.3</A>
+<B> Previous:</B> <A NAME="tex2html364"
+  HREF="3_Basic.html">3. Basic Usage</A>
+ &nbsp <B>  <A NAME="tex2html372"
+  HREF="Contents.html">Contents</A></B> 
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+<!--Table of Child-Links-->
+<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
+
+<UL>
+<LI><A NAME="tex2html375"
+  HREF="4_Customizing.html#SECTION00510000000000000000">4.1 Specifying Options</A>
+<UL>
+<LI><A NAME="tex2html376"
+  HREF="4_Customizing.html#SECTION00511000000000000000">4.1.1 At the Command Line</A>
+<UL>
+<LI><A NAME="tex2html377"
+  HREF="4_Customizing.html#SECTION00511100000000000000">4.1.1.1 Boolean</A>
+<LI><A NAME="tex2html378"
+  HREF="4_Customizing.html#SECTION00511200000000000000">4.1.1.2 Value</A>
+<LI><A NAME="tex2html379"
+  HREF="4_Customizing.html#SECTION00511300000000000000">4.1.1.3 List</A>
+</UL>
+<LI><A NAME="tex2html380"
+  HREF="4_Customizing.html#SECTION00512000000000000000">4.1.2 Via a Configuration File</A>
+<UL>
+<LI><A NAME="tex2html381"
+  HREF="4_Customizing.html#SECTION00512100000000000000">4.1.2.1 Boolean</A>
+<LI><A NAME="tex2html382"
+  HREF="4_Customizing.html#SECTION00512200000000000000">4.1.2.2 Value</A>
+<LI><A NAME="tex2html383"
+  HREF="4_Customizing.html#SECTION00512300000000000000">4.1.2.3 List</A>
+</UL>
+<LI><A NAME="tex2html384"
+  HREF="4_Customizing.html#SECTION00513000000000000000">4.1.3 Via an Environmental Variable</A>
+</UL>
+<LI><A NAME="tex2html385"
+  HREF="4_Customizing.html#SECTION00520000000000000000">4.2 The Options</A>
+<UL>
+<LI><A NAME="tex2html386"
+  HREF="4_Customizing.html#SECTION00521000000000000000">4.2.1 Dictionary Options</A>
+<LI><A NAME="tex2html387"
+  HREF="4_Customizing.html#SECTION00522000000000000000">4.2.2 Checker Options</A>
+<LI><A NAME="tex2html388"
+  HREF="4_Customizing.html#SECTION00523000000000000000">4.2.3 Filter Options</A>
+<LI><A NAME="tex2html389"
+  HREF="4_Customizing.html#SECTION00524000000000000000">4.2.4 Run-together Word Options</A>
+<LI><A NAME="tex2html390"
+  HREF="4_Customizing.html#SECTION00525000000000000000">4.2.5 Misc Options</A>
+<LI><A NAME="tex2html391"
+  HREF="4_Customizing.html#SECTION00526000000000000000">4.2.6 Aspell Utility Options</A>
+</UL>
+<LI><A NAME="tex2html392"
+  HREF="4_Customizing.html#SECTION00530000000000000000">4.3 Dumping Configuration Values</A>
+<LI><A NAME="tex2html393"
+  HREF="4_Customizing.html#SECTION00540000000000000000">4.4 Notes on various Options</A>
+<UL>
+<LI><A NAME="tex2html394"
+  HREF="4_Customizing.html#SECTION00541000000000000000">4.4.1 Notes on Various Filters and Filter Modes</A>
+<UL>
+<LI><A NAME="tex2html395"
+  HREF="4_Customizing.html#SECTION00541100000000000000">4.4.1.1 None Mode</A>
+<LI><A NAME="tex2html396"
+  HREF="4_Customizing.html#SECTION00541200000000000000">4.4.1.2 Url Filter/Mode</A>
+<LI><A NAME="tex2html397"
+  HREF="4_Customizing.html#SECTION00541300000000000000">4.4.1.3 Email Filter/Mode</A>
+<LI><A NAME="tex2html398"
+  HREF="4_Customizing.html#SECTION00541400000000000000">4.4.1.4 SGML Filter/Mode</A>
+<LI><A NAME="tex2html399"
+  HREF="4_Customizing.html#SECTION00541500000000000000">4.4.1.5 T<SMALL>E</SMALL>X Filter/Mode</A>
+</UL>
+<LI><A NAME="tex2html400"
+  HREF="4_Customizing.html#SECTION00542000000000000000">4.4.2 Notes on the Prefix Option</A>
+<LI><A NAME="tex2html401"
+  HREF="4_Customizing.html#SECTION00543000000000000000">4.4.3 Notes on Typo-Analysis and the Keyboard Definition File</A>
+<LI><A NAME="tex2html402"
+  HREF="4_Customizing.html#SECTION00544000000000000000">4.4.4 Notes on the Different Suggestion Modes</A>
+</UL></UL>
+<!--End of Table of Child-Links-->
+<HR>
+
+<H1><A NAME="SECTION00500000000000000000"></A><A NAME="customizing"></A>
+<BR>
+4. Customizing Aspell
+</H1>
+
+<P>
+The behavior of Aspell can be changed by any number of options which
+can be specified at either the command line, the environmental variable
+ASPELL_CONF, a personal configuration file, or a global configuration
+file. Options specified on the command line override options specified
+by the environmental variable. Options specified by the environmental
+variable override options specified by either of the configurations
+files. Finally options specified by the personal configuration file
+override options specified in the global configuration file. Options
+specified in the environmental variable ASPELL_CONF, a personal configuration
+file, or a global configuration file will take effect no matter how
+Aspell is used which includes being used by other applications.
+
+<P>
+Aspell has three basic type of options: <B>boolean</B>, <B>value</B>,
+and <B>list</B>. <B>Boolean</B> options are either enabled or
+disabled, <B>value</B> options take a specific value, and <B>list</B>
+options can either have entries added or removed from the list.
+
+<P>
+
+<H1><A NAME="SECTION00510000000000000000">
+4.1 Specifying Options</A>
+</H1>
+
+<P>
+
+<H2><A NAME="SECTION00511000000000000000">
+4.1.1 At the Command Line</A>
+</H2>
+
+<P>
+All options specified at the command line have the following basic
+format:
+
+<P>
+<BLOCKQUOTE>
+&#45;&#45;«option»[=«value»]
+
+</BLOCKQUOTE>
+where the '=' can be replaced by whitespace.
+
+<P>
+However some options also have single letter abbreviations of the
+form:
+
+<P>
+<BLOCKQUOTE>
+-«letter»[«optional
+whitespace»«value»]
+
+</BLOCKQUOTE>
+
+<P>
+
+<H3><A NAME="SECTION00511100000000000000">
+4.1.1.1 Boolean</A>
+</H3>
+
+<P>
+To enable a boolean option simply special the option with out any
+corresponding value. For example to ignore accents when checking words
+use ``&#45;&#45;ignore-accents''. To disable a boolean option prefix the
+option name with a ``dont-''. For example to not ignore accents
+when checking words use ``&#45;&#45;dont-ignore-accents''.
+
+<P>
+If a boolean option has a single letter abbreviation simply give the
+letter corresponding to either enabling or disabling the option with
+out any corresponding value. For example to consider run-together
+words legal use ``-C'' or to consider them illegal use ``-B''
+
+<P>
+
+<H3><A NAME="SECTION00511200000000000000">
+4.1.1.2 Value</A>
+</H3>
+
+<P>
+To specify a value option simply specify the option with its corresponding
+value. For example to set the filter mode to Tex use ``&#45;&#45;mode=tex''.
+
+<P>
+If a value option has a single letter shortcut simply specify the
+single letter short cut with its corresponding value. For example
+to use a large american dictionary use ``-d american-lrg''.
+
+<P>
+
+<H3><A NAME="SECTION00511300000000000000">
+4.1.1.3 List</A>
+</H3>
+
+<P>
+To add a value to the list prefix the option name with a ``add-''
+and then specify the value to add. For example to add the URL filter
+use ``&#45;&#45;add-filter url''. To remove a value from a list option
+prefix the option name with a ``rem-'' and then specify the value
+to remove. For example to remove the URL filter use ``&#45;&#45;rem-filter
+url''. To remove all items from a list prefix the option name with
+a ``rem-all'' without specify any value. For example to remove
+all filters use ``&#45;&#45;rem-all-filter''.
+
+<P>
+
+<H2><A NAME="SECTION00512000000000000000">
+4.1.2 Via a Configuration File</A>
+</H2>
+
+<P>
+Aspell can also accept options via a personal or global configuration
+file. The exact files to used are specified by the options <B>per-conf</B>
+and <B>conf</B> respectfully but the personal configuration file
+is normally ``.aspell.conf'' located in the HOME directory and
+the global one is normally ``aspell.conf'' which is located in
+the etc directory which is normally ``/usr/etc'' or ``/usr/local/etc''.
+To find out the particular values for your particular system use ``aspell
+dump config''.
+
+<P>
+Each line of the configuration file has the format:
+
+<P>
+
+<DL COMPACT>
+<DT>
+<DD><TT>«option»&nbsp;[«value»]</TT>
+</DD>
+</DL> There may any number of spaces between the option and the value however
+it can only be spaces, ie there is no '=' between the option name
+and the value.
+
+<P>
+Comments may also be included by preceding them with a '#' as anything
+from a ``#'' to a newline is ignored. Blank lines are also allowed.
+
+<P>
+Values set in the personal configuration file override those in the
+global file. Options specified at either the command line or via an
+environmental variable override those specified by either configuration
+file.
+
+<P>
+
+<H3><A NAME="SECTION00512100000000000000">
+4.1.2.1 Boolean</A>
+</H3>
+
+<P>
+To specify a boolean option simply include the option followed by
+a ``true'' to enable it or a ``false'' to disable it. For
+example to allow run-together words use ``run-together true''.
+
+<P>
+
+<H3><A NAME="SECTION00512200000000000000">
+4.1.2.2 Value</A>
+</H3>
+
+<P>
+To specify a value option simply include the option followed by the
+corresponding option. For example to set the default language to german
+use ``lang german''.
+
+<P>
+
+<H3><A NAME="SECTION00512300000000000000">
+4.1.2.3 List</A>
+</H3>
+
+<P>
+To add a value to the list prefix the option name with a ``add-''
+and then specify the value to add. For example to add the URL filter
+use ``add-filter url''. To remove a value from a list option prefix
+the option name with a ``rem-'' and then specify the value to
+remove. For example to remove the URL filter use ``rem-filter url''.
+To remove all items from a list prefix the option name with a ``rem-all''
+without specify any value. For example to remove all filters use ``rem-all-filter''.
+
+<P>
+
+<H2><A NAME="SECTION00513000000000000000">
+4.1.3 Via an Environmental Variable</A>
+</H2>
+
+<P>
+The environmental variable ASPELL_CONF may also be used and it overrides
+any options set in the configuration file. The format of the string
+is exactly the same as the configuration file except that semicolons
+( ; ) are used instead of newlines.
+
+<P>
+
+<H1><A NAME="SECTION00520000000000000000"></A><A NAME="options"></A>
+<BR>
+4.2 The Options
+</H1>
+
+<P>
+The following is a list of available options broken down by category.
+Each entry has the following format:
+
+<P><DL>
+<DT><STRONG>«option»[,«single letter abbreviations»]</STRONG></DT>
+<DD>(«type») «description»
+</DD>
+</DL>
+
+<P>
+Where single letter options are specified as they would appear at
+the command line, ie with the preceding dash. Boolean single letter
+options are specified in the following format:
+
+<P>
+<BLOCKQUOTE>
+-«abbreviation to enable»|-«abbreviation
+to disable»
+
+</BLOCKQUOTE>
+«Option» is one of the following:
+<B>boolean</B>, <B>string</B>, <B>file</B>, <B>dir</B>, <B>integer</B>,
+or <B>list</B>. <B>String</B>, <B>file</B>, <B>dir</B>, and
+<B>integer</B> types are all value options which can only take a
+specific type of value.
+
+<P>
+
+<H2><A NAME="SECTION00521000000000000000">
+4.2.1 Dictionary Options</A>
+</H2>
+
+<P>
+The following options may be used to control which dictionaries to
+use and how they behave (see section <A HREF="5_Working.html#dict-opts">5</A> for more information):
+
+<P>
+<DL>
+<DT><STRONG>master,-d</STRONG></DT>
+<DD><I>(string)</I> base name of the dictionary to use.
+If this option is specifed than Aspell with either use this dictionary
+or die.
+</DD>
+<DT><STRONG>dict-dir</STRONG></DT>
+<DD><I>(dir)</I> location of the main word list
+</DD>
+<DT><STRONG>lang</STRONG></DT>
+<DD><I>(string)</I> language to use, it follows the same format
+of the LANG environmental variable on most systems. It consists of
+the two letter ISO 639 language code and an optional two letter ISO
+3166 country code after a dash or underscore. The default value is
+based on the value of the LC_MESSAGES locale.
+</DD>
+<DT><STRONG>size</STRONG></DT>
+<DD><I>(string)</I> the preferred size of the word list
+</DD>
+<DT><STRONG>jargon</STRONG></DT>
+<DD><I>(string)</I> an extra information to distinguish two
+different words lists that have the same lang and size.
+</DD>
+<DT><STRONG>word-list-path</STRONG></DT>
+<DD><I>(list)</I> search path for word list information
+files
+</DD>
+<DT><STRONG>module-search-order</STRONG></DT>
+<DD><I>(list)</I> list of available modules, modules
+that come first on this list have a higher priority. Currently there
+is only one speller module.
+</DD>
+<DT><STRONG>personal,-p</STRONG></DT>
+<DD><I>(file)</I> personal word list file name
+</DD>
+<DT><STRONG>repl</STRONG></DT>
+<DD><I>(file)</I> replacements list file name
+</DD>
+<DT><STRONG>extra-dicts</STRONG></DT>
+<DD><I>(list)</I> extra dictionaries to use.
+</DD>
+<DT><STRONG>strip-accents</STRONG></DT>
+<DD><I>(boolean)</I> strip accents from all words in
+the dictionary
+</DD>
+</DL>
+
+<P>
+
+<H2><A NAME="SECTION00522000000000000000">
+4.2.2 Checker Options</A>
+</H2>
+
+<P>
+These options control the beahvior of Aspell when checking documents.
+
+<P>
+<DL>
+<DT><STRONG>ignore,-W</STRONG></DT>
+<DD>(<I>integer</I>) ignore words &lt;= n chars
+</DD>
+<DT><STRONG>ignore-case</STRONG></DT>
+<DD><I>(boolean)</I> ignore case when checking words
+</DD>
+<DT><STRONG>ignore-accents</STRONG></DT>
+<DD><I>(boolean)</I> ignore accents when checking words
+</DD>
+<DT><STRONG>ignore-repl</STRONG></DT>
+<DD><I>(boolean)</I> ignore commands to store replacement
+pairs
+</DD>
+<DT><STRONG>save-repl</STRONG></DT>
+<DD><I>(boolean)</I> save the replacement word list on save
+allkeyboard <I>(file)</I> the base name of the keyboard definition
+file to use (see section <A HREF="4_Customizing.html#typo">4.4.3</A>)
+</DD>
+<DT><STRONG>sug-mode</STRONG></DT>
+<DD><I>(mode)</I> suggestion mode = ultra | fast | normal
+| bad-spellers (see section <A HREF="4_Customizing.html#suggestion">4.4.4</A>)
+</DD>
+</DL>
+
+<P>
+
+<H2><A NAME="SECTION00523000000000000000">
+4.2.3 Filter Options</A>
+</H2>
+
+<P>
+These options modify the behavior of the various filters (see section
+<A HREF="4_Customizing.html#filter">4.4.1</A> for more information):
+
+<P>
+<DL>
+<DT><STRONG>filter</STRONG></DT>
+<DD><I>(list)</I> add or removes a filter
+</DD>
+<DT><STRONG>mode</STRONG></DT>
+<DD><I>(string)</I> sets the filter mode. Mode is one if none,
+url, email, sgml, or tex. (The short cut options '-e' may be used
+for email, '-H' for Html/Sgml, or '-t' for Tex)
+</DD>
+<DT><STRONG>encoding</STRONG></DT>
+<DD><I>(string)</I> The encoding the input text is in. Valid
+values are ``utf-8'', ``iso8859-*'', ``koi8-r'', ``viscii'',
+``cp1252'', ``machine unsigned 16'', ``machine unsigned
+32''. However, the aspell utility will currently only function correctly
+with 8-bit encodings. I hope to provide utf-8 support in the future.
+The two ``machine unsigned'' encodings are entended to be used
+by other programs using the Aspell librarary and it is unlikly the
+Aspell utility will ever support these encodings.
+</DD>
+<DT><STRONG>add|rem-email-quote</STRONG></DT>
+<DD><I>(list)</I> email quote characters
+</DD>
+<DT><STRONG>email-margin</STRONG></DT>
+<DD><I>(integer)</I> num chars that can appear before
+the quote char
+</DD>
+<DT><STRONG>sgml-check</STRONG></DT>
+<DD><I>(list)</I> sgml attributes to always check.
+</DD>
+<DT><STRONG>sgml-extension</STRONG></DT>
+<DD><I>(list)</I> sgml file extensions.
+</DD>
+<DT><STRONG>tex-command</STRONG></DT>
+<DD><I>(list)</I> T<SMALL>E</SMALL>X commands
+</DD>
+<DT><STRONG>tex-check-comments</STRONG></DT>
+<DD><I>(boolean)</I> check T<SMALL>E</SMALL>X comments
+</DD>
+</DL>
+
+<P>
+
+<H2><A NAME="SECTION00524000000000000000">
+4.2.4 Run-together Word Options</A>
+</H2>
+
+<P>
+These may be used to control the behavior of run-together words (see
+section <A HREF="7_Adding.html#run-together">7.4</A> for more information):
+
+<P>
+<DL>
+<DT><STRONG>run-together,-C|-B</STRONG></DT>
+<DD><I>(boolean)</I> consider run-together words
+legal
+</DD>
+<DT><STRONG>run-together-limit</STRONG></DT>
+<DD><I>(integer)</I> maximum numbers that can be
+strung together 
+</DD>
+<DT><STRONG>run-together-min</STRONG></DT>
+<DD><I>(integer)</I> minimal length of interior words
+</DD>
+</DL>
+
+<P>
+
+<H2><A NAME="SECTION00525000000000000000">
+4.2.5 Misc Options</A>
+</H2>
+
+<P>
+Misc. other options that don't fall under any other catagory
+
+<P>
+<DL>
+<DT><STRONG>conf</STRONG></DT>
+<DD><I>(file)</I> main configuration file
+</DD>
+<DT><STRONG>conf-dir</STRONG></DT>
+<DD><I>(dir)</I> location of main configuration file
+</DD>
+<DT><STRONG>data-dir</STRONG></DT>
+<DD><I>(dir</I>) location of language data files
+</DD>
+<DT><STRONG>local-data-dir</STRONG></DT>
+<DD><I>(dir)</I> alternative location of language data
+files. This directory is searched before <B>data-dir</B>. It defaults
+to the same directory the actual main word list is in (which is not
+necessarily dict-dir).
+</DD>
+<DT><STRONG>home-dir</STRONG></DT>
+<DD>(<I>dir</I>) location for personal files
+</DD>
+<DT><STRONG>per-conf</STRONG></DT>
+<DD><I>(file)</I> personal configuration file
+</DD>
+<DT><STRONG>prefix</STRONG></DT>
+<DD><I>(dir)</I> prefix directory
+</DD>
+<DT><STRONG>set-prefix</STRONG></DT>
+<DD><I>(boolean)</I> set the prefix based on executable
+location (only works on Win32 and when compiled with &#45;&#45;enable-win32-relocatable)
+</DD>
+</DL>
+
+<P>
+
+<H2><A NAME="SECTION00526000000000000000">
+4.2.6 Aspell Utility Options</A>
+</H2>
+
+<P>
+<DL>
+<DT><STRONG>backup,-b|-x</STRONG></DT>
+<DD><I>(boolean)</I> create a backup file by appending
+``.bak'' to the file name. (Only applies when the command is <B>check</B>)
+</DD>
+<DT><STRONG>time</STRONG></DT>
+<DD><I>(boolean)</I> time load time and suggest time in pipe
+mode.
+</DD>
+<DT><STRONG>reverse</STRONG></DT>
+<DD><I>(boolean)</I> reverse the order of the suggestions
+list.
+</DD>
+<DT><STRONG>keymapping</STRONG></DT>
+<DD><I>(string)</I> the keymapping to use. Either <B>aspell</B>
+for the default mapping or <B>ispell</B> to use the same mapping
+that the ispell utility uses.
+</DD>
+</DL>
+
+<P>
+
+<H1><A NAME="SECTION00530000000000000000">
+4.3 Dumping Configuration Values</A>
+</H1>
+
+<P>
+To find out the current value of all the options use the command ``aspell
+dump config''. This will dump the current configuration to standard
+output. The format of the contents dumped is such that it can be used
+as either the global or personal configuration file.
+
+<P>
+To find out the current value of a particular option use ``aspell
+config «option»''. This will
+print out the value of «option»
+to stdout and nothing else.
+
+<P>
+
+<H1><A NAME="SECTION00540000000000000000">
+4.4 Notes on various Options</A>
+</H1>
+
+<P>
+
+<H2><A NAME="SECTION00541000000000000000"></A><A NAME="filter"></A>
+<BR>
+4.4.1 Notes on Various Filters and Filter Modes
+</H2>
+
+<P>
+Aspell now has rudimentary filter support. You can either select from
+individual filters or chose a filter mode. To select a filter mode
+use the <B>mode</B> option. You may chose from <B>none</B>, <B>url</B>,
+<B>email</B>, <B>sgml</B>, and <B>tex</B>. The default mode
+is <B>url</B>. Individual filters can be added with the option <B>add-filter</B>
+and remove with the <B>rem-filter</B> option. The currently available
+filters are <B>url</B>, <B>email</B>, <B>sgml</B>, <B>tex</B>
+as well as a bunch of filters which translate the text from one format
+to another. 
+
+<P>
+
+<H3><A NAME="SECTION00541100000000000000">
+4.4.1.1 None Mode</A>
+</H3>
+
+<P>
+This mode is exactly what it says. It turns off all filters.
+
+<P>
+
+<H3><A NAME="SECTION00541200000000000000">
+4.4.1.2 Url Filter/Mode</A>
+</H3>
+
+<P>
+The <B>url</B> filter/mode skips over URL's, host names, and email
+addresses. Because this filter is almost always useful and rarely
+does any harm it is enabled in all modes except <B>none</B>. To
+turn it off either select the <B>none</B> mode or use <B>rem-filter</B>
+option <I>after</I> the desired mode is selected.
+
+<P>
+
+<H3><A NAME="SECTION00541300000000000000">
+4.4.1.3 Email Filter/Mode</A>
+</H3>
+
+<P>
+The <B>email</B> filter/mode skips over quoted text. It currently
+does not support skipping over headers however a future version should.
+In the mean time I suggest you use Aspell with Newsbody which can
+be found at <TT><A NAME="tex2html11"
+  HREF="http://home.worldonline.dk/~byrial/newsbody/">http://home.worldonline.dk/~byrial/newsbody/</A></TT>. The
+option <B>email-skip</B> controls the number of characters that
+can appear before the email quote char, the default is 10. The option
+<B>add|rem-email-quote</B> controls the characters that are considered
+quote characters, the default is ``>' and '|'.
+
+<P>
+
+<H3><A NAME="SECTION00541400000000000000"></A><A NAME="sgml"></A>
+<BR>
+4.4.1.4 SGML Filter/Mode
+</H3>
+
+<P>
+The <B>sgml</B> filter/mode will skip over sgml commands. It currently
+does not handle nested &lt; &gt; unless they are in quotes. It also does
+it handle the null end tag (net) minimization feature of sgml such
+as 
+
+<P>
+<BLOCKQUOTE>
+&lt;emphasis/important/
+
+</BLOCKQUOTE>
+This filter will also translate sgml characters of the form ``&amp;#num;''.
+Other sgml characters such as ``&amp;amp;'' will simply be skiped
+over so that the word ``amp'' for example will not be spell checked.
+Eventually full support for properly translating sgml characters will
+be added.
+
+<P>
+The option <B>add|rem-sgml-check</B> controls which sgml tags should
+always be checked. The default is ``alt''.
+
+<P>
+The option <B>add|rem-sgml-extension</B> controls which file extensions
+are recognized as sgml/html files. The default is html, htm, php,
+and sgml. The extension are not case sensitive so extensions like
+.HTM will also be recognized.
+
+<P>
+
+<H3><A NAME="SECTION00541500000000000000">
+4.4.1.5 T<SMALL>E</SMALL>X Filter/Mode</A>
+</H3>
+
+<P>
+The <B>tex</B> (all lowercase) filter/mode skips over T<SMALL>E</SMALL>X commands
+and parameters and/or options to certain command. It also skips over
+T<SMALL>E</SMALL>X comments by default. The option <B>[dont-]tex-check-comments</B>
+controls whether or not aspel will skip over T<SMALL>E</SMALL>X comments. The
+option <B>add|rem-tex-command</B> controls which T<SMALL>E</SMALL>X commands
+should have certain parameters and/or options also skipped over. Commands
+that are not specified will have all there parameters and/or options
+checked. The format for each item is
+
+<P>
+<BLOCKQUOTE>
+«command»&nbsp;&nbsp;«a
+list of p,P,o and Os»
+
+</BLOCKQUOTE>
+The first item is simple the command name. The second item controls
+which parameters to skip over. A 'p' skips over a parameter while
+a 'P' won't. Similar an 'o' will skip over an optional parameter while
+a 'O' won't. The first letter on the list will apply to the first
+parameter, the second letter will apply to the second parameter etc.
+If there are more parameters than letters Aspell will simply check
+them as normal. For example the option
+
+<P>
+<BLOCKQUOTE>
+add-tex-command rule pp
+
+</BLOCKQUOTE>
+will skip over the first two parameters of the ``rule'' command
+while the option
+
+<P>
+<BLOCKQUOTE>
+add-tex-command foo Pop
+
+</BLOCKQUOTE>
+will <I>check</I> the first parameter of the ``foo'' command,
+skip over the next optional parameter, if it is present, and will
+skip over the second parameter -- even if the optional parameter
+is not present -- and will check any additional parameters.
+
+<P>
+A'*' at the end of the command is simply ignored. For example the
+option
+
+<P>
+<BLOCKQUOTE>
+enlargethispage p
+
+</BLOCKQUOTE>
+will ignore the first parameter in both enlargethispage and enlargethispage*.
+
+<P>
+To remove a command simple use the <B>rem-tex-command</B> option.
+For example
+
+<P>
+<BLOCKQUOTE>
+rem-tex-command foo
+
+</BLOCKQUOTE>
+will remove the command foo, if present, from the list of T<SMALL>E</SMALL>X commands.
+
+<P>
+
+<H2><A NAME="SECTION00542000000000000000">
+4.4.2 Notes on the Prefix Option</A>
+</H2>
+
+<P>
+The <B>prefix</B> option is there to allow Aspell to easily be relocated.
+Changing <B>prefix</B> will change all directory names relative
+to the new prefix that are not explicitly set. For example if <B>prefix</B>
+was ``/usr/local/aspell'' and <B>dict-dir</B> has a default
+value of ``/usr/local/aspell/dict'' than changing <B>prefix</B>
+to ``/opt/aspell'' will also change the default value of <B>dict-dir</B>
+to ``/opt/aspell/dict''. Note that modifying prefix will only
+effect the default compiled in values of directories. If a directory
+option is explicitly given a value than changing the value of <B>prefix</B>
+has no effect on that directory option.
+
+<P>
+
+<H2><A NAME="SECTION00543000000000000000"></A><A NAME="typo"></A>
+<BR>
+4.4.3 Notes on Typo-Analysis and the Keyboard Definition File
+</H2>
+
+<P>
+Aspell .33 and better will, in general, give a higher priority to
+certain misspelling which are likely to be due to typos such as ``teh''
+instead of ``the'' or ``hapoy'' instead of ``happy''.
+However in order to do this well Aspell needs to know the layout of
+the keyboard. The keyboard definition file simply identifies keys
+that are right next to each other. The file has an extension of .kbd
+and each line consists of two letters corresponding to two keys that
+are right next to each other. For example the line ``as'' will
+indicate that '<TT><B>a</B></TT>' and '<TT><B>s</B></TT>' are
+right next to each other. If ``as'' is listed as a entry it is
+not necessary to list ``sa'' as an entry as that will be done
+automatically. Also by ``right next to each other'' I mean to
+keys that are close enough together that it is easy to type one instead
+of the other. On most keyboards this means keys that are to the left
+or to the right of each other and not <I>keys</I> that are below or
+above it.
+
+<P>
+The default for this option is normally ``standard''. However
+the default can be changed via the language data file. The normal
+default, ``standard'', should work well for most QWERTY like keyboard
+layouts. It may need minor adjusting for foreign keyboards. The ``dvorak''
+option can for a Dvorak layout. When creating a keyboard definition
+file for a foreign language please keep in mind that Aspell completely
+ignores accents when scoring words so that the key '<TT><B>o</B></TT>'
+and '<TT><B>ö</B></TT>' will appear to be the same key to aspell
+even if they are in fact separate keys on your keyboard.
+
+<P>
+
+<H2><A NAME="SECTION00544000000000000000"></A><A NAME="suggestion"></A>
+<BR>
+4.4.4 Notes on the Different Suggestion Modes
+</H2>
+
+<P>
+In order to understand what these suggestion modes do, a basic understanding
+of how aspell works is required. See section <A HREF="8_How.html#works">8</A> for that.
+The suggestion modes are as follows.
+
+<P>
+<DL>
+<DT><STRONG>ultra</STRONG></DT>
+<DD>This method will use the fastest method available to come
+up with decent suggestions. This currently means that it will look
+for soundslikes within one edit distance apart without doing any typo
+analysis. It is slower than Ispell by a factor of 1.5 to 2 when a
+single word list is used. It speed is only minor affected by the size
+of the word list, if at all, but it is strongly effected by the number
+of word lists use. In this mode Aspell gets about 87% of the words
+from my small test kernel of misspelled words. (Go to <TT><A NAME="tex2html12"
+  HREF="http://aspell.net/test">http://aspell.net/test</A></TT>for more info on the test kernel as well as comparisons of this version
+of Aspell with previous versions and other spell checkers.)
+</DD>
+<DT><STRONG>fast</STRONG></DT>
+<DD>This method is like ultra except that it also performs typo
+analysis unless it is turned off by setting the keyboard to none.
+The typo analysis brings words which are likely to be due to typos
+to the beginning of the list but slows things down by a factor of
+about two. This mode should get around the same number of words that
+the ultra method does.
+</DD>
+<DT><STRONG>normal</STRONG></DT>
+<DD>This method looks for soundslikes within two edit distance
+apart and perform typo-analysis unless it is turned off. Is is around
+10 times slower than fast mode with the english word list but returns
+better suggestions. Its speed is directly proportional to the size
+of the word list. This mode gets 93% of the words.
+</DD>
+<DT><STRONG>bad-spellers</STRONG></DT>
+<DD>This method also looks for soundslikes within two edit
+distances apart but is more tailored for the bad speller where as
+fast or normal are more tailed to strike a good balance between typos
+and true misspellings. This mode never performs typo-analysis and
+returns a <I>huge</I> number of words for the really bad spellers
+who can't seam to get the spelling anything close to what it should
+be. If the misspelled word looks anything like the correct spelling
+it is bound to be found <I>somewhere</I> on the list of 100 or more
+suggestions. This mode gets 98% of the words.
+</DD>
+</DL>
+
+<P>
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html373"
+  HREF="5_Working.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html369"
+  HREF="manual.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html363"
+  HREF="3_Basic.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html371"
+  HREF="Contents.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html374"
+  HREF="5_Working.html">5. Working With Dictionaries</A>
+<B> Up:</B> <A NAME="tex2html370"
+  HREF="manual.html">GNU Aspell 0.50.3</A>
+<B> Previous:</B> <A NAME="tex2html364"
+  HREF="3_Basic.html">3. Basic Usage</A>
+ &nbsp <B>  <A NAME="tex2html372"
+  HREF="Contents.html">Contents</A></B> 
+<!--End of Navigation Panel-->
+<ADDRESS>
+Thorsten Maerz
+2002-12-18
+</ADDRESS>
+</BODY>
+</HTML>

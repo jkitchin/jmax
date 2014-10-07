@@ -1,0 +1,184 @@
+next up previous contents
+Next: 4. Customizing Aspell Up: GNU Aspell 0.50.3 Previous: 2. Getting
+Started   Contents
+
+Subsections
+
+  * 3.1 Spellchecking Individual Files
+  * 3.2 Using Aspell with other Applications
+      + 3.2.1 With Applications that Expect Ispell
+      + 3.2.2 With Emacs and Xemacs
+      + 3.2.3 With LyX
+      + 3.2.4 With VIM
+      + 3.2.5 With Pine
+
+--------------------------------------------------------------------------
+
+3. Basic Usage
+
+For a quick reference on the Aspell utility use the command "aspell
+--help".
+
+
+3.1 Spellchecking Individual Files
+
+To use Aspell to spellcheck a file use:
+
+    aspell check [«options»] «filename»
+
+at the command line where «filename» is the file you want to check and «
+options» is any number of optional options. Some of the more useful ones
+include:
+
+--mode=«mode»
+    the mode to use when checking files. The available modes are none,
+    url, email, sgml, or tex. See section 4.4.1 for more informations on
+    the various modes.
+--dont-backup
+    don't create a backup file.
+--sug-mode=«mode»
+    the suggestion mode to use where mode is one of ultra, fast, normal,
+    or bad-spellers. See section 4.4.4 for more information on these
+    modes.
+--master=«name»
+    the main dictionary to use.
+--keymapping=«name»
+    the keymapping to use. Either aspell for the default mapping or ispell
+    to use the same mapping that the ispell utility uses.
+
+Please see Chapter 4 for more information on the available options.
+
+For example to check the file foo.txt:
+
+    aspell check foo.txt
+
+and to check the file foo.txt using the bad-spellers suggestion mode and
+the large American English dictionary:
+
+    aspell check --sug-mode=bad-spellers --master=american-lrg foo.txt
+
+If the mode option is not given then aspell will use the extension of the
+file to determine the current mode. If the extension is .tex, then TEX
+mode will be uses, if the extension is .html, .htm, .php, or .sgml it will
+check the file in sgml mode, otherwise it will use url mode. These
+extensions can be changed via the tex-extension and sgml-extension options
+respectfully. See chapter 4.4.1 for more information on the various modes
+that can be used.
+
+If Aspell was compiled with curses support and the TERM environmental
+variable is set to a capable terminal type than Aspell will use a nice
+full screen interface. Otherwise it will use a simpler "dumb" terminal
+interface where the misspelled word is surrounded by two '*'. In either
+case the interface should be self explanatory.
+
+3.2 Using Aspell with other Applications
+
+3.2.1 With Applications that Expect Ispell
+
+Aspell can be used as a drop in replacement for Ispell for programs that
+use Ispell through a pipe such as Emacs and LyX. It can also be used with
+programs that use simple call the ispell command and expect the original
+file to be overwritten with the corrected version. It support the basic
+features of Ispell, however it does not currently have a Nroff mode so
+there may be situations in which you still wish to use Ispell.
+Nevertheless, I have been using Aspell for Xemacs and LyX since the middle
+of September of 1998 with out any problems.
+
+If you do not have Ispell installed on your system and have installed the
+Ispell compatibly script than you should not need to do anything as most
+applications will that expect Ispell will work as expected with Aspell via
+the Ispell compatibility script.
+
+Otherwise, the recommended way to use Aspell as a replacement for ispell
+is to change the Ispell command from within the program being used. If the
+program uses ispell in pipe mode simple change ispell to aspell. If the
+program calls the ispell command to check the file change "ispell" with
+"aspell check".
+
+If that is impossible and the program uses ispell through a pipe than the
+run-with-aspell script can be used for programs using ispell in pipe mode.
+The format of the script is:
+
+    run-with-aspell «command»
+
+where «command» is the name of the program with any optional arguments.
+
+The old method of mapping Ispell to Aspell is discouraged because it can
+create compatibility problems with programs that actually require Ispell
+such as Ispell's own scripts.
+
+3.2.2 With Emacs and Xemacs
+
+The easiest way to use Aspell with Emacs or Xemacs is to add this line:
+
+    (setq-default ispell-program-name "aspell")
+
+to the end of your .emacs file.
+
+For some reason version 3.0 of ispell.el (the lisp program that (x)emacs
+uses) want to reverse the suggestion list. To fix this add this line:
+
+    (setq-default ispell-extra-args '("--reverse"))
+
+after the previous line in your .emacs file and it should solve the
+problem.
+
+Ispell.el, version 3.1 (December 1, 1998) and better, has the list
+reversing problem fixed. You can find it at http://www.kdstevens.com/
+~stevens/ispell-page.html.
+
+3.2.3 With LyX
+
+Version 1.0 of LyX provides support for Aspell learning for users mistake
+feature.
+
+To use aspell with LyX 1.0 either change the spell_command option in the
+lyxrc file or use the run-with-aspell utility.
+
+3.2.4 With VIM
+
+(The following section was written by "R. Marc", rmarc at copacetic net.)
+
+To use aspell in vim you simply need to add the following line to your
+.vimrc file:
+
+    map ^T :w!<CR>:!aspell check %<CR>:e! %<CR>
+
+I use <Ctrl-T> since that's the way you spell check in pico. In order to
+add a control character to your .vimrc you must type <Ctrl-v> first. In
+this case <Ctrl-v><Ctrl-t>.
+
+A more useful way to use Aspell, IMHO, is in combination with newsbody (
+http://www.image.dk/~byrial/newsbody/) which is how I use it since vim is
+my editor for my mailer and my news reader.
+
+    map ^T \1\2<CR>:e! %<CR>
+   
+    map \1 :w!<CR>
+   
+    map \2 :!newsbody -qs -n % -p aspell check \%f<CR>
+
+3.2.5 With Pine
+
+To use aspell in pine simply change the option speller to
+
+    aspell --mode=email check
+
+To change the speller option go to the main menu. Type S for setup, C for
+config, then W for where is. Type in speller as the word to find. The
+speller option should be highlighted now. Hit enter, type in the above
+line, and hit enter again. Then type E for exit setup and Y to save the
+change.
+
+If you have a strong desire to check other peoples comments change speller
+to
+
+    aspell check
+
+instead which will avoid switching aspell into email mode.
+
+--------------------------------------------------------------------------
+next up previous contents
+Next: 4. Customizing Aspell Up: GNU Aspell 0.50.3 Previous: 2. Getting
+Started   Contents
+Thorsten Maerz 2002-12-18

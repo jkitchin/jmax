@@ -1,0 +1,306 @@
+next up previous contents
+Next: 3. Basic Usage Up: GNU Aspell 0.50.3 Previous: 1. Introduction   
+Contents
+
+Subsections
+
+  * 2.1 Requirements
+  * 2.2 Obtaining
+  * 2.3 Support
+  * 2.4 Helping Out
+  * 2.5 Compiling & Installing
+      + 2.5.1 Generic Install Instructions
+      + 2.5.2 General Problems
+      + 2.5.3 Curses Notes
+      + 2.5.4 Upgrading from Aspell .33/Pspell .12
+      + 2.5.5 Upgrading from a pre-release snapshot
+      + 2.5.6 Win32 Notes
+          o 2.5.6.1 Getting
+          o 2.5.6.2 Building
+          o 2.5.6.3 (PD)Curses
+          o 2.5.6.4 Directories
+          o 2.5.6.5 Installer
+          o 2.5.6.6 Win32 consoles
+  * 2.6 Using aspell-import
+
+--------------------------------------------------------------------------
+
+2. Getting Started
+
+
+2.1 Requirements
+
+Aspell requires gcc 2.95 (or better) as the C++ compiler. Other C++
+compilers should work with some effort. Other C++ compilers for mostly
+POSIX compliant (Unix, Linux, BeOS, CygWin) systems should work with out
+any major problems provided that the compile can handle all of the
+advanced C++ features Aspell uses. C++ compilers for non-Unix systems
+might work but it will take some work. Aspell at very least requires a
+Unix-like environment (sh, grep, sed, tr, etc...) in order to build.
+Aspell also uses a few POSIX functions when necessary.
+
+2.2 Obtaining
+
+The latest version can always be found at GNU Aspell's home page at http:/
+/aspell.net.
+
+2.3 Support
+
+Support for Aspell can be found on the Aspell mailing lists. Instructions
+for joining the various mailing lists (and an archive of them) can be
+found off the Aspell home page at http://aspell.net.
+
+2.4 Helping Out
+
+I have very little time to work on Aspell so I desperately need other
+people to help with the development of Aspell. There are a lot of things
+that need to be done before I consider Aspell complete. See section B.1
+for a list of them. I would really appreciate some help with doing them.
+If you are interested in helping with one of them please let me know.
+
+I am also looking for someone to eventually take over the maintenance and
+development of Aspell. If you are interested please contact me directly.
+
+2.5 Compiling & Installing
+
+2.5.1 Generic Install Instructions
+
+    ./configure && make
+
+For additional configure options type ./configure --help. You can control
+what C++ compiler is used by setting the environmental variable CXX before
+running configure and you can control what flags are passed to the C++
+compile via the environmental variable CXXFLAGS. Static libraries are
+disabled by default since static libraries will not work right due to the
+mixing of C and C++. When a C program links with the static libraries in
+Aspell it is likely to crash because Aspell's C++ objects are not getting
+initialized correctly. However, if for some reason you want them, you can
+enable them via --enable-static.
+
+Aspell should then compile with out any additional user intervention. If
+you run into problems please first check the sections below as that might
+solve your problem.
+
+To install the program simply type
+
+    make install
+
+After Aspell is installed at least one dictionary needs to be installed.
+You can find them at http://aspell.net/. The "aspell" program must be in
+your path in order for the dictionaries to install correctly.
+
+If you do not have Ispell or the traditional Unix "spell" utility
+installed on your system than you should also copy the compatibly scripts
+"ispell" and "spell" located in the scripts/ directory into your
+binary directory which is usually /usr/local/bin so that programs that
+expect ispell or spell command will work correctly.
+
+2.5.2 General Problems
+
+Aspell does not use a released version of GNU Libtool. If you have a need
+to modify configure.ac or any of the Makefile.am's you should install the
+CVS version of libtool.
+
+2.5.3 Curses Notes
+
+If you are having problems compiling termios.cc than the most likely
+reason is due to incompatibilities with the curses implementation on your
+system. If this is the case than you can explicitly disable the curses
+library with --disable-curses. By doing this you will lose the nice full
+screen interface but hopefully you will be able to at least get Aspell to
+compile correctly.
+
+If the curses library is installed in a non-standard location than you can
+specify the library and include directory with --enable-curses=«lib» and
+--enable-curses-include=«dir». Lib can either be the complete path of the
+library (for example "/usr/local/curses/libcurses.a"), the name of the
+library (for example "ncurses") or a combined location and library in
+the form "-L«lib dir» -l«lib»" (for example "-L/usr/local/ncurses/lib
+-lncurses"). Dir is the location of the curses header files (for example
+"/usr/local/ncurses/include").
+
+2.5.4 Upgrading from Aspell .33/Pspell .12
+
+Aspell has undergone an extremely large number of changes since the
+previous Aspell/Pspell release. For one thing Pspell has been merged with
+Aspell so there in no longer two separate libraries you have to worry
+about.
+
+Because of the massive changes between Aspell/Pspell and Aspell 0.50 you
+may want to clean out the old files before installing the the new Aspell.
+To do so do a "make uninstall" in the original Aspell and Pspell source
+directories.
+
+The way dictionaries are handled has also changed. This includes a change
+in the naming conventions of both language names and dictionaries. Due to
+the language name change, your old personal dictionaries will not be
+recognized. However, you can import the old dictionaries by running the
+"aspell-import" script. This also means that dictionaries designed to
+work with older versions of Aspell are not likely to function correctly.
+Fortunately new dictionary packages are available for most languages. You
+can find them off of the Aspell home page at http://aspell.net.
+
+The Pspell ABI is now part of Aspell except that the name of everything
+has changed due to the renaming of Pspell to Aspell. In particular please
+note the following name changes:
+
+    pspell -> aspell
+    manager -> speller
+    emulation -> enumeration
+    master_word_list -> main_word_list
+
+Please also note that the name of the language-tag option has changed to 
+lang. However, for backward compatible the language-tag option will still
+work.
+
+However, you should also be able to build applications that require Pspell
+with the new Aspell as a backward compatibility header file is provided.
+
+Due to a change in the way dictionaries are handled, scanning for .pwli
+files in order to get find out which dictionaries are available will no
+longer work. This means that programs that relied on this technique may
+have problems finding dictionaries. Fortunately, GNU Aspell now provided a
+uniform way to list all installed dictionaries via the C API. See the file
+"list-dicts.c" in the examples/ directory for an example of how to due
+this. Unfortunately there is isn't any simply way to find out which
+dictionaries are installed which will work with both the old Aspell/Pspell
+and the new GNU Aspell.
+
+2.5.5 Upgrading from a pre-release snapshot
+
+At the last minute I decided to merge the "speller-util" program into
+the main "aspell" program. You may right to remove that speller-util
+program to avoid confusion. This also means that dictionaries designed to
+work with the snapshot will no longer work with the official release.
+
+2.5.6 Win32 Notes
+
+2.5.6.1 Getting
+
+The latest version of the native Aspell/Win32 port can be found at http://
+aspell.net/win32.
+
+2.5.6.2 Building
+
+There are two basically different ways of building ASpell using GCC for
+Win32: You can either use the Cygwin compiler, which will produce binaries
+that depend on the posix layer in cygwin1.dll. The other way is using
+MinGW GCC, those binaries use the native C runtime from Microsoft
+(MSVCRT.DLL). If you intend to use or link against the Aspell libraries
+using a native Win32 compiler (e.g. MS Visual C++), you will need the
+MinGW built ones to avoid problems caused by the different runtime
+libraries.
+
+Building Aspell using Cygwin: This works exactly like on other posix
+compatible systems using the "configure && make && make install" cycle.
+Some versions of Cygwin GCC will fail to link, this is caused by an
+incorrect libstdc++.la in the /lib directory. After removing or renaming
+this file, the build progress should work (GCC-2.95 and GCC-3.x should
+work).
+
+Building Aspell using MinGW: To compile Aspell with the MinGW compiler,
+you will need at least GCC-3.2 (as shipped with MinGW-2.0.3) and some GNU
+tools like rm and cp. The origin of those tools doesn't matter, it has
+shown to work with any tools from MinGW/MSys, Cygwin or Linux. To build
+Aspell, move into the win32 subdirectory and type "make". You can enable
+some additional build options by either commenting out the definitions at
+the head of the Makefile or passing those values as environment variables
+or at the make command line. Following options are supported:
+
+DEBUGVERSION
+    If set to "1", the binaries will include debugging information
+    (resulting in a much bigger size).
+CURSESDIR
+    Enter the path to the pdcurses library here, in order to get a nicer
+    console interface (see below).
+MSVCLIB
+    Enter the filename of MS lib.exe here, if you want to build libraries
+    that can be imported from MS Visual C++.
+WIN32_RELOCATABLE
+    If set to "1", Aspell will detect the prefix from the path where the
+    DLL resides (see below for further datails).
+TARGET
+    Sets a prefix to be used for cross compilation (e.g. "/usr/local/bin/
+    i586-mingw32msvc-" to cross compile from linux).
+
+There are also a MinGW compilers available for Cygwin and Linux, both
+versions are able to compile Aspell using the prebuilt Makefile. While the
+Cygwin port automatically detects the correct compiler, the Linux version
+depends on setting the "TARGET" variable in the Makefile (or environment)
+to the correct compiler prefix.
+
+Other compilers may work. There is a patch for MS Visual C++ 6.0 available
+at ftp://ftp.gnu.org/gnu/aspell, but it needs a lot of changes to the
+Aspell sources. It has also been reported that the Intel C++ compiler can
+be used for compilation.
+
+2.5.6.3 (PD)Curses
+
+In order to get the nice full screen interface when spell checking files a
+curses implementation that does not require Cygwin is required. The
+PDCurses (http://pdcurses.sourceforge.net) implementation is known to
+work, other implementations may work however they have not been tested.
+See the previous section for information on specifying the location of the
+curses library and include file.
+
+Curses notes:
+
+  * PDcurses built with MinGW needs to be compiled with -DPDC_STATIC_BUILD
+    to avoid duplicate declaration of DllMain when compiling aspell.exe.
+  * The curses enabled version can cause trouble in some shells (MSys
+    rxvt, emacs) and will produce errors like "initscr() LINES=1 COLS=1:
+    too small". Use a non-curses version for those purposes.
+
+2.5.6.4 Directories
+
+If Aspell is compiled with WIN32_RELOCATABLE=1, it can be run from any
+directory: It will set «prefix» according to its install location
+(assuming it resides in «prefix»\bin). Your personal wordlists will be
+saved in the «prefix» directory with their names changed from ".aspell.
+<lang>.*" to "<lang>.*" (you can override the path by setting the HOME
+environment variable).
+
+2.5.6.5 Installer
+
+The installer registers the DLLs as shared libraries, you should increase
+the reference counter to avoid the libraries being uninstalled if your
+application still depends on them (and decrease it again when uninstalling
+your program). The reference counters are located under:
+
+HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\SharedDLLs
+
+The install location and version numbers are stored under
+
+HKLM\SOFTWARE\Aspell
+
+2.5.6.6 Win32 consoles
+
+The console uses a different encoding than GUI applications, changing this
+to to a Windows encoding (e.g. 1252) is not supported on Win9x/Me. On
+WinNT (and later) those codepages can be set by first changing the console
+font to "lucida console", then changing the codepage using "chcp
+1252".
+
+Some alternative shells (e.g. MSys' rxvt or Cygwin's bash) do a codepage
+conversion (if correctly set up), so running Aspell inside those shells
+might be a workaround for Win9x.
+
+2.6 Using aspell-import
+
+The aspell-import Perl script will look for old personal dictionaries and
+will import them into GNU Aspell. It will look for both Ispell and Aspell
+ones. To use it just run it from the command prompt. If you get an error
+about /usr/bin/perl not being found than instead try "perl «bindir»/
+aspell-import". When running the script if you get a message like:
+
+    Error: No word lists can be found for the language "de".
+
+This means that you have not installed support for the given language, in
+this case "de" for German. To rectify the situation download and install
+a dictionary designed to work with GNU Aspell 0.50 or better.
+
+--------------------------------------------------------------------------
+next up previous contents
+Next: 3. Basic Usage Up: GNU Aspell 0.50.3 Previous: 1. Introduction   
+Contents
+Thorsten Maerz 2002-12-18

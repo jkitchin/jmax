@@ -1,0 +1,64 @@
+next up previous contents
+Next: E. Copyright Up: GNU Aspell 0.50.3 Previous: C. Credits   Contents
+
+
+D. Glossary and References
+
+affix
+    in grammar, a word element that, when added to a word, modifies its
+    meaning or function; prefix, infix, or suffix.
+Debian
+    A 100% Open Source Linux distribution http://www.debian.org
+DICT protocol
+    A TCP transaction based query/response protocol that allows a client
+    to access dictionary definitions from a set of natural language
+    dictionary databases. http://www.dict.org/
+Gnome
+    A project to build a complete, user-friendly desktop based entirely on
+    free software. http://www.gnome.org/
+GTK+
+    A library for creating graphical user interfaces for the X Window
+    System. It is designed to be small, efficient, and flexible. http://
+    www.gtk.org/
+GUI
+    Graphics User Interface
+Ispell.el
+    Emacs interface for ispell. http://www.kdstevens.com/~stevens/
+    ispell-page.html
+Ispell
+    An international spell checker which is just about the only decent
+    Open Source spell checker out there. (except Aspell of course). http:/
+    /fmg-www.cs.ucla.edu/geoff/ispell.html
+Ispell -a
+    An Ispell mode that is designed to be used by other applications
+    though a pipe.
+KDE
+    A powerful graphical desktop environment for Unix workstations. http:/
+    /www.kde.org
+Linux
+    A Open Source version of Unix which runs on many platforms. http://
+    www.linux.org/
+LyX
+    An What You See is What You Mean document editor for the X
+    environment, http://www.lyx.org
+Open Source
+    Software where the source code is available for anyone to extend or
+    modify. http://www.opensource.org/
+Red Hat
+    A commercial Linux distribution. http://www.redhat.com
+RPM
+    Red Hat's packing format also used by other Linux distributions.
+STL
+    Standard Temple Library. A C++ library of container classes,
+    algorithms, and iterators.
+SGI STL
+    Silicon Graphics implantation of the STL. http://www.sgi.com/
+    Technology/STL/
+STLPort
+    A port of SGI STL designed to run on compilers that don't support all
+    the latest features of C++. http://corp.metabyte.com/~fbp/stl/
+
+--------------------------------------------------------------------------
+next up previous contents
+Next: E. Copyright Up: GNU Aspell 0.50.3 Previous: C. Credits   Contents
+Thorsten Maerz 2002-12-18

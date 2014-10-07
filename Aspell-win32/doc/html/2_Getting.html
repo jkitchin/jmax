@@ -1,0 +1,559 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with LaTeX2HTML 99.2beta8 (1.43)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>2. Getting Started</TITLE>
+<META NAME="description" CONTENT="2. Getting Started">
+<META NAME="keywords" CONTENT="manual">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="LaTeX2HTML v99.2beta8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="manual.css">
+
+<LINK REL="next" HREF="3_Basic.html">
+<LINK REL="previous" HREF="1_Introduction.html">
+<LINK REL="up" HREF="manual.html">
+<LINK REL="next" HREF="3_Basic.html">
+</HEAD>
+
+<BODY >
+<!--Navigation Panel-->
+<A NAME="tex2html324"
+  HREF="3_Basic.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html320"
+  HREF="manual.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html314"
+  HREF="1_Introduction.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html322"
+  HREF="Contents.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html325"
+  HREF="3_Basic.html">3. Basic Usage</A>
+<B> Up:</B> <A NAME="tex2html321"
+  HREF="manual.html">GNU Aspell 0.50.3</A>
+<B> Previous:</B> <A NAME="tex2html315"
+  HREF="1_Introduction.html">1. Introduction</A>
+ &nbsp <B>  <A NAME="tex2html323"
+  HREF="Contents.html">Contents</A></B> 
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+<!--Table of Child-Links-->
+<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
+
+<UL>
+<LI><A NAME="tex2html326"
+  HREF="2_Getting.html#SECTION00310000000000000000">2.1 Requirements</A>
+<LI><A NAME="tex2html327"
+  HREF="2_Getting.html#SECTION00320000000000000000">2.2 Obtaining</A>
+<LI><A NAME="tex2html328"
+  HREF="2_Getting.html#SECTION00330000000000000000">2.3 Support</A>
+<LI><A NAME="tex2html329"
+  HREF="2_Getting.html#SECTION00340000000000000000">2.4 Helping Out</A>
+<LI><A NAME="tex2html330"
+  HREF="2_Getting.html#SECTION00350000000000000000">2.5 Compiling &amp; Installing</A>
+<UL>
+<LI><A NAME="tex2html331"
+  HREF="2_Getting.html#SECTION00351000000000000000">2.5.1 Generic Install Instructions</A>
+<LI><A NAME="tex2html332"
+  HREF="2_Getting.html#SECTION00352000000000000000">2.5.2 General Problems</A>
+<LI><A NAME="tex2html333"
+  HREF="2_Getting.html#SECTION00353000000000000000">2.5.3 Curses Notes</A>
+<LI><A NAME="tex2html334"
+  HREF="2_Getting.html#SECTION00354000000000000000">2.5.4 Upgrading from Aspell .33/Pspell .12</A>
+<LI><A NAME="tex2html335"
+  HREF="2_Getting.html#SECTION00355000000000000000">2.5.5 Upgrading from a pre-release snapshot</A>
+<LI><A NAME="tex2html336"
+  HREF="2_Getting.html#SECTION00356000000000000000">2.5.6 Win32 Notes</A>
+<UL>
+<LI><A NAME="tex2html337"
+  HREF="2_Getting.html#SECTION00356100000000000000">2.5.6.1 Getting</A>
+<LI><A NAME="tex2html338"
+  HREF="2_Getting.html#SECTION00356200000000000000">2.5.6.2 Building</A>
+<LI><A NAME="tex2html339"
+  HREF="2_Getting.html#SECTION00356300000000000000">2.5.6.3 (PD)Curses</A>
+<LI><A NAME="tex2html340"
+  HREF="2_Getting.html#SECTION00356400000000000000">2.5.6.4 Directories</A>
+<LI><A NAME="tex2html341"
+  HREF="2_Getting.html#SECTION00356500000000000000">2.5.6.5 Installer</A>
+<LI><A NAME="tex2html342"
+  HREF="2_Getting.html#SECTION00356600000000000000">2.5.6.6 Win32 consoles</A>
+</UL>
+</UL>
+<LI><A NAME="tex2html343"
+  HREF="2_Getting.html#SECTION00360000000000000000">2.6 Using aspell-import</A>
+</UL>
+<!--End of Table of Child-Links-->
+<HR>
+
+<H1><A NAME="SECTION00300000000000000000">
+2. Getting Started</A>
+</H1>
+
+<P>
+
+<H1><A NAME="SECTION00310000000000000000"></A><A NAME="reqs"></A>
+<BR>
+2.1 Requirements
+</H1>
+
+<P>
+Aspell requires gcc 2.95 (or better) as the C++ compiler. Other C++
+compilers should work with some effort. Other C++ compilers for mostly
+POSIX compliant (Unix, Linux, BeOS, CygWin) systems should work with
+out any major problems provided that the compile can handle all of
+the advanced C++ features Aspell uses. C++ compilers for non-Unix
+systems might work but it will take some work. Aspell at very least
+requires a Unix-like environment (sh, grep, sed, tr, etc...) in order
+to build. Aspell also uses a few POSIX functions when necessary.
+
+<P>
+
+<H1><A NAME="SECTION00320000000000000000">
+2.2 Obtaining</A>
+</H1>
+
+<P>
+The latest version can always be found at GNU Aspell's home page at
+<TT><A NAME="tex2html2"
+  HREF="http://aspell.net">http://aspell.net</A></TT>.
+
+<P>
+
+<H1><A NAME="SECTION00330000000000000000">
+2.3 Support</A>
+</H1>
+
+<P>
+Support for Aspell can be found on the Aspell mailing lists. Instructions
+for joining the various mailing lists (and an archive of them) can
+be found off the Aspell home page at <TT><A NAME="tex2html3"
+  HREF="http://aspell.net">http://aspell.net</A></TT>.
+
+<P>
+
+<H1><A NAME="SECTION00340000000000000000">
+2.4 Helping Out</A>
+</H1>
+
+<P>
+I have very little time to work on Aspell so I desperately need other
+people to help with the development of Aspell. There are a lot of
+things that need to be done before I consider Aspell complete. See
+section <A HREF="B_Do.html#todo">B.1</A> for a list of them. I would really appreciate
+some help with doing them. If you are interested in helping with one
+of them please let me know.
+
+<P>
+I am also looking for someone to eventually take over the maintenance
+and development of Aspell. If you are interested please contact me
+directly.
+
+<P>
+
+<H1><A NAME="SECTION00350000000000000000">
+2.5 Compiling &amp; Installing</A>
+</H1>
+
+<P>
+
+<H2><A NAME="SECTION00351000000000000000">
+2.5.1 Generic Install Instructions</A>
+</H2>
+
+<P>
+<BLOCKQUOTE>
+./configure &amp;&amp; make
+
+</BLOCKQUOTE>
+For additional configure options type ./configure &#45;&#45;help. You can
+control what C++ compiler is used by setting the environmental variable
+CXX before running configure and you can control what flags are passed
+to the C++ compile via the environmental variable CXXFLAGS. Static
+libraries are disabled by default since static libraries will not
+work right due to the mixing of C and C++. When a C program links
+with the static libraries in Aspell it is likely to crash because
+Aspell's C++ objects are not getting initialized correctly. However,
+if for some reason you want them, you can enable them via &#45;&#45;enable-static.
+
+<P>
+Aspell should then compile with out any additional user intervention.
+If you run into problems please first check the sections below as
+that might solve your problem.
+
+<P>
+To install the program simply type
+
+<P>
+<BLOCKQUOTE>
+make install
+
+</BLOCKQUOTE>
+After Aspell is installed at least one dictionary needs to be installed.
+You can find them at <TT><A NAME="tex2html4"
+  HREF="http://aspell.net/">http://aspell.net/</A></TT>. The &#34;aspell&#34;
+program must be in your path in order for the dictionaries to install
+correctly.
+
+<P>
+If you do not have Ispell or the traditional Unix ``spell'' utility
+installed on your system than you should also copy the compatibly
+scripts ``ispell'' and ``spell'' located in the scripts/ directory
+into your binary directory which is usually /usr/local/bin so that
+programs that expect ispell or spell command will work correctly.
+
+<P>
+
+<H2><A NAME="SECTION00352000000000000000">
+2.5.2 General Problems</A>
+</H2>
+
+<P>
+Aspell does not use a released version of GNU Libtool. If you have
+a need to modify configure.ac or any of the Makefile.am's you should
+install the CVS version of libtool.
+
+<P>
+
+<H2><A NAME="SECTION00353000000000000000">
+2.5.3 Curses Notes</A>
+</H2>
+
+<P>
+If you are having problems compiling termios.cc than the most likely
+reason is due to incompatibilities with the curses implementation
+on your system. If this is the case than you can explicitly disable
+the curses library with &#45;&#45;disable-curses. By doing this you will lose
+the nice full screen interface but hopefully you will be able to at
+least get Aspell to compile correctly.
+
+<P>
+If the curses library is installed in a non-standard location than
+you can specify the library and include directory with &#45;&#45;enable-curses=«lib»
+and &#45;&#45;enable-curses-include=«dir».
+<B>Lib</B> can either be the complete path of the library (for example
+``/usr/local/curses/libcurses.a''), the name of the library (for
+example ``ncurses'') or a combined location and library in the
+form ``-L«lib dir» -l«lib»''
+(for example ``-L/usr/local/ncurses/lib -lncurses''). <B>Dir</B>
+is the location of the curses header files (for example ``/usr/local/ncurses/include''). 
+
+<P>
+
+<H2><A NAME="SECTION00354000000000000000">
+2.5.4 Upgrading from Aspell .33/Pspell .12</A>
+</H2>
+
+<P>
+Aspell has undergone an extremely large number of changes since the
+previous Aspell/Pspell release. For one thing Pspell has been merged
+with Aspell so there in no longer two separate libraries you have
+to worry about.
+
+<P>
+Because of the massive changes between Aspell/Pspell and Aspell 0.50
+you may want to clean out the old files before installing the the
+new Aspell. To do so do a ``make uninstall'' in the original Aspell
+and Pspell source directories.
+
+<P>
+The way dictionaries are handled has also changed. This includes a
+change in the naming conventions of both language names and dictionaries.
+Due to the language name change, your old personal dictionaries will
+not be recognized. However, you can import the old dictionaries by
+running the ``aspell-import'' script. This also means that dictionaries
+designed to work with older versions of Aspell are not likely to function
+correctly. Fortunately new dictionary packages are available for most
+languages. You can find them off of the Aspell home page at <TT><A NAME="tex2html5"
+  HREF="http://aspell.net">http://aspell.net</A></TT>.
+
+<P>
+The Pspell ABI is now part of Aspell except that the name of everything
+has changed due to the renaming of Pspell to Aspell. In particular
+please note the following name changes:
+
+<P>
+<BLOCKQUOTE>
+pspell -&gt; aspell
+<BR>
+manager -&gt; speller
+<BR>
+emulation -&gt; enumeration
+<BR>
+master_word_list -&gt; main_word_list
+
+</BLOCKQUOTE>
+Please also note that the name of the <B>language-tag</B> option
+has changed to <B>lang</B>. However, for backward compatible the
+language-tag option will still work.
+
+<P>
+However, you should also be able to build applications that require
+Pspell with the new Aspell as a backward compatibility header file
+is provided.
+
+<P>
+Due to a change in the way dictionaries are handled, scanning for
+.pwli files in order to get find out which dictionaries are available
+will no longer work. This means that programs that relied on this
+technique may have problems finding dictionaries. Fortunately, GNU
+Aspell now provided a uniform way to list all installed dictionaries
+via the C API. See the file ``list-dicts.c'' in the examples/
+directory for an example of how to due this. Unfortunately there is
+isn't any simply way to find out which dictionaries are installed
+which will work with both the old Aspell/Pspell and the new GNU Aspell.
+
+<P>
+
+<H2><A NAME="SECTION00355000000000000000">
+2.5.5 Upgrading from a pre-release snapshot</A>
+</H2>
+
+<P>
+At the last minute I decided to merge the ``speller-util'' program
+into the main ``aspell'' program. You may right to remove that
+speller-util program to avoid confusion. This also means that dictionaries
+designed to work with the snapshot will no longer work with the official
+release. 
+
+<P>
+
+<H2><A NAME="SECTION00356000000000000000">
+2.5.6 Win32 Notes</A>
+</H2>
+
+<P>
+
+<H3><A NAME="SECTION00356100000000000000">
+2.5.6.1 Getting</A>
+</H3>
+
+<P>
+The latest version of the native Aspell/Win32 port can be found at
+<TT><A NAME="tex2html6"
+  HREF="http://aspell.net/win32">http://aspell.net/win32</A></TT>. 
+
+<P>
+
+<H3><A NAME="SECTION00356200000000000000">
+2.5.6.2 Building</A>
+</H3>
+
+<P>
+There are two basically different ways of building ASpell using GCC
+for Win32: You can either use the Cygwin compiler, which will produce
+binaries that depend on the posix layer in cygwin1.dll. The other
+way is using MinGW GCC, those binaries use the native C runtime from
+Microsoft (MSVCRT.DLL). If you intend to use or link against the Aspell
+libraries using a native Win32 compiler (e.g. MS Visual C++), you
+will need the MinGW built ones to avoid problems caused by the different
+runtime libraries.
+
+<P>
+Building Aspell using Cygwin: This works exactly like on other posix
+compatible systems using the &#34;configure &amp;&amp; make &amp;&amp; make
+install&#34; cycle. Some versions of Cygwin GCC will fail to
+link, this is caused by an incorrect libstdc++.la in the /lib directory.
+After removing or renaming this file, the build progress should work
+(GCC-2.95 and GCC-3.x should work).
+
+<P>
+Building Aspell using MinGW: To compile Aspell with the MinGW compiler,
+you will need at least GCC-3.2 (as shipped with MinGW-2.0.3) and some
+GNU tools like rm and cp. The origin of those tools doesn't matter,
+it has shown to work with any tools from MinGW/MSys, Cygwin or Linux.
+To build Aspell, move into the win32 subdirectory and type &#34;make&#34;.
+You can enable some additional build options by either commenting
+out the definitions at the head of the Makefile or passing those values
+as environment variables or at the make command line. Following options
+are supported: 
+
+<P>
+<DL>
+<DT><STRONG>DEBUGVERSION</STRONG></DT>
+<DD>If set to &#34;1&#34;, the binaries will
+include debugging information (resulting in a much bigger size).
+</DD>
+<DT><STRONG>CURSESDIR</STRONG></DT>
+<DD>Enter the path to the pdcurses library here, in order
+to get a nicer console interface (see below). 
+</DD>
+<DT><STRONG>MSVCLIB</STRONG></DT>
+<DD>Enter the filename of MS lib.exe here, if you want to build
+libraries that can be imported from MS Visual C++. 
+</DD>
+<DT><STRONG>WIN32_RELOCATABLE</STRONG></DT>
+<DD>If set to &#34;1&#34;, Aspell will
+detect the prefix from the path where the DLL resides (see below for
+further datails). 
+</DD>
+<DT><STRONG>TARGET</STRONG></DT>
+<DD>Sets a prefix to be used for cross compilation (e.g. &#34;/usr/local/bin/i586-mingw32msvc-&#34;
+to cross compile from linux). 
+</DD>
+</DL>
+There are also a MinGW compilers available for Cygwin and Linux, both
+versions are able to compile Aspell using the prebuilt Makefile. While
+the Cygwin port automatically detects the correct compiler, the Linux
+version depends on setting the &#34;TARGET&#34; variable
+in the Makefile (or environment) to the correct compiler prefix.
+
+<P>
+Other compilers may work. There is a patch for MS Visual C++ 6.0 available
+at <TT><A NAME="tex2html7"
+  HREF="ftp://ftp.gnu.org/gnu/aspell">ftp://ftp.gnu.org/gnu/aspell</A></TT>, but it needs a lot of changes
+to the Aspell sources. It has also been reported that the Intel C++
+compiler can be used for compilation.
+
+<P>
+
+<H3><A NAME="SECTION00356300000000000000">
+2.5.6.3 (PD)Curses</A>
+</H3>
+
+<P>
+In order to get the nice full screen interface when spell checking
+files a curses implementation that does not require Cygwin is required.
+The PDCurses (<TT><A NAME="tex2html8"
+  HREF="http://pdcurses.sourceforge.net">http://pdcurses.sourceforge.net</A></TT>) implementation
+is known to work, other implementations may work however they have
+not been tested. See the previous section for information on specifying
+the location of the curses library and include file.
+
+<P>
+Curses notes:
+
+<P>
+
+<UL>
+<LI>PDcurses built with MinGW needs to be compiled with <TT>-DPDC_STATIC_BUILD</TT>
+to avoid duplicate declaration of DllMain when compiling aspell.exe.
+</LI>
+<LI>The curses enabled version can cause trouble in some shells (MSys
+rxvt, emacs) and will produce errors like ``<TT>initscr() LINES=1
+COLS=1: too small</TT>''. Use a non-curses version for those purposes.
+</LI>
+</UL>
+
+<P>
+
+<H3><A NAME="SECTION00356400000000000000">
+2.5.6.4 Directories</A>
+</H3>
+
+<P>
+If Aspell is compiled with WIN32_RELOCATABLE=1, it can be run from
+any directory: It will set «prefix» according to its install location
+(assuming it resides in «prefix»&#92;bin). Your personal
+wordlists will be saved in the «prefix» directory with their names
+changed from ``<TT>.aspell.&lt;lang&gt;.*</TT>'' to ``<TT>&lt;lang&gt;.*</TT>''
+(you can override the path by setting the HOME environment variable). 
+
+<P>
+
+<H3><A NAME="SECTION00356500000000000000">
+2.5.6.5 Installer</A>
+</H3>
+
+<P>
+The installer registers the DLLs as shared libraries, you should increase
+the reference counter to avoid the libraries being uninstalled if
+your application still depends on them (and decrease it again when
+uninstalling your program). The reference counters are located under:
+
+<P>
+<TT>HKLM&#92;SOFTWARE&#92;Microsoft&#92;Windows&#92;CurrentVersion&#92;SharedDLLs</TT>
+
+<P>
+The install location and version numbers are stored under
+
+<P>
+<TT>HKLM&#92;SOFTWARE&#92;Aspell</TT>
+
+<P>
+
+<H3><A NAME="SECTION00356600000000000000">
+2.5.6.6 Win32 consoles</A>
+</H3>
+
+<P>
+The console uses a different encoding than GUI applications, changing
+this to to a Windows encoding (e.g. 1252) is not supported on Win9x/Me.
+On WinNT (and later) those codepages can be set by first changing
+the console font to ``<TT>lucida console</TT>'', then changing
+the codepage using ``<TT>chcp 1252</TT>''.
+
+<P>
+Some alternative shells (e.g. MSys' rxvt or Cygwin's bash) do a codepage
+conversion (if correctly set up), so running Aspell inside those shells
+might be a workaround for Win9x.
+
+<P>
+
+<H1><A NAME="SECTION00360000000000000000">
+2.6 Using aspell-import</A>
+</H1>
+
+<P>
+The aspell-import Perl script will look for old personal dictionaries
+and will import them into GNU Aspell. It will look for both Ispell
+and Aspell ones. To use it just run it from the command prompt. If
+you get an error about /usr/bin/perl not being found than instead
+try ``perl «bindir»/aspell-import''.
+When running the script if you get a message like:
+
+<P>
+
+<DL COMPACT>
+<DT>
+<DD><TT>Error:&nbsp;No&nbsp;word&nbsp;lists&nbsp;can&nbsp;be&nbsp;found&nbsp;for&nbsp;the&nbsp;language&nbsp;&#34;de&#34;.</TT>
+</DD>
+</DL> This means that you have not installed support for the given language,
+in this case ``de'' for German. To rectify the situation download
+and install a dictionary designed to work with GNU Aspell 0.50 or
+better.
+
+<P>
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html324"
+  HREF="3_Basic.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html320"
+  HREF="manual.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html314"
+  HREF="1_Introduction.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html322"
+  HREF="Contents.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html325"
+  HREF="3_Basic.html">3. Basic Usage</A>
+<B> Up:</B> <A NAME="tex2html321"
+  HREF="manual.html">GNU Aspell 0.50.3</A>
+<B> Previous:</B> <A NAME="tex2html315"
+  HREF="1_Introduction.html">1. Introduction</A>
+ &nbsp <B>  <A NAME="tex2html323"
+  HREF="Contents.html">Contents</A></B> 
+<!--End of Navigation Panel-->
+<ADDRESS>
+Thorsten Maerz
+2002-12-18
+</ADDRESS>
+</BODY>
+</HTML>

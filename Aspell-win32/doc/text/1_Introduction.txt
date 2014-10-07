@@ -1,0 +1,98 @@
+next up previous contents
+Next: 2. Getting Started Up: GNU Aspell 0.50.3 Previous: Contents   
+Contents
+
+Subsections
+
+  * 1.1 Comparison to other spell checker engines
+      + 1.1.1 Comparison to Ispell
+          o 1.1.1.1 Features that only Aspell has
+          o 1.1.1.2 Things that, currently, only Ispell have
+
+--------------------------------------------------------------------------
+
+1. Introduction
+
+GNU Aspell is a spell checker designed to eventually replace Ispell. It
+can either be used as a library or as an independent spell checker. Its
+main feature is that it does a much better job of coming up with possible
+suggestions than just about any other spell checker out there for the
+English language, including Ispell and Microsoft Word. It also has many
+other technical enhancements over Ispell such as using shared memory for
+dictionaries and intelligently handling personal dictionaries when more
+than one Aspell process is open at once.
+
+1.1 Comparison to other spell checker engines
+
+
+
++------------------------------------------------------------------------+
+|                        | Aspell | Ispell |  Netscape  | Microsoft Word |
+|                        |        |        |    4.0     |       97       |
+|------------------------+--------+--------+------------+----------------|
+|            Open Source | x      |   x    |            |                |
+|------------------------+--------+--------+------------+----------------|
+|             Suggestion | 88-98  |   54   |   55-70?   |       71       |
+|           Intelligence |        |        |            |                |
+|------------------------+--------+--------+------------+----------------|
+|       Personal part of | x      |   x    |     x      |                |
+|            Suggestions |        |        |            |                |
+|------------------------+--------+--------+------------+----------------|
+| Alternate Dictionaries | x      |   x    |     ?      |       ?        |
+|------------------------+--------+--------+------------+----------------|
+|  International Support | x      |   x    |     ?      |       ?        |
++------------------------------------------------------------------------+
+
+
+
+The suggestion Intelligence is based on a small test kernel of misspelled/
+correct word pairs. Go to http://aspell.net/test for more info and how you
+can help contribute to the test kernel. The current scores for Aspell are
+88 in fast mode, 93 in normal mode, and 98 in bad spellers mode see
+section 4.4.4 for more information about the various suggestion modes.
+
+If you have any other information you would like to add to this chart
+please contact me at kevina@gnu.org.
+
+1.1.1 Comparison to Ispell
+
+1.1.1.1 Features that only Aspell has
+
+  * Does a much better job with coming up with suggestions than Ispell
+    does or for that matter any other spell checker I have seen. If you
+    know a spell checker that does a better job please let me know.
+  * Can learn from users misspellings.
+  * Is an actual library that others programs can link to instead of
+    having to use it through a pipe.
+  * Is multiprocess intelligent. When a personal dictionary (or
+    replacement list) is saved it will now first update the list against
+    the dictionary on disk in case another process modified it.
+  * Can share the memory used in the main word list between processes.
+  * Support for detachable dictionaries so that more than one aspell class
+    can use the same dictionary.
+  * Support for multiple personal dictionaries as well as support for
+    special auxiliary dictionaries.
+  * Better support for run-together words.
+  * Ability to use multiple dictionaries by simply specifying it on the
+    command line or in the configuration files.
+  * A better, more complete word list for the English language. Word lists
+    are provided for American, British, and Canadian spelling. Special
+    care has been taken to only include one spelling for each word in any
+    particular word list. The word list included in Ispell by contrast
+    only included support for American and British and also tends to
+    included multiple spellings for a word which can mask some spelling
+    errors.
+
+1.1.1.2 Things that, currently, only Ispell have
+
+  * Support for affix compression (However this should change soon once
+    Kevin Hendricks is integrated)
+  * Lower memory footprint
+  * Perhaps better support for spell checking (La)TEX files.
+  * Support for spell checking Nroff files.
+
+--------------------------------------------------------------------------
+next up previous contents
+Next: 2. Getting Started Up: GNU Aspell 0.50.3 Previous: Contents   
+Contents
+Thorsten Maerz 2002-12-18

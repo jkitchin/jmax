@@ -1,0 +1,487 @@
+next up previous contents
+Next: 8. How Aspell Works Up: GNU Aspell 0.50.3 Previous: 6. Writing
+programs to   Contents
+
+Subsections
+
+  * 7.1 The Language Data File
+  * 7.2 Compiling the Word List
+  * 7.3 Phonetic Code
+      + 7.3.1 Syntax of the transformation array
+      + 7.3.2 How do I start finally?
+          o 7.3.2.1 Things that come in handy
+          o 7.3.2.2 What the phonetic code should do
+  * 7.4 Controlling the Behavior of Run-together Words
+
+--------------------------------------------------------------------------
+
+
+7. Adding Support For Other Languages
+
+Before you consider adding support for Aspell first make sure that someone
+else has not already done it. A good number of dictionaries off the Aspell
+home page at http://aspell.net. If your language is not listed above
+please send me a note and I will work with you on adding support.
+
+This chapter describes the old manual way of adding support for a new
+language in Aspell. The recommended way to add support is through the
+aspell-dicts package. The scripts used, as well as some documentation on
+what to do, is available in the aspell-gen package which is available in
+the same location the dictionary packages are at.
+
+Adding a language to aspell is fairly straightforward. You need to create
+the language data file, and compile a new word list.
+
+7.1 The Language Data File
+
+The basic format of the language data data is the same as it for aspell
+configuration file. It is named «lang».dat and is located in the
+architecture independent data dir for aspell (option data-dir) which is
+usually «prefix»/share/aspell. Use "aspell config" to find out where it
+is in your installation. By convention the language name should be the two
+letter ISO 639 language code.
+
+The language data file has several mandatory fields, and several optional
+ones. All fields are case sensitive and should be in all lower case.
+
+The two mandatory fields are name and charset. Name is the name of the
+language and should be the same as the file name (without the .dat). 
+Charset is the charset aspell will expect the word lists to be formatted
+in. You may chose from any of the iso-8859-* character sets as well as,
+koi8-f, koi8-r, and viscii. If your language can fit in the plain old
+ASCII character set use iso8859-1. If you use some other character set for
+your language other than the ones listed here drop me a note and I will
+look into adding support for it.
+
+The optional fields are special, soundslike, keyboard and a bunch of
+options to specify how run-together words are handles. Special is for non
+letter characters that can appear in your language such as the ' and -.
+The format for the value is a list separated by spaces. Each item of the
+list has the following format
+
+    «char»  «begin»«middle»«end»
+
+«char» is the non letter character in question. «begin»,«middle»,«end» are
+either a '-' or a '*'. A star for «begin» means that the character at the
+beginning of the word, a '-' means it can't. The same is true for «middle»
+and «end». For example the entry for the ' in english is:
+
+    ' -*-
+
+To include more than one middle character just list them one after another
+on the same line. for example to make both the ' and the - a middle
+character use the following line in the language data file:
+
+    special ' -*- - -*-
+
+The soundslike option, if present, should be the name of the soundslike
+data for the language. The data is expected to be in the file «name»
+_phonetic.dat.
+
+If the name is generic a really generic soundslike algorithm will be used
+which consists of striping all the vowels and removing all accents. I
+recommend first using the generic algorithm and then, after aspell is
+working with the new language, work on the transformation array.
+
+If the soundslike name is none then no soundslike lookup table will be
+used. This will reduce the size of the compiled word list by around 50%
+but at the sacrifice of suggestion quality. If the soundslike is none than
+the soundslike for the word will simply be the word itself in lowercase,
+will all accents stripped. For languages with phonetic spelling the
+difference will not be very noticeable. However, for languages with
+non-phonetic spelling there will be a noticeable difference. The
+difference you notice will depend on the quality of the soundslike data
+file. If you do not notice much of a difference for a language with
+non-phonetic spelling that is a good indication that the soundslike data
+is not rough enough--or the words you are trying are not that badly
+misspelled.
+
+The keyboard option specifies the base name of the keyboard definition
+file to use. See section 4.4.3 for more information.
+
+The options to control how run-together words are handled are the same as
+the are in the normal configurations files. Please see section 7.4 for
+more information.
+
+7.2 Compiling the Word List
+
+Once you have a working language data file installed in the right place
+you are ready to compile the main word list. See section 5 to find out
+what to do. This section also includes instructions for creating the awli
+file.
+
+7.3 Phonetic Code
+
+(The following section was written by Björn Jacke, bjoern.jacke at gmx de)
+
+Aspell is in fact the spell checker that comes up with the best
+suggestions if it finds an unknown word. One reason is that it does not
+just compare the word with other words in the dictionary (like Ispell
+does) but also uses phonetic comparisons with other words.
+
+The new table driven phonetic code is very flexible and setting up
+phonetic transformation rules for other languages is not difficult but
+there can be a number of stumbling stones -- that's why I wrote this
+section.
+
+The main phonetic code is free of any language specific code and should be
+powerful enough to allow setting up rules for any language. Anything which
+is language specific is kept in a plain text file and can easily be
+edited. So it's even possible to write phonetic transformation rules if
+you don't have any programming skills. All you need to know is how words
+of the language are written and how they are pronounced.
+
+7.3.1 Syntax of the transformation array
+
+In the translation array there are two strings on each line; the first one
+is the search string (or switch name) and the second one is the
+replacement string (or switch parameter). The line
+
+    version   «version»
+
+is also required to appear somewhere in the translation array. The version
+string can be anything but it should be changed when ever the a new
+version of the translation array is released. This is important because it
+will keep Aspell from using a compiled dictionary with the wrong set of
+rules. For example if when coming up with suggestion for "hallo" aspell
+will use the new rules to come up with the soundslike say "H*L*" but if
+hello is stored in the dictionary using the old rules as "HL" instead of
+"H*L*" aspell will never be able to come up with hello. So to solve this
+problem Aspell checks if the version strings match and abort with an error
+if they don't. Thus it is important to update it when ever a new version
+of the translation array is releases. This is only a problem with the main
+word list as the personal word lists are now stored as simple word lists
+with a single header line (ie, no soundslike data).
+
+Each non switch line represents one replacement (transformation) rule.
+Words beginning with the same letter must be grouped together; the order
+inside this group does not depend on alphabetical issues but it gives
+priorities; the higher the rule the higher the priority. That's why the
+first rule that matches is applied. In the following example:
+
+    GH     _  
+    G      K  
+     
+
+"GH to _" has higher priority than "G to K". "_" represents the
+empty string "". If "GH to _" would stand after "G to K", the second
+rule would never match because the algorithm would stop searching for more
+rules after the first match. The above rules transform any "GH" to an
+empty string (delete them) and transform any other "G" to "K".
+
+At the end of the first string of a line (the search string) there may
+optionally stand a number of characters in brackets. One (only one!) of
+these characters must fit. It's comparable with the [ ] brackets in
+regular expressions. The rule "DG(EIY) to J" for example would match any
+"DGE", "DGI" and "DGY" and replace them with "J". This way you can
+reduce several rules to one.
+
+Behind the search string there can stand one or more dashes (-). Those
+search strings will be matched totally but only the beginning of the
+string will be replaced. Furthermore for these rules no follow-up rule
+will be searched (what this is will be explained later). The rule "TCH--
+to _" will match any word containing "TCH" (like "match") but will
+only replace the first character "T" with an empty string. The number of
+dashes determines how many characters from the end will not be replaced.
+After the replacement the search for transformation rules continues with
+the not replaced "CH"!
+
+If a "<" is appended to the search string, the search for replacement
+rules will continue with the replacement string and not with the next
+character of the word. The rule "PH< to F" for example would replace
+"PH" with "F" and then again start to search for a replacement rule
+for "F...". If there would also be rules like "FO to O" and "F to _"
+then words like "PHOXYZ" would be transformed to "OXYZ" and any
+occurrences of "PH" that are not followed by an "O" will be deleted
+like "PHIXYZ to IXYZ". The second replacement however is not applied if
+the priority of this rule is lower than the priority of the first rule.
+
+Priorities are added to a rule by putting a number between 0 and 9 at the
+end of the search string, for example "ING6 to N". The higher the number
+the higher is the priority.
+
+Priorities are especially important for the previously mentioned follow-up
+rules. Follow-up rules are searched beginning from the last string of the
+first search string. This is a bit complicated but I hope this example
+will make it more clear:
+
+    CHS      X 
+    CH       G 
+     
+    HAU--1   H 
+     
+    SCH      SH 
+     
+
+In this example "CHS' in the word "FUCHS" would be transformed to
+"X". If we take the word "DURCHSCHNITT" the things look a bit
+different. Here "CH" belongs together and "SCH" belongs together and
+both are spoken separately. The algorithm however first finds the string
+"CHS" which may not be transformed like in the previous word "FUCHS".
+At this point the algorithm can find a follow up rule. It takes the last
+character of the first matching rule ("CHS") which is "S" and looks
+for the next match, beginning from this character. What it finds is clear:
+It finds "SCH to SH", which has the same priority (no priority means
+standard priority, which is 5). If the priority is the same or higher the
+follow-up rule will be applied. Let's take a look at the word
+"SCHAUKEL". In this word "SCH" belongs together and may not be torn
+apart. After the algorithm has found "SCH to SH" it searches for a
+follow-up rule for "H"+"AUKEL". It finds "HAU--1 to H", but does not apply
+it because its priority is lower than the one of the first rule. You see
+that this is a very powerful feature but it also can easily lead to
+mistakes. If you really don't need this feature you can turn it off by
+putting the line
+
+    followup      0 
+
+at the beginning of the phonetic table file. As mentioned, for rules
+containing a `-' no follow-up rules are searched but giving such rules a
+priority is not totally senseless because they self can be follow-up rules
+and in that case the priority makes sense again. Follow-up rules of
+follow-up rules are not searched because this is in fact not needed very
+often.
+
+The control character "^" says that the search string only matches at the
+beginning of words so that the rule "RH^to R" will only apply to words
+like "RHESUS" but not "PERHAPS". You can append another "^" to the search
+string. In that case the algorithm treats the rest of the word totally
+separately from first matched string in at beginning. This is useful for
+prefixes whose pronunciation does not depend on the rest of the word and
+vice versa like "OVER^^" in English for example.
+
+The same way as "^" works does "$" only apply on words that end with the
+search string. "GN$ to N" only matches on words like "SIGN" but not
+"SIGNUM". If you use "^" and "$" together, both of them must fit "ENOUGH^$
+to NF" will only match the word "ENOUGH" and nothing else.
+
+Of course you can combine all of the mentioned control characters but they
+must occur in this order: < - priority ^ $. All characters must be written
+in CAPITAL letters.
+
+If absolutely no rule can be found -- might happen if you use strange
+characters for which you don't have any replacement rule -- the next
+character will simply be skipped and the search for replacement rules will
+continue with the rest of the word.
+
+If you want double letters to be reduced to one you must set up a rule
+like "LL- to L". If double letters in the resulting phonetic word should
+be allowed, you must place the line
+
+    collapse_result     0 
+
+at the beginning of your transformation table file; otherwise set the
+value to `1'. The English rules for example strip all vowels from words
+and so the word "GOGO" would be transformed to "K" and not to "KK" (as
+desired) if collapse_result is set to 1. That's why the English rules have
+collapse_result set to 0.
+
+7.3.2 How do I start finally?
+
+Before you start to write an array of transformation rules, you should be
+aware that you have to do some work to make sure that things you do will
+result in correct transformation rules.
+
+7.3.2.1 Things that come in handy
+
+First of all you need to have a large word list of the language you want
+to make phonetics for. It should contain about as many words as the
+dictionary of the spell checker. If you don't have such a list, you will
+probably find an Ispell dictionary at http://fmg-www.cs.ucla.edu/geoff/
+ispell-dictionaries.htmlwhich will help you. You can then make affix
+expansion via ispell -e and then pipe it trough \tr " " "\n" to put one
+word on each line. After that you eventually have to convert special
+characters like `é' from Ispell's internal representation to latin1
+encoding. sed s/e'/é/g for example would replace all e' with é.
+
+The second is that you know how to use regular expressions and know how to
+use grep. You should for example know that
+
+    grep ^[^aeiou]qu[io] wordlist | less
+
+will show you all words that begin with any character but a, e, i, o or u
+and then continue with `qui' or `quo'. This stuff is important for example
+to find out if a phonetic replacement rule you want to set up is valid for
+all words which match the expression you want to replace. Taking a look at
+the regex(7) man page is a good idea.
+
+7.3.2.2 What the phonetic code should do
+
+Normal text comparison works well as long as the typer misspells a word
+because he pressed one key he didn't really want to press. In this cases
+mostly one character differs from the original word.
+
+In cases where the writer didn't know about the correct spelling of the
+word however the word may have several characters that differ from the
+original word but usually the word would still sound like the original
+word. Someone might think for example that `tough' is spelled `taff'. No
+spell checker without phonetic code will come to the idea that this might
+be `tough' but a spell checker who knows that `taff' would be pronounced
+like `tough' will make good suggestions to the user. Another example could
+be `funetik' and `phonetic'.
+
+From this examples you can see that the phonetic transformation should not
+be too fussy and too precise. If you implement a whole phonetic dictionary
+as you can find it in books this will not be very useful because then
+there could still be many characters differing from the misspelled and the
+desired word. What you should do if you implement the phonetic
+transformation table is to reduce the number of used letters to the only
+really necessary ones.
+
+Characters that sound similar should be reduced to one. In English
+language for example `Z' sounds like `S' and that's why the transformation
+rule "Z to S" is present in the replacement table. `PH' is spoken like
+`F' and so we have a "PH to F" rule.
+
+If you take a closer look you will even see that vowels sound very similar
+in English language: `contradiction', `cuntradiction', `cantradiction' or
+`centradiction' in fact sound nearly the same, don't they? Therefore the
+English phonetic replacement rules not only reduce all vowels to one but
+even remove them all (removing is done by just setting up no rule for
+those letters). The phonetic code of `contradiction' is `KNTRTKXN' and if
+you try to read this letter-monster loud you will hear that it still sound
+a bit like `contradiction'. You also see that `D' is transformed to `T'
+because they nearly sound the same.
+
+If you think you have found a regularity you should always take your word
+list and grep for the corresponding regular expression you want to make a
+transformation rule for. An example: If you come to the idea that all
+English words ending on `ough' sound like `AF' at the end because you
+think of `enough' and `tough'. If you then grep for the corresponding
+regular expression by "grep -i ough$ wordlist" you will see that the
+rule you wanted to set up is not correct because the rule doesn't fit to
+words like `although' or `bough'. So you have to define your rule more
+precisely or you have to set up exceptions if the number of words that
+differ from the desired rule is not so big.
+
+Don't forget about follow-up rules which can help in many cases but which
+also can lead to many confusions and side effects. It's also important to
+write exceptions in front of the more general rules ("GH" before "G"
+etc.).
+
+If you think you have set up a number of rules that may produce some good
+results try them out! If you run Aspell as "aspell --lang=«your language»
+pipe" you get a prompt at which you can type in words. If you just type
+words Aspell checks them and eventually makes suggestions if they are
+misspelled. If you type in "$$Sw «word»" you will see the phonetic
+transformation and you can test out if your work does what you want.
+
+Another good way to control if changes you apply to your rules don't have
+any evil side effects is to create another list from your word list which
+contains not only the word of the word list but also the corresponding
+phonetic version of this word on the same line. If you do this one time
+before the change and one time after the change you can make a diff (see
+man diff) to see what really changed. To do this use the command "aspell
+--lang=«your language» soundslike". In this mode aspell will output the
+the original word and then its soundslike separated by a tab character for
+each word you give it. If you are interested in seeing how the algorithm
+works you can download a set of useful programs from http://
+members.xoom.com/maccy/spell/phonet-utils.tar.gz. This includes a program
+that produces a list as mentioned above and another program which
+illustrates how the algorithm works. It uses the same transformation table
+as Aspell and so it helps a lot during the process of creating a phonetic
+transformation table for Aspell.
+
+During your work you should write down your basic ideas so that other
+people are able to understand what you did (and you still know about it
+after a few weeks). The English table has a huge documentation appended
+for example.
+
+Now you can start experimenting with all the things you just read and
+perhaps set up a nice phonetic transformation table for your language to
+help Aspell to come up with the best correction suggestions ever seen also
+for your language. Take a look at the Aspell homepage to see if there is
+already a transformation table for your language. If there is one you
+might also take a look at it to see if it could be improved.
+
+If you think that this section helped you or if you think that this is
+just a waste of time you can send any feedback to bjoern.jacke@gmx.de.
+
+
+7.4 Controlling the Behavior of Run-together Words
+
+Aspell has support for either unconditionally accepting run-together words
+or only accepting certain words in compound formation.
+
+Support for unconditionally accepting run-together words can either be
+turned on in the language data file or as a normal option via the 
+run-together option. The run-together-limit options controls the maximum
+number of words that can be strung together, the default is normally 255.
+The run-together-min options controls the minimal length the individual
+components of the run together word can be, the default is normally 3.
+Both the run-together-limit and run-together-min option may be specified
+in both the language data file or as a normal. The run-together-mid
+option, which may only be specified in the language data file, may be used
+to specify up to three optional characters that may appear between
+individual words.
+
+In order for aspell to conditionally only accept certain words in
+compounds those words must be flagged when the compiled word list is being
+created. The format for each entry is
+
+    «word»:C[1][2][3]«middle char»
+
+The 1, 2, and 3 control if the word is allowed to appear in the begging,
+middle, or end of the compound, respectfully. More than one position flag
+may be specified. If none of them are specified it as assumed that the
+word may appear anywhere. The C is optional if 1, 2, or 3 is specified.
+The «middle char» represents an optional character that may appear after
+the word in the formation of the compound if the word is not at the end of
+the compound. If the letter is lowercase than the character may appear
+after the word, if it is in uppercase then that letter must appear after
+the compound. Only one letter may be specified and it must also be in the
+list of middle letters specified via the run-together-mid option. The 
+run-together-limit option may also be used to specify the maximum number
+of words to string together.
+
+For example the word list:
+
+    beg:1
+    mid:2
+    end:3
+    any:C
+    never
+    must:CM
+    maybe:Cm
+
+Means that the word "beg" may only appear at the begging of a word, the
+word "mid" at the middle, the word "end" at the end, and the word
+"any" any place. The word "never" is never accepted in a compound
+unless the run-together option is set. The word "must" may appear
+anywhere however it must be followed by an "m", while the word maybe may
+be followed by an "m". Given the above word list the following compounds
+or legal:
+
+    begmidend
+    begany
+    mustmend
+    maybeend
+    maybemend
+
+are all legal, but the following are not:
+
+    begmid
+    mustend
+    neverany
+
+Individual words such as "beg" are always accepted.
+
+When the run-together option is not set Aspell will only accept words that
+have been flagged in a run-together word. When the run-together option is
+set aspell will accept words which are as least as long as the value
+specified in the run-together-min option. If the words length is less than
+run-together-min then it will only accept the word if it has been flagged.
+When the run-together option is not set the run-together-min option is
+ignored all together.
+
+Currently Aspell only supports run-together words when checking if a word
+is in the dictionary. When coming up with suggestions Aspell treats the
+word as a normal word and does not do anything special. This means that
+the suggestions will be virtually meaningless when the actual word is a
+run-together. I plan on more intelligently supporting run-together words
+when coming up with suggestions in a future version of Aspell.
+
+--------------------------------------------------------------------------
+next up previous contents
+Next: 8. How Aspell Works Up: GNU Aspell 0.50.3 Previous: 6. Writing
+programs to   Contents
+Thorsten Maerz 2002-12-18

@@ -1,0 +1,374 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with LaTeX2HTML 99.2beta8 (1.43)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>3. Basic Usage</TITLE>
+<META NAME="description" CONTENT="3. Basic Usage">
+<META NAME="keywords" CONTENT="manual">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="LaTeX2HTML v99.2beta8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="manual.css">
+
+<LINK REL="next" HREF="4_Customizing.html">
+<LINK REL="previous" HREF="2_Getting.html">
+<LINK REL="up" HREF="manual.html">
+<LINK REL="next" HREF="4_Customizing.html">
+</HEAD>
+
+<BODY >
+<!--Navigation Panel-->
+<A NAME="tex2html354"
+  HREF="4_Customizing.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html350"
+  HREF="manual.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html344"
+  HREF="2_Getting.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html352"
+  HREF="Contents.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html355"
+  HREF="4_Customizing.html">4. Customizing Aspell</A>
+<B> Up:</B> <A NAME="tex2html351"
+  HREF="manual.html">GNU Aspell 0.50.3</A>
+<B> Previous:</B> <A NAME="tex2html345"
+  HREF="2_Getting.html">2. Getting Started</A>
+ &nbsp <B>  <A NAME="tex2html353"
+  HREF="Contents.html">Contents</A></B> 
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+<!--Table of Child-Links-->
+<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
+
+<UL>
+<LI><A NAME="tex2html356"
+  HREF="3_Basic.html#SECTION00410000000000000000">3.1 Spellchecking Individual Files</A>
+<LI><A NAME="tex2html357"
+  HREF="3_Basic.html#SECTION00420000000000000000">3.2 Using Aspell with other Applications</A>
+<UL>
+<LI><A NAME="tex2html358"
+  HREF="3_Basic.html#SECTION00421000000000000000">3.2.1 With Applications that Expect Ispell</A>
+<LI><A NAME="tex2html359"
+  HREF="3_Basic.html#SECTION00422000000000000000">3.2.2 With Emacs and Xemacs</A>
+<LI><A NAME="tex2html360"
+  HREF="3_Basic.html#SECTION00423000000000000000">3.2.3 With LyX</A>
+<LI><A NAME="tex2html361"
+  HREF="3_Basic.html#SECTION00424000000000000000">3.2.4 With VIM</A>
+<LI><A NAME="tex2html362"
+  HREF="3_Basic.html#SECTION00425000000000000000">3.2.5 With Pine</A>
+</UL></UL>
+<!--End of Table of Child-Links-->
+<HR>
+
+<H1><A NAME="SECTION00400000000000000000">
+3. Basic Usage</A>
+</H1>
+
+<P>
+For a quick reference on the Aspell utility use the command ``aspell
+&#45;&#45;help''.
+
+<P>
+
+<H1><A NAME="SECTION00410000000000000000"></A><A NAME="check"></A>
+<BR>
+3.1 Spellchecking Individual Files
+</H1>
+
+<P>
+To use Aspell to spellcheck a file use:
+
+<P>
+<BLOCKQUOTE>
+aspell check [«options»]
+«filename»
+
+</BLOCKQUOTE>
+at the command line where «filename»
+is the file you want to check and «options»
+is any number of optional options. Some of the more useful ones include:
+
+<P>
+<DL>
+<DT><STRONG>&#45;&#45;mode=«mode»</STRONG></DT>
+<DD>the mode to
+use when checking files. The available modes are none, url, email,
+sgml, or tex. See section <A HREF="4_Customizing.html#filter">4.4.1</A> for more informations on the
+various modes.
+</DD>
+<DT><STRONG>&#45;&#45;dont-backup</STRONG></DT>
+<DD>don't create a backup file.
+</DD>
+<DT><STRONG>&#45;&#45;sug-mode=«mode»</STRONG></DT>
+<DD>the suggestion
+mode to use where mode is one of ultra, fast, normal, or bad-spellers.
+See section <A HREF="4_Customizing.html#suggestion">4.4.4</A> for more information on these modes.
+</DD>
+<DT><STRONG>&#45;&#45;master=«name»</STRONG></DT>
+<DD>the main
+dictionary to use.
+</DD>
+<DT><STRONG>&#45;&#45;keymapping=«name»</STRONG></DT>
+<DD>the
+keymapping to use. Either <B>aspell</B> for the default mapping
+or <B>ispell</B> to use the same mapping that the ispell utility
+uses.
+</DD>
+</DL>
+Please see Chapter <A HREF="4_Customizing.html#customizing">4</A> for more information on the
+available options.
+
+<P>
+For example to check the file foo.txt:
+
+<P>
+<BLOCKQUOTE>
+aspell check foo.txt
+
+</BLOCKQUOTE>
+and to check the file foo.txt using the bad-spellers suggestion mode
+and the large American English dictionary:
+
+<P>
+<BLOCKQUOTE>
+aspell check &#45;&#45;sug-mode=bad-spellers &#45;&#45;master=american-lrg foo.txt
+
+</BLOCKQUOTE>
+If the <B>mode</B> option is not given then aspell will use the
+extension of the file to determine the current mode. If the extension
+is .tex, then T<SMALL>E</SMALL>X mode will be uses, if the extension is .html,
+.htm, .php, or .sgml it will check the file in sgml mode, otherwise
+it will use url mode. These extensions can be changed via the <B>tex-extension</B>
+and <B>sgml-extension</B> options respectfully. See chapter <A HREF="4_Customizing.html#filter">4.4.1</A>
+for more information on the various modes that can be used.
+
+<P>
+If Aspell was compiled with curses support and the TERM environmental
+variable is set to a capable terminal type than Aspell will use a
+nice full screen interface. Otherwise it will use a simpler ``dumb''
+terminal interface where the misspelled word is surrounded by two
+'*'. In either case the interface should be self explanatory.
+
+<P>
+
+<H1><A NAME="SECTION00420000000000000000">
+3.2 Using Aspell with other Applications</A>
+</H1>
+
+<P>
+
+<H2><A NAME="SECTION00421000000000000000">
+3.2.1 With Applications that Expect Ispell</A>
+</H2>
+
+<P>
+Aspell can be used as a drop in replacement for Ispell for programs
+that use Ispell through a pipe such as Emacs and LyX. It can also
+be used with programs that use simple call the ispell command and
+expect the original file to be overwritten with the corrected version.
+It support the basic features of Ispell, however it does not currently
+have a Nroff mode so there may be situations in which you still wish
+to use Ispell. Nevertheless, I have been using Aspell for Xemacs and
+LyX since the middle of September of 1998 with out any problems.
+
+<P>
+If you do not have Ispell installed on your system and have installed
+the Ispell compatibly script than you should not need to do anything
+as most applications will that expect Ispell will work as expected
+with Aspell via the Ispell compatibility script.
+
+<P>
+Otherwise, the recommended way to use Aspell as a replacement for
+ispell is to change the Ispell command from within the program being
+used. If the program uses ispell in pipe mode simple change ispell
+to aspell. If the program calls the ispell command to check
+the file change ``ispell'' with ``aspell check''.
+
+<P>
+If that is impossible and the program uses ispell through a pipe than
+the run-with-aspell script can be used for programs using ispell in
+pipe mode. The format of the script is:
+
+<P>
+<BLOCKQUOTE>
+run-with-aspell «command»
+
+</BLOCKQUOTE>
+where «command» is the name
+of the program with any optional arguments.
+
+<P>
+The old method of mapping Ispell to Aspell is discouraged because
+it can create compatibility problems with programs that actually require
+Ispell such as Ispell's own scripts.
+
+<P>
+
+<H2><A NAME="SECTION00422000000000000000">
+3.2.2 With Emacs and Xemacs</A>
+</H2>
+
+<P>
+The easiest way to use Aspell with Emacs or Xemacs is to add this
+line:
+
+<P>
+
+<DL COMPACT>
+<DT>
+<DD><TT>(setq-default&nbsp;ispell-program-name&nbsp;&#34;aspell&#34;)</TT>
+</DD>
+</DL> to the end of your .emacs file.
+
+<P>
+For some reason version 3.0 of ispell.el (the lisp program that (x)emacs
+uses) want to reverse the suggestion list. To fix this add this line:
+
+<P>
+
+<DL COMPACT>
+<DT>
+<DD><TT>(setq-default&nbsp;ispell-extra-args&nbsp;'(&#34;&#45;&#45;reverse&#34;))</TT>
+</DD>
+</DL> after the previous line in your .emacs file and it should solve the
+problem. 
+
+<P>
+Ispell.el, version 3.1 (December 1, 1998) and better, has the list
+reversing problem fixed. You can find it at <TT><A NAME="tex2html9"
+  HREF="http://www.kdstevens.com/~stevens/ispell-page.html">http://www.kdstevens.com/~stevens/ispell-page.html</A></TT>.
+
+<P>
+
+<H2><A NAME="SECTION00423000000000000000">
+3.2.3 With LyX</A>
+</H2>
+
+<P>
+Version 1.0 of LyX provides support for Aspell learning for users
+mistake feature.
+
+<P>
+To use aspell with LyX 1.0 either change the <B>spell_command</B>
+option in the lyxrc file or use the run-with-aspell utility.
+
+<P>
+
+<H2><A NAME="SECTION00424000000000000000">
+3.2.4 With VIM</A>
+</H2>
+
+<P>
+<I>(The following section was written by &#34;R. Marc&#34;,
+rmarc at copacetic net.) </I>
+
+<P>
+To use aspell in vim you simply need to add the following line to
+your .vimrc file:
+
+<P>
+
+<DL COMPACT>
+<DT>
+<DD><TT>map&nbsp;^T&nbsp;:w!&lt;CR&gt;:!aspell&nbsp;check&nbsp;%&lt;CR&gt;:e!&nbsp;%&lt;CR&gt;</TT>
+</DD>
+</DL> I use &lt;Ctrl-T&gt; since that's the way you spell check in pico. In order
+to add a control character to your .vimrc you must type &lt;Ctrl-v&gt; first.
+In this case &lt;Ctrl-v&gt;&lt;Ctrl-t&gt;.
+
+<P>
+A more useful way to use Aspell, IMHO, is in combination with newsbody
+(<TT><A NAME="tex2html10"
+  HREF="http://www.image.dk/~byrial/newsbody/">http://www.image.dk/~byrial/newsbody/</A></TT>) which is how I use
+it since vim is my editor for my mailer and my news reader.
+
+<P>
+
+<DL COMPACT>
+<DT>
+<DD><TT>map&nbsp;^T&nbsp;&#92;1&#92;2&lt;CR&gt;:e!&nbsp;%&lt;CR&gt;
+</TT>
+<P>
+<TT>map&nbsp;&#92;1&nbsp;:w!&lt;CR&gt;
+</TT>
+<P>
+<TT>map&nbsp;&#92;2&nbsp;:!newsbody&nbsp;-qs&nbsp;-n&nbsp;%&nbsp;-p&nbsp;aspell&nbsp;check&nbsp;&#92;%f&lt;CR&gt;</TT>
+</DD>
+</DL> 
+<P>
+
+<H2><A NAME="SECTION00425000000000000000">
+3.2.5 With Pine</A>
+</H2>
+
+<P>
+To use aspell in pine simply change the option <B>speller</B> to 
+
+<P>
+<BLOCKQUOTE>
+aspell &#45;&#45;mode=email check
+
+</BLOCKQUOTE>
+To change the speller option go to the main menu. Type <B>S</B>
+for <I>setup</I>, <B>C</B> for <I>config</I>, then W for <I>where
+is</I>. Type in <B>speller</B> as the word to find. The speller option
+should be highlighted now. Hit enter, type in the above line, and
+hit enter again. Then type <B>E</B> for <I>exit setup</I> and <B>Y</B>
+to save the change.
+
+<P>
+If you have a strong desire to check other peoples comments change
+<B>speller</B> to
+
+<P>
+<BLOCKQUOTE>
+aspell check
+
+</BLOCKQUOTE>
+instead which will avoid switching aspell into email mode.
+
+<P>
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html354"
+  HREF="4_Customizing.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html350"
+  HREF="manual.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html344"
+  HREF="2_Getting.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html352"
+  HREF="Contents.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html355"
+  HREF="4_Customizing.html">4. Customizing Aspell</A>
+<B> Up:</B> <A NAME="tex2html351"
+  HREF="manual.html">GNU Aspell 0.50.3</A>
+<B> Previous:</B> <A NAME="tex2html345"
+  HREF="2_Getting.html">2. Getting Started</A>
+ &nbsp <B>  <A NAME="tex2html353"
+  HREF="Contents.html">Contents</A></B> 
+<!--End of Navigation Panel-->
+<ADDRESS>
+Thorsten Maerz
+2002-12-18
+</ADDRESS>
+</BODY>
+</HTML>

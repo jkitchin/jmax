@@ -1,0 +1,24 @@
+next up previous contents
+Up: GNU Aspell 0.50.3 Previous: E. Copyright   Contents
+
+
+About this document ...
+
+GNU Aspell 0.50.3
+
+This document was generated using the LaTeX2HTML translator Version
+99.2beta8 (1.43)
+
+Copyright © 1993, 1994, 1995, 1996, Nikos Drakos, Computer Based Learning
+Unit, University of Leeds.
+Copyright © 1997, 1998, 1999, Ross Moore, Mathematics Department,
+Macquarie University, Sydney.
+
+The command line arguments were:
+latex2html -split 3 -toc_depth 3 -dir man-html -long_titles 2 -local_icons
+-show_section_numbers manual.tex
+
+The translation was initiated by Thorsten Maerz on 2002-12-18
+--------------------------------------------------------------------------
+
+Thorsten Maerz 2002-12-18

@@ -1,0 +1,411 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with LaTeX2HTML 99.2beta8 (1.43)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>B. To Do</TITLE>
+<META NAME="description" CONTENT="B. To Do">
+<META NAME="keywords" CONTENT="manual">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="LaTeX2HTML v99.2beta8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="manual.css">
+
+<LINK REL="next" HREF="C_Credits.html">
+<LINK REL="previous" HREF="A_Changelog.html">
+<LINK REL="up" HREF="manual.html">
+<LINK REL="next" HREF="C_Credits.html">
+</HEAD>
+
+<BODY >
+<!--Navigation Panel-->
+<A NAME="tex2html539"
+  HREF="C_Credits.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html535"
+  HREF="manual.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html529"
+  HREF="A_Changelog.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html537"
+  HREF="Contents.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html540"
+  HREF="C_Credits.html">C. Credits</A>
+<B> Up:</B> <A NAME="tex2html536"
+  HREF="manual.html">GNU Aspell 0.50.3</A>
+<B> Previous:</B> <A NAME="tex2html530"
+  HREF="A_Changelog.html">A. Changelog</A>
+ &nbsp <B>  <A NAME="tex2html538"
+  HREF="Contents.html">Contents</A></B> 
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+<!--Table of Child-Links-->
+<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
+
+<UL>
+<LI><A NAME="tex2html541"
+  HREF="B_Do.html#SECTION001110000000000000000">B.1 Things that need to be done</A>
+<LI><A NAME="tex2html542"
+  HREF="B_Do.html#SECTION001120000000000000000">B.2 Good ideas that are worth implementing</A>
+<LI><A NAME="tex2html543"
+  HREF="B_Do.html#SECTION001130000000000000000">B.3 Notes and Status of various items</A>
+<UL>
+<LI><A NAME="tex2html544"
+  HREF="B_Do.html#SECTION001131000000000000000">B.3.1 General region skipping</A>
+<LI><A NAME="tex2html545"
+  HREF="B_Do.html#SECTION001132000000000000000">B.3.2 Word skipping by context</A>
+<LI><A NAME="tex2html546"
+  HREF="B_Do.html#SECTION001133000000000000000">B.3.3 Hidden Markov Model</A>
+<LI><A NAME="tex2html547"
+  HREF="B_Do.html#SECTION001134000000000000000">B.3.4 Email the Personal Dictionary</A>
+<LI><A NAME="tex2html548"
+  HREF="B_Do.html#SECTION001135000000000000000">B.3.5 Words With Spaces in Them</A>
+</UL></UL>
+<!--End of Table of Child-Links-->
+<HR>
+
+<H1><A NAME="SECTION001100000000000000000">
+B. To Do</A>
+</H1>
+
+<P>
+Words in bold indicate how you should refer to the item when discussing
+it with me or others.
+
+<P>
+
+<H1><A NAME="SECTION001110000000000000000"></A><A NAME="todo"></A>
+<BR>
+B.1 Things that need to be done
+</H1>
+
+<P>
+These items need to be done before I consider Aspell finished. Unfortunately,
+I do not have the time to do all so if you are interested in helping
+me with one of these tasks please email me. Good C++ skills are needed
+for most of these tasks involving coding.
+
+<P>
+
+<UL>
+<LI>Convert manual from LyX/L<SUP><SMALL>A</SMALL></SUP>T<SMALL>E</SMALL>X to Texinfo.
+</LI>
+<LI>Clean up copyright notices and bring the Aspell package up to GNU
+Standards.
+</LI>
+<LI>Add gettext support to Aspell.
+</LI>
+<LI>Allow Aspell to check documents which are in UTF-8. The main thing
+to be done is to get Aspell to display UTF-8 correctly. This will
+involve being able to get the length of UTF-8 strings and display
+UTF-8 using the curses library.
+</LI>
+<LI>Make Aspell Thread safe. Even though Aspell itself is not multi-threaded
+I would like it to be thread safe so that it can be used by multi-threaded
+programs. There are several areas of Aspell that that are potently
+thread unsafe (such as accessing a global pool) and several several
+classes which have the potential of being used by more than one thread
+(such as the personal dictionary).
+</LI>
+<LI>Allow filters to be loaded at run-time. At the moment all filters
+must be complied in.
+</LI>
+<LI>Integrate Kevin Hendricks affix compression code into Aspell. His
+code is already in use in OpenOffice as part of the lingucomponent
+component. More information can be found at <TT><A NAME="tex2html18"
+  HREF="http://whiteboard.openoffice.org/lingucomponent/dictionary.html">http://whiteboard.openoffice.org/lingucomponent/dictionary.html</A></TT>.
+The latest version of his code is also available there.
+</LI>
+<LI>Create a C++ interface for Aspell, possibly on top of the C one.
+</LI>
+<LI>Enhance ispell.el so that it will work better with the new Aspell.
+</LI>
+</UL>
+
+<P>
+
+<H1><A NAME="SECTION001120000000000000000">
+B.2 Good ideas that are worth implementing</A>
+</H1>
+
+<P>
+These items all sound like good ideas however I am not sure when I
+will get to implementing then if ever.
+
+<P>
+
+<UL>
+<LI>Use Lawrence Philips' new Double Metaphone algorithm. See <TT><A NAME="tex2html19"
+  HREF="http://aspell.sourceforge.net/metaphone/">http://aspell.sourceforge.net/metaphone/</A></TT>.
+</LI>
+<LI>Come up with a plug-in for <B>gEdit</B> the gnome text editor.
+</LI>
+<LI>Change languages (and thus dictionaries) based on the information
+in the actual document.
+</LI>
+<LI>Come up with a <B>nroff mode</B> for spell checking.
+</LI>
+<LI>Come up with a mode that will skip words based on the symbols that
+(almost) always surround the word. (<B>Word skipping by context</B>)
+</LI>
+<LI>Create two <B>server modes</B> for Aspell. One that uses the <B>DICT</B>
+protocol and one that uses <B>ispell -a</B> method of communication
+of some arbitrary port.
+</LI>
+<LI>Come up with <B>thread safe personal dictionaries</B>.
+</LI>
+<LI>Use the <B>Hidden Markov Model</B> to base the suggestions on not
+only the word itself but on the context around the word.
+</LI>
+<LI>Having a way to <B>email</B> <B>the personal dictionary</B> and/or
+replacement list to a particular address either periodical or when
+it grows to a certain size.
+</LI>
+<LI>Be able to accept <B>words with spaces in them</B> as many
+languages have words such as as a word in a foreign phrases which
+only make sense when followed by other words.
+</LI>
+</UL>
+The following good ideas where found in the ispell WISHES file so
+I thought I would pass them on.
+
+<P>
+
+<UL>
+<LI>Ispell should be smart enough to ignore hyphenation signs, such as
+the T<SMALL>E</SMALL>X &#92;- hyphenation indicator.
+</LI>
+<LI>(Jeff Edmonds) The personal dictionary should be able to remove certain
+words from the master dictionary, so that obscure words like &#34;wether&#34;
+wouldn't mask favorite typos.
+</LI>
+<LI>(Jeff Edmonds) It would be wonderful if ispell could correct inserted
+spaces such as &#34;th e&#34; for &#34;the&#34;
+or even &#34;can not&#34; for &#34;cannot&#34;.
+</LI>
+<LI>Since ispell has dictionaries available to it, it is conceivable that
+it could automatically determine the language of a particular file
+by choosing the dictionary that produced the fewest spelling errors
+on the first few lines.
+</LI>
+</UL>
+
+<P>
+
+<H1><A NAME="SECTION001130000000000000000">
+B.3 Notes and Status of various items</A>
+</H1>
+
+<P>
+
+<H2><A NAME="SECTION001131000000000000000">
+B.3.1 General region skipping</A>
+</H2>
+
+<P>
+I want to implement this give other people an idea of how it should
+be done and because I am really sick of having to spell check through
+url and email address.
+
+<P>
+
+<H2><A NAME="SECTION001132000000000000000">
+B.3.2 Word skipping by context</A>
+</H2>
+
+<P>
+This was posted on the Aspell mailing list on January 1, 1999:
+
+<P>
+I had an idea on a great general way to determine if a word should
+be skipped. Determine the words to skip based on the symbols that
+(almost) always surround the word.
+
+<P>
+For example when asked to check the following C++ code:
+
+<P>
+
+<DL COMPACT>
+<DT>
+<DD><TT>cout&nbsp;&#171;&nbsp;&#34;My&nbsp;age&nbsp;is:&nbsp;&#34;&nbsp;&#171;&nbsp;num&nbsp;&#171;&nbsp;endl;&nbsp;&nbsp;
+<BR>
+cout&nbsp;&#171;&nbsp;&#34;Next&nbsp;year&nbsp;I&nbsp;will&nbsp;be&nbsp;&#34;&nbsp;&#171;&nbsp;num&nbsp;+&nbsp;1&nbsp;&#171;&nbsp;endl;&nbsp;</TT>
+</DD>
+</DL> cout, num, and endl will all be skipped. &#34;cout&#34;
+will be skipped because it is always preceded by a &#171;. &#34;num&#34;
+will be skipped because it is always preceded by a &#171;. And &#34;endl&#34;
+will be skipped because it is always between a &#171; and a ;.
+
+<P>
+Given the following html code.
+
+<P>
+
+<DL COMPACT>
+<DT>
+<DD><TT>&lt;table&nbsp;width=50%&nbsp;cellspacing=0&nbsp;cellpadding=1&gt;&nbsp;&nbsp;
+<BR>&lt;tr&gt;&lt;td&gt;One&lt;td&gt;Two&lt;td&gt;Three&nbsp;&nbsp;
+<BR>&lt;tr&gt;&lt;td&gt;1&lt;td&gt;2&lt;td&gt;3&nbsp;&nbsp;
+<BR>&lt;/table&gt;&nbsp;
+<BR>&nbsp;
+<BR>&lt;table&nbsp;cellspacing=0&nbsp;cellpadding=1&gt;&nbsp;&nbsp;
+<BR>&lt;/table&gt;</TT>
+</DD>
+</DL> table, width cellspacing, cellpadding, tr, td will all be skipped
+because they are always enclosed in &#34;&lt;&gt;&#34;. Now of
+course table and width would be marked as correct anyway however there
+is no harm in skipping them.
+
+<P>
+So I was wondering if anyone on this list has any experience in writing
+this sort of context recognition code or could give me some pointers
+in the right direction.
+
+<P>
+This sort of word skipping will be very powerful if done right. I
+imagine that it could replace specific spell checker modes for Tex,
+Nroff, SGML etc because it will automatically be able to figure out
+where it should skip words. It could also probably do a very good
+job on programming languages code.
+
+<P>
+If you are interested in helping be out with this or just have general
+comments about the idea please let me know.
+
+<P>
+
+<H2><A NAME="SECTION001133000000000000000">
+B.3.3 Hidden Markov Model</A>
+</H2>
+
+<P>
+Knud Haugaard Sørensen suggested this one. From his email on the Aspell
+mailing list:
+
+<P>
+<BLOCKQUOTE>
+consider this examples.
+</BLOCKQUOTE>
+<P>
+<BLOCKQUOTE>a fone number. -&gt; a phone number. 
+<BR>
+a fone dress. -&gt; a fine dress.
+</BLOCKQUOTE>
+<P>
+<BLOCKQUOTE>the example illustrates that the right correction might depend on
+the context of the word. So I suggest that you take a look on HMM
+to solve this problem.
+</BLOCKQUOTE>
+<P>
+<BLOCKQUOTE>This might also provide a good base to include grammar correction
+in aspell.
+</BLOCKQUOTE>
+<P>
+<BLOCKQUOTE>see this link <TT><A NAME="tex2html20"
+  HREF="http://www.cse.ogi.edu/CSLU/HLTsurvey/ch1node7.html">http://www.cse.ogi.edu/CSLU/HLTsurvey/ch1node7.html</A></TT>
+</BLOCKQUOTE>
+I think it is a great idea. However unfortunately it will probably
+be very complicated to implement. Perhaps in the far future.
+
+<P>
+
+<H2><A NAME="SECTION001134000000000000000">
+B.3.4 Email the Personal Dictionary</A>
+</H2>
+
+<P>
+Some one suggest in a personal email:
+
+<P>
+<BLOCKQUOTE>
+Have you thought of adding a function to aspell, that - when the personal
+dictionary has grown significantly - sends the user's personal dictionary
+to the maintainer of the corresponding aspell dictionary? (if the
+user allows it)
+</BLOCKQUOTE>
+<P>
+<BLOCKQUOTE>It would be a very useful service to the dictionary maintainers, and
+I think most users can see their benefit in it too.
+
+</BLOCKQUOTE>
+And I replied:
+
+<P>
+<BLOCKQUOTE>
+Yes I have considered something like that but not for the personal
+dictionaries but rather the replacement word list in order to get
+better test data for <TT><A NAME="tex2html21"
+  HREF="http://aspell.sourceforge.net/test/">http://aspell.sourceforge.net/test/</A></TT>. The
+problem is I don't know of a good way to do this sense Aspell can
+also be used as a library. It also is not a real high priority, especially
+sense I would first need to learn how to send email within a C++ program.
+
+</BLOCKQUOTE>
+
+<P>
+
+<H2><A NAME="SECTION001135000000000000000">
+B.3.5 Words With Spaces in Them</A>
+</H2>
+
+<P>
+While this is something I would like to do it is not a simple task.
+The basic problem is that when tokenizing a string there is no good
+way to keep phrases together. So the solution is to some how add special
+conditions to certain words which will dictate which words can come
+before/after it. Then there is also a problem of how to come up with
+intelligent suggestions. What further complicates things is that many
+applications send words to Aspell a word at a time. So even if Aspell
+did support such a thing many applications that would use Aspell will
+not. So, in order for this to work applications will need to send
+text to Aspell a document or at least a sentence at a time. Unfortunately
+the framework for doing this is not there yet. It will be once I finish
+the filter interface. Another possible is to provide call back functions
+in which Aspell will be able to request the previous or next word
+on request. Yet again the framework for doing this is not there. Perhaps
+sometime in the near future.
+
+<P>
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html539"
+  HREF="C_Credits.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html535"
+  HREF="manual.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html529"
+  HREF="A_Changelog.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html537"
+  HREF="Contents.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html540"
+  HREF="C_Credits.html">C. Credits</A>
+<B> Up:</B> <A NAME="tex2html536"
+  HREF="manual.html">GNU Aspell 0.50.3</A>
+<B> Previous:</B> <A NAME="tex2html530"
+  HREF="A_Changelog.html">A. Changelog</A>
+ &nbsp <B>  <A NAME="tex2html538"
+  HREF="Contents.html">Contents</A></B> 
+<!--End of Navigation Panel-->
+<ADDRESS>
+Thorsten Maerz
+2002-12-18
+</ADDRESS>
+</BODY>
+</HTML>

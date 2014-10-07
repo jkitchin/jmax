@@ -1,0 +1,514 @@
+next up previous contents
+Next: 5. Working With Dictionaries Up: GNU Aspell 0.50.3 Previous: 3.
+Basic Usage   Contents
+
+Subsections
+
+  * 4.1 Specifying Options
+      + 4.1.1 At the Command Line
+          o 4.1.1.1 Boolean
+          o 4.1.1.2 Value
+          o 4.1.1.3 List
+      + 4.1.2 Via a Configuration File
+          o 4.1.2.1 Boolean
+          o 4.1.2.2 Value
+          o 4.1.2.3 List
+      + 4.1.3 Via an Environmental Variable
+  * 4.2 The Options
+      + 4.2.1 Dictionary Options
+      + 4.2.2 Checker Options
+      + 4.2.3 Filter Options
+      + 4.2.4 Run-together Word Options
+      + 4.2.5 Misc Options
+      + 4.2.6 Aspell Utility Options
+  * 4.3 Dumping Configuration Values
+  * 4.4 Notes on various Options
+      + 4.4.1 Notes on Various Filters and Filter Modes
+          o 4.4.1.1 None Mode
+          o 4.4.1.2 Url Filter/Mode
+          o 4.4.1.3 Email Filter/Mode
+          o 4.4.1.4 SGML Filter/Mode
+          o 4.4.1.5 TEX Filter/Mode
+      + 4.4.2 Notes on the Prefix Option
+      + 4.4.3 Notes on Typo-Analysis and the Keyboard Definition File
+      + 4.4.4 Notes on the Different Suggestion Modes
+
+--------------------------------------------------------------------------
+
+
+4. Customizing Aspell
+
+The behavior of Aspell can be changed by any number of options which can
+be specified at either the command line, the environmental variable
+ASPELL_CONF, a personal configuration file, or a global configuration
+file. Options specified on the command line override options specified by
+the environmental variable. Options specified by the environmental
+variable override options specified by either of the configurations files.
+Finally options specified by the personal configuration file override
+options specified in the global configuration file. Options specified in
+the environmental variable ASPELL_CONF, a personal configuration file, or
+a global configuration file will take effect no matter how Aspell is used
+which includes being used by other applications.
+
+Aspell has three basic type of options: boolean, value, and list. Boolean
+options are either enabled or disabled, value options take a specific
+value, and list options can either have entries added or removed from the
+list.
+
+4.1 Specifying Options
+
+4.1.1 At the Command Line
+
+All options specified at the command line have the following basic format:
+
+    --«option»[=«value»]
+
+where the '=' can be replaced by whitespace.
+
+However some options also have single letter abbreviations of the form:
+
+    -«letter»[«optional whitespace»«value»]
+
+4.1.1.1 Boolean
+
+To enable a boolean option simply special the option with out any
+corresponding value. For example to ignore accents when checking words use
+"--ignore-accents". To disable a boolean option prefix the option name
+with a "dont-". For example to not ignore accents when checking words
+use "--dont-ignore-accents".
+
+If a boolean option has a single letter abbreviation simply give the
+letter corresponding to either enabling or disabling the option with out
+any corresponding value. For example to consider run-together words legal
+use "-C" or to consider them illegal use "-B"
+
+4.1.1.2 Value
+
+To specify a value option simply specify the option with its corresponding
+value. For example to set the filter mode to Tex use "--mode=tex".
+
+If a value option has a single letter shortcut simply specify the single
+letter short cut with its corresponding value. For example to use a large
+american dictionary use "-d american-lrg".
+
+4.1.1.3 List
+
+To add a value to the list prefix the option name with a "add-" and then
+specify the value to add. For example to add the URL filter use
+"--add-filter url". To remove a value from a list option prefix the
+option name with a "rem-" and then specify the value to remove. For
+example to remove the URL filter use "--rem-filter url". To remove all
+items from a list prefix the option name with a "rem-all" without
+specify any value. For example to remove all filters use
+"--rem-all-filter".
+
+4.1.2 Via a Configuration File
+
+Aspell can also accept options via a personal or global configuration
+file. The exact files to used are specified by the options per-conf and 
+conf respectfully but the personal configuration file is normally
+".aspell.conf" located in the HOME directory and the global one is
+normally "aspell.conf" which is located in the etc directory which is
+normally "/usr/etc" or "/usr/local/etc". To find out the particular
+values for your particular system use "aspell dump config".
+
+Each line of the configuration file has the format:
+
+    «option» [«value»]
+
+There may any number of spaces between the option and the value however it
+can only be spaces, ie there is no '=' between the option name and the
+value.
+
+Comments may also be included by preceding them with a '#' as anything
+from a "#" to a newline is ignored. Blank lines are also allowed.
+
+Values set in the personal configuration file override those in the global
+file. Options specified at either the command line or via an environmental
+variable override those specified by either configuration file.
+
+4.1.2.1 Boolean
+
+To specify a boolean option simply include the option followed by a
+"true" to enable it or a "false" to disable it. For example to allow
+run-together words use "run-together true".
+
+4.1.2.2 Value
+
+To specify a value option simply include the option followed by the
+corresponding option. For example to set the default language to german
+use "lang german".
+
+4.1.2.3 List
+
+To add a value to the list prefix the option name with a "add-" and then
+specify the value to add. For example to add the URL filter use
+"add-filter url". To remove a value from a list option prefix the option
+name with a "rem-" and then specify the value to remove. For example to
+remove the URL filter use "rem-filter url". To remove all items from a
+list prefix the option name with a "rem-all" without specify any value.
+For example to remove all filters use "rem-all-filter".
+
+4.1.3 Via an Environmental Variable
+
+The environmental variable ASPELL_CONF may also be used and it overrides
+any options set in the configuration file. The format of the string is
+exactly the same as the configuration file except that semicolons ( ; )
+are used instead of newlines.
+
+
+4.2 The Options
+
+The following is a list of available options broken down by category. Each
+entry has the following format:
+
+«option»[,«single letter abbreviations»]
+    («type») «description»
+
+Where single letter options are specified as they would appear at the
+command line, ie with the preceding dash. Boolean single letter options
+are specified in the following format:
+
+    -«abbreviation to enable»|-«abbreviation to disable»
+
+«Option» is one of the following: boolean, string, file, dir, integer, or 
+list. String, file, dir, and integer types are all value options which can
+only take a specific type of value.
+
+4.2.1 Dictionary Options
+
+The following options may be used to control which dictionaries to use and
+how they behave (see section 5 for more information):
+
+master,-d
+    (string) base name of the dictionary to use. If this option is
+    specifed than Aspell with either use this dictionary or die.
+dict-dir
+    (dir) location of the main word list
+lang
+    (string) language to use, it follows the same format of the LANG
+    environmental variable on most systems. It consists of the two letter
+    ISO 639 language code and an optional two letter ISO 3166 country code
+    after a dash or underscore. The default value is based on the value of
+    the LC_MESSAGES locale.
+size
+    (string) the preferred size of the word list
+jargon
+    (string) an extra information to distinguish two different words lists
+    that have the same lang and size.
+word-list-path
+    (list) search path for word list information files
+module-search-order
+    (list) list of available modules, modules that come first on this list
+    have a higher priority. Currently there is only one speller module.
+personal,-p
+    (file) personal word list file name
+repl
+    (file) replacements list file name
+extra-dicts
+    (list) extra dictionaries to use.
+strip-accents
+    (boolean) strip accents from all words in the dictionary
+
+4.2.2 Checker Options
+
+These options control the beahvior of Aspell when checking documents.
+
+ignore,-W
+    (integer) ignore words <= n chars
+ignore-case
+    (boolean) ignore case when checking words
+ignore-accents
+    (boolean) ignore accents when checking words
+ignore-repl
+    (boolean) ignore commands to store replacement pairs
+save-repl
+    (boolean) save the replacement word list on save allkeyboard (file)
+    the base name of the keyboard definition file to use (see section 
+    4.4.3)
+sug-mode
+    (mode) suggestion mode = ultra | fast | normal | bad-spellers (see
+    section 4.4.4)
+
+4.2.3 Filter Options
+
+These options modify the behavior of the various filters (see section 
+4.4.1 for more information):
+
+filter
+    (list) add or removes a filter
+mode
+    (string) sets the filter mode. Mode is one if none, url, email, sgml,
+    or tex. (The short cut options '-e' may be used for email, '-H' for
+    Html/Sgml, or '-t' for Tex)
+encoding
+    (string) The encoding the input text is in. Valid values are
+    "utf-8", "iso8859-*", "koi8-r", "viscii", "cp1252",
+    "machine unsigned 16", "machine unsigned 32". However, the aspell
+    utility will currently only function correctly with 8-bit encodings. I
+    hope to provide utf-8 support in the future. The two "machine
+    unsigned" encodings are entended to be used by other programs using
+    the Aspell librarary and it is unlikly the Aspell utility will ever
+    support these encodings.
+add|rem-email-quote
+    (list) email quote characters
+email-margin
+    (integer) num chars that can appear before the quote char
+sgml-check
+    (list) sgml attributes to always check.
+sgml-extension
+    (list) sgml file extensions.
+tex-command
+    (list) TEX commands
+tex-check-comments
+    (boolean) check TEX comments
+
+4.2.4 Run-together Word Options
+
+These may be used to control the behavior of run-together words (see
+section 7.4 for more information):
+
+run-together,-C|-B
+    (boolean) consider run-together words legal
+run-together-limit
+    (integer) maximum numbers that can be strung together
+run-together-min
+    (integer) minimal length of interior words
+
+4.2.5 Misc Options
+
+Misc. other options that don't fall under any other catagory
+
+conf
+    (file) main configuration file
+conf-dir
+    (dir) location of main configuration file
+data-dir
+    (dir) location of language data files
+local-data-dir
+    (dir) alternative location of language data files. This directory is
+    searched before data-dir. It defaults to the same directory the actual
+    main word list is in (which is not necessarily dict-dir).
+home-dir
+    (dir) location for personal files
+per-conf
+    (file) personal configuration file
+prefix
+    (dir) prefix directory
+set-prefix
+    (boolean) set the prefix based on executable location (only works on
+    Win32 and when compiled with --enable-win32-relocatable)
+
+4.2.6 Aspell Utility Options
+
+backup,-b|-x
+    (boolean) create a backup file by appending ".bak" to the file name.
+    (Only applies when the command is check)
+time
+    (boolean) time load time and suggest time in pipe mode.
+reverse
+    (boolean) reverse the order of the suggestions list.
+keymapping
+    (string) the keymapping to use. Either aspell for the default mapping
+    or ispell to use the same mapping that the ispell utility uses.
+
+4.3 Dumping Configuration Values
+
+To find out the current value of all the options use the command "aspell
+dump config". This will dump the current configuration to standard
+output. The format of the contents dumped is such that it can be used as
+either the global or personal configuration file.
+
+To find out the current value of a particular option use "aspell config «
+option»". This will print out the value of «option» to stdout and nothing
+else.
+
+4.4 Notes on various Options
+
+
+4.4.1 Notes on Various Filters and Filter Modes
+
+Aspell now has rudimentary filter support. You can either select from
+individual filters or chose a filter mode. To select a filter mode use the
+mode option. You may chose from none, url, email, sgml, and tex. The
+default mode is url. Individual filters can be added with the option 
+add-filter and remove with the rem-filter option. The currently available
+filters are url, email, sgml, tex as well as a bunch of filters which
+translate the text from one format to another.
+
+4.4.1.1 None Mode
+
+This mode is exactly what it says. It turns off all filters.
+
+4.4.1.2 Url Filter/Mode
+
+The url filter/mode skips over URL's, host names, and email addresses.
+Because this filter is almost always useful and rarely does any harm it is
+enabled in all modes except none. To turn it off either select the none
+mode or use rem-filter option after the desired mode is selected.
+
+4.4.1.3 Email Filter/Mode
+
+The email filter/mode skips over quoted text. It currently does not
+support skipping over headers however a future version should. In the mean
+time I suggest you use Aspell with Newsbody which can be found at http://
+home.worldonline.dk/~byrial/newsbody/. The option email-skip controls the
+number of characters that can appear before the email quote char, the
+default is 10. The option add|rem-email-quote controls the characters that
+are considered quote characters, the default is ">' and '|'.
+
+
+4.4.1.4 SGML Filter/Mode
+
+The sgml filter/mode will skip over sgml commands. It currently does not
+handle nested < > unless they are in quotes. It also does it handle the
+null end tag (net) minimization feature of sgml such as
+
+    <emphasis/important/
+
+This filter will also translate sgml characters of the form "&#num;".
+Other sgml characters such as "&amp;" will simply be skiped over so that
+the word "amp" for example will not be spell checked. Eventually full
+support for properly translating sgml characters will be added.
+
+The option add|rem-sgml-check controls which sgml tags should always be
+checked. The default is "alt".
+
+The option add|rem-sgml-extension controls which file extensions are
+recognized as sgml/html files. The default is html, htm, php, and sgml.
+The extension are not case sensitive so extensions like .HTM will also be
+recognized.
+
+4.4.1.5 TEX Filter/Mode
+
+The tex (all lowercase) filter/mode skips over TEX commands and parameters
+and/or options to certain command. It also skips over TEX comments by
+default. The option [dont-]tex-check-comments controls whether or not
+aspel will skip over TEX comments. The option add|rem-tex-command controls
+which TEX commands should have certain parameters and/or options also
+skipped over. Commands that are not specified will have all there
+parameters and/or options checked. The format for each item is
+
+    «command»  «a list of p,P,o and Os»
+
+The first item is simple the command name. The second item controls which
+parameters to skip over. A 'p' skips over a parameter while a 'P' won't.
+Similar an 'o' will skip over an optional parameter while a 'O' won't. The
+first letter on the list will apply to the first parameter, the second
+letter will apply to the second parameter etc. If there are more
+parameters than letters Aspell will simply check them as normal. For
+example the option
+
+    add-tex-command rule pp
+
+will skip over the first two parameters of the "rule" command while the
+option
+
+    add-tex-command foo Pop
+
+will check the first parameter of the "foo" command, skip over the next
+optional parameter, if it is present, and will skip over the second
+parameter -- even if the optional parameter is not present -- and will
+check any additional parameters.
+
+A'*' at the end of the command is simply ignored. For example the option
+
+    enlargethispage p
+
+will ignore the first parameter in both enlargethispage and
+enlargethispage*.
+
+To remove a command simple use the rem-tex-command option. For example
+
+    rem-tex-command foo
+
+will remove the command foo, if present, from the list of TEX commands.
+
+4.4.2 Notes on the Prefix Option
+
+The prefix option is there to allow Aspell to easily be relocated.
+Changing prefix will change all directory names relative to the new prefix
+that are not explicitly set. For example if prefix was "/usr/local/
+aspell" and dict-dir has a default value of "/usr/local/aspell/dict"
+than changing prefix to "/opt/aspell" will also change the default value
+of dict-dir to "/opt/aspell/dict". Note that modifying prefix will only
+effect the default compiled in values of directories. If a directory
+option is explicitly given a value than changing the value of prefix has
+no effect on that directory option.
+
+
+4.4.3 Notes on Typo-Analysis and the Keyboard Definition File
+
+Aspell .33 and better will, in general, give a higher priority to certain
+misspelling which are likely to be due to typos such as "teh" instead of
+"the" or "hapoy" instead of "happy". However in order to do this
+well Aspell needs to know the layout of the keyboard. The keyboard
+definition file simply identifies keys that are right next to each other.
+The file has an extension of .kbd and each line consists of two letters
+corresponding to two keys that are right next to each other. For example
+the line "as" will indicate that 'a' and 's' are right next to each
+other. If "as" is listed as a entry it is not necessary to list "sa"
+as an entry as that will be done automatically. Also by "right next to
+each other" I mean to keys that are close enough together that it is easy
+to type one instead of the other. On most keyboards this means keys that
+are to the left or to the right of each other and not keys that are below
+or above it.
+
+The default for this option is normally "standard". However the default
+can be changed via the language data file. The normal default,
+"standard", should work well for most QWERTY like keyboard layouts. It
+may need minor adjusting for foreign keyboards. The "dvorak" option can
+for a Dvorak layout. When creating a keyboard definition file for a
+foreign language please keep in mind that Aspell completely ignores
+accents when scoring words so that the key 'o' and 'ö' will appear to be
+the same key to aspell even if they are in fact separate keys on your
+keyboard.
+
+
+4.4.4 Notes on the Different Suggestion Modes
+
+In order to understand what these suggestion modes do, a basic
+understanding of how aspell works is required. See section 8 for that. The
+suggestion modes are as follows.
+
+ultra
+    This method will use the fastest method available to come up with
+    decent suggestions. This currently means that it will look for
+    soundslikes within one edit distance apart without doing any typo
+    analysis. It is slower than Ispell by a factor of 1.5 to 2 when a
+    single word list is used. It speed is only minor affected by the size
+    of the word list, if at all, but it is strongly effected by the number
+    of word lists use. In this mode Aspell gets about 87% of the words
+    from my small test kernel of misspelled words. (Go to http://
+    aspell.net/testfor more info on the test kernel as well as comparisons
+    of this version of Aspell with previous versions and other spell
+    checkers.)
+fast
+    This method is like ultra except that it also performs typo analysis
+    unless it is turned off by setting the keyboard to none. The typo
+    analysis brings words which are likely to be due to typos to the
+    beginning of the list but slows things down by a factor of about two.
+    This mode should get around the same number of words that the ultra
+    method does.
+normal
+    This method looks for soundslikes within two edit distance apart and
+    perform typo-analysis unless it is turned off. Is is around 10 times
+    slower than fast mode with the english word list but returns better
+    suggestions. Its speed is directly proportional to the size of the
+    word list. This mode gets 93% of the words.
+bad-spellers
+    This method also looks for soundslikes within two edit distances apart
+    but is more tailored for the bad speller where as fast or normal are
+    more tailed to strike a good balance between typos and true
+    misspellings. This mode never performs typo-analysis and returns a
+    huge number of words for the really bad spellers who can't seam to get
+    the spelling anything close to what it should be. If the misspelled
+    word looks anything like the correct spelling it is bound to be found
+    somewhere on the list of 100 or more suggestions. This mode gets 98%
+    of the words.
+
+--------------------------------------------------------------------------
+next up previous contents
+Next: 5. Working With Dictionaries Up: GNU Aspell 0.50.3 Previous: 3.
+Basic Usage   Contents
+Thorsten Maerz 2002-12-18

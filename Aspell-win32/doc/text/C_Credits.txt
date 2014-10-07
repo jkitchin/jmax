@@ -1,0 +1,28 @@
+next up previous contents
+Next: D. Glossary and References Up: GNU Aspell 0.50.3 Previous: B. To Do
+  Contents
+
+
+C. Credits
+
+  * To the FSF for adopting the project.
+  * To the many authors of Ispell (including R. E. Gorin, Pace Willisson,
+    and Geoff Kuenning) for providing me with a good word list as well as
+    giving me a few good ideas.
+  * Alan Beale for going well beyond the call of duty with helping me
+    create a better word list.
+  * Lawrence Philips for coming up with the original metaphone algorithm
+    and Michael Kuhn for writing C code for the algorithm.
+  * Björn Jacke for coming up with a generic soundslike algorithm which
+    gets all of its data from a file, thus eliminating almost all need for
+    language specific code from aspell.
+  * To the authors of SGI STL version 3.0 and up for proving a great set
+    of generic container classes with cut the development time of this
+    program in half at least.
+  * To the LyX development team for giving me a great tool for the
+    development of this manual.
+
+
+--------------------------------------------------------------------------
+
+Thorsten Maerz 2002-12-18

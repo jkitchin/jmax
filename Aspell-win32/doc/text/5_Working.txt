@@ -1,0 +1,196 @@
+next up previous contents
+Next: 6. Writing programs to Up: GNU Aspell 0.50.3 Previous: 4.
+Customizing Aspell   Contents
+
+Subsections
+
+  * 5.1 How Aspell Selects an Appropriate Dictionary
+  * 5.2 Listing Available Dictionaries
+  * 5.3 Dumping the contents of the word list
+  * 5.4 Creating an Individual Word List
+      + 5.4.1 Format of the Replacement Word List
+  * 5.5 Using Multi Dictionaries
+  * 5.6 Dictionary Naming
+  * 5.7 AWLI files
+
+--------------------------------------------------------------------------
+
+
+5. Working With Dictionaries
+
+5.1 How Aspell Selects an Appropriate Dictionary
+
+If the master options is set in any fashion (via the command line, the
+ASPELL_CONF environmental variable, or a configuration file) Aspell will
+look for a dictionary of that name. If one could not be found complain.
+
+Otherwise it will use the value of the lang option to search for an
+appropriate dictionary. If more than one dictionary is found for the given
+language string than it will look for a dictionary with a matching jargon
+if the jargon option is set. If it is not set it will look for a
+dictionary with no jargon. If after matching the lang and jargon there is
+still more than one dictionary available it will find one with the size
+closest to the value of the size option. The default size is 60. If Aspell
+can not find a dictionary based on the lang option than it will give up
+and complain.
+
+If the lang option is not explicitly set its value will be based on the
+LC_MESSAGES locale. This locale is generally taken from the LC_MESSAGES
+environmental variable or the LANG environmental variable if LC_MESSAGES
+is not set. However, if Aspell is being used as a library from within
+another program which already explicitly set the locale then it will use
+the locale of the library rather than the environmental variables. If
+Aspell can not determine the language from the LC_MESSAGES locale than it
+will default to "en_US".
+
+5.2 Listing Available Dictionaries
+
+For a list of available dictionaries use the command "aspell dump
+dicts". This will form a list of dictionaries that aspell will search
+when a dictionary is not specifically given.
+
+5.3 Dumping the contents of the word list
+
+The dump command in aspell will simply dump the contents of a word list to
+stdout in a format than can be read back in with aspell create.
+
+If no word list is specified the command will act on the default one. For
+example the command
+
+    aspell dump personal
+
+will simply dump the contents of the current personal word list to stdout.
+
+5.4 Creating an Individual Word List
+
+To create an individual main word list from a list of words use the
+command
+
+    aspell --lang=«lang» create master ./«base» < «wordlist»
+
+where «base» is the name of the word list and «word list» is the list of
+words separated by white space. The name of the word list will
+automatically be converted to all lowercase. The "./" is important
+because without it aspell will create the word list in the normal word
+list directory. If you are trying to create a word list in a language
+other than english check the aspell data-dir (usually /usr/share/aspell,
+use "aspell dump config" to find out what it is on your system) to see
+if a language data file exists for your language. If not you will need to
+create one. See chapter 7 for more information on using Aspell with other
+languages.
+
+This will create the file «base» in the current directory. To use the new
+word list copy the file to the normal word list directory (use "aspell
+config" to find out what it is) and use the option --master=«base».
+
+The compiled dictionary file is machine dependent. It is dependent on
+endian order, and the page size for the machine because they are mmaped
+in. Please do not distribute the compiled dictionaries unless you are only
+distributing them for a particular platform such as you would a binary.
+That is why is normally installed in "lib/aspell" instead of "share/
+aspell".
+
+Aspell is now also able to use special "multi" dictionaries. See section
+5 form more information.
+
+A personal and replacement word list can be created in a similar fashion.
+
+Because Aspell does not support any sort of affix compression like Ispell
+does Ispell word lists will not work as is. In order to use Ispell's word
+lists simply pipe the word list through "ispell -e" to expand the
+munched word lists.
+
+5.4.1 Format of the Replacement Word List
+
+The replacement word has each replacement pair on its own line in the
+following format
+
+    «misspelled word» «correction»
+
+5.5 Using Multi Dictionaries
+
+As with precious versions of aspell you can specify the main dictionary to
+use via the -d or --master option. However as of Aspell .32 you can now
+also:
+
+ 1. Specify more than word list to use with the extra-dicts option.
+ 2. Optionally have all accents striped form the word lists using 
+    strip-accents option. This is not the same thing as the ignore-accents
+    option. As enabling the ignore-accents would accept both cafe and café
+    (notice the accent on the e), but only enabling strip-accents would
+    only accent cafe, even if café is in the original dictionary. Specify 
+    strip-accents is just like using a word list with out the accents.
+ 3. Specify special "multi" dictionaries.
+
+A "multi" dictionary is a special file which basically a list of
+dictionary files to use. A multi dictionary must end is .multi and has
+roughly the same format of a configuration file where the two valid keys
+are add and strip-accents. The add key is used for adding individual word
+lists, or other "multi" files. The strip-accents key is used to control
+if accents are striped from the dictionaries. Unlike the global
+strip-accent option this option only effects word lists that came after
+the option. For example:
+
+    strip-accents yes
+    add english
+    strip-accents no
+    add must-accent
+
+will strip accents from the english word list but not the must-accent word
+list. If the global strip-accents option is specified the local
+strip-accents options are ignored
+
+   
+
+
+5.6 Dictionary Naming
+
+In order for Aspell to be able to correctly recognize a dictionary based
+on the setting of the LANG environmental variable the dictionaries need to
+be located some where Aspell can find it and they need to be a "multi"
+dictionary. Where aspell looks for dictionaries depends on the value of
+the dict-dir and word-list-path option. Dict-dir is generally «prefix»/lib
+/aspell, and word-list-path is generally empty.
+
+Each dictionary that you expect aspell to be able to find needs to have
+the following name:
+
+    «language»[_«region>][-«jargon»][-«size»].multi
+
+Where «language» is the two letter language code, «region» is the two
+letter region code, «jargon» is any extra informations to distinguish the
+word list from other ones with the same language and spelling, and «size»
+is the size of the dictionary. If no size is specified that the default
+size of 60 will be assumed.
+
+For example:
+
+    en.multi
+    en_US.multi
+    en-medical.multi
+    en-medical-85.multi
+    en-85.multi
+    de.multi
+
+5.7 AWLI files
+
+In order for Aspell to find dictionaries that are located in odd places or
+not named according to section 5.6 a AWLI file needs to be created for the
+dictionary and located in some place where Aspell can find it.
+
+Each AWLI has the the following name:
+
+    «language»[_«region>][-«jargon»][-«size»]-«module».awli
+
+Where the names have the same meaning as in section 5.6 and «module» is
+the speller module to use, which should be set to "default" for now
+since there is only one speller module.
+
+Each AWLI file for an Aspell word list should then contain exactly one
+line which contains the full path of the main word list.
+
+--------------------------------------------------------------------------
+next up previous contents
+Next: 6. Writing programs to Up: GNU Aspell 0.50.3 Previous: 4.
+Customizing Aspell   Contents
+Thorsten Maerz 2002-12-18

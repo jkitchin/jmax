@@ -1,0 +1,211 @@
+next up previous contents
+Next: C. Credits Up: GNU Aspell 0.50.3 Previous: A. Changelog   Contents
+
+Subsections
+
+  * B.1 Things that need to be done
+  * B.2 Good ideas that are worth implementing
+  * B.3 Notes and Status of various items
+      + B.3.1 General region skipping
+      + B.3.2 Word skipping by context
+      + B.3.3 Hidden Markov Model
+      + B.3.4 Email the Personal Dictionary
+      + B.3.5 Words With Spaces in Them
+
+--------------------------------------------------------------------------
+
+B. To Do
+
+Words in bold indicate how you should refer to the item when discussing it
+with me or others.
+
+
+B.1 Things that need to be done
+
+These items need to be done before I consider Aspell finished.
+Unfortunately, I do not have the time to do all so if you are interested
+in helping me with one of these tasks please email me. Good C++ skills are
+needed for most of these tasks involving coding.
+
+  * Convert manual from LyX/LATEX to Texinfo.
+  * Clean up copyright notices and bring the Aspell package up to GNU
+    Standards.
+  * Add gettext support to Aspell.
+  * Allow Aspell to check documents which are in UTF-8. The main thing to
+    be done is to get Aspell to display UTF-8 correctly. This will involve
+    being able to get the length of UTF-8 strings and display UTF-8 using
+    the curses library.
+  * Make Aspell Thread safe. Even though Aspell itself is not
+    multi-threaded I would like it to be thread safe so that it can be
+    used by multi-threaded programs. There are several areas of Aspell
+    that that are potently thread unsafe (such as accessing a global pool)
+    and several several classes which have the potential of being used by
+    more than one thread (such as the personal dictionary).
+  * Allow filters to be loaded at run-time. At the moment all filters must
+    be complied in.
+  * Integrate Kevin Hendricks affix compression code into Aspell. His code
+    is already in use in OpenOffice as part of the lingucomponent
+    component. More information can be found at http://
+    whiteboard.openoffice.org/lingucomponent/dictionary.html. The latest
+    version of his code is also available there.
+  * Create a C++ interface for Aspell, possibly on top of the C one.
+  * Enhance ispell.el so that it will work better with the new Aspell.
+
+B.2 Good ideas that are worth implementing
+
+These items all sound like good ideas however I am not sure when I will
+get to implementing then if ever.
+
+  * Use Lawrence Philips' new Double Metaphone algorithm. See http://
+    aspell.sourceforge.net/metaphone/.
+  * Come up with a plug-in for gEdit the gnome text editor.
+  * Change languages (and thus dictionaries) based on the information in
+    the actual document.
+  * Come up with a nroff mode for spell checking.
+  * Come up with a mode that will skip words based on the symbols that
+    (almost) always surround the word. (Word skipping by context)
+  * Create two server modes for Aspell. One that uses the DICT protocol
+    and one that uses ispell -a method of communication of some arbitrary
+    port.
+  * Come up with thread safe personal dictionaries.
+  * Use the Hidden Markov Model to base the suggestions on not only the
+    word itself but on the context around the word.
+  * Having a way to email the personal dictionary and/or replacement list
+    to a particular address either periodical or when it grows to a
+    certain size.
+  * Be able to accept words with spaces in them as many languages have
+    words such as as a word in a foreign phrases which only make sense
+    when followed by other words.
+
+The following good ideas where found in the ispell WISHES file so I
+thought I would pass them on.
+
+  * Ispell should be smart enough to ignore hyphenation signs, such as the
+    TEX \- hyphenation indicator.
+  * (Jeff Edmonds) The personal dictionary should be able to remove
+    certain words from the master dictionary, so that obscure words like
+    "wether" wouldn't mask favorite typos.
+  * (Jeff Edmonds) It would be wonderful if ispell could correct inserted
+    spaces such as "th e" for "the" or even "can not" for "cannot".
+  * Since ispell has dictionaries available to it, it is conceivable that
+    it could automatically determine the language of a particular file by
+    choosing the dictionary that produced the fewest spelling errors on
+    the first few lines.
+
+B.3 Notes and Status of various items
+
+B.3.1 General region skipping
+
+I want to implement this give other people an idea of how it should be
+done and because I am really sick of having to spell check through url and
+email address.
+
+B.3.2 Word skipping by context
+
+This was posted on the Aspell mailing list on January 1, 1999:
+
+I had an idea on a great general way to determine if a word should be
+skipped. Determine the words to skip based on the symbols that (almost)
+always surround the word.
+
+For example when asked to check the following C++ code:
+
+    cout « "My age is: " « num « endl;  
+    cout « "Next year I will be " « num + 1 « endl; 
+
+cout, num, and endl will all be skipped. "cout" will be skipped because it
+is always preceded by a «. "num" will be skipped because it is always
+preceded by a «. And "endl" will be skipped because it is always between a
+« and a ;.
+
+Given the following html code.
+
+    <table width=50% cellspacing=0 cellpadding=1>  
+    <tr><td>One<td>Two<td>Three  
+    <tr><td>1<td>2<td>3  
+    </table> 
+     
+    <table cellspacing=0 cellpadding=1>  
+    </table>
+
+table, width cellspacing, cellpadding, tr, td will all be skipped because
+they are always enclosed in "<>". Now of course table and width would be
+marked as correct anyway however there is no harm in skipping them.
+
+So I was wondering if anyone on this list has any experience in writing
+this sort of context recognition code or could give me some pointers in
+the right direction.
+
+This sort of word skipping will be very powerful if done right. I imagine
+that it could replace specific spell checker modes for Tex, Nroff, SGML
+etc because it will automatically be able to figure out where it should
+skip words. It could also probably do a very good job on programming
+languages code.
+
+If you are interested in helping be out with this or just have general
+comments about the idea please let me know.
+
+B.3.3 Hidden Markov Model
+
+Knud Haugaard Sørensen suggested this one. From his email on the Aspell
+mailing list:
+
+    consider this examples.
+
+    a fone number. -> a phone number.
+    a fone dress. -> a fine dress.
+
+    the example illustrates that the right correction might depend on the
+    context of the word. So I suggest that you take a look on HMM to solve
+    this problem.
+
+    This might also provide a good base to include grammar correction in
+    aspell.
+
+    see this link http://www.cse.ogi.edu/CSLU/HLTsurvey/ch1node7.html
+
+I think it is a great idea. However unfortunately it will probably be very
+complicated to implement. Perhaps in the far future.
+
+B.3.4 Email the Personal Dictionary
+
+Some one suggest in a personal email:
+
+    Have you thought of adding a function to aspell, that - when the
+    personal dictionary has grown significantly - sends the user's
+    personal dictionary to the maintainer of the corresponding aspell
+    dictionary? (if the user allows it)
+
+    It would be a very useful service to the dictionary maintainers, and I
+    think most users can see their benefit in it too.
+
+And I replied:
+
+    Yes I have considered something like that but not for the personal
+    dictionaries but rather the replacement word list in order to get
+    better test data for http://aspell.sourceforge.net/test/. The problem
+    is I don't know of a good way to do this sense Aspell can also be used
+    as a library. It also is not a real high priority, especially sense I
+    would first need to learn how to send email within a C++ program.
+
+B.3.5 Words With Spaces in Them
+
+While this is something I would like to do it is not a simple task. The
+basic problem is that when tokenizing a string there is no good way to
+keep phrases together. So the solution is to some how add special
+conditions to certain words which will dictate which words can come before
+/after it. Then there is also a problem of how to come up with intelligent
+suggestions. What further complicates things is that many applications
+send words to Aspell a word at a time. So even if Aspell did support such
+a thing many applications that would use Aspell will not. So, in order for
+this to work applications will need to send text to Aspell a document or
+at least a sentence at a time. Unfortunately the framework for doing this
+is not there yet. It will be once I finish the filter interface. Another
+possible is to provide call back functions in which Aspell will be able to
+request the previous or next word on request. Yet again the framework for
+doing this is not there. Perhaps sometime in the near future.
+
+--------------------------------------------------------------------------
+next up previous contents
+Next: C. Credits Up: GNU Aspell 0.50.3 Previous: A. Changelog   Contents
+Thorsten Maerz 2002-12-18

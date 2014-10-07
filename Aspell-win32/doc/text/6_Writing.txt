@@ -1,0 +1,363 @@
+next up previous contents
+Next: 7. Adding Support For Up: GNU Aspell 0.50.3 Previous: 5. Working
+With Dictionaries   Contents
+
+Subsections
+
+  * 6.1 Through the C API
+      + 6.1.1 Usage
+      + 6.1.2 API Reference
+      + 6.1.3 Examples
+      + 6.1.4 Notes About Thread Safety
+  * 6.2 Through A Pipe
+      + 6.2.1 Format of the Data Stream
+  * 6.3 Notes of Storing Replacement Pairs
+
+--------------------------------------------------------------------------
+
+6. Writing programs to use Aspell
+
+There are two main ways to use aspell from within your application.
+Through the external C API or through a pipe. The internal Aspell API can
+be used directly but that is not recommended as the actual Aspell API is
+constantly changing.
+
+6.1 Through the C API
+
+The Aspell library contains two main classes and several helper classes.
+The two main classes are AspellConfig and AspellMaster. The AspellConfig
+class is used to set initial defaults and to change spell checker specific
+options. The AspellManager class does most of the real work. It is
+responsible for managing the dictionaries, checking if a word is in the
+dictionary, and coming up with suggestions among other things. There are
+many helper classes the important ones are AspellWordList,
+AspellMutableWordList, Aspell*Enumeration. The AspellWordList classes is
+used for accessing the suggestion list, as well as the personal and
+suggestion word list currently in use. The AspellMutableWordList is used
+to manage the personal, and perhaps other, word lists. The Aspell*
+Enumeration classes are used for iterating through a list.
+
+6.1.1 Usage
+
+To use Aspell your application should include "aspell.h". In order to
+insure that all the necessary libraries are linked in libtool should be
+used to perform the linking. When using libtool simply linking with
+"-laspell" should be all that is necessary. When using shared libraries
+you might be able to simply link "-laspell", but this is not
+recommended. This version of Aspell uses the CVS version of libtool
+however released versions of libtool should also work.
+
+When your application first starts you should get a new configuration
+class with the command:
+
+    AspellConfig * spell_config = new_aspell_config();
+
+which will create a new AspellConfig class. It is allocated with new and
+it is your responsibility to delete it with delete_aspell_config. Once you
+have the config class you should set some variables. The most important
+one is the language variable. To do so use the command:
+
+    aspell_config_replace(spell_config, "lang", "en_US");
+
+which will set the default language to use to American English. The
+language is expected to be the standard two letter ISO 639 language code,
+with an optional two letter ISO 3166 country code after an underscore. You
+can set the preferred size via the size option, any extra info via the 
+jargon option, and the encoding via the encoding option. Other things you
+might want to set is the preferred spell checker to use, the search path
+for dictionary's, and the like see section 4.2 for a list of all available
+options.
+
+When ever a new document is created a new AspellManager class should also
+be created. There should be one speller class per document. To create a
+new speller class use the new_aspell_speller and then cast it up using
+to_aspell_speller like so.
+
+    AspellCanHaveError * possible_err = new_aspell_speller(spell_config);
+   
+    AspellManager * spell_checker = 0;
+   
+    if (aspell_error_number(possible_err) != 0)
+   
+      puts(aspell_error_message(possible_err));
+   
+    else
+   
+      spell_checker = to_aspell_speller(possible_err);
+
+which will create a new AspellManager class using the defaults found in
+spell_config. To find out which dictionary is selected the lang, size, and
+jargon options may be examinded. To find out the exact name of the
+dictionary the master option way be examned as well as the master-flags
+opntions to see if any special flags that were passed on to the module.
+The module option way also be examed to figure out which speller module
+was selected, but since there is only one this option will always be the
+same.
+
+If for some reason you want to use different defaults simply clone
+spell_config and change the setting like so:
+
+    AspellConfig * spell_config2 = aspell_config_clone(spell_config);
+   
+    aspell_config_replace(spell_config2, "lang","nl");
+   
+    possible_err = new_aspell_speller(spell_config2);
+   
+    delete_aspell_config(spell_config2);
+
+Once the speller class is created you can use the check method to see if a
+word in the document is correct like so:
+
+    int correct = aspell_speller_check(spell_checker, <word>, <size>);
+
+<word> can is expected to a const char * character string. If the encoding
+is set to be "machine unsigned 16" or "machine unsigned 32". <word> is
+expected to be a cast from either const u16int * or const u32int*
+respectfully. U16int and u32int are generally unsigned short and unsigned
+int respectfully. <size> is the length of the string or -1 if the sting is
+null terminated. If the string is a cast from const u16int * or const
+u32int * then size is the amount of space in bytes the string takes up
+after being casted to const char * and not the true size of the string.
+Aspell_speller_check will return 0 is it is not found and non-zero
+otherwise.
+
+If the word is not correct than the suggest method can be used to come up
+with likely replacements.
+
+    AspellWordList * suggestions = aspell_speller_suggest(spell_checker, 
+    <word>, <size>);
+   
+    AspellStringEnumeration * elements = aspell_word_list_elements
+    (suggestions);
+   
+    const char * word;
+   
+    while ( (word = aspell_string_enumeration_next(aspell_elements) !=
+     NULL ) {
+   
+      // add to suggestion list
+   
+    }
+   
+    delete_aspell_string_manag(elements);
+
+Notice how elements is deleted but suggestions is not. The value returned
+by suggestions is only valid to the next call to suggest. Once a
+replacement is made the store_repl method should be used to communicate
+the replacement pair back to the spell checker (see section 6.3 for why).
+It usage is as follows:
+
+    aspell_speller_store_repl(spell_checker, 
+   
+                              <misspelled word>, <size>,
+   
+                              <correctly spelled word>, <size>);
+
+If the user decided to add the word to the session or personal dictionary
+the the word can be be added using the add_to_session or add_to_personal
+methods respectfully like so:
+
+    aspell_speller_add_to_session|personal(spell_checker, <word>, <size>);
+
+It is better to let the spell checker manage these words rather than doing
+it your self so that the words have a change of appearing in the
+suggestion list.
+
+Finally, when the document is closed the AspellManager class should be
+deleted like so.
+
+    delete_aspell_speller(spell_checker);
+
+6.1.2 API Reference
+
+Methods that return a boolean result generally return false on error and
+true other wise. To find out what went wrong use the error_number and
+error_message methods. Unless otherwise stated methods that return a
+"const char *" will return null on error. In general, the charter string
+returned is only valid until the next method which returns a "const char
+*" is called.
+
+For the details of the various classes please see the header files. In the
+future I will generate class references using some automated tool.
+
+6.1.3 Examples
+
+Two simple examples are included in the examples directory. The
+"example-c" program demenstracts most of the Aspell library functionary
+and the "list-dicts" lists the available dictionaries.
+
+6.1.4 Notes About Thread Safety
+
+Read-only Aspell methods and functions should be thread safe as long as
+exceptions, new, delete, delete[], and STL allocators are thread safe. To
+the best of my knowledge gcc and egcs meet these requirements. It is up to
+the programmer to make sure multiple threads do not do thing such as
+change the dictionaries and add or delete items from the personal or
+session dictionaries.
+
+
+6.2 Through A Pipe
+
+When given the pipe or -a command aspell goes into a pipe mode that is
+compatible with "ispell -a". Aspell also defines its own set of
+extensions to ispell pipe mode.
+
+
+6.2.1 Format of the Data Stream
+
+In this mode, Aspell prints a one-line version identification message, and
+then begins reading lines of input. For each input line, a single line is
+written to the standard output for each word checked for spelling on the
+line. If the word was found in the main dictionary, or your personal
+dictionary, then the line contains only a '*'.
+
+If the word is not in the dictionary, but there are suggestions, then the
+line contains an '&', a space, the misspelled word, a space, the number of
+near misses, the number of characters between the beginning of the line
+and the beginning of the misspelled word, a colon, another space, and a
+list of the suggestions separated by commas and spaces.
+
+Finally, if the word does not appear in the dictionary, and there are no
+suggestions, then the line contains a '#', a space, the misspelled word, a
+space, and the character offset from the beginning of the line. Each
+sentence of text input is terminated with an additional blank line,
+indicating that ispell has completed processing the input line.
+
+These output lines can be summarized as follows:
+
+OK:
+    *
+Suggestions:
+    & «original» «count» «offset»: «miss», «miss», ...
+None:
+    # «original» «offset»
+
+When in the -a mode, Aspell will also accept lines of single words
+prefixed with any of '*', '&', '@', '+', '-', '~', '#', '!', '%', or '^'.
+A line starting with '*' tells ispell to insert the word into the user's
+dictionary. A line starting with '&' tells ispell to insert an
+all-lowercase version of the word into the user's dictionary. A line
+starting with '@' causes ispell to accept this word in the future. A line
+starting with '+', followed immediately by a valid mode will cause aspell
+to parse future input according the syntax of that formatter. A line
+consisting solely of a '+' will place ispell in TEX/LATEX mode (similar to
+the -t option) and '-' returns aspell to its default mode (but these
+commands are obsolete). A line '~', is ignored for ispell compatibility. A
+line prefixed with '#' will cause the personal dictionaries to be saved. A
+line prefixed with '!' will turn on terse mode (see below), and a line
+prefixed with '%' will return ispell to normal (non-terse) mode. Any input
+following the prefix characters '+', '-', '#', '!', '~', or '%' is
+ignored, as is any input following. To allow spell-checking of lines
+beginning with these characters, a line starting with '^' has that
+character removed before it is passed to the spell-checking code. It is
+recommended that programmatic interfaces prefix every data line with an
+uparrow to protect themselves against future changes in Aspell.
+
+To summarize these:
+
+*«word»
+    Add a word to the personal dictionary
+&«word»
+    Insert the all-lowercase version of the word in the personal
+    dictionary
+@«word»
+    Accept the word, but leave it out of the dictionary
+#
+    Save the current personal dictionary
+~
+    Ignored for ispell compatibility.
++
+    Enter TEX mode.
++«mode»
+    Enter the mode specified by «mode».
+-
+    Enter the default mode.
+!
+    Enter terse mode
+%
+    Exit terse mode
+^
+    Spell-check the rest of the line
+
+In terse mode, Aspell will not print lines beginning with '*', which
+indicate correct words. This significantly improves running speed when the
+driving program is going to ignore correct words anyway.
+
+In addition to the above commands which are designed for Ispell
+compatibility Aspell also supports its own extension. All Aspell
+extensions follow the following format.
+
+    $$«command» [data]
+
+Where data may or may not be required depending on the particular command.
+Aspell currently supports the following command.
+
+cs «option»,«value»
+    Change a configuration option.
+cr «option»
+    Prints the value of a configuration option.
+pp
+    Returns a list of all words in the current personal wordlist.
+ps
+    Returns a list of all words in the current session dictionary.
+l
+    Returns the current language name.
+ra «mis»,«cor»
+    Add the word pair to the replacement dictionary for latter use.
+    Returns nothing.
+
+Anything returned is returned on its own line line. All lists returned
+have the following format
+
+    «num of items»: «item1», «item2», «etc»
+
+(Part of the preceding section was directly copied out of the Ispell
+manual)
+
+
+6.3 Notes of Storing Replacement Pairs
+
+The store_repl method and the $$ra should be used because Aspell is able
+to learn from users misspellings. For example on the first pass a user
+misspells beginning as beging so aspell suggests:
+
+    begging, begin, being, Beijing, bagging, ....
+
+However the user then tries "begning" and aspell suggests
+
+    beginning, beaning, begging, ...
+
+so the user selects beginning. However than, latter on in the document the
+user misspelles it as begng (NOT beging). Normally aspell will suggest.
+
+    began, begging, begin, begun, ....
+
+However becuase it knows the user mispelled beginning as beging it will
+instead suggest:
+
+    beginning, began, begging, begin, begun ...
+
+I myself often misspelled beginning (and still do) as something close to
+begging and two many times wind up writing sentences such as "begging with
+....".
+
+Please also note that replacements commands has a memory. Which means if
+you first store the replacement pair:
+
+    sicolagest -> psycolagest
+
+then store the replacement pair
+
+    psycolagest -> psychologist
+
+The replacement pair
+
+    sicolagest -> psychologist
+
+will also get stored so that you don't have to worry about it.
+
+--------------------------------------------------------------------------
+next up previous contents
+Next: 7. Adding Support For Up: GNU Aspell 0.50.3 Previous: 5. Working
+With Dictionaries   Contents
+Thorsten Maerz 2002-12-18

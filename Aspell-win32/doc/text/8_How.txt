@@ -1,0 +1,51 @@
+next up previous contents
+Next: A. Changelog Up: GNU Aspell 0.50.3 Previous: 7. Adding Support For  
+Contents
+
+
+
+8. How Aspell Works
+
+The magic behind my spell checker comes from merging Lawrence Philips
+excellent metaphone algorithm and Ispell's near miss strategy which is
+inserting a space or hyphen, interchanging two adjacent letters, changing
+one letter, deleting a letter, or adding a letter.
+
+The process goes something like this.
+
+ 1. Convert the misspelled word to its soundslike equivalent (its
+    metaphone for English words).
+ 2. Find all words that have a soundslike within one or two edit distances
+    from the original words soundslike. The edit distance is the total
+    number of deletions, insertions, exchanges, or adjacent swaps needed
+    to make one string equivalent to the other. When set to only look for
+    soundslikes within one edit distance it tries all possible soundslike
+    combinations and check if each one is in the dictionary. When set to
+    find all soundslike within two edit distance it scans through the
+    entire dictionary and quickly scores each soundslike. The scoring is
+    quick because it will give up if the two soundslikes are more than two
+    edit distances apart.
+ 3. Find misspelled words that have a correctly spelled replacement by the
+    same criteria of step number 2 and 3. That is the misspelled word in
+    the word pair (such as teh -> the) would appear in the suggestions
+    list as if it was a correct spelling.
+ 4. Score the result list and return the words with the lowest score. The
+    score is roughly the weighed average of the weighed edit distance of
+    the word to the misspelled word and the soundslike equivalent of the
+    two words. The weighted edit distance is like the edit distance except
+    that the various edits have weights attached to them.
+ 5. Replace the misspelled words that have correctly spelled replacements
+    with their replacements and remove any duplicates that might arise
+    because of this.
+
+Please note that the soundslike equivalent is a rough approximation of how
+the words sounds. It is not the phoneme of the word by any means. For more
+details about exactly how each step is performed please see the file 
+suggest.cc. For more information on the metaphone algorithm please see the
+data file english_phonet.dat.
+
+--------------------------------------------------------------------------
+next up previous contents
+Next: A. Changelog Up: GNU Aspell 0.50.3 Previous: 7. Adding Support For  
+Contents
+Thorsten Maerz 2002-12-18

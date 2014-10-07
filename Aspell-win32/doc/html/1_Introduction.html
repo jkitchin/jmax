@@ -1,0 +1,251 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with LaTeX2HTML 99.2beta8 (1.43)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>1. Introduction</TITLE>
+<META NAME="description" CONTENT="1. Introduction">
+<META NAME="keywords" CONTENT="manual">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="LaTeX2HTML v99.2beta8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="manual.css">
+
+<LINK REL="next" HREF="2_Getting.html">
+<LINK REL="previous" HREF="Contents.html">
+<LINK REL="up" HREF="manual.html">
+<LINK REL="next" HREF="2_Getting.html">
+</HEAD>
+
+<BODY >
+<!--Navigation Panel-->
+<A NAME="tex2html308"
+  HREF="2_Getting.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html304"
+  HREF="manual.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html298"
+  HREF="Contents.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html306"
+  HREF="Contents.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html309"
+  HREF="2_Getting.html">2. Getting Started</A>
+<B> Up:</B> <A NAME="tex2html305"
+  HREF="manual.html">GNU Aspell 0.50.3</A>
+<B> Previous:</B> <A NAME="tex2html299"
+  HREF="Contents.html">Contents</A>
+ &nbsp <B>  <A NAME="tex2html307"
+  HREF="Contents.html">Contents</A></B> 
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+<!--Table of Child-Links-->
+<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
+
+<UL>
+<LI><A NAME="tex2html310"
+  HREF="1_Introduction.html#SECTION00210000000000000000">1.1 Comparison to other spell checker engines</A>
+<UL>
+<LI><A NAME="tex2html311"
+  HREF="1_Introduction.html#SECTION00211000000000000000">1.1.1 Comparison to Ispell</A>
+<UL>
+<LI><A NAME="tex2html312"
+  HREF="1_Introduction.html#SECTION00211100000000000000">1.1.1.1 Features that only Aspell has</A>
+<LI><A NAME="tex2html313"
+  HREF="1_Introduction.html#SECTION00211200000000000000">1.1.1.2 Things that, currently, only Ispell have</A>
+</UL></UL></UL>
+<!--End of Table of Child-Links-->
+<HR>
+
+<H1><A NAME="SECTION00200000000000000000">
+1. Introduction</A>
+</H1>
+
+<P>
+GNU Aspell is a spell checker designed to eventually replace Ispell.
+It can either be used as a library or as an independent spell checker.
+Its main feature is that it does a much better job of coming up with
+possible suggestions than just about any other spell checker out there
+for the English language, including Ispell and Microsoft Word. It
+also has many other technical enhancements over Ispell such as using
+shared memory for dictionaries and intelligently handling personal
+dictionaries when more than one Aspell process is open at once.
+
+<P>
+
+<H1><A NAME="SECTION00210000000000000000">
+1.1 Comparison to other spell checker engines</A>
+</H1>
+
+<P>
+<BR>
+<BR>
+<DIV ALIGN="CENTER">
+<TABLE CELLPADDING=3 BORDER="1">
+<TR><TD ALIGN="RIGHT">&nbsp;</TD>
+<TD ALIGN="LEFT">Aspell</TD>
+<TD ALIGN="CENTER">Ispell</TD>
+<TD ALIGN="CENTER">Netscape 4.0</TD>
+<TD ALIGN="CENTER">Microsoft Word 97</TD>
+</TR>
+<TR><TD ALIGN="RIGHT">Open Source</TD>
+<TD ALIGN="LEFT">x</TD>
+<TD ALIGN="CENTER">x</TD>
+<TD ALIGN="CENTER">&nbsp;</TD>
+<TD ALIGN="CENTER">&nbsp;</TD>
+</TR>
+<TR><TD ALIGN="RIGHT">Suggestion Intelligence</TD>
+<TD ALIGN="LEFT">88-98</TD>
+<TD ALIGN="CENTER">54</TD>
+<TD ALIGN="CENTER">55-70?</TD>
+<TD ALIGN="CENTER">71</TD>
+</TR>
+<TR><TD ALIGN="RIGHT">Personal part of Suggestions</TD>
+<TD ALIGN="LEFT">x</TD>
+<TD ALIGN="CENTER">x</TD>
+<TD ALIGN="CENTER">x</TD>
+<TD ALIGN="CENTER">&nbsp;</TD>
+</TR>
+<TR><TD ALIGN="RIGHT">Alternate Dictionaries</TD>
+<TD ALIGN="LEFT">x</TD>
+<TD ALIGN="CENTER">x</TD>
+<TD ALIGN="CENTER">?</TD>
+<TD ALIGN="CENTER">?</TD>
+</TR>
+<TR><TD ALIGN="RIGHT">International Support</TD>
+<TD ALIGN="LEFT">x</TD>
+<TD ALIGN="CENTER">x</TD>
+<TD ALIGN="CENTER">?</TD>
+<TD ALIGN="CENTER">?</TD>
+</TR>
+</TABLE>
+</DIV>
+<BR>
+<BR>
+
+<P>
+The suggestion Intelligence is based on a small test kernel of misspelled/correct
+word pairs. Go to <TT><A NAME="tex2html1"
+  HREF="http://aspell.net/test">http://aspell.net/test</A></TT> for more info and
+how you can help contribute to the test kernel. The current scores
+for Aspell are 88 in <B>fast</B> mode, 93 in <B>normal</B> mode,
+and 98 in <B>bad spellers</B> mode see section <A HREF="4_Customizing.html#suggestion">4.4.4</A>
+for more information about the various suggestion modes.
+
+<P>
+If you have any other information you would like to add to this chart
+please contact me at kevina@gnu.org.
+
+<P>
+
+<H2><A NAME="SECTION00211000000000000000">
+1.1.1 Comparison to Ispell</A>
+</H2>
+
+<P>
+
+<H3><A NAME="SECTION00211100000000000000">
+1.1.1.1 Features that only Aspell has</A>
+</H3>
+
+<P>
+
+<UL>
+<LI>Does a much better job with coming up with suggestions than Ispell
+does or for that matter any other spell checker I have seen. If you
+know a spell checker that does a better job please let me know.
+</LI>
+<LI>Can learn from users misspellings.
+</LI>
+<LI>Is an actual library that others programs can link to instead of having
+to use it through a pipe.
+</LI>
+<LI>Is multiprocess intelligent. When a personal dictionary (or replacement
+list) is saved it will now first update the list against the dictionary
+on disk in case another process modified it.
+</LI>
+<LI>Can share the memory used in the main word list between processes.
+</LI>
+<LI>Support for detachable dictionaries so that more than one
+aspell class can use the same dictionary.
+</LI>
+<LI>Support for multiple personal dictionaries as well as support for
+special auxiliary dictionaries.
+</LI>
+<LI>Better support for run-together words.
+</LI>
+<LI>Ability to use multiple dictionaries by simply specifying it on the
+command line or in the configuration files.
+</LI>
+<LI>A better, more complete word list for the English language. Word lists
+are provided for American, British, and Canadian spelling. Special
+care has been taken to only include one spelling for each word in
+any particular word list. The word list included in Ispell by contrast
+only included support for American and British and also tends to included
+multiple spellings for a word which can mask some spelling errors.
+</LI>
+</UL>
+
+<P>
+
+<H3><A NAME="SECTION00211200000000000000">
+1.1.1.2 Things that, currently, only Ispell have</A>
+</H3>
+
+<P>
+
+<UL>
+<LI>Support for affix compression (However this should change soon once
+Kevin Hendricks is integrated)
+</LI>
+<LI>Lower memory footprint
+</LI>
+<LI>Perhaps better support for spell checking (La)T<SMALL>E</SMALL>X files.
+</LI>
+<LI>Support for spell checking Nroff files.
+</LI>
+</UL>
+
+<P>
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html308"
+  HREF="2_Getting.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html304"
+  HREF="manual.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html298"
+  HREF="Contents.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html306"
+  HREF="Contents.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html309"
+  HREF="2_Getting.html">2. Getting Started</A>
+<B> Up:</B> <A NAME="tex2html305"
+  HREF="manual.html">GNU Aspell 0.50.3</A>
+<B> Previous:</B> <A NAME="tex2html299"
+  HREF="Contents.html">Contents</A>
+ &nbsp <B>  <A NAME="tex2html307"
+  HREF="Contents.html">Contents</A></B> 
+<!--End of Navigation Panel-->
+<ADDRESS>
+Thorsten Maerz
+2002-12-18
+</ADDRESS>
+</BODY>
+</HTML>

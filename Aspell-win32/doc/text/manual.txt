@@ -1,0 +1,178 @@
+next up previous contents
+Next: Contents   Contents
+
+
+                            GNU Aspell 0.50.3                             
+                                                                          
+                         Copyright (c) 2000-2002                          
+                              Kevin Atkinson                              
+                              kevina@gnu.org                              
+
+
+--------------------------------------------------------------------------
+
+  * Contents
+  * 1. Introduction
+      + 1.1 Comparison to other spell checker engines
+          o 1.1.1 Comparison to Ispell
+              # 1.1.1.1 Features that only Aspell has
+              # 1.1.1.2 Things that, currently, only Ispell have
+  * 2. Getting Started
+      + 2.1 Requirements
+      + 2.2 Obtaining
+      + 2.3 Support
+      + 2.4 Helping Out
+      + 2.5 Compiling & Installing
+          o 2.5.1 Generic Install Instructions
+          o 2.5.2 General Problems
+          o 2.5.3 Curses Notes
+          o 2.5.4 Upgrading from Aspell .33/Pspell .12
+          o 2.5.5 Upgrading from a pre-release snapshot
+          o 2.5.6 Win32 Notes
+              # 2.5.6.1 Getting
+              # 2.5.6.2 Building
+              # 2.5.6.3 (PD)Curses
+              # 2.5.6.4 Directories
+              # 2.5.6.5 Installer
+              # 2.5.6.6 Win32 consoles
+      + 2.6 Using aspell-import
+  * 3. Basic Usage
+      + 3.1 Spellchecking Individual Files
+      + 3.2 Using Aspell with other Applications
+          o 3.2.1 With Applications that Expect Ispell
+          o 3.2.2 With Emacs and Xemacs
+          o 3.2.3 With LyX
+          o 3.2.4 With VIM
+          o 3.2.5 With Pine
+  * 4. Customizing Aspell
+      + 4.1 Specifying Options
+          o 4.1.1 At the Command Line
+              # 4.1.1.1 Boolean
+              # 4.1.1.2 Value
+              # 4.1.1.3 List
+          o 4.1.2 Via a Configuration File
+              # 4.1.2.1 Boolean
+              # 4.1.2.2 Value
+              # 4.1.2.3 List
+          o 4.1.3 Via an Environmental Variable
+      + 4.2 The Options
+          o 4.2.1 Dictionary Options
+          o 4.2.2 Checker Options
+          o 4.2.3 Filter Options
+          o 4.2.4 Run-together Word Options
+          o 4.2.5 Misc Options
+          o 4.2.6 Aspell Utility Options
+      + 4.3 Dumping Configuration Values
+      + 4.4 Notes on various Options
+          o 4.4.1 Notes on Various Filters and Filter Modes
+              # 4.4.1.1 None Mode
+              # 4.4.1.2 Url Filter/Mode
+              # 4.4.1.3 Email Filter/Mode
+              # 4.4.1.4 SGML Filter/Mode
+              # 4.4.1.5 TEX Filter/Mode
+          o 4.4.2 Notes on the Prefix Option
+          o 4.4.3 Notes on Typo-Analysis and the Keyboard Definition File
+          o 4.4.4 Notes on the Different Suggestion Modes
+  * 5. Working With Dictionaries
+      + 5.1 How Aspell Selects an Appropriate Dictionary
+      + 5.2 Listing Available Dictionaries
+      + 5.3 Dumping the contents of the word list
+      + 5.4 Creating an Individual Word List
+          o 5.4.1 Format of the Replacement Word List
+      + 5.5 Using Multi Dictionaries
+      + 5.6 Dictionary Naming
+      + 5.7 AWLI files
+  * 6. Writing programs to use Aspell
+      + 6.1 Through the C API
+          o 6.1.1 Usage
+          o 6.1.2 API Reference
+          o 6.1.3 Examples
+          o 6.1.4 Notes About Thread Safety
+      + 6.2 Through A Pipe
+          o 6.2.1 Format of the Data Stream
+      + 6.3 Notes of Storing Replacement Pairs
+  * 7. Adding Support For Other Languages
+      + 7.1 The Language Data File
+      + 7.2 Compiling the Word List
+      + 7.3 Phonetic Code
+          o 7.3.1 Syntax of the transformation array
+          o 7.3.2 How do I start finally?
+              # 7.3.2.1 Things that come in handy
+              # 7.3.2.2 What the phonetic code should do
+      + 7.4 Controlling the Behavior of Run-together Words
+  * 8. How Aspell Works
+  * A. Changelog
+      + Changes from 0.50.2 to 0.50.3 (Nov 23, 2002)
+      + Changes from 0.50.1 to 0.50.2 (Sep 28, 2002)
+      + Changes from 0.50 to 0.50.1 (Aug 28, 2002)
+      + Changes from .33.7.1 to 0.50 (Aug 23, 2002)
+      + Changes from .33.7 to .33.7.1 (Aug 20, 2001)
+      + Changes from .33.6.3 to .33.7 (Aug 2, 2001)
+      + Changes from .33.6.2 to .33.6.3 (June 3, 2001)
+      + Changes from .33.6.1 to .33.6.2 (June 3, 2001)
+      + Changes from .33.6 to .33.6.1 (May 29, 2001)
+      + Changes from .33.5 to .33.6 (May 18, 2001)
+      + Changes from .33 to .33.5 (April 5, 2001)
+      + Changes from .32.6 to .33 (January 28, 2001)
+      + Changes from .32.5 to .32.6 (Nov 8, 2000)
+      + Changes from .32.1 to .32.5 (August 18, 2000)
+      + Changes from .32 to .32.1 (August 5, 2000)
+      + Changes from .31.1 to .32 (July 23, 2000)
+      + Changes from .31 to .31.1 (June 18, 2000)
+      + Changes from .30.1 to .31 (June 11, 2000)
+      + Changes from .30 to .30.1 (April 29, 2000)
+      + Changes from .29.1 to .30 (April 2, 2000)
+      + Changes from .29 to .29.1 (Feb 18, 2000)
+      + Changes from .28.3 to .29 (Feb 6, 2000)
+      + Changes from .28.2.1 to .28.3 (Nov 20, 1999)
+      + Changes from .28.2 to .28.2.1 (Aug 25, 1999)
+      + Changes from .28.1 to .28.2 (Aug 25, 1999)
+      + Changes from .28 to .28.1 (July 27, 1999)
+      + Changes from .27.2 to .28 (July 25, 1999)
+      + Changes from .27.1 to .27.2 (Mar 1, 1999)
+      + Changes from .27 to .27.1 (Feb 24, 1999)
+      + Changes from .26.2 to .27 (Feb 22, 1999)
+      + Changed from .26.1 to .26.2 (Jan 3, 1998)
+      + Changed from .26 to .26.1 (Jan 3, 1998)
+      + Changed from .25.1 to .26 (Jan 3, 1999)
+      + Changes from .25 to .25.1 (Dec 10, 1998)
+      + Changes from .24 to .25 (Nov 23, 1998)
+      + Changes from .23 to .24 (Nov 8, 1998)
+      + Changes from .22.1 to .23 (Oct 31, 1998)
+      + Changes from .22 to .22.1 (Oct 27, 1998)
+      + Changes from .21 to .22 (Oct 26, 1998)
+      + Changes from .20 to .21 (Oct 13, 1998)
+      + Changes from .11 to .20 (Oct 10, 1998)
+      + Changes from .10 to .11 (Sep 12, 1998)
+  * B. To Do
+      + B.1 Things that need to be done
+      + B.2 Good ideas that are worth implementing
+      + B.3 Notes and Status of various items
+          o B.3.1 General region skipping
+          o B.3.2 Word skipping by context
+          o B.3.3 Hidden Markov Model
+          o B.3.4 Email the Personal Dictionary
+          o B.3.5 Words With Spaces in Them
+  * C. Credits
+  * D. Glossary and References
+  * E. Copyright
+      + E.1 GNU Free Documentation License
+          o Preamble
+          o E.1.1 Applicability and Definitions
+          o E.1.2 Verbatim Copying
+          o E.1.3 Copying in Quantity
+          o E.1.4 Modifications
+          o E.1.5 Combining Documents
+          o E.1.6 Collections of Documents
+          o E.1.7 Aggregation With Independent Works
+          o E.1.8 Translation
+          o E.1.9 Termination
+          o E.1.10 Future Revisions of This License
+          o ADDENDUM: How to use this License for your documents
+      + E.2 GNU Lesser Public License
+  * About this document ...
+
+
+--------------------------------------------------------------------------
+
+Thorsten Maerz 2002-12-18

@@ -1,0 +1,140 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with LaTeX2HTML 99.2beta8 (1.43)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>8. How Aspell Works</TITLE>
+<META NAME="description" CONTENT="8. How Aspell Works">
+<META NAME="keywords" CONTENT="manual">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="LaTeX2HTML v99.2beta8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="manual.css">
+
+<LINK REL="next" HREF="A_Changelog.html">
+<LINK REL="previous" HREF="7_Adding.html">
+<LINK REL="up" HREF="manual.html">
+<LINK REL="next" HREF="A_Changelog.html">
+</HEAD>
+
+<BODY >
+<!--Navigation Panel-->
+<A NAME="tex2html473"
+  HREF="A_Changelog.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html469"
+  HREF="manual.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html463"
+  HREF="7_Adding.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html471"
+  HREF="Contents.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html474"
+  HREF="A_Changelog.html">A. Changelog</A>
+<B> Up:</B> <A NAME="tex2html470"
+  HREF="manual.html">GNU Aspell 0.50.3</A>
+<B> Previous:</B> <A NAME="tex2html464"
+  HREF="7_Adding.html">7. Adding Support For</A>
+ &nbsp <B>  <A NAME="tex2html472"
+  HREF="Contents.html">Contents</A></B> 
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+
+<H1><A NAME="SECTION00900000000000000000"></A><A NAME="works"></A>
+<BR>
+8. How Aspell Works
+</H1>
+
+<P>
+The magic behind my spell checker comes from merging Lawrence Philips
+excellent metaphone algorithm and Ispell's near miss strategy which
+is inserting a space or hyphen, interchanging two adjacent letters,
+changing one letter, deleting a letter, or adding a letter.
+
+<P>
+The process goes something like this.
+
+<P>
+
+<OL>
+<LI>Convert the misspelled word to its soundslike equivalent (its metaphone
+for English words).
+</LI>
+<LI>Find all words that have a soundslike within one or two edit distances
+from the original words soundslike. The edit distance is the total
+number of deletions, insertions, exchanges, or adjacent swaps needed
+to make one string equivalent to the other. When set to only look
+for soundslikes within one edit distance it tries all possible soundslike
+combinations and check if each one is in the dictionary. When set
+to find all soundslike within two edit distance it scans through the
+entire dictionary and quickly scores each soundslike. The scoring
+is quick because it will give up if the two soundslikes are more than
+two edit distances apart.
+</LI>
+<LI>Find misspelled words that have a correctly spelled replacement by
+the same criteria of step number 2 and 3. That is the misspelled word
+in the word pair (such as teh -&gt; the) would appear in the suggestions
+list as if it was a correct spelling.
+</LI>
+<LI>Score the result list and return the words with the lowest score.
+The score is roughly the weighed average of the weighed edit distance
+of the word to the misspelled word and the soundslike equivalent of
+the two words. The weighted edit distance is like the edit distance
+except that the various edits have weights attached to them.
+</LI>
+<LI>Replace the misspelled words that have correctly spelled replacements
+with their replacements and remove any duplicates that might arise
+because of this.
+</LI>
+</OL>
+Please note that the soundslike equivalent is a rough approximation
+of how the words sounds. It is not the phoneme of the word by any
+means. For more details about exactly how each step is performed please
+see the file <B>suggest.cc</B>. For more information on the metaphone
+algorithm please see the data file <B>english_phonet.dat</B>.
+
+<P>
+
+<P>
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html473"
+  HREF="A_Changelog.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html469"
+  HREF="manual.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html463"
+  HREF="7_Adding.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html471"
+  HREF="Contents.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html474"
+  HREF="A_Changelog.html">A. Changelog</A>
+<B> Up:</B> <A NAME="tex2html470"
+  HREF="manual.html">GNU Aspell 0.50.3</A>
+<B> Previous:</B> <A NAME="tex2html464"
+  HREF="7_Adding.html">7. Adding Support For</A>
+ &nbsp <B>  <A NAME="tex2html472"
+  HREF="Contents.html">Contents</A></B> 
+<!--End of Navigation Panel-->
+<ADDRESS>
+Thorsten Maerz
+2002-12-18
+</ADDRESS>
+</BODY>
+</HTML>

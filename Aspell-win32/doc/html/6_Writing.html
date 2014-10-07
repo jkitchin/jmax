@@ -1,0 +1,627 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<!--Converted with LaTeX2HTML 99.2beta8 (1.43)
+original version by:  Nikos Drakos, CBLU, University of Leeds
+* revised and updated by:  Marcus Hennecke, Ross Moore, Herb Swan
+* with significant contributions from:
+  Jens Lippmann, Marek Rouchal, Martin Wilck and others -->
+<HTML>
+<HEAD>
+<TITLE>6. Writing programs to use Aspell</TITLE>
+<META NAME="description" CONTENT="6. Writing programs to use Aspell">
+<META NAME="keywords" CONTENT="manual">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+<META NAME="Generator" CONTENT="LaTeX2HTML v99.2beta8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+
+<LINK REL="STYLESHEET" HREF="manual.css">
+
+<LINK REL="next" HREF="7_Adding.html">
+<LINK REL="previous" HREF="5_Working.html">
+<LINK REL="up" HREF="manual.html">
+<LINK REL="next" HREF="7_Adding.html">
+</HEAD>
+
+<BODY >
+<!--Navigation Panel-->
+<A NAME="tex2html433"
+  HREF="7_Adding.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html429"
+  HREF="manual.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html423"
+  HREF="5_Working.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html431"
+  HREF="Contents.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html434"
+  HREF="7_Adding.html">7. Adding Support For</A>
+<B> Up:</B> <A NAME="tex2html430"
+  HREF="manual.html">GNU Aspell 0.50.3</A>
+<B> Previous:</B> <A NAME="tex2html424"
+  HREF="5_Working.html">5. Working With Dictionaries</A>
+ &nbsp <B>  <A NAME="tex2html432"
+  HREF="Contents.html">Contents</A></B> 
+<BR>
+<BR>
+<!--End of Navigation Panel-->
+<!--Table of Child-Links-->
+<A NAME="CHILD_LINKS"><STRONG>Subsections</STRONG></A>
+
+<UL>
+<LI><A NAME="tex2html435"
+  HREF="6_Writing.html#SECTION00710000000000000000">6.1 Through the C API</A>
+<UL>
+<LI><A NAME="tex2html436"
+  HREF="6_Writing.html#SECTION00711000000000000000">6.1.1 Usage</A>
+<LI><A NAME="tex2html437"
+  HREF="6_Writing.html#SECTION00712000000000000000">6.1.2 API Reference</A>
+<LI><A NAME="tex2html438"
+  HREF="6_Writing.html#SECTION00713000000000000000">6.1.3 Examples</A>
+<LI><A NAME="tex2html439"
+  HREF="6_Writing.html#SECTION00714000000000000000">6.1.4 Notes About Thread Safety</A>
+</UL>
+<LI><A NAME="tex2html440"
+  HREF="6_Writing.html#SECTION00720000000000000000">6.2 Through A Pipe</A>
+<UL>
+<LI><A NAME="tex2html441"
+  HREF="6_Writing.html#SECTION00721000000000000000">6.2.1 Format of the Data Stream</A>
+</UL>
+<LI><A NAME="tex2html442"
+  HREF="6_Writing.html#SECTION00730000000000000000">6.3 Notes of Storing Replacement Pairs</A>
+</UL>
+<!--End of Table of Child-Links-->
+<HR>
+
+<H1><A NAME="SECTION00700000000000000000">
+6. Writing programs to use Aspell</A>
+</H1>
+
+<P>
+There are two main ways to use aspell from within your application.
+Through the external C API or through a pipe. The internal Aspell
+API can be used directly but that is not recommended as the actual
+Aspell API is constantly changing.
+
+<P>
+
+<H1><A NAME="SECTION00710000000000000000">
+6.1 Through the C API</A>
+</H1>
+
+<P>
+The Aspell library contains two main classes and several helper classes.
+The two main classes are AspellConfig and AspellMaster. The AspellConfig
+class is used to set initial defaults and to change spell checker
+specific options. The AspellManager class does most of the real work.
+It is responsible for managing the dictionaries, checking if a word
+is in the dictionary, and coming up with suggestions among other things.
+There are many helper classes the important ones are AspellWordList,
+AspellMutableWordList, Aspell*Enumeration. The AspellWordList classes
+is used for accessing the suggestion list, as well as the personal
+and suggestion word list currently in use. The AspellMutableWordList
+is used to manage the personal, and perhaps other, word lists. The
+Aspell*Enumeration classes are used for iterating through a list.
+
+<P>
+
+<H2><A NAME="SECTION00711000000000000000">
+6.1.1 Usage</A>
+</H2>
+
+<P>
+To use Aspell your application should include ``aspell.h''. In
+order to insure that all the necessary libraries are linked in libtool
+should be used to perform the linking. When using libtool simply linking
+with ``-laspell'' should be all that is necessary. When using
+shared libraries you might be able to simply link ``-laspell'',
+but this is not recommended. This version of Aspell uses the CVS version
+of libtool however released versions of libtool should also work.
+
+<P>
+When your application first starts you should get a new configuration
+class with the command:
+
+<P>
+
+<DL COMPACT>
+<DT>
+<DD><TT>AspellConfig&nbsp;*&nbsp;spell_config&nbsp;=&nbsp;new_aspell_config();</TT>
+</DD>
+</DL> which will create a new AspellConfig class. It is allocated with new
+and it is your responsibility to delete it with delete_aspell_config.
+Once you have the config class you should set some variables. The
+most important one is the language variable. To do so use the command:
+
+<P>
+
+<DL COMPACT>
+<DT>
+<DD><TT>aspell_config_replace(spell_config,&nbsp;&#34;lang&#34;,&nbsp;&#34;en_US&#34;);</TT>
+</DD>
+</DL> which will set the default language to use to American English. The
+language is expected to be the standard two letter ISO 639 language
+code, with an optional two letter ISO 3166 country code after an underscore.
+You can set the preferred size via the <B>size</B> option, any extra
+info via the <B>jargon</B> option, and the encoding via the <B>encoding</B>
+option. Other things you might want to set is the preferred spell
+checker to use, the search path for dictionary's, and the like see
+section <A HREF="4_Customizing.html#options">4.2</A> for a list of all available options.
+
+<P>
+When ever a new document is created a new AspellManager class should
+also be created. There should be one speller class per document. To
+create a new speller class use the new_aspell_speller and then cast
+it up using to_aspell_speller like so.
+
+<P>
+
+<DL COMPACT>
+<DT>
+<DD><TT>AspellCanHaveError&nbsp;*&nbsp;possible_err&nbsp;=&nbsp;new_aspell_speller(spell_config);
+</TT>
+<P>
+<TT>AspellManager&nbsp;*&nbsp;spell_checker&nbsp;=&nbsp;0;
+</TT>
+<P>
+<TT>if&nbsp;(aspell_error_number(possible_err)&nbsp;!=&nbsp;0)
+</TT>
+<P>
+<TT>&nbsp;&nbsp;puts(aspell_error_message(possible_err));
+</TT>
+<P>
+<TT>else
+</TT>
+<P>
+<TT>&nbsp;&nbsp;spell_checker&nbsp;=&nbsp;to_aspell_speller(possible_err);</TT>
+</DD>
+</DL> which will create a new AspellManager class using the defaults found
+in spell_config. To find out which dictionary is selected the <B>lang</B>,
+<B>size</B>, and <B>jargon</B> options may be examinded. To find
+out the exact name of the dictionary the <B>master</B> option way
+be examned as well as the <B>master-flags</B> opntions to see if
+any special flags that were passed on to the module. The <B>module</B>
+option way also be examed to figure out which speller module was selected,
+but since there is only one this option will always be the same.
+
+<P>
+If for some reason you want to use different defaults simply clone
+spell_config and change the setting like so:
+
+<P>
+
+<DL COMPACT>
+<DT>
+<DD><TT>AspellConfig&nbsp;*&nbsp;spell_config2&nbsp;=&nbsp;aspell_config_clone(spell_config);
+</TT>
+<P>
+<TT>aspell_config_replace(spell_config2,&nbsp;&#34;lang&#34;,&#34;nl&#34;);
+</TT>
+<P>
+<TT>possible_err&nbsp;=&nbsp;new_aspell_speller(spell_config2);
+</TT>
+<P>
+<TT>delete_aspell_config(spell_config2);</TT>
+</DD>
+</DL> Once the speller class is created you can use the check method to
+see if a word in the document is correct like so:
+
+<P>
+
+<DL COMPACT>
+<DT>
+<DD><TT>int&nbsp;correct&nbsp;=&nbsp;aspell_speller_check(spell_checker,&nbsp;&lt;word&gt;,&nbsp;&lt;size&gt;);</TT>
+</DD>
+</DL> &lt;word&gt; can is expected to a const char * character string. If the
+encoding is set to be ``machine unsigned 16'' or ``machine
+unsigned 32''. &lt;word&gt; is expected to be a cast from either const
+u16int * or const u32int* respectfully. U16int and u32int are
+generally unsigned short and unsigned int respectfully. &lt;size&gt; is
+the length of the string or -1 if the sting is null terminated. If
+the string is a cast from const u16int * or const u32int * then
+size is the amount of space in bytes the string takes up after being
+casted to const char * and not the true size of the string. Aspell_speller_check
+will return 0 is it is not found and non-zero otherwise.
+
+<P>
+If the word is not correct than the suggest method can be used to
+come up with likely replacements.
+
+<P>
+
+<DL COMPACT>
+<DT>
+<DD><TT>AspellWordList&nbsp;*&nbsp;suggestions&nbsp;=&nbsp;aspell_speller_suggest(spell_checker,&nbsp;&lt;word&gt;,&nbsp;&lt;size&gt;);
+</TT>
+<P>
+<TT>AspellStringEnumeration&nbsp;*&nbsp;elements&nbsp;=&nbsp;aspell_word_list_elements(suggestions);
+</TT>
+<P>
+<TT>const&nbsp;char&nbsp;*&nbsp;word;
+</TT>
+<P>
+<TT>while&nbsp;(&nbsp;(word&nbsp;=&nbsp;aspell_string_enumeration_next(aspell_elements)&nbsp;!=&nbsp;NULL&nbsp;)&nbsp;{
+</TT>
+<P>
+<TT>&nbsp;&nbsp;//&nbsp;add&nbsp;to&nbsp;suggestion&nbsp;list
+</TT>
+<P>
+<TT>}
+</TT>
+<P>
+<TT>delete_aspell_string_manag(elements);</TT>
+</DD>
+</DL> Notice how <TT>elements</TT> is deleted but <TT>suggestions</TT> is
+not. The value returned by suggestions is only valid to the next call
+to suggest. Once a replacement is made the store_repl method should
+be used to communicate the replacement pair back to the spell checker
+(see section <A HREF="6_Writing.html#replpair">6.3</A> for why). It usage is as follows:
+
+<P>
+
+<DL COMPACT>
+<DT>
+<DD><TT>aspell_speller_store_repl(spell_checker,&nbsp;
+</TT>
+<P>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;misspelled&nbsp;word&gt;,&nbsp;&lt;size&gt;,
+</TT>
+<P>
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;correctly&nbsp;spelled&nbsp;word&gt;,&nbsp;&lt;size&gt;);</TT>
+</DD>
+</DL> If the user decided to add the word to the session or personal dictionary
+the the word can be be added using the add_to_session or add_to_personal
+methods respectfully like so:
+
+<P>
+
+<DL COMPACT>
+<DT>
+<DD><TT>aspell_speller_add_to_session|personal(spell_checker,&nbsp;&lt;word&gt;,&nbsp;&lt;size&gt;);</TT>
+</DD>
+</DL> It is better to let the spell checker manage these words rather than
+doing it your self so that the words have a change of appearing in
+the suggestion list.
+
+<P>
+Finally, when the document is closed the AspellManager class should
+be deleted like so.
+
+<P>
+
+<DL COMPACT>
+<DT>
+<DD><TT>delete_aspell_speller(spell_checker);</TT>
+</DD>
+</DL> 
+<P>
+
+<H2><A NAME="SECTION00712000000000000000">
+6.1.2 API Reference</A>
+</H2>
+
+<P>
+Methods that return a boolean result generally return false on error
+and true other wise. To find out what went wrong use the error_number
+and error_message methods. Unless otherwise stated methods that return
+a ``const char *'' will return null on error. In general, the
+charter string returned is only valid until the next method which
+returns a ``const char *'' is called.
+
+<P>
+For the details of the various classes please see the header files.
+In the future I will generate class references using some automated
+tool.
+
+<P>
+
+<H2><A NAME="SECTION00713000000000000000">
+6.1.3 Examples</A>
+</H2>
+
+<P>
+Two simple examples are included in the examples directory. The ``example-c''
+program demenstracts most of the Aspell library functionary and the
+``list-dicts'' lists the available dictionaries.
+
+<P>
+
+<H2><A NAME="SECTION00714000000000000000">
+6.1.4 Notes About Thread Safety</A>
+</H2>
+
+<P>
+Read-only Aspell methods and functions should be thread safe as long
+as exceptions, new, delete, delete[], and STL allocators are thread
+safe. To the best of my knowledge gcc and egcs meet these requirements.
+It is up to the programmer to make sure multiple threads do not do
+thing such as change the dictionaries and add or delete items from
+the personal or session dictionaries.
+
+<P>
+
+<H1><A NAME="SECTION00720000000000000000"></A><A NAME="pipe"></A>
+<BR>
+6.2 Through A Pipe
+</H1>
+
+<P>
+When given the <B>pipe</B> or <B>-a</B> command aspell goes into
+a pipe mode that is compatible with ``ispell -a''. Aspell also
+defines its own set of extensions to ispell pipe mode.
+
+<P>
+
+<H2><A NAME="SECTION00721000000000000000"></A><A NAME="data_stream"></A>
+<BR>
+6.2.1 Format of the Data Stream
+</H2>
+
+<P>
+In this mode, Aspell prints a one-line version identification message,
+and then begins reading lines of input. For each input line, a single
+line is written to the standard output for each word checked for spelling
+on the line. If the word was found in the main dictionary, or your
+personal dictionary, then the line contains only a '*'. 
+
+<P>
+If the word is not in the dictionary, but there are suggestions, then
+the line contains an '&amp;', a space, the misspelled word, a space,
+the number of near misses, the number of characters between the beginning
+of the line and the beginning of the misspelled word, a colon, another
+space, and a list of the suggestions separated by commas and spaces.
+
+<P>
+Finally, if the word does not appear in the dictionary, and there
+are no suggestions, then the line contains a '#', a space, the misspelled
+word, a space, and the character offset from the beginning of the
+line. Each sentence of text input is terminated with an additional
+blank line, indicating that ispell has completed processing the input
+line. 
+
+<P>
+These output lines can be summarized as follows: 
+
+<P>
+<DL>
+<DT><STRONG>OK:</STRONG></DT>
+<DD>* 
+</DD>
+<DT><STRONG>Suggestions:</STRONG></DT>
+<DD>&amp; «original»
+«count» «offset»:
+«miss», «miss»,
+... 
+</DD>
+<DT><STRONG>None:</STRONG></DT>
+<DD># «original» «offset» 
+</DD>
+</DL>
+When in the -a mode, Aspell will also accept lines of single words
+prefixed with any of '*', '&amp;', '@', '+', '-', '~',
+'#', '!', '%', or '^'. A line starting with '*'
+tells ispell to insert the word into the user's dictionary. A line
+starting with '&amp;' tells ispell to insert an all-lowercase version
+of the word into the user's dictionary. A line starting with '@' causes
+ispell to accept this word in the future. A line starting with '+',
+followed immediately by a valid mode will cause aspell to parse future
+input according the syntax of that formatter. A line consisting solely
+of a '+' will place ispell in T<SMALL>E</SMALL>X/L<SUP><SMALL>A</SMALL></SUP>T<SMALL>E</SMALL>X mode (similar to the
+-t option) and '-' returns aspell to its default mode (but these commands
+are obsolete). A line '~', is ignored for ispell compatibility.
+A line prefixed with '#' will cause the personal dictionaries to
+be saved. A line prefixed with '!' will turn on terse mode (see below),
+and a line prefixed with '%' will return ispell to normal (non-terse)
+mode. Any input following the prefix characters '+', '-', '#', '!',
+'~', or '%' is ignored, as is any input following.
+To allow spell-checking of lines beginning with these characters,
+a line starting with '^' has that character removed
+before it is passed to the spell-checking code. It is recommended
+that programmatic interfaces prefix every data line with an uparrow
+to protect themselves against future changes in Aspell. 
+
+<P>
+To summarize these: 
+
+<P>
+<DL>
+<DT><STRONG>*«word»</STRONG></DT>
+<DD>Add a word to
+the personal dictionary 
+</DD>
+<DT><STRONG>&amp;«word»</STRONG></DT>
+<DD>Insert the all-lowercase
+version of the word in the personal dictionary
+</DD>
+<DT><STRONG>@«word»</STRONG></DT>
+<DD>Accept the word,
+but leave it out of the dictionary
+</DD>
+<DT><STRONG>#</STRONG></DT>
+<DD>Save the current personal dictionary
+</DD>
+<DT><STRONG>~</STRONG></DT>
+<DD>Ignored for ispell compatibility.
+</DD>
+<DT><STRONG>+</STRONG></DT>
+<DD>Enter T<SMALL>E</SMALL>X mode.
+</DD>
+<DT><STRONG>+«mode»</STRONG></DT>
+<DD>Enter the mode specified
+by «mode».
+</DD>
+<DT><STRONG>-</STRONG></DT>
+<DD>Enter the default mode.
+</DD>
+<DT><STRONG>!</STRONG></DT>
+<DD>Enter terse mode 
+</DD>
+<DT><STRONG>%</STRONG></DT>
+<DD>Exit terse mode
+</DD>
+<DT><STRONG>^</STRONG></DT>
+<DD>Spell-check the rest of the line 
+</DD>
+</DL>
+In terse mode, Aspell will not print lines beginning with '*', which
+indicate correct words. This significantly improves running speed
+when the driving program is going to ignore correct words anyway.
+
+<P>
+In addition to the above commands which are designed for Ispell compatibility
+Aspell also supports its own extension. All Aspell extensions follow
+the following format.
+
+<P>
+<BLOCKQUOTE>
+$$«command» [data]
+
+</BLOCKQUOTE>
+Where data may or may not be required depending on the particular
+command. Aspell currently supports the following command.
+
+<P>
+<DL>
+<DT><STRONG>cs&nbsp;«option»,«value»</STRONG></DT>
+<DD>Change
+a configuration option.
+</DD>
+<DT><STRONG>cr&nbsp;«option»</STRONG></DT>
+<DD>Prints the
+value of a configuration option.
+</DD>
+<DT><STRONG>pp</STRONG></DT>
+<DD>Returns a list of all words in the current personal wordlist.
+</DD>
+<DT><STRONG>ps</STRONG></DT>
+<DD>Returns a list of all words in the current session dictionary.
+</DD>
+<DT><STRONG>l</STRONG></DT>
+<DD>Returns the current language name.
+</DD>
+<DT><STRONG>ra&nbsp;«mis»,«cor»</STRONG></DT>
+<DD>Add
+the word pair to the replacement dictionary for latter use. Returns
+nothing.
+</DD>
+</DL>
+Anything returned is returned on its own line line. All lists returned
+have the following format
+
+<P>
+<BLOCKQUOTE>
+«num of items»: «item1»,
+«item2», «etc»
+
+</BLOCKQUOTE>
+<I>(Part of the preceding section was directly copied out of the
+Ispell manual)</I>
+
+<P>
+
+<H1><A NAME="SECTION00730000000000000000"></A><A NAME="replpair"></A>
+<BR>
+6.3 Notes of Storing Replacement Pairs
+</H1>
+
+<P>
+The store_repl method and the $$ra should be used because Aspell
+is able to learn from users misspellings. For example on the first
+pass a user misspells beginning as beging so aspell suggests:
+
+<P>
+<BLOCKQUOTE>
+begging, begin, being, Beijing, bagging, ....
+
+</BLOCKQUOTE>
+However the user then tries &#34;begning&#34; and aspell
+suggests
+
+<P>
+<BLOCKQUOTE>
+beginning, beaning, begging, ... 
+
+</BLOCKQUOTE>
+so the user selects beginning. However than, latter on in the document
+the user misspelles it as begng (NOT beging). Normally aspell will
+suggest.
+
+<P>
+<BLOCKQUOTE>
+began, begging, begin, begun, ....
+
+</BLOCKQUOTE>
+However becuase it knows the user mispelled beginning as beging it
+will instead suggest:
+
+<P>
+<BLOCKQUOTE>
+beginning, began, begging, begin, begun ...
+
+</BLOCKQUOTE>
+I myself often misspelled beginning (and still do) as something close
+to begging and two many times wind up writing sentences such as &#34;begging
+with ....&#34;.
+
+<P>
+Please also note that replacements commands has a memory. Which means
+if you first store the replacement pair:
+
+<P>
+<BLOCKQUOTE>
+sicolagest -&gt; psycolagest
+
+</BLOCKQUOTE>
+then store the replacement pair
+
+<P>
+<BLOCKQUOTE>
+psycolagest -&gt; psychologist
+
+</BLOCKQUOTE>
+The replacement pair
+
+<P>
+<BLOCKQUOTE>
+sicolagest -&gt; psychologist
+
+</BLOCKQUOTE>
+will also get stored so that you don't have to worry about it.
+
+<P>
+<HR>
+<!--Navigation Panel-->
+<A NAME="tex2html433"
+  HREF="7_Adding.html">
+<IMG WIDTH="37" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="next" SRC="next.png"></A> 
+<A NAME="tex2html429"
+  HREF="manual.html">
+<IMG WIDTH="26" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="up" SRC="up.png"></A> 
+<A NAME="tex2html423"
+  HREF="5_Working.html">
+<IMG WIDTH="63" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="previous" SRC="prev.png"></A> 
+<A NAME="tex2html431"
+  HREF="Contents.html">
+<IMG WIDTH="65" HEIGHT="24" ALIGN="BOTTOM" BORDER="0" ALT="contents" SRC="contents.png"></A>  
+<BR>
+<B> Next:</B> <A NAME="tex2html434"
+  HREF="7_Adding.html">7. Adding Support For</A>
+<B> Up:</B> <A NAME="tex2html430"
+  HREF="manual.html">GNU Aspell 0.50.3</A>
+<B> Previous:</B> <A NAME="tex2html424"
+  HREF="5_Working.html">5. Working With Dictionaries</A>
+ &nbsp <B>  <A NAME="tex2html432"
+  HREF="Contents.html">Contents</A></B> 
+<!--End of Navigation Panel-->
+<ADDRESS>
+Thorsten Maerz
+2002-12-18
+</ADDRESS>
+</BODY>
+</HTML>
