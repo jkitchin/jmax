@@ -809,5 +809,11 @@ pyflakes checks your code for errors. You should probably fix all of these.
   (ad-deactivate 'org-babel-execute:python)
   (message "org-py-check is deactivated for this session"))
 
-
+;; setup english dictionary and spell check on windows.
+(cond
+ ((string= system-type "windows-nt")
+  (setq-default ispell-program-name
+		(expand-file-name				     
+		 "Aspell-win32/bin/aspell.exe" starter-kit-dir))))
+  
 (message "jmax-org.el loaded")
