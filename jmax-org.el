@@ -814,6 +814,8 @@ pyflakes checks your code for errors. You should probably fix all of these.
  ((string= system-type "windows-nt")
   (setq-default ispell-program-name
 		(expand-file-name				     
-		 "Aspell-win32/bin/aspell.exe" starter-kit-dir))))
+		 "Aspell-win32/bin/aspell.exe" starter-kit-dir))
+  (flyspell-mode +1)
+  (add-hook 'org-mode-hook 'turn-on-flyspell 'append)))
   
 (message "jmax-org.el loaded")
