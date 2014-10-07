@@ -182,8 +182,15 @@ The user ssh.pub key must be registered in the course."
 
 Check *techela log* for error messages."
   (interactive)
-  (save-some-buffers t t) ; make sure all buffers are saved
+
   (tq-insert-system-info) ; creates a file
+  (gb-set-filetag "TURNED-IN" (current-time-string))
+  (gb-set-filetag "TURNED-IN-FAILED" nil) ; rm it in case it exists to
+					  ; avoid confusion if it
+					  ; succeeds this time.
+  (save-some-buffers t t) ; make sure all buffers are saved
+
+  ;; add everything in this directory
   (mygit "git add *")
 
   (let ((status (car (mygit "git commit -am \"turning in\""))))
@@ -192,13 +199,27 @@ Check *techela log* for error messages."
       (switch-to-buffer "*techela log*")
       (error "Problem committing.  Check the logs")))
 
-  (mygit "git tag -a turned_in -m \"Tagging version turned in\"")
+  (mygit "git tag -f -a turned_in -m \"Tagging version turned in.\"")
 
-  (unless (= 0 (car (mygit "git push -u origin master")))
+  (unless (= 0 (car (mygit "git push --tags -u origin master")))
     (mygit "git commit --amend -m \"*** TURNING IN FAILED ***.\"")
+    (gb-set-filetag "TURNED-IN-FAILED" (current-time-string))
+    (save-buffer)
     (switch-to-buffer "*techela log*")
-    (error "Problem pushing to server.  Check the logs"))  
+    (error "Problem pushing to server.  Check the logs."))  
+  (save-buffer)
   (message "Woohoo! You turned it in!"))
+
+
+(defun tq-git-log ()
+  "Show a buffer with the git history for the file associated with the open buffer."
+  (interactive)
+  (when (buffer-file-name)
+    (switch-to-buffer-other-window
+     (get-buffer-create "*git hist*"))
+    (erase-buffer)
+    (insert (nth 1 (mygit "git log --pretty=format:\"%h %ad | %s%d [%an]\" --graph --date=short")))
+    (goto-char (point-min)))) 
 
 
 (defun tq-update-course ()
@@ -447,15 +468,37 @@ Messages\n==========\n")
 This is normally only done after the deadline, when you cannot push to the git repo, or when there is some issue with the git server. There must be extenuating circumstances for this to be used."
   (interactive)
   (tq-check-internet)
+  (save-some-buffers t)
   (unless (executable-find "zip")
     (error "Could not find a zip executable."))
   
-  (let ((zip-name (file-name-sans-extension
-		   (file-name-nondirectory
-		    (buffer-file-name)))))
+  (let ((zip-name (concat tq-userid "-"
+			  (file-name-sans-extension
+			   (file-name-nondirectory
+			    (buffer-file-name))))))
+    ;; update system file
     (tq-insert-system-info)
-    (shell-command (format "zip -v -r %s *"
+
+    ;; remove zip if it exists.
+    (when (file-exists-p (concat zip-name ".zip"))
+      (delete-file (concat zip-name ".zip")))
+    
+    ;; add everything in this directory to get it clean, except for the zip file.
+    (mygit "git add *")
+  
+    (let ((status (car (mygit "git commit -am \"saving for email submit\""))))
+      (unless (or (= 0 status)  ; no problem
+		  (= 1 status)) ; no change in files
+	(switch-to-buffer "*techela log*")
+	(error "Problem committing.  Check the logs")))
+
+    (mygit "git tag -f -a turned_in -m \"Tagging version turned in by email.\"")
+
+    ;; make zip of directory
+    (shell-command (format "zip -v -r %s .git *"
 			   zip-name))
+
+    ;; the .git folder is locally not in sync with the one turned in. 
     (message-mail)
     (mml-attach-file (concat zip-name ".zip"))
     (message-goto-to)
@@ -556,6 +599,7 @@ a link in the heading."
   '("techela"
     ["Open syllabus" tq-open-syllabus t]
     ["Turn assignment in" tq-turn-it-in t]
+    ["Assignment history" tq-git-log t]
     ["Search course files" tq-search t]
     ["Table of contents" tq-toc t]
     ["Course index" tq-index t]
