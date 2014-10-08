@@ -218,8 +218,11 @@ Check *techela log* for error messages."
     (switch-to-buffer-other-window
      (get-buffer-create "*git hist*"))
     (erase-buffer)
-    (insert (nth 1 (mygit "git log --pretty=format:\"%h %ad | %s%d [%an]\" --graph --date=short")))
-    (goto-char (point-min)))) 
+    ;; just to make sure git runs in the right place we temporarily change directory.
+    (with-current-directory
+     (file-name-directory (buffer-file-name))
+     (insert (nth 1 (mygit "git log --pretty=format:\"%h %ad | %s%d [%an]\" --graph --date=local")))
+     (goto-char (point-min))))) 
 
 
 (defun tq-update-course ()
