@@ -199,9 +199,9 @@ Check *techela log* for error messages."
       (switch-to-buffer "*techela log*")
       (error "Problem committing.  Check the logs")))
 
-  (mygit "git tag -f -a turned_in -m \"Tagging version turned in.\"")
+  ;(mygit "git tag -f -a turned_in -m \"Tagging version turned in.\"")
 
-  (unless (= 0 (car (mygit "git push --tags -u origin master")))
+  (unless (= 0 (car (mygit "git push -u origin master")))
     (mygit "git commit --amend -m \"*** TURNING IN FAILED ***.\"")
     (gb-set-filetag "TURNED-IN-FAILED" (current-time-string))
     (save-buffer)
