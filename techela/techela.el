@@ -471,7 +471,7 @@ Messages\n==========\n")
 This is normally only done after the deadline, when you cannot push to the git repo, or when there is some issue with the git server. There must be extenuating circumstances for this to be used."
   (interactive)
   (tq-check-internet)
-  (save-some-buffers t)
+
   (unless (executable-find "zip")
     (error "Could not find a zip executable."))
   
@@ -481,7 +481,9 @@ This is normally only done after the deadline, when you cannot push to the git r
 			    (buffer-file-name))))))
     ;; update system file
     (tq-insert-system-info)
-
+    (gb-set-filetag "TURNED-IN-BY-EMAIL:" (current-time-string))
+    (save-some-buffers t)
+    
     ;; remove zip if it exists.
     (when (file-exists-p (concat zip-name ".zip"))
       (delete-file (concat zip-name ".zip")))
@@ -676,3 +678,4 @@ a link in the heading."
 (provide 'techela)
 
 ;;; techela.el ends here
+
