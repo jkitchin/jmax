@@ -5,7 +5,7 @@
 
 ;;; Code:
 
-(defvar jmax-bibtex-abbreviations
+(defvar jmax-bibtex-journal-abbreviations
   '(("ACAT" "ACS Catalysis" "ACS Catal.")
     ("AM" "Acta Materialia" "Acta Mater.")
     ("AMM" "Acta Metallurgica et Materialia" "Acta Metall. Mater.")
@@ -53,7 +53,6 @@
     ("JACerS" "Journal of the American Ceramic Society" "J. Am. Ceram. Soc.")
     ("JACS" "Journal of the American Chemical Society" "J. Am. Chem. Soc.")
     ("JES" "Journal of The Electrochemical Society" "J. Electrochem. Soc.")
-    ("JES" "Journal of The Electrochemical Society" "J. Electrochem. Soc.")
     ("JEaC" "Journal of Electroanalytical Chemistry" "J. Electroanal. Chem.")
     ("JMS" "Journal of Membrane Science" "J. Memb. Sci.")
     ("JVST" "Journal of Vacuum Science \\& Technology A" "J. Vac. Sci. Technol. A")
@@ -85,35 +84,36 @@
     ("TSF" "Thin Solid Films" "Thin Solid Films")
     ("TC" "Topics in Catalysis" "Top. Catal.")
     ("WR" "Water Research" "Water Res."))
-  "List of (string journal-full-name journal-abbreviation). Find abbreviations at http://cassi.cas.org/search.jsp.")
+  "List of (string journal-full-name journal-abbreviation).  Find abbreviations at http://cassi.cas.org/search.jsp.")
 
 
 (defun jmax-bibtex-generate-longtitles ()
-  "generates longtitles.bib which are @string definitions of the
-full journal names in `jmax-bibtex-abbreviations'."
+  "Generate longtitles.bib which are @string definitions.
+The full journal names are in `jmax-bibtex-journal-abbreviations'."
   (interactive)
   (with-temp-file "longtitles.bib"
-    (dolist (row jmax-bibtex-abbreviations)
+    (dolist (row jmax-bibtex-journal-abbreviations)
       (insert (format "@string{%s=\"%s\"}\n"
 		      (nth 0 row)
 		      (nth 1 row))))))
 
 
 (defun jmax-bibtex-generate-shorttitles ()
-    "generates shorttitles.bib which are @string definitions of the
-abbreviated journal names in `jmax-bibtex-abbreviations'."
+    "Generate shorttitles.bib which are @string definitions.
+The abbreviated journal names in `jmax-bibtex-journal-abbreviations'."
   (interactive)
   (with-temp-file "shorttitles.bib"
-    (dolist (row jmax-bibtex-abbreviations)
+    (dolist (row jmax-bibtex-journal-abbreviations)
       (insert (format "@string{%s=\"%s\"}\n"
 		      (nth 0 row)
 		      (nth 2 row))))))
 
 
 (defun jmax-stringify-journal-name (&optional key start end)
-  "replace journal name in a bibtex entry with a string. The
-strings are defined in `jmax-bibtex-abbreviations'. The optional
-arguments allow you to use this with `bibtex-map-entries'"
+  "Replace journal name in a bibtex entry with a string.
+The strings are defined in
+`jmax-bibtex-journal-abbreviations'.  The optional arguments KEY,
+START and END allow you to use this with `bibtex-map-entries'"
   (interactive)
   (bibtex-beginning-of-entry)
   (when
@@ -123,11 +123,11 @@ arguments allow you to use this with `bibtex-map-entries'"
     (let* ((full-names (mapcar
 			(lambda (row)
 			  (cons  (nth 1 row) (nth 0 row)))
-			jmax-bibtex-abbreviations))
+			jmax-bibtex-journal-abbreviations))
 	   (abbrev-names (mapcar
 			  (lambda (row)
 			    (cons  (nth 2 row) (nth 0 row)))
-			  jmax-bibtex-abbreviations))
+			  jmax-bibtex-journal-abbreviations))
 	   (journal (s-trim (bibtex-autokey-get-field "journal")))
 	   (bstring (or
 		     (cdr (assoc journal full-names))
@@ -136,9 +136,29 @@ arguments allow you to use this with `bibtex-map-entries'"
 	(bibtex-set-field "journal" bstring t)
         (bibtex-fill-entry)))))
 
+(defun jmax-set-journal-string (full-journal-name)
+  "Set a bibtex journal name to the string that represents FULL-JOURNAL-NAME.
+This is defined in `jmax-bibtex-journal-abbreviations'."
+  (interactive (list
+		(ido-completing-read
+		 "Journal: "
+		 (mapcar
+		  (lambda (x)
+		    (nth 1 x))
+		  jmax-bibtex-journal-abbreviations))))
+  ;; construct data alist for the string lookup.
+  (let ((alist (mapcar
+		(lambda (x)
+		  (cons (nth 1 x) (nth 0 x)))
+		jmax-bibtex-journal-abbreviations)))
+    (bibtex-set-field "journal" (cdr (assoc full-journal-name alist)) t)
+    (bibtex-fill-entry)
+    (bibtex-clean-entry)))
+
 
 (defvar jmax-nonascii-latex-replacements
   '(("í" . "{\\\\'i}")
+    ("ć" . "{\\\\'c}")
     ("é" . "{\\\\'e}")
     ("á" . "{\\\\'a}")
     ("ø" . "{\\\\o}")
@@ -158,16 +178,16 @@ arguments allow you to use this with `bibtex-map-entries'"
     ("→" . "$\\rightarrow$")
     ("⇌" . "$\\leftrightharpoons$")
     ("×" . "$\\times$")
-    ;; I think this is a non-ascii space.
+    ;; I think these is a non-ascii space.
     (" " . " ")
     (" " . " ")
     ("–" . "-")
     ("−" . "-"))
-  "Cons list of non-ascii characters and their LaTeX representations")
+  "Cons list of non-ascii characters and their LaTeX representations.")
   
 (defun jmax-replace-nonascii ()
-  "hook function to replace non-ascii characters in a bibtex
-entry. "
+  "Hook function to replace non-ascii characters in a bibtex entry."
+
   (interactive)
   (save-restriction
     (bibtex-narrow-to-entry)
@@ -183,14 +203,14 @@ entry. "
 (defvar jmax-lower-case-words
   '("a" "an" "on" "and" "for"
     "the" "of" "in")
-  "List of words to keep lowercase")
+  "List of words to keep lowercase.")
 
 
 (defun jmax-title-case-article (&optional key start end)
-  "Convert a bibtex entry article title to title-case. The
-arguments are optional, and are only there so you can use this
-function with `bibtex-map-entries' to change all the title
-entries in articles."
+  "Convert a bibtex entry article title to title-case.
+The arguments KEY, START and END are optional, and are only there
+so you can use this function with `bibtex-map-entries' to change
+all the title entries in articles."
   (interactive)
   (bibtex-beginning-of-entry)
 
@@ -219,7 +239,7 @@ entries in articles."
       (setq title (mapconcat 'identity words " "))
       
       ;; Capitalize letters after a dash
-      (while 
+      (while
 	  (string-match "[a-zA-Z]-\\([a-z]\\)" title start)
 	(let ((char (substring title (match-beginning 1) (match-end 1))))
 	  (setf (substring title (match-beginning 1) (match-end 1))
@@ -234,14 +254,12 @@ entries in articles."
 
 (add-hook 'org-ref-clean-bibtex-entry-hook 'jmax-title-case-article)
 
-(defun jmax-sentence-case-article (&optional key start end)
-  "Convert a bibtex entry article title to sentence-case. The
-arguments are optional, and are only there so you can use this
-function with `bibtex-map-entries' to change all the title
-entries in articles.
 
-This is not a perfect function. It splits the title on whitespace.
-"
+(defun jmax-sentence-case-article (&optional key start end)
+  "Convert a bibtex entry article title to sentence-case.
+The arguments KEY, START and END are optional, and are only there
+so you can use this function with `bibtex-map-entries' to change
+all the title entries in articles."
   (interactive)
   (bibtex-beginning-of-entry)
 
@@ -271,22 +289,25 @@ This is not a perfect function. It splits the title on whitespace.
 	  (string-match "[a-z]:\\s-+\\([A-Z]\\)" title start)
 	(let ((char (substring title (match-beginning 1) (match-end 1))))
 	  (setf (substring title (match-beginning 1) (match-end 1))
-		(format "{%s}" (upcase char)))
+;;		(format "{%s}" (upcase char)))
+		(format "%s" (upcase char)))
 	  (setq start (match-end 1))))
 	    
       ;; this is defined in doi-utils
       (bibtex-set-field
        "title" title)
-       
+
+      ;; clean and refill entry so it looks nice
+      (bibtex-clean-entry)
       (bibtex-fill-entry))))
 
 
 
 
 (defun jmax-bibtex-next-entry (&optional n)
-  "Jump to the beginning of the next bibtex entry. N is a prefix
-argument. If it is numeric, jump that many entries
-forward. Negative numbers do nothing."
+  "Jump to the beginning of the next bibtex entry.
+N is a prefix argument.  If it is numeric, jump that many entries
+forward.  Negative numbers do nothing."
   (interactive "P")
   ;; Note if we start at the beginning of an entry, nothing
   ;; happens. We need to move forward a char, and call again.
@@ -295,19 +316,19 @@ forward. Negative numbers do nothing."
     (forward-char)
     (bibtex-next-entry))
 
-  ;; search forward for an entry 
-  (when 
+  ;; search forward for an entry
+  (when
       (re-search-forward bibtex-entry-head nil t (and (numberp n) n))
     ;; go to beginning of the entry
     (bibtex-beginning-of-entry)))
 
 
 (defun jmax-bibtex-previous-entry (&optional n)
-  "Jump to beginning of the previous bibtex entry. N is a prefix
-argument. If it is numeric, jump that many entries back."
+  "Jump to beginning of the previous bibtex entry.
+N is a prefix argument.  If it is numeric, jump that many entries back."
   (interactive "P")
   (bibtex-beginning-of-entry)
- (when 
+ (when
      (re-search-backward bibtex-entry-head nil t (and (numberp n) n))
    (bibtex-beginning-of-entry)))
 
