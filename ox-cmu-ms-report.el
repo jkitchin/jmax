@@ -60,12 +60,12 @@
      ;; org-mode escapes these in the abstract. This is hackery to
      ;; undo it. It is probably not fail-proof
      (message "%s" abstract)
-     ;(setq abstract (org-export-data abstract info))
+     (setq abstract (org-export-data abstract info))
      ;(setq abstract (replace-regexp-in-string "\\\\\\$" "$" abstract))
-     ;(setq abstract (replace-regexp-in-string "\\\\{" "{" abstract))
-     ;(setq abstract (replace-regexp-in-string "\\\\}" "}" abstract))
-     ;(setq abstract (replace-regexp-in-string "\\\\_" "_" abstract))
-     ;(setq abstract (replace-regexp-in-string "\\$\\\\backslash\\$" "\\\\" abstract))
+     (setq abstract (replace-regexp-in-string "\\\\{" "{" abstract))
+     (setq abstract (replace-regexp-in-string "\\\\}" "}" abstract))
+     (setq abstract (replace-regexp-in-string "\\\\_" "_" abstract))
+     (setq abstract (replace-regexp-in-string "\\$\\\\backslash\\$" "\\\\" abstract))
      (concat 
    "
 \\begin{document}
