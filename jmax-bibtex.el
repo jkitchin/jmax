@@ -155,36 +155,48 @@ This is defined in `jmax-bibtex-journal-abbreviations'."
     (bibtex-fill-entry)
     (bibtex-clean-entry)))
 
-
+;; see https://github.com/fxcoudert/tools/blob/master/doi2bib for more replacements
 (defvar jmax-nonascii-latex-replacements
-  '(("í" . "{\\\\'i}")
-    ("ć" . "{\\\\'c}")
-    ("é" . "{\\\\'e}")
-    ("á" . "{\\\\'a}")
-    ("ø" . "{\\\\o}")
-    ("ü" . "{\\\\\"u}")
-    ("ñ" . "{\\\\~n}")
-    ("å" . "{\\\\aa}")
-    ("ö" . "{\\\\\"o}")
-    ("ó" . "{\\\\'o}")
-    ("ú" . "{\\\\'u}")
-    ("İ" . "{\\\\.I}")
-    ("ğ" . "{\\\\u{g}}")
-    ("δ" . "$\\\\delta$")
-    ("ç" . "{\\\\c{c}}")
-    ("≤" . "$\\le$")
-    ("<" . "$\\lt$")
-    ("θ" . "$\\theta$")
-    ("→" . "$\\rightarrow$")
-    ("⇌" . "$\\leftrightharpoons$")
-    ("×" . "$\\times$")
-    ;; I think these is a non-ascii space.
-    (" " . " ")
-    (" " . " ")
-    ("–" . "-")
-    ("−" . "-"))
+  '()
   "Cons list of non-ascii characters and their LaTeX representations.")
-  
+
+(setq jmax-nonascii-latex-replacements
+      '(("í" . "{\\\\'i}")
+	("ć" . "{\\\\'c}")
+	("é" . "{\\\\'e}")
+	("à" . "{\\\\`a}")
+	("á" . "{\\\\'a}")
+	("ø" . "{\\\\o}")
+	("ü" . "{\\\\\"u}")
+	("ñ" . "{\\\\~n}")
+	("å" . "{\\\\aa}")
+	("ö" . "{\\\\\"o}")
+	("ó" . "{\\\\'o}")
+	("ú" . "{\\\\'u}")
+	("İ" . "{\\\\.I}")
+	("ğ" . "{\\\\u{g}}")
+	("δ" . "$\\\\delta$")
+	("ç" . "{\\\\c{c}}")
+	("ß" . "{\\\\ss}")
+	("≤" . "$\\\\le$")
+	("<" . "$\\\\lt$")
+	("θ" . "$\\\\theta$")
+	("μ" . "$\\\\mu$")
+	("→" . "$\\\\rightarrow$")
+	("⇌" . "$\\\\leftrightharpoons$")
+	("×" . "$\\\\times$")
+	("°" . "$\\\\deg$")
+	;; I think these are non-ascii spaces. there seems to be more than one.
+	(" " . " ")
+	(" " . " ")
+	("–" . "-")
+	("−" . "-")
+	("–" . "-")
+	("‘" . "'")
+	("’" . "'")
+	("“" . "\"")
+	("”" . "\"")))
+
 (defun jmax-replace-nonascii ()
   "Hook function to replace non-ascii characters in a bibtex entry."
 
@@ -314,7 +326,7 @@ forward.  Negative numbers do nothing."
   (when (= (point) (save-excursion
 		     (bibtex-beginning-of-entry)))
     (forward-char)
-    (bibtex-next-entry))
+    (jmax-bibtex-next-entry))
 
   ;; search forward for an entry
   (when
@@ -341,6 +353,83 @@ N is a prefix argument.  If it is numeric, jump that many entries back."
 ;; add to bibtex-mode-hook
 (add-hook 'bibtex-mode-hook 'jmax-bibtex-mode-keys)
 
+
+(defun jmax-bibtex-entry-doi ()
+  "get doi from entry at point"
+  (interactive)
+  (save-excursion
+    (bibtex-beginning-of-entry)
+    (reftex-get-bib-field "doi" (bibtex-parse-entry t))))
+
+
+(defun jmax-bibtex-wos ()
+  "Open bibtex entry in Web Of Science if there is a DOI"
+  (interactive)
+  (doi-utils-wos (jmax-bibtex-entry-doi)))
+
+
+(defun jmax-bibtex-wos-citing ()
+  "Open citing articles for bibtex entry in Web Of Science if there is a DOI"
+  (interactive)
+  (doi-utils-wos-citing (jmax-bibtex-entry-doi)))
+
+
+(defun jmax-bibtex-wos-related ()
+  "Open related articles for bibtex entry in Web Of Science if there is a DOI"
+  (interactive)
+  (doi-utils-wos-related (jmax-bibtex-entry-doi)))
+
+
+(defun jmax-bibtex-wos-citing ()
+  "Open citing articles for bibtex entry in Web Of Science if there is a DOI"
+  (interactive)
+  (doi-utils-wos-citing (jmax-bibtex-entry-doi)))
+
+
+(defun jmax-bibtex-crossref ()
+  (interactive)
+  (doi-utils-crossref (jmax-bibtex-entry-doi)))
+
+
+(defun jmax-bibtex-google-scholar ()
+  (interactive)
+  (doi-utils-google-scholar (jmax-bibtex-entry-doi)))
+
+(defvar jmax-bibtex-menu-funcs '()
+ "Functions to run in doi menu. Each entry is a list of (key menu-name function). 
+The function must take one argument, the doi.")
+
+(setq jmax-bibtex-menu-funcs
+      '(("w" "os" doi-utils-wos)
+	("c" "iting articles" doi-utils-wos-citing)
+	("r" "elated articles" doi-utils-wos-related)
+        ("s" "Google Scholar" doi-utils-google-scholar)
+        ("f" "CrossRef DOI" doi-utils-crossref)))
+
+(defun jmax-bibtex ()
+  "Menu command to run in a bibtex entry.
+Functions from `jmax-bibtex-menu-funcs'."
+  
+  (interactive)
+  (message
+   (concat
+    (mapconcat
+     (lambda (tup)
+       (concat "[" (elt tup 0) "]"
+	       (elt tup 1) " "))
+     jmax-bibtex-menu-funcs "") ": "))
+  (let* ((input (read-char-exclusive))
+	 (choice (assoc
+		  (char-to-string input) jmax-bibtex-menu-funcs)))
+    (when choice
+      (funcall
+       (elt 
+	choice
+	2)
+       (jmax-bibtex-entry-doi)
+       ))))
+
+(defalias 'jb 'jmax-bibtex)
 
 (provide 'jmax-bibtex)
 
