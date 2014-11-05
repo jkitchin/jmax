@@ -325,6 +325,14 @@ start  empty title path
  (lambda (link-string)
    (shell-command (format "python -m pydoc %s" link-string))))
 
+(defun pydoc (name)
+  "Display pydoc information for NAME in a buffer named *pydoc*."
+  (interactive "sName of function or module: ")
+  (switch-to-buffer-other-window "*pydoc*")
+  (erase-buffer)
+  (insert (shell-command-to-string (format "python -m pydoc %s" name)))
+  (goto-char (point-min)))
+
 ;; Setup the frame configuration for following links.
 (setq org-link-frame-setup (quote ((gnus . org-gnus-no-new-news)
                                    (file . find-file))))
