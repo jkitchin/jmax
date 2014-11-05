@@ -17,7 +17,7 @@
   :options-alist
   '((:department "DEPARTMENT" nil "Department of Chemical Engineering")
     ;; the name is a committee or your name
-    (:name "NAME" nil nil)
+    (:fromname "FROMNAME" nil nil)
     ;; I am leaving out proftitle, location, telephone, email, and zipcode.
     (:to "TO" nil nil)
     (:from "FROM" nil nil)
@@ -68,16 +68,17 @@
    (let ((to (plist-get info :to))
 	 (from (plist-get info :from))
 	 (subject (plist-get info :subject))
+	 (fromname (plist-get info :fromname))
 	 (cc (plist-get info :cc)))     
      (concat "
-\\usepackage[color-logo]{cmuugmemo}
+\\usepackage[color-logo]{cmumemo}
 \\usepackage{charter}
 \\newcommand{\\section}[1]{{{\\bfseries #1}: }}
 
 
 \\begin{document}
 \\begin{letter}{}
-
+\\NAME{" (org-export-data fromname info) "}
 \\TO{" (org-export-data to info) "}
 \\FROM{" (org-export-data from info) "}
 \\SUBJECT{" (org-export-data subject info) "}
