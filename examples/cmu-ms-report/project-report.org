@@ -1,5 +1,5 @@
-#+LATEX_CLASS: revtex4-1
-#+LATEX_CLASS_OPTIONS: [aps,prb,citeautoscript,preprint,citeautoscript,showkeys]
+#+LATEX_CLASS: cmu-article
+#+OPTIONS: toc:nil ^:{} 
 #+EXPORT_EXCLUDE_TAGS: noexport
 
 # here is where you include the relevant packages. These are pretty
@@ -43,6 +43,10 @@ Describe the relevant methods for your work here.
 
 * Results and Discussion
 Here is where the results and discussion go.
+
+#+attr_latex: :placement [H] :width 2in
+#+caption: the seal
+[[./cmu-seal.png]]
 
 * Conclusions
 
