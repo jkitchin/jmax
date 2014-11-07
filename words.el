@@ -174,6 +174,18 @@ end tell")))
     (do-applescript applescript)))
 
 
+(defun wos ()
+  "Open Web of Science search page in browser."
+  (interactive)
+  (browse-url "http://apps.webofknowledge.com"))
+
+
+(defun pubmed ()
+  "Open Pubmed in browser."
+  (interactive)
+  (browse-url "http://www.ncbi.nlm.nih.gov/pubmed"))
+
+
 (defvar words-funcs '()
  "Functions to run in `words'.  Each entry is a list of (char menu-name function).")
 
