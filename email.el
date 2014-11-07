@@ -104,3 +104,24 @@ subsequent sends. could save them all in a logbook?
       (message-goto-to))))
 
 
+
+(defun email-bibtex-entry ()
+  "Email current bibtex entry and pdf if it exists."
+  (interactive)
+  
+  (save-excursion
+    (bibtex-beginning-of-entry)
+    (let* ((key (reftex-get-bib-field "=key=" (bibtex-parse-entry t)))
+	   (pdf (expand-file-name
+		 (concat key ".pdf")
+		 org-ref-pdf-directory)))
+      (bibtex-copy-entry-as-kill)
+      (compose-mail)
+      (message-goto-body)
+      (insert (pop bibtex-entry-kill-ring))
+      (message-goto-subject)
+      (insert key)
+      (message "%s exists %s" pdf (file-exists-p pdf))
+      (when (file-exists-p pdf)
+	(mml-attach-file pdf))
+      (message-goto-to))))
