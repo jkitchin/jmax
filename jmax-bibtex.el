@@ -162,6 +162,7 @@ This is defined in `jmax-bibtex-journal-abbreviations'."
 
 (setq jmax-nonascii-latex-replacements
       '(("í" . "{\\\\'i}")
+	("æ" . "{\\\\ae}")
 	("ć" . "{\\\\'c}")
 	("é" . "{\\\\'e}")
 	("à" . "{\\\\`a}")
@@ -171,7 +172,10 @@ This is defined in `jmax-bibtex-journal-abbreviations'."
 	("ñ" . "{\\\\~n}")
 	("å" . "{\\\\aa}")
 	("ö" . "{\\\\\"o}")
+	("í" . "{\\\\'i}")
 	("ó" . "{\\\\'o}")
+	("ó" . "{\\\\'o}")
+	("ú" .  "{\\\\'u}")
 	("ú" . "{\\\\'u}")
 	("İ" . "{\\\\.I}")
 	("ğ" . "{\\\\u{g}}")
@@ -395,16 +399,30 @@ N is a prefix argument.  If it is numeric, jump that many entries back."
   (interactive)
   (doi-utils-google-scholar (jmax-bibtex-entry-doi)))
 
+
+(defun jmax-bibtex-pubmed ()
+  (interactive)
+  (doi-utils-pubmed (jmax-bibtex-entry-doi)))
+
+(defun jmax-bibtex-pdf (doi)
+  "thin wrapper to get `jmax-bibtex' to open pdf"
+  (interactive)
+  (org-ref-open-bibtex-pdf))
+  
+
+
 (defvar jmax-bibtex-menu-funcs '()
  "Functions to run in doi menu. Each entry is a list of (key menu-name function). 
 The function must take one argument, the doi.")
 
 (setq jmax-bibtex-menu-funcs
-      '(("w" "os" doi-utils-wos)
+      '(("p" "df" jmax-bibtex-pdf)
+	("w" "os" doi-utils-wos)
 	("c" "iting articles" doi-utils-wos-citing)
 	("r" "elated articles" doi-utils-wos-related)
         ("s" "Google Scholar" doi-utils-google-scholar)
-        ("f" "CrossRef DOI" doi-utils-crossref)))
+	("P" "Pubmed" doi-utils-pubmed)
+        ("f" "CrossRef" doi-utils-crossref)))
 
 (defun jmax-bibtex ()
   "Menu command to run in a bibtex entry.
