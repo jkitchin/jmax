@@ -47,6 +47,20 @@
       (thing-at-point 'word)))))
 
 
+(defun words-scopus ()
+  "Scopus the word at point or selection."
+  (interactive)
+  (browse-url
+   (format
+    "http://www.scopus.com//search/submit/basic.url?field1=TITLE-ABS-KEY&searchterm1=%s"
+    (if (region-active-p)
+	(mapconcat 'identity (split-string
+			      (buffer-substring (region-beginning)
+						(region-end))) "+")
+      (thing-at-point 'word)))))
+
+
+
 (defun words-twitter ()
   "Search twitter for word at point or selection."
   (interactive)
@@ -185,6 +199,11 @@ end tell")))
   (interactive)
   (browse-url "http://www.ncbi.nlm.nih.gov/pubmed"))
 
+(defun scopus ()
+  "Open Scopus in browser."
+  (interactive)
+  (browse-url "http://www.scopus.com"))
+
 
 (defvar words-funcs '()
  "Functions to run in `words'.  Each entry is a list of (char menu-name function).")
@@ -193,12 +212,13 @@ end tell")))
   '(("d" "ictionary" words-dictionary)
     ("t" "hesaurus" words-thesaurus)
     ("g" "oogle" words-google)
-    ("r" "CrossRef" words-crossref)
+    ("c" "CrossRef" words-crossref)
+    ("s" "Scopus" words-scopus)
     ("b" "ibtex" words-bibtex)
     ("f" "inder" words-finder)
     ("m" "dfind" words-mdfind)
-    ("c" "google-scholar" words-google-scholar)
-    ("s" "spell/grammar" words-atd)
+    ("G" "google-scholar" words-google-scholar)
+    ("S" "spell/grammar" words-atd)
     ("w" "twitter" words-twitter)))
  
 
