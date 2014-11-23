@@ -444,6 +444,19 @@ Messages\n==========\n")
    (occur path)))
 
 
+(org-add-link-type
+ "mc"
+ ;; multiple choice link.
+ (lambda (link)
+   (org-entry-put (point) "ANSWER" link)
+   (save-restriction
+     (save-excursion
+       (org-narrow-to-subtree)
+       (goto-char (point-max))
+       (unless (bolp)
+	 (insert "\n"))
+       (insert (format "# you chose %s" link))))))
+
 ;; Link to record answers. ans:label::data
 ;; save in tq-userid-label-data.dat
 (org-add-link-type
