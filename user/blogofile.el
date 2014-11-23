@@ -146,11 +146,11 @@ all keys and values are taken from properties."
               (copy-file path (concat media-dir fname) t)
               (format "<img src=\"%s%s\"> " media-url fname)))
            ;; regular file with content
-           ((and (string= type "file")  content)
+           ((and (string= type "file")  content (file-exists-p fname))
             (progn (copy-file path (concat media-dir fname) t)
                    (format "<a href=\"%s%s\">%s</a> " media-url fname content)))
            ;; regular file with no content
-           ((string= type "file")
+           ((and (string= type "file") (file-exists-p fname))
             (progn (copy-file path (concat media-dir fname) t)
                    (format "<a href=\"%s%s\">%s</a> " media-url fname fname)))
            ;; URLS with content
