@@ -210,6 +210,7 @@ Run this from an org-buffer after you have exported it to a LaTeX file"
     (with-current-buffer (get-buffer-create "*latex*")
       (insert results))))
 
+
 (defun ox-manuscript-bibtex (tex-file)
   "Run `ox-manuscript-bibtex-command' on the tex-file."
   (interactive "fTex file: ")
@@ -220,6 +221,7 @@ Run this from an org-buffer after you have exported it to a LaTeX file"
     (with-current-buffer (get-buffer-create "*bibtex*")
       (insert output))))
 
+
 (defun ox-manuscript-makeindex (tex-file)
   "run makeindex program"
   (interactive "fTex file: ")
@@ -227,6 +229,16 @@ Run this from an org-buffer after you have exported it to a LaTeX file"
 	 (output (shell-command-to-string (concat "makeindex " basename))))
     (with-current-buffer (get-buffer-create "*makeindex*")
       (insert output))))
+
+
+(defun ox-manuscript-makeglossary (tex-file)
+  "run makeglossary program"
+  (interactive "fTex file: ")
+  (let* ((basename (file-name-sans-extension tex-file))
+	 (output (shell-command-to-string (concat "makeglossaries " basename))))
+    (with-current-buffer (get-buffer-create "*makeglossary*")
+      (insert output))))
+
 
 (defun ox-manuscript-latex-pdf-process (quoted-tex-file)
   "Build a tex-file to pdf. The argument is called quoted-tex-file because this seems to be what org-mode passes to this function. The function strips the quotes out. Depending on the value of `ox-manuscript-interactive-build', you will get buffers of the intermediate output steps."
@@ -238,7 +250,8 @@ Run this from an org-buffer after you have exported it to a LaTeX file"
 	 (pdf-file (concat basename ".pdf"))
 	 (status)
 	 (cb (current-buffer))
-	 (run-makeindex-p) 
+	 (run-makeindex-p)
+	 (run-makeglossary-p)
 	 (run-bibtex-p))
  
     ;; start out clean
@@ -251,6 +264,8 @@ Run this from an org-buffer after you have exported it to a LaTeX file"
       (insert-file-contents tex-file)
       (beginning-of-buffer)
       (setq run-makeindex-p (re-search-forward "\\\\makeindex" nil t))
+      (beginning-of-buffer) 
+      (setq run-makeglossary-p (re-search-forward "\\\\makeglossaries" nil t))
       (beginning-of-buffer)
       (setq run-bibtex-p (re-search-forward "bibliography" nil t)))
 
@@ -265,7 +280,7 @@ Run this from an org-buffer after you have exported it to a LaTeX file"
 	    ;; continuing. delete buffers
 	    (progn 
 	      (mapcar (lambda (x) (when (get-buffer x) (kill-buffer x)))
-		      '("*latex*" "*bibtex*" "*makeindex*" "*Occur*"))
+		      '("*latex*" "*bibtex*" "*makeindex*" "*makeglossary*" "*Occur*"))
 	      (switch-to-buffer cb))
 	  ;; not continuing
 	  (throw 'status nil)))
@@ -286,6 +301,7 @@ Run this from an org-buffer after you have exported it to a LaTeX file"
 	    ;; not continuing
 	    (throw 'status nil))))
 
+      ;; index
       (when run-makeindex-p
 	(ox-manuscript-makeindex tex-file)
 	(when ox-manuscript-interactive-build
@@ -296,10 +312,27 @@ Run this from an org-buffer after you have exported it to a LaTeX file"
 	      ;; continuing. delete buffers
 	      (progn 
 	 	(mapcar (lambda (x) (when (get-buffer x) (kill-buffer x)))
-	 		'("*latex*" "*bibtex*" "*makeindex*" "*Occur*"))
+	 		'("*latex*" "*bibtex*" "*makeindex*" "*makeglossary*" "*Occur*"))
 		(switch-to-buffer cb))
 	    ;; not continuing
 	    (throw 'status nil))))
+
+      ;; glossary
+      (when run-makeglossary-p
+	(ox-manuscript-makeglossary basename)
+	(when ox-manuscript-interactive-build
+	  (switch-to-buffer "*makeglossary*")
+	  (end-of-buffer)
+	  (occur "warning\\|undefined\\|error\\|missing")
+	  (if (y-or-n-p "Continue to latex 2?")
+	      ;; continuing. delete buffers
+	      (progn 
+	 	(mapcar (lambda (x) (when (get-buffer x) (kill-buffer x)))
+	 		'("*latex*" "*bibtex*" "*makeindex*" "*makeglossary*" "*Occur*"))
+		(switch-to-buffer cb))
+	    ;; not continuing
+	    (throw 'status nil))))
+	    
 
       (ox-manuscript-latex tex-file)    
       (when ox-manuscript-interactive-build
