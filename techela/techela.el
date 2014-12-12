@@ -438,7 +438,7 @@ Messages\n==========\n")
 
 ;; index link for techela
 (org-add-link-type
- "index"
+ "tq-index"
  (lambda (path)
    (tq-index)
    (occur path)))
