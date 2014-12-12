@@ -234,8 +234,10 @@ Run this from an org-buffer after you have exported it to a LaTeX file"
 (defun ox-manuscript-makeglossary (tex-file)
   "run makeglossary program"
   (interactive "fTex file: ")
-  (let* ((basename (file-name-sans-extension tex-file))
-	 (output (shell-command-to-string (concat "makeglossaries " basename))))
+  (let* ((basename (file-name-base tex-file))
+	 (cmd (concat "makeglossaries " basename))	 
+	 (output (shell-command-to-string cmd)))
+    (message "Ran %s" cmd)
     (with-current-buffer (get-buffer-create "*makeglossary*")
       (insert output))))
 
@@ -301,6 +303,22 @@ Run this from an org-buffer after you have exported it to a LaTeX file"
 	    ;; not continuing
 	    (throw 'status nil))))
 
+      ;; glossary
+      (when run-makeglossary-p
+	(ox-manuscript-makeglossary tex-file)
+	(when ox-manuscript-interactive-build
+	  (switch-to-buffer "*makeglossary*")
+	  (end-of-buffer)
+	  (occur "warning\\|undefined\\|error\\|missing")
+	  (if (y-or-n-p "Continue to latex 2?")
+	      ;; continuing. delete buffers
+	      (progn 
+	 	(mapcar (lambda (x) (when (get-buffer x) (kill-buffer x)))
+	 		'("*latex*" "*bibtex*" "*makeindex*" "*makeglossary*" "*Occur*"))
+		(switch-to-buffer cb))
+	    ;; not continuing
+	    (throw 'status nil))))
+      
       ;; index
       (when run-makeindex-p
 	(ox-manuscript-makeindex tex-file)
@@ -315,24 +333,7 @@ Run this from an org-buffer after you have exported it to a LaTeX file"
 	 		'("*latex*" "*bibtex*" "*makeindex*" "*makeglossary*" "*Occur*"))
 		(switch-to-buffer cb))
 	    ;; not continuing
-	    (throw 'status nil))))
-
-      ;; glossary
-      (when run-makeglossary-p
-	(ox-manuscript-makeglossary basename)
-	(when ox-manuscript-interactive-build
-	  (switch-to-buffer "*makeglossary*")
-	  (end-of-buffer)
-	  (occur "warning\\|undefined\\|error\\|missing")
-	  (if (y-or-n-p "Continue to latex 2?")
-	      ;; continuing. delete buffers
-	      (progn 
-	 	(mapcar (lambda (x) (when (get-buffer x) (kill-buffer x)))
-	 		'("*latex*" "*bibtex*" "*makeindex*" "*makeglossary*" "*Occur*"))
-		(switch-to-buffer cb))
-	    ;; not continuing
-	    (throw 'status nil))))
-	    
+	    (throw 'status nil))))   
 
       (ox-manuscript-latex tex-file)    
       (when ox-manuscript-interactive-build
