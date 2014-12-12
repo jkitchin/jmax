@@ -308,17 +308,6 @@ start  empty title path
      ;; write out the latex command
      (format "\\attachfile{%s}" keyword)))))
 
-(org-add-link-type 
- "index" 
- (lambda (link-string) (org-open-file link-string))
- ;; formatting
- (lambda (keyword desc format)
-   (cond
-    ((eq format 'html) (format "")); no output for html
-    ((eq format 'latex)
-     ;; write out the latex command
-     (format "%s \\index{%s}" keyword keyword)))))
-
 ;; make access to python documentation available cross-platform
 (org-add-link-type
  "pydoc"
