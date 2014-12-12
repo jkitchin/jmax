@@ -136,7 +136,7 @@
       recentf-max-menu-items 15)
 (recentf-mode +1)
 (setq save-place-file (expand-file-name "user/saved-places" starter-kit-dir))
-(global-set-key (kbd "<f7>") 'recentf-open-files)
+(global-set-key (kbd "<f7>") 'helm-recentf)
 
 
 ;; automatically show completions for execute-extended-command
