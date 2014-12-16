@@ -11,7 +11,7 @@
   "Do what I need in vc next.
 Add current file if not in vc, then prompt for commit message"
   (interactive)
-
+  (save-buffer)
   (when (file-exists-p (buffer-file-name))
     ;; register the file if it is not
     (unless (vc-registered (buffer-file-name))
