@@ -19,7 +19,7 @@ Add current file if not in vc, then prompt for commit message"
 	 (state (elt deduction 3)))
 
     (cond
-     (backend     
+     (backend  ;; we are in a vc directory   
       (when (file-exists-p (buffer-file-name))
 	;; register the file if it is not
 	(when (eq state 'unregistered)
