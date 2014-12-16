@@ -33,8 +33,11 @@ Add current file if not in vc, then prompt for commit message"
 		      (read-string "Commit log: ")
 		      t
 		      ))
+	 ((eq state 'up-to-date)
+	  (message "up-to-date. No commit needed"))
+	 ;; catch other states we do not have a plan for yet.
 	 (t
-	  (message "state of %s = %s" (buffer-file-name) state)))))
+	  (message "state of %s = %s. No action coded." (buffer-file-name) state)))))
      ;; catch case not in vc
      (t
       (message "Not in a VC repo. Perhaps run vc-create-repo?"))
