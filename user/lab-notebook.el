@@ -1,4 +1,11 @@
+;;; lab-notebook.el --- lab-notebook-mode
 
+
+
+;;; Commentary:
+;; 
+
+;;; Code:
 
 (defun dwin-vc ()
   "Do what I need in vc next.
@@ -7,8 +14,8 @@ Add current file if not in vc, then prompt for commit message"
 
   (when (file-exists-p (buffer-file-name))
     ;; register the file if it is not
-    (unless (vc-registered (buffer-file-name))      
-      (vc-register))) 
+    (unless (vc-registered (buffer-file-name))
+      (vc-register)))
     
   ;; Now commit it
   (vc-checkin `(,(buffer-file-name))
@@ -35,4 +42,7 @@ This will prompt you to commit a file when you kill a buffer
   ;; body
   (add-hook 'kill-buffer-hook 'dwin-vc nil 'make-it-local))
  
-(provide 'lab-notebook-mode)
+
+(provide 'lab-notebook)
+
+;;; lab-notebook.el ends here
