@@ -34,11 +34,11 @@ Add current file if not in vc, then prompt for commit message"
 		      t
 		      ))
 	 (t
-	  (message "state of %s = %s" (buffer-file-name) state))))
-      ;; catch case not in vc
-      (t
-       (message "Not in a VC repo. Perhaps run vc-create-repo?"))
-      ))))
+	  (message "state of %s = %s" (buffer-file-name) state)))))
+     ;; catch case not in vc
+     (t
+      (message "Not in a VC repo. Perhaps run vc-create-repo?"))
+     )))
 
 
 
