@@ -1,22 +1,18 @@
 
 
 (defun dwin-vc ()
-  "Do what I need in vc next."
+  "Do what I need in vc next.
+Shows the diff in one window, a commit message in another one."
   (interactive)
 
   (when (file-exists-p (buffer-file-name))
     ;; register the file if it is not
     (unless (vc-registered (buffer-file-name))
       (vc-register))
-
-    (let ((cb (current-buffer)))
-      ;; show diff in another window
-      (vc-diff)
-      (split-window-below)
-      (switch-to-buffer-other-window  cb))
     
     ;; do next thing, probably commit
     (vc-next-action nil)))
+
 
 
 ;;;###autoload
