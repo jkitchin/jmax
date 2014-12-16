@@ -34,7 +34,7 @@ Add current file if not in vc, then prompt for commit message"
 	   (eq state 'unregistered))
 	  (vc-checkin (list (buffer-file-name))
 		      backend
-		      (read-string "Commit log: ")
+		      (read-string "Commit message: ")
 		      t
 		      ))
 	 ((eq state 'up-to-date)
