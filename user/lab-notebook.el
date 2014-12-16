@@ -13,21 +13,25 @@ Add current file if not in vc, then prompt for commit message"
   (interactive)
   (save-buffer)
 
-  (let ((backend (vc-backend (buffer-file-name))))
+  (let* ((deduction (vc-deduce-fileset nil t 'state-model-only-files))
+	 (backend (elt deduction 0))
+	 (fileset (elt deduction 1))
+	 (state (elt deduction 3)))
+
     (cond
      (backend     
       (when (file-exists-p (buffer-file-name))
 	;; register the file if it is not
-	(unless (vc-registered (buffer-file-name))
-	  (vc-register)))
+	(when (eq state 'unregistered)
+	  (vc-register))
       
-      ;; Now commit it if needed
-      (let* ((deduction (vc-deduce-fileset nil t 'state-model-only-files))
-	     (the-backend (elt deduction 0))
-	     (fileset (elt deduction 1))
-	     (state (elt deduction 3)))
+	;; Now commit it if needed. We know about edited, added,
+	;; unregistered files. these should all be committed.
 	(cond
-	 ((eq state 'edited)
+	 ((or
+	   (eq state 'edited)
+	   (eq state 'added)
+	   (eq state 'unregistered))
 	  (vc-checkin (list (buffer-file-name))
 		      backend
 		      (read-string "Commit log: ")
