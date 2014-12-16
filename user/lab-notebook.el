@@ -10,7 +10,11 @@
       (vc-register))
 
     (let ((cb (current-buffer)))
+      ;; show diff in another window
       (vc-diff)
+      (split-window-below)
+      (switch-to-buffer-other-window  cb))
+    
     ;; do next thing, probably commit
     (vc-next-action nil)))
 
