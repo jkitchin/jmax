@@ -12,17 +12,33 @@
 Add current file if not in vc, then prompt for commit message"
   (interactive)
   (save-buffer)
-  (when (file-exists-p (buffer-file-name))
-    ;; register the file if it is not
-    (unless (vc-registered (buffer-file-name))
-      (vc-register)))
-    
-  ;; Now commit it
-  (vc-checkin `(,(buffer-file-name))
-	      (vc-backend (buffer-file-name))
-	      (read-string "Commit log: ")
-	      t
-	      ))
+
+  (let ((backend (vc-backend (buffer-file-name))))
+    (cond
+     (backend     
+      (when (file-exists-p (buffer-file-name))
+	;; register the file if it is not
+	(unless (vc-registered (buffer-file-name))
+	  (vc-register)))
+      
+      ;; Now commit it if needed
+      (let* ((deduction (vc-deduce-fileset nil t 'state-model-only-files))
+	     (the-backend (elt deduction 0))
+	     (fileset (elt deduction 1))
+	     (state (elt deduction 3)))
+	(cond
+	 ((eq state 'edited)
+	  (vc-checkin (list (buffer-file-name))
+		      backend
+		      (read-string "Commit log: ")
+		      t
+		      ))
+	 (t
+	  (message "state of %s = %s" (buffer-file-name) state)))
+	;; catch case not in vc
+	(t
+	 (message "Not in a VC repo. Perhaps run vc-create-repo?"))
+	)))))
 
 
 
