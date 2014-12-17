@@ -128,7 +128,8 @@
 (fset 'yes-or-no-p 'y-or-n-p) ; answer with y/n instead of yes/no
 
 ;; Disable all version control. makes startup and opening files much faster
-(setq vc-handled-backends nil)
+;; except git which I actually use
+(setq vc-handled-backends '(Git))
 
 ;; http://emacsredux.com/blog/2013/04/05/recently-visited-files
 (require 'recentf)
