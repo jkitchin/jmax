@@ -166,9 +166,11 @@ This is defined in `jmax-bibtex-journal-abbreviations'."
 	("ć" . "{\\\\'c}")
 	("é" . "{\\\\'e}")
 	("ä" . "{\\\\\"a}")
+	("è" . "{\\\\`e}")
 	("à" . "{\\\\`a}")
 	("á" . "{\\\\'a}")
 	("ø" . "{\\\\o}")
+	("ë" . "{\\\\\"e}")
 	("ü" . "{\\\\\"u}")
 	("ñ" . "{\\\\~n}")
 	("å" . "{\\\\aa}")
@@ -221,7 +223,7 @@ This is defined in `jmax-bibtex-journal-abbreviations'."
 (defvar jmax-lower-case-words
   '("a" "an" "on" "and" "for"
     "the" "of" "in")
-  "List of words to keep lowercase.")
+  "List of words to keep lowercase when changing case in a title.")
 
 
 (defun jmax-title-case-article (&optional key start end)
