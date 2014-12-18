@@ -1,0 +1,3 @@
+[submodule "org-ref"]
+	path = org-ref
+	url = https://github.com/jkitchin/org-ref
