@@ -15,7 +15,7 @@ repo team-project-1
     RW = @team-1
 #+END_EXAMPLE
 
-* Can students turn in a Word document?
+* Can students turn in a Word document? or a PPT presentation? Or a ...?
 Any kind of file can be turned in. Simply put a copy of the file into the assignment directory andturn it in.  All files in the directory will be turned in.
 
 * Do I have to use Emacs or org-mode?

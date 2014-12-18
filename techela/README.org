@@ -20,11 +20,29 @@ mkdir bin
 gitolite/install --to $HOME/bin
 #+END_SRC
 
+You need to get your ssh pub key in the directory. From your local machine, in the .ssh directory run this.
+
+#+BEGIN_SRC sh
+scp id_rsa.pub s15-06640@techela.cheme.cmu.edu:jkitchin-admin.pub
+#+END_SRC
+
+Then, on the remote machine:
+#+BEGIN_SRC sh
+gitolite setup -pk jkitchin-admin.pub 
+#+END_SRC
+
+Initialized empty Git repository in /home/s15-06640/repositories/gitolite-admin.git/
+Initialized empty Git repository in /home/s15-06640/repositories/testing.git/
+WARNING: /home/s15-06640/.ssh missing; creating a new one
+    (this is normal on a brand new install)
+WARNING: /home/s15-06640/.ssh/authorized_keys missing; creating a new one
+    (this is normal on a brand new install)
+
 ** clone the admin repo
 Create a directory somewhere on your remote machine where you want the course to live. Then, clone the admin repo into it. 
 
 #+BEGIN_SRC sh
-git clone org-course@git-it.cheme.cmu.edu:gitolite-admin
+git clone course-name@techela.cheme.cmu.edu:gitolite-admin
 #+END_SRC
 
 ** edit gitolite/gitolite.conf
@@ -61,7 +79,7 @@ echo "student repo conf files go here" >> repos/README
 touch students.conf
 #+END_SRC
 
-That creates the course repo, and sets up the directories and files we need to create student repos. You have to commit and push these changes to 
+That creates the course repo, and sets up the directories and files we need to create student repos. You have to commit and push these changes too. 
 
 #+BEGIN_SRC sh
 git add repos students.conf
@@ -194,7 +212,6 @@ chmod g+x /home/org-course
 chmod g+x /home/org-course/repositories
 chmod -R g+rx /home/org-course/repositories/course.git
 #+END_SRC
-
 
 * Running your course
 ** Create assignments

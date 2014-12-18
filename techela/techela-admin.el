@@ -14,6 +14,7 @@
 (require 'techela)
 (require 'techela-roster)
 (require 'techela-grade)
+(require 'techela-gradebook)
 (require 'f) ; file utilities
 
 ;;; Code:
@@ -29,6 +30,7 @@
 
 (defvar ta-rubrics '(("homework" . (("\"technical\"" . 0.7) ("\"presentation\"" . 0.2) ("\"typography\"" . 0.1)))
 		     ("exam" . (("\"technical\"" . 0.7) ("\"presentation\"" . 0.3)))
+		     ("multiple-choice" . (("\"participation\"" . 1.0)))
 		     ("participation" . (("\"participation\"" . 1.0))))
   "List of rubrics for assignments. Each element should be a list of components in alist form.")
 
@@ -291,7 +293,7 @@ need to make sure the student is in the roster, and that
 to assignments."
   (interactive
    (list
-    (ido-completing-read "Label: " (ta-get-assigned-assignments) nil t)
+    (ido-completing-read "Label: " (ta-get-possible-assignments) nil t)
     (ido-completing-read "Userid: " (ta-get-userids))))
   ;; first, create the repo and push it.
   (let* ((repo-name (ta-get-repo-name label userid)))
@@ -408,13 +410,25 @@ solution."
 			solution-dir)))
 	 ;; we use the soln-org
 	 (unless (file-exists-p soln-org)
+	   ;; save solution .git, it will get clobbered by the
+	   ;; assignment copy
+	   (with-current-directory
+	    solution-dir
+	    (rename-file ".git" ".git-bak"))
 	   (copy-directory (expand-file-name
 			    label
 			    ta-course-assignments-dir) ;; assignment dir
 			   solution-dir
 			   nil ; keep-time
 			   t ; create parents
-			   t))))) ; copy contents only
+			   t)
+	   ;; now restore the solution .git
+	   (with-current-directory
+	    solution-dir
+	    (delete-directory ".git" t)
+	    (rename-file ".git-bak" ".git"))
+	   
+	   )))) ; copy contents only
 
     ;; open the file
     (find-file (expand-file-name
@@ -454,7 +468,8 @@ See also `ta-close-solution'.
    (format "ssh %s@%s perms solutions/%s - READERS @students" ta-course-name ta-course-server label)))
 
 
-;;; These are class functions which should efficiently operate on each entry of the roster.
+;;; These are class functions which should efficiently operate on each
+;;; entry of the roster.
 
 (defun ta-create-assignment-repos (label)
   "Create repos for all students in the roster for an assignment LABEL.
@@ -577,7 +592,7 @@ section.
        (lambda (userid)
 	 (ta-create-edit-repo-conf
 	  (ta-get-repo-name label userid)
-	  nil           ;; R
+	  nil              ;; R
 	  (list userid)))  ;; RW
        (ta-get-userids))
 
@@ -745,13 +760,6 @@ This is not fast.
 		 nil ; predicate
 		 t ; require match
 		 )))
-
-  ;; set permissions to R for students
-  (ta-collect label)
-  (message "%s has been collected" label)
-  
-  (ta-pull-repos label)  
-  (message "%s has been pulled" label)
   
   ;; Now, make org-file
   (let ((grading-file (expand-file-name
@@ -760,6 +768,13 @@ This is not fast.
     (if (file-exists-p grading-file)
 	(find-file grading-file)
       ;; else, we have to make one
+      ;; set permissions to R for students
+      (ta-collect label)
+      (message "%s has been collected" label)
+  
+      (ta-pull-repos label)  
+      (message "%s has been pulled" label)
+
       (unless (file-exists-p (expand-file-name
 			      "gradebook"
 			      ta-gitolite-admin-dir))
@@ -818,11 +833,8 @@ This is not fast.
 
 We do not check if our local copy is up to date first.  we probably should."
   (interactive)
-  (let ((userids (ta-get-userids))
-	(assigned-assignments (ta-get-assigned-assignments))
-    (dolist (userid userids)
-      (dolist (label assigned-assignments nil)
-	(ta-pull-repos label))))))
+  (dolist (label (ta-get-assigned-assignments))
+    (ta-pull-repos label)))
 
 
 ;; (defun ta-save-commit-and-push ()
@@ -893,6 +905,18 @@ print('Std Dev = {}'.format(np.std(grades)))
 		 (org-table-to-lisp))))
     (mapcar (lambda (x) (car x)) (cddr table))))
 
+(defun ta-get-categories-weights ()
+  "Read categories and weights from the syllabus. Returns an alist."
+  (let ((table (with-current-buffer
+		   (find-file-noselect (expand-file-name "syllabus.org" ta-course-dir))
+		 (beginning-of-buffer)
+		 (re-search-forward "#\\+tblname:\\s-*categories")
+		 (forward-line)
+		 (org-table-to-lisp))))
+    ;; cddr removes the headings and hline
+    (mapcar (lambda (x)
+	      (cons (car x) (string-to-number (nth 1 x))))
+    (cddr table))))
 
 (defun ta-get-possible-assignments ()
   "Return list of assignments in the assignments directory."
@@ -953,13 +977,14 @@ This will be in student-work/label/userid-label/userid-label.org."
       (with-current-directory
        repo-dir
        (find-file (concat label ".org"))
-       (grade-mode)))))
+       (grade-mode)
+       (buffer-name)))))
 
 
 (defun ta-show-assigned-assignments ()
  "Show assigned assignments in an org buffer."
  (interactive)
- (switch-to-buffer-other-frame (get-buffer-create "*techela-assignments*"))
+ (switch-to-buffer-other-frame (get-uffer-create "*techela-assignments*"))
  (erase-buffer)
 
  (dolist (label (ta-get-assigned-assignments))
@@ -1212,6 +1237,8 @@ git status:
 ** Admin Actions
 
 - [[elisp:(find-file ta-gitolite-admin-dir)][Open the admin directory]]
+
+- [[elisp:(find-file (expand-file-name \"gradebook\" ta-gitolite-admin-dir))][Open the gradebook directory]]
 
 ** Course Actions
 

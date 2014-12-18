@@ -15,16 +15,21 @@
 (add-to-list 'load-path starter-kit-dir)
 (add-to-list 'load-path user-dir)
 
-;; check status of jmax, and update if needed. 
+;; check status of jmax, and update if needed.  This is not super
+;; robust if the user has changed jmax, since we do not check if your
+;; repo is clean.
 (let ((default-directory starter-kit-dir))
   (shell-command "git fetch")
-  (unless (= 0 (string-to-number
-		(shell-command-to-string
-		 "git rev-list HEAD...origin/master --count")))
-    (when (let ((last-nonmenu-event nil))
-	    (y-or-n-p "jmax is not up to date. Update now?"))
-      (message "updating jmax now")
-      (shell-command "git pull"))))
+  (let ((output (shell-command-to-string
+		 "git rev-list --count --left-right HEAD...origin/master"))
+	(local-changes) (remote-changes))
+    (setq local-changes (string-to-number (nth 0 (split-string output))))
+    (setq remote-changes (string-to-number (nth 1 (split-string output))))
+    (when (> remote-changes 0)
+      (when (let ((last-nonmenu-event nil))
+	      (y-or-n-p "jmax is not up to date. Update now?"))
+	(message "updating jmax now")
+	(shell-command "git pull")))))
 
 (require 'packages)
 (require 'jmax)

@@ -35,17 +35,21 @@
 
 (defun gb-fraction-to-lettergrade (fraction)
   "Return the letter grade associated with FRACTION."
-  (message "%s" (reverse gb-MULTIPLIERS))
-  (let (last-letter-grade)
-    (dolist (tuple (reverse gb-MULTIPLIERS) value)
-      (let ((lettergrade (car tuple))
-            (multiplier (cdr tuple)))
-        (message "%s %s %s %s" fraction multiplier lettergrade last-letter-grade)
-        (when (< fraction multiplier)
-          (setq value last-letter-grade)
-          (return ))
-        (setq last-letter-grade lettergrade))) value))
+  (let ((tuples (reverse gb-MULTIPLIERS))
+	(last-letter-grade))
+    (setq tuples (remove '("WAIVED" . nil) tuples))
+    (setq tuples (remove '("P" . 1.0) tuples))
+    (setq tuples (remove '("F" . 1.0) tuples))
 
+    
+    (catch 'grade
+      (dolist (tuple tuples) 
+	(let ((lettergrade (car tuple))
+	      (multiplier (cdr tuple)))	  
+	  (when multiplier
+	    (when (< fraction multiplier)
+	      (throw 'grade last-letter-grade))
+	    (setq last-letter-grade lettergrade)))))))
 
 (defun gb-feedback (comment)
   "Insert feedback in an org file.  Bound to \\[gb-feedback].
