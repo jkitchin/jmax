@@ -425,7 +425,7 @@ citecolor=blue,filecolor=blue,menucolor=blue,urlcolor=blue"
 	       ("\\paragraph{%s}" . "\\paragraph*{%s}")
 	       ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
 
-;;;;;;; org path
+;;;;;;; org path for loadable org-files
 (defvar org-load-path 
   (list (file-name-as-directory
 	 (expand-file-name "org" starter-kit-dir)))
@@ -450,9 +450,19 @@ FEATURE is a symbol, and it is loaded from an org-file by the name of FEATURE.or
     (let ((default-directory (file-name-directory path)))
       (org-babel-load-file path))))
 
+(org-require 'org-show)
+
+;; https://github.com/jkitchin/org-ref
+(add-to-list 'org-load-path
+	     (expand-file-name "org-ref" starter-kit-dir))
+
+(add-to-list 'load-path
+	     (expand-file-name "org-ref" starter-kit-dir))
+
 (org-require 'org-ref)
 (org-require 'doi-utils)
-(org-require 'org-show)
+(require 'jmax-bibtex)
+
 
 ;; ;; the real source is in the org-file. whenever the org file is newer
 ;; ;; we build the el file.
