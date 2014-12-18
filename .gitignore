@@ -77,3 +77,4 @@ examples/cmu-letter
 examples/cmu-memo
 devel
 .DS_Store
+bibtex-utils/.hg*
