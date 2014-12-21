@@ -1,5 +1,7 @@
 ;;; pydoc.el --- pydoc - functional, syntax highlighted python documentation
-
+;; Copyright (C) 2014
+;;
+;; Author: John Kitchin <jkitchin@andrew.cmu.edu>
 
 ;;; Commentary:
 ;; This module runs pydoc on an argument, inserts the output into a
@@ -165,7 +167,7 @@ at the function definition."
 	     (find-file ,pydoc-file)
 	     (goto-char (point-min))
 	     (re-search-forward
-	      (format "%s" ,function nil t))))
+	      (format "def %s" ,function nil t))))
 
 	(set-text-properties
 	 start end
@@ -204,7 +206,40 @@ This is not very robust."
      (match-end 0)
      '(font-lock-face (:foreground "forest green")))))
 
+(defun pydoc-linkify-sphinx-directives ()
+  "Make sphinx directives into clickable links.
 
+class, func and mod directive links will run pydoc on the link contents."
+
+  (goto-char (point-min))
+  (while (re-search-forward ":\\(class\\|func\\|mod\\):`\\([^`]*\\)`" nil t)
+    (let ((map (make-sparse-keymap)))    
+      ;; we run pydoc on the func
+      (define-key map [mouse-1]
+	`(lambda ()
+	  (interactive)
+	  (pydoc ,(match-string 2))))
+
+      (set-text-properties
+       (match-beginning 2)
+       (match-end 2)
+       `(local-map, map
+		    font-lock-face (:foreground "SteelBlue4"  :underline t)
+		    mouse-face highlight
+		    help-echo
+		    (format "mouse-1: pydoc %s" ,(match-string 1)))))))
+
+
+(defun pydoc-fontify-inline-code ()
+  "fontify lines with >>> in them, which are inline python."
+  (goto-char (point-min))
+  (while (re-search-forward "\\(\\.\\.\\.\\|>>>\\)" nil t)
+    (org-src-font-lock-fontify-block
+     "python"
+     (line-beginning-position)
+     (line-end-position))))
+
+    
 (defun pydoc-linkify-classes ()
   "TODO: find class lines, and linkify them"
   (goto-char (point-min))
@@ -299,6 +334,8 @@ This is not very robust."
     (pydoc-colorize-class-methods)
     (pydoc-colorize-envvars)
     (pydoc-colorize-strings)
+    (pydoc-linkify-sphinx-directives)
+    (pydoc-fontify-inline-code)
     (pydoc-insert-back-link))
 
   ;; make read-only and press q to quit. add some navigation keys
