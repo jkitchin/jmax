@@ -10,6 +10,14 @@
 
 ;;; Code:
 
+(defvar *pydoc-current* nil
+ "Stores current pydoc command.")
+
+
+(defvar *pydoc-last* nil
+ "Stores the last pydoc command.")
+
+
 (defun pydoc-make-file-link ()
   "Find FILE in a pydoc buffer and make it a clickable link that
 opens the file."
@@ -121,7 +129,8 @@ opens the file."
 	   (find-file ,pydoc-file)
 	   (goto-char (point-min))
 	   (re-search-forward
-	    (format "%s" ,function nil t))))
+	    ;; fragile if spacing is not right
+	    (format "def %s(" ,function nil t))))
       
       (set-text-properties
        start end
@@ -262,14 +271,6 @@ This is not very robust."
 		    help-echo "mouse-1: click to return"))))
 
 
-(defvar *pydoc-current* nil
- "Stores current pydoc command.")
-
-
-(defvar *pydoc-last* nil
- "Stores the last pydoc command.")
-
-
 (defun pydoc (name)
   "Display pydoc information for NAME in a buffer named *pydoc*."
   (interactive "sName of function or module: ")
@@ -300,11 +301,20 @@ This is not very robust."
     (pydoc-colorize-strings)
     (pydoc-insert-back-link))
 
-  ;; make read-only and press q to quit
+  ;; make read-only and press q to quit. add some navigation keys
   (setq buffer-read-only t)
   (use-local-map (copy-keymap org-mode-map))
   (local-set-key "q" #'(lambda () (interactive) (kill-buffer)))
-
+  (local-set-key "n" #'(lambda () (interactive) (next-line)))
+  (local-set-key "N" #'(lambda () (interactive) (forward-page)))
+  (local-set-key "p" #'(lambda () (interactive) (previous-line)))
+  (local-set-key "P" #'(lambda () (interactive) (backward-page)))
+  (local-set-key "f" #'(lambda () (interactive) (forward-char)))
+  (local-set-key "b" #'(lambda () (interactive) (backward-char)))
+  (local-set-key "F" #'(lambda () (interactive) (forward-word)))
+  (local-set-key "B" #'(lambda () (interactive) (backward-word)))
+  (local-set-key "o" #'(lambda () (interactive) (call-interactively 'occur)))
+  (local-set-key "s" #'(lambda () (interactive) (isearch-forward)))
   (font-lock-mode))
 
 (provide 'pydoc)
