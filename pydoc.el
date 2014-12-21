@@ -2,20 +2,23 @@
 
 
 ;;; Commentary:
-;; 
+;; This module runs pydoc on an argument, inserts the output into a
+;; buffer, and then linkifies and colorizes the buffer. For example,
+;; some things are linked to open the source code, or to run pydoc on
+;; them. Some things are colorized for readability, e.g. environment
+;; variables and strings, function names and arguments.
 
 ;;; Code:
 
 (defun pydoc-make-file-link ()
-  "Find FILE in a pydoc buffer and make it a clickable link."
+  "Find FILE in a pydoc buffer and make it a clickable link that
+opens the file."
   (goto-char (point-min))
   (when (re-search-forward "^FILE
     \\(.*\\)$" nil t)
-
-    (make-variable-buffer-local 'pydoc-file)
+    
     (setq pydoc-file (match-string 1))
     
-
     (let ((map (make-sparse-keymap))
 	  (start (match-beginning 1))
 	  (end (match-end 1)))
@@ -24,7 +27,8 @@
       (define-key map [mouse-1]
 	`(lambda ()
 	  (interactive)
-	  (find-file ,pydoc-file)))
+	  (find-file ,pydoc-file)
+	  (goto-char (point-min))))
 
       (set-text-properties
        start end
@@ -57,10 +61,10 @@
 
 (defun pydoc-get-name ()
   "Get NAME and store locally."
-  (make-variable-buffer-local 'pydoc-name)
   (goto-char (point-min))
   (when (re-search-forward "^NAME
-\\s-*\\([^-][a-zA-Z]*\\)" nil t)
+    \\([a-zA-Z0-9_]*\\(\\..*\\)?\\) -"
+			   nil t)
     (setq pydoc-name (match-string 1))))
 
 
@@ -71,7 +75,7 @@
     (forward-line)
 
     (while (string-match
-	    "^    \\([a-zA-Z0-9_]*\\)[ ]?\\((package)\\)?"
+	    "^    \\([a-zA-Z0-9_-]*\\)[ ]?\\((package)\\)?"
 	    (buffer-substring
 	     (line-beginning-position)
 	     (line-end-position)))
@@ -100,6 +104,38 @@
 		      help-echo (format "mouse-1: click to open %s" ,package))))
       (forward-line))))
 
+
+(defun pydoc-colorize-class-methods ()
+  (goto-char (point-min))
+  ;; group1 is the method, group2 is the args
+  (while (re-search-forward "     |  \\([a-zA-Z0-9_]*\\)(\\(.*\\))" nil t)
+
+    (let ((map (make-sparse-keymap))
+	  (start (match-beginning 1))
+	  (end (match-end 1))
+	  (function (match-string 1)))
+		
+      (define-key map [mouse-1]
+	`(lambda ()
+	   (interactive)
+	   (find-file ,pydoc-file)
+	   (goto-char (point-min))
+	   (re-search-forward
+	    (format "%s" ,function nil t))))
+      
+      (set-text-properties
+       start end
+       `(local-map, map
+		    font-lock-face (:foreground "brown")
+		    mouse-face highlight
+		    help-echo (format "mouse-1: click to open %s" ,function)))
+      
+      (set-text-properties
+       (match-beginning 2)
+       (match-end 2)
+       '(font-lock-face (:foreground "red"))))))
+
+
 (defun pydoc-colorize-functions ()
   "Change color of function names and args.
 Also, make function names clickable so they open the source file
@@ -118,6 +154,7 @@ at the function definition."
 	  `(lambda ()
 	     (interactive)
 	     (find-file ,pydoc-file)
+	     (goto-char (point-min))
 	     (re-search-forward
 	      (format "%s" ,function nil t))))
 
@@ -132,6 +169,7 @@ at the function definition."
 	 (match-beginning 2)
 	 (match-end 2)
 	 '(font-lock-face (:foreground "red")))))))
+
 
 (defun pydoc-colorize-envvars ()
   "Makes environment variables a green color"
@@ -171,7 +209,9 @@ This is not very robust."
 	`(lambda ()
 	   (interactive)
 	   (find-file ,pydoc-file)
-	   (re-search-forward (format "class[ ]*%s[ ]+("  ,(match-string 1)))))
+	   (goto-char (point-min))
+	   ;; this might be fragile if people put other spaces in
+	   (re-search-forward (format "class %s("  ,(match-string 1)))))
 
       (set-text-properties
        (match-beginning 1)
@@ -184,7 +224,7 @@ This is not very robust."
     ;; colorize and link superclass
     (let ((map (make-sparse-keymap)))
     
-      ;; set file to be clickable to open the source
+      ;; we run pydoc on the superclass
       (define-key map [mouse-1]
 	`(lambda ()
 	  (interactive)
@@ -196,7 +236,8 @@ This is not very robust."
        `(local-map, map
 		    font-lock-face (:foreground "SteelBlue4"  :underline t)
 		    mouse-face highlight
-		    help-echo "mouse-1: click to open")))))
+		    help-echo
+		    (format "mouse-1: pydoc %s" ,(match-string 2)))))))
 
 
 (defun pydoc-insert-back-link ()
@@ -220,11 +261,14 @@ This is not very robust."
 		    mouse-face highlight
 		    help-echo "mouse-1: click to return"))))
 
+
 (defvar *pydoc-current* nil
  "Stores current pydoc command.")
 
+
 (defvar *pydoc-last* nil
  "Stores the last pydoc command.")
+
 
 (defun pydoc (name)
   "Display pydoc information for NAME in a buffer named *pydoc*."
@@ -241,6 +285,8 @@ This is not very robust."
       (setq *pydoc-last* *pydoc-current*))
   (setq *pydoc-current* name)
 
+  (make-variable-buffer-local 'pydoc-file)
+  (make-variable-buffer-local 'pydoc-name)
 
   (save-excursion
     (pydoc-get-name)
@@ -249,6 +295,7 @@ This is not very robust."
     (pydoc-make-package-links)
     (pydoc-linkify-classes)
     (pydoc-colorize-functions)
+    (pydoc-colorize-class-methods)
     (pydoc-colorize-envvars)
     (pydoc-colorize-strings)
     (pydoc-insert-back-link))
