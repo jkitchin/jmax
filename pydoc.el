@@ -9,6 +9,10 @@
 ;; some things are linked to open the source code, or to run pydoc on
 ;; them. Some things are colorized for readability, e.g. environment
 ;; variables and strings, function names and arguments.
+;;
+;; https://github.com/jkitchin/jmax/blob/master/pydoc.el
+;;
+;; There is one command. M-x pydoc
 
 ;;; Code:
 
@@ -206,10 +210,13 @@ This is not very robust."
      (match-end 0)
      '(font-lock-face (:foreground "forest green")))))
 
+
 (defun pydoc-linkify-sphinx-directives ()
   "Make sphinx directives into clickable links.
 
-class, func and mod directive links will run pydoc on the link contents."
+class, func and mod directive links will run pydoc on the link contents.
+
+we just colorize parameters in red."
 
   (goto-char (point-min))
   (while (re-search-forward ":\\(class\\|func\\|mod\\):`\\([^`]*\\)`" nil t)
@@ -227,7 +234,52 @@ class, func and mod directive links will run pydoc on the link contents."
 		    font-lock-face (:foreground "SteelBlue4"  :underline t)
 		    mouse-face highlight
 		    help-echo
-		    (format "mouse-1: pydoc %s" ,(match-string 1)))))))
+		    (format "mouse-1: pydoc %s" ,(match-string 1))))))
+
+  (goto-char (point-min))
+  ;; param, parameter, arg, argument, key, keyword
+  (while (re-search-forward
+	  (concat
+	   ":\\(param\\|parameter\\|arg\\|argument\\|key\\|keyword\\):"
+	   "`\\([^`]*\\)`")
+	  nil t)
+    (set-text-properties
+     (match-beginning 2)
+     (match-end 2)
+     '(font-lock-face (:foreground "red"))))
+
+  ;; :param type name:
+  (goto-char (point-min))
+  (while (re-search-forward
+	  ":param\\s-*\\([^: ]*\\)\\s-*\\([^:]*\\):"
+	  nil t)
+
+    (cond
+     ;; neither present
+     ((and (string= "" (match-string 1))
+	   (string= "" (match-string 2)))
+      ;; pass
+      )
+     ;; no type and one arg.
+     ((and (not (string= "" (match-string 1)))
+	   (string= "" (match-string 2)))
+      (set-text-properties
+       (match-beginning 1)
+       (match-end 1)
+       '(font-lock-face (:foreground "red"))))
+     ;; both type and arg
+     (t
+      ;; optional type
+      (set-text-properties
+       (match-beginning 1)
+       (match-end 1)
+       '(font-lock-face (:foreground "DeepSkyBlue3")))
+      
+      ;; arg
+      (set-text-properties
+       (match-beginning 2)
+       (match-end 2)
+       '(font-lock-face (:foreground "red")))))))
 
 
 (defun pydoc-fontify-inline-code ()
