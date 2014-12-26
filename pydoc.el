@@ -177,7 +177,7 @@ at the function definition."
 	     (find-file ,pydoc-file)
 	     (goto-char (point-min))
 	     (re-search-forward
-	      (format "def %s" ,function nil t))))
+	      (format "def %s(" ,function nil t))))
 
 	(set-text-properties
 	 start end
