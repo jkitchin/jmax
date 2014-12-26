@@ -55,10 +55,16 @@ opens the file."
 (defun pydoc-make-url-links ()
   "Propertize urls so they are clickable."
   (goto-char (point-min))
-  (while (re-search-forward "\\(http\\(s\\)?://.*$\\)" nil t)
+
+  (while (re-search-forward "http" nil t)
+    ;; this seems like a clumsy way to set this link, but it works.
+    (let ((url (browse-url-url-at-point)))      
+      (re-search-backward "http")
+      (re-search-forward url))
+    
     (let ((map (make-sparse-keymap))
-	  (start (match-beginning 1))
-	  (end (match-end 1)))
+	  (start (match-beginning 0))
+	  (end (match-end 0)))
 	
       (define-key map [mouse-1]
 	`(lambda ()
