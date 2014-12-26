@@ -1,7 +1,14 @@
+;;; email.el --- Email functions
 
 ;; this provides gnus-dired-attach which allows you to mark files and
 ;; attach them to an email
+
+;;; Commentary:
+;; 
+
 (require 'gnus-dired)
+
+;;; Code:
 
 (defun email-region (start end)
   "Send region as the body of an email."
@@ -22,13 +29,13 @@
     (message-goto-to)))
 
 (defvar *email-heading-point* nil
-  "global variable to store point in for returning")
+  "Global variable to store point in for returning.")
 
 (defvar *email-to-addresses* nil
-  "global variable to store to address in email")
+  "Global variable to store to address in email.")
 
 (defun email-heading-return ()
-  "after returning from compose do this"
+  "After returning from compose do this."
   (switch-to-buffer (marker-buffer  *email-heading-point*))
   (goto-char (marker-position  *email-heading-point*))
   (setq *email-heading-point* nil)
@@ -38,7 +45,7 @@
   )
 
 (defun email-send-action ()
-  "send action for compose-mail"
+  "Send action for `compose-mail'."
   (setq *email-to-addresses* (mail-fetch-field "To")))
 
 (defun email-heading ()
@@ -52,9 +59,8 @@ OTHER-HEADERS is an alist specifying additional
 header fields.  Elements look like (HEADER . VALUE) where both
 HEADER and VALUE are strings.
 
-save when it was sent as s SENT property. this is overwritten on
-subsequent sends. could save them all in a logbook?
-"
+Save when it was sent as a SENT property. this is overwritten on
+subsequent sends."
   (interactive)
   ; store location.
   (setq *email-heading-point* (set-marker (make-marker) (point)))
@@ -83,12 +89,13 @@ subsequent sends. could save them all in a logbook?
 	(insert BCC))
       (if TO
 	  (message-goto-body)
-	(message-goto-to))       
-      )))
+	(message-goto-to)))))
 
 
 (defun email-region-as-attachment (start end)
-  "Send the region as an attachment in an email"
+  "Send the region as an attachment in an email.
+Argument START start of region.
+Argument END end of region."
   (interactive "r")
   (save-restriction
     (narrow-to-region start end)
@@ -125,3 +132,7 @@ subsequent sends. could save them all in a logbook?
       (when (file-exists-p pdf)
 	(mml-attach-file pdf))
       (message-goto-to))))
+
+(provide 'email)
+
+;;; email.el ends here
