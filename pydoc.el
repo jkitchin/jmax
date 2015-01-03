@@ -129,7 +129,7 @@ opens the file."
 (defun pydoc-colorize-class-methods ()
   (goto-char (point-min))
   ;; group1 is the method, group2 is the args
-  (while (re-search-forward "     |  \\([a-zA-Z0-9_]*\\)(\\(.*\\))" nil t)
+  (while (re-search-forward "^\\s-+|  \\([a-zA-Z0-9_]*\\)(\\(.*\\))" nil t)
 
     (let ((map (make-sparse-keymap))
 	  (start (match-beginning 1))
@@ -302,8 +302,8 @@ we just colorize parameters in red."
 (defun pydoc-linkify-classes ()
   "TODO: find class lines, and linkify them"
   (goto-char (point-min))
-  ;; first match is class name, second match is super class
-  (while (re-search-forward "    class \\(.*\\)(\\(.*\\))$" nil t)
+  ;; first match is class name, second match is optional super class
+  (while (re-search-forward "^\\s-+class \\(.*\\)(?\\(.*\\)?)?" nil t)
     ;; colorize the class
     (let ((map (make-sparse-keymap)))
     
@@ -314,7 +314,7 @@ we just colorize parameters in red."
 	   (find-file ,pydoc-file)
 	   (goto-char (point-min))
 	   ;; this might be fragile if people put other spaces in
-	   (re-search-forward (format "class %s("  ,(match-string 1)))))
+	   (re-search-forward (format "^class %s\\b"  ,(match-string 1)))))
 
       (set-text-properties
        (match-beginning 1)
