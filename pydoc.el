@@ -364,7 +364,7 @@ we just colorize parameters in red."
 		    mouse-face highlight
 		    help-echo "mouse-1: click to return"))))
 
-
+;;;###autoload
 (defun pydoc (name)
   "Display pydoc information for NAME in a buffer named *pydoc*."
   (interactive "sName of function or module: ")
