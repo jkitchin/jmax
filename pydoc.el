@@ -24,6 +24,16 @@
  "Stores the last pydoc command.")
 
 
+
+(defun pydoc-get-name ()
+  "Get NAME and store locally."
+  (goto-char (point-min))
+  (when (re-search-forward "^NAME
+    \\([a-zA-Z0-9_]*\\(\\..*\\)?\\) -"
+			   nil t)
+    (setq pydoc-name (match-string 1))))
+
+
 (defun pydoc-make-file-link ()
   "Find FILE in a pydoc buffer and make it a clickable link that
 opens the file."
@@ -50,15 +60,6 @@ opens the file."
 		   font-lock-face (:foreground "blue"  :underline t)
 		   mouse-face highlight
 		   help-echo "mouse-1: click to open")))))
-
-
-(defun pydoc-get-name ()
-  "Get NAME and store locally."
-  (goto-char (point-min))
-  (when (re-search-forward "^NAME
-    \\([a-zA-Z0-9_]*\\(\\..*\\)?\\) -"
-			   nil t)
-    (setq pydoc-name (match-string 1))))
 
 
 (defun pydoc-make-package-links ()
@@ -99,6 +100,10 @@ opens the file."
 
 
 (defun pydoc-colorize-class-methods ()
+  "Colorize and linkify class methods.
+These tend to be something like:
+
+   | function_name(args)"
   (goto-char (point-min))
   ;; group1 is the method, group2 is the args
   (while (re-search-forward "^\\s-+|  \\([a-zA-Z0-9_]*\\)(\\(.*\\))" nil t)
@@ -133,7 +138,9 @@ opens the file."
 (defun pydoc-colorize-functions ()
   "Change color of function names and args.
 Also, make function names clickable so they open the source file
-at the function definition."
+at the function definition.
+
+These are in a special section called Functions."
   (goto-char (point-min))
   (when (re-search-forward "^Functions" nil t)
     ;; we use this regexp to find functions "    name(args)"
@@ -166,7 +173,7 @@ at the function definition."
 
 
 (defun pydoc-colorize-envvars ()
-  "Makes environment variables a green color"
+  "Makes environment variables a green color."
   (goto-char (point-min))
   (while (re-search-forward "\\$[a-zA-Z_]*\\>" nil t)
     (set-text-properties
@@ -177,7 +184,7 @@ at the function definition."
 
 (defun pydoc-colorize-strings ()
   "Make strings in single ' or \" a green color.
-This is not very robust."
+This is not very robust, e.g. it fails if quotes cross lines, or if they are used in mathematics."
   (goto-char (point-min))
   (while (re-search-forward
 	  (concat "\\('\\|\"\\)" ; opening quote
@@ -272,7 +279,7 @@ we just colorize parameters in red."
 
     
 (defun pydoc-linkify-classes ()
-  "TODO: find class lines, and linkify them"
+  "Find class lines, and colorize and linkify them."
   (goto-char (point-min))
   ;; first match is class name, second match is optional super class
   (while (re-search-forward "^\\s-+class \\(.*\\)(?\\(.*\\)?)?" nil t)
@@ -315,6 +322,7 @@ we just colorize parameters in red."
 		    (format "mouse-1: pydoc %s" ,(match-string 2)))))))
 
 
+;;; TODO replace this with a history 
 (defun pydoc-insert-back-link ()
   "Insert link to previous buffer."
   (goto-char (point-max))
@@ -335,6 +343,7 @@ we just colorize parameters in red."
 		    font-lock-face (:foreground "blue"  :underline t)
 		    mouse-face highlight
 		    help-echo "mouse-1: click to return"))))
+
 
 ;;;###autoload
 (defun pydoc (name)
@@ -358,7 +367,6 @@ we just colorize parameters in red."
   (save-excursion
     (pydoc-get-name)
     (goto-address-mode)
-;;    (pydoc-make-url-links)
     (pydoc-make-file-link)
     (pydoc-make-package-links)
     (pydoc-linkify-classes)
