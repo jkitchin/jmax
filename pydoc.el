@@ -380,7 +380,7 @@ we just colorize parameters in red."
 
   ;; make read-only and press q to quit. add some navigation keys
   (setq buffer-read-only t)
-  (use-local-map (copy-keymap org-mode-map))
+  (use-local-map (copy-keymap text-mode-map))
   (local-set-key "q" #'(lambda () (interactive) (kill-buffer)))
   (local-set-key "n" #'(lambda () (interactive) (next-line)))
   (local-set-key "N" #'(lambda () (interactive) (forward-page)))
