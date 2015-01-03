@@ -52,31 +52,32 @@ opens the file."
 		   help-echo "mouse-1: click to open")))))
 
 
-(defun pydoc-make-url-links ()
-  "Propertize urls so they are clickable."
-  (goto-char (point-min))
+;; (defun pydoc-make-url-links ()
+;;   "Propertize urls so they are clickable."
+;;   (goto-address-mode)
+  ;; (goto-char (point-min))
 
-  (while (re-search-forward "http" nil t)
-    ;; this seems like a clumsy way to set this link, but it works.
-    (let ((url (browse-url-url-at-point)))      
-      (re-search-backward "http")
-      (re-search-forward url))
+  ;; (while (re-search-forward "http" nil t)
+  ;;   ;; this seems like a clumsy way to set this link, but it works.
+  ;;   (let ((url (browse-url-url-at-point)))      
+  ;;     (re-search-backward "http")
+  ;;     (re-search-forward url))
     
-    (let ((map (make-sparse-keymap))
-	  (start (match-beginning 0))
-	  (end (match-end 0)))
+  ;;   (let ((map (make-sparse-keymap))
+  ;; 	  (start (match-beginning 0))
+  ;; 	  (end (match-end 0)))
 	
-      (define-key map [mouse-1]
-	`(lambda ()
-	  (interactive)
-	  (browse-url ,(buffer-substring start end))))
+  ;;     (define-key map [mouse-1]
+  ;; 	`(lambda ()
+  ;; 	  (interactive)
+  ;; 	  (browse-url ,(buffer-substring start end))))
 	
-      (set-text-properties
-       start end
-       `(local-map ,map
-		   font-lock-face (:foreground "blue"  :underline t)
-		   mouse-face highlight
-		   help-echo (format "mouse-1: click to open"))))))
+  ;;     (set-text-properties
+  ;;      start end
+  ;;      `(local-map ,map
+  ;; 		   font-lock-face (:foreground "blue"  :underline t)
+  ;; 		   mouse-face highlight
+  ;; 		   help-echo (format "mouse-1: click to open"))))))
 
 
 (defun pydoc-get-name ()
@@ -384,7 +385,8 @@ we just colorize parameters in red."
 
   (save-excursion
     (pydoc-get-name)
-    (pydoc-make-url-links)
+    (goto-address-mode)
+;;    (pydoc-make-url-links)
     (pydoc-make-file-link)
     (pydoc-make-package-links)
     (pydoc-linkify-classes)
