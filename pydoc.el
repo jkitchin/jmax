@@ -16,6 +16,11 @@
 
 ;;; Code:
 
+
+;; we use org-mode for python fontification
+(unless (featurep 'org)
+  (require 'org))
+
 (defvar *pydoc-current* nil
  "Stores current pydoc command.")
 
@@ -373,7 +378,10 @@ we just colorize parameters in red."
   (insert (shell-command-to-string (format "python -m pydoc %s" name)))
   (goto-char (point-min))
 
-  ;; store name at end of history
+  ;; store name at end of history if it is not in the history
+  ;; already. This isn't exactly a real history this way, since it
+  ;; won't add multiple instances, and revisiting a NAME will move you
+  ;; around in the history.
   (add-to-list '*pydoc-history* name t)
   (setq *pydoc-index* (-elem-index name *pydoc-history*))
 
@@ -391,7 +399,7 @@ we just colorize parameters in red."
     (pydoc-make-file-link)
     (pydoc-make-package-links)
     (pydoc-linkify-classes)
-    (pydoc-colorize-functions)
+    (pydoc-colorze-functions)
     (pydoc-colorize-class-methods)
     (pydoc-colorize-envvars)
     (pydoc-colorize-strings)
