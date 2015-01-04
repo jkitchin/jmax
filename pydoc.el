@@ -24,6 +24,11 @@
  "Stores the last pydoc command.")
 
 
+(defvar *pydoc-history* '()
+  "History for pydoc commands.")
+
+(defvar *pydoc-index* 0
+  "Current index in the history.")
 
 (defun pydoc-get-name ()
   "Get NAME and store locally."
@@ -323,26 +328,38 @@ we just colorize parameters in red."
 
 
 ;;; TODO replace this with a history 
+
 (defun pydoc-insert-back-link ()
-  "Insert link to previous buffer."
+  "Insert link to next and previous pydoc buffers."
   (goto-char (point-max))
-  (insert "
-[back]")
   (let ((map (make-sparse-keymap)))
-    
-    ;; set file to be clickable to open the source
     (define-key map [mouse-1]
       (lambda ()
 	(interactive)
-        (pydoc *pydoc-last*)))
+	(setq *pydoc-index* (mod (- *pydoc-index* 1) (length *pydoc-history*)))
+	(pydoc (elt *pydoc-history* *pydoc-index*))))
+    (insert
+     (propertize "[Back]"
+		 'local-map map
+		 'font-lock-face '(:foreground "blue"  :underline t)
+		 'mouse-face 'highlight
+		 'help-echo "mouse-1: click to return")))
 
-      (set-text-properties
-       (line-beginning-position)
-       (line-end-position)
-       `(local-map, map
-		    font-lock-face (:foreground "blue"  :underline t)
-		    mouse-face highlight
-		    help-echo "mouse-1: click to return"))))
+  (let ((map (make-sparse-keymap)))
+    (define-key map [mouse-1]
+      (lambda ()
+	(interactive)
+	(setq *pydoc-index* (mod (+ *pydoc-index* 1) (length *pydoc-history*)))
+	(pydoc (elt *pydoc-history* *pydoc-index*))))
+    (insert
+     (concat
+      "  "
+      (propertize "[Forward]"
+		  'local-map map
+		  'font-lock-face '(:foreground "blue"  :underline t)
+		  'mouse-face 'highlight
+		  'help-echo "mouse-1: click to return")))))
+  
 
 
 ;;;###autoload
@@ -355,6 +372,10 @@ we just colorize parameters in red."
   (erase-buffer)
   (insert (shell-command-to-string (format "python -m pydoc %s" name)))
   (goto-char (point-min))
+
+  ;; store name at end of history
+  (add-to-list '*pydoc-history* name t)
+  (setq *pydoc-index* (-elem-index name *pydoc-history*))
 
   ;; save
   (when *pydoc-current*
