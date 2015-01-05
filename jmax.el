@@ -227,47 +227,6 @@
 
 (load-file (expand-file-name "email.el" starter-kit-dir))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;; bbdb 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;(setq bbdb-file (expand-file-name "user/bbdb" starter-kit-dir))
-
-;(require 'bbdb)
-;(bbdb-initialize 'gnus 'message 'rmail)
-
-
-;; This is not defined in my bbdb/icicles installation. This lets me use tab-completion.
-;;(defalias 'icicle-bbdb-complete-name 'bbdb-complete-mail) 
-
-;; http://emacs-fu.blogspot.com/2009/08/managing-e-mail-addresses-with-bbdb.html
-;; these seem to be v2 variables.
-;; see http://www.emacswiki.org/emacs/UpgradeBBDB for new names
-;(setq 
-;;    bbdb-offer-save 1                        ;; 1 means save-without-asking
-;;    bbdb-use-pop-up t                        ;; allow popups for addresses
-;;    bbdb-electric-p t                        ;; be disposable with SPC
-;;    bbdb-popup-target-lines  1               ;; very small
-    
-;;    bbdb-dwim-net-address-allow-redundancy t ;; always use full name
-;;    bbdb-quiet-about-name-mismatches 2       ;; show name-mismatches 2 secs
-
-;;    bbdb-always-add-address t                ;; add new addresses to existing...
-                                             ;; ...contacts automatically
-;;    bbdb-canonicalize-redundant-nets-p t     ;; x@foo.bar.cx => x@bar.cx
-
-;    bbdb-completion-list t                 ;; complete on anything
-
-;;    bbdb-complete-name-allow-cycling t       ;; cycle through matches
-                                             ;; this only works partially
-
-;;    bbbd-message-caching-enabled t           ;; be fast
-;;    bbdb-use-alternate-names t               ;; use AKA
-
-;;    bbdb-elided-display t                    ;; single-line addresses
-;)
-
-
 ;; add matlab
 (add-to-list 'load-path (expand-file-name "matlab" starter-kit-dir))
  (load-library "matlab-load")
