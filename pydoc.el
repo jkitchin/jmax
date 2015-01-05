@@ -399,7 +399,7 @@ we just colorize parameters in red."
     (pydoc-make-file-link)
     (pydoc-make-package-links)
     (pydoc-linkify-classes)
-    (pydoc-colorze-functions)
+    (pydoc-colorize-functions)
     (pydoc-colorize-class-methods)
     (pydoc-colorize-envvars)
     (pydoc-colorize-strings)
