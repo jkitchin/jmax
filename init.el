@@ -29,7 +29,9 @@
       (when (let ((last-nonmenu-event nil))
 	      (y-or-n-p "jmax is not up to date. Update now?"))
 	(message "updating jmax now")
-	(shell-command "git pull")))))
+	(shell-command "git pull")
+	(shell-command "git submodule init")
+	(shell-command "git submodule update")))))
 
 (require 'packages)
 (require 'jmax)
