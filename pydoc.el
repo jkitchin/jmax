@@ -197,9 +197,8 @@ These are in a special section called Functions."
 This is not very robust, e.g. it fails if quotes cross lines, or if they are used in mathematics."
   (goto-char (point-min))
   (while (re-search-forward
-	  (concat "\\('\\|\"\\)" ; opening quote
-		  "[^'\\|\"\\|\\n]*"  ; chars that are not a quote or line ending
-		  "\\('\\|\"\\)"); closing quote
+	  "\\('\\|\\\"\\)[^'\"|
+]*\\('\\|\\\"\\)"
 		  nil t)
     (set-text-properties
      (match-beginning 0)
