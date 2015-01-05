@@ -32,6 +32,7 @@
 (global-undo-tree-mode)
 (diminish 'undo-tree-mode)
 
+;; we load the custom file if it exists.
 (setq custom-file (expand-file-name "user/custom.el" starter-kit-dir))
 (when (file-exists-p custom-file)
   (load custom-file))
