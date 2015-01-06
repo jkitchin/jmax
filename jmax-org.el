@@ -461,6 +461,7 @@ FEATURE is a symbol, and it is loaded from an org-file by the name of FEATURE.or
 
 (org-require 'org-ref)
 (org-require 'doi-utils)
+(org-require 'pubmed)
 (require 'jmax-bibtex)
 
 
