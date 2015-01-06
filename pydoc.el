@@ -331,7 +331,32 @@ we just colorize parameters in red."
 		    (format "mouse-1: pydoc %s" ,(match-string 2)))))))
 
 
-;;; TODO replace this with a history 
+(defun pydoc-linkify-data ()
+  "Find DATA block and then make links to entries.
+This is not perfect, as the data entries are not always in the file defined, e.g. when it is an __init__ file that imports *."
+  (goto-char (point-min))
+  (when (re-search-forward "^DATA" nil t)
+    (while (re-search-forward "\\([_A-Za-z0-9]*\\) =" nil t)
+      (let ((map (make-sparse-keymap))
+	    (start (match-beginning 1))
+	    (end (match-end 1))
+	    (token (match-string 1)))
+		
+	(define-key map [mouse-1]
+	  `(lambda ()
+	     (interactive)
+	     (find-file ,pydoc-file)
+	     (goto-char (point-min))
+	     (re-search-forward
+	      (format "^%s" ,token nil t))))
+
+	(set-text-properties
+	 start end
+	 `(local-map, map
+		      font-lock-face (:foreground "brown")
+		      mouse-face highlight
+		      help-echo (format "mouse-1: click to go to %s" ,token)))))))
+
 
 (defun pydoc-insert-back-link ()
   "Insert link to next and previous pydoc buffers."
@@ -404,6 +429,7 @@ we just colorize parameters in red."
     (pydoc-colorize-strings)
     (pydoc-linkify-sphinx-directives)
     (pydoc-fontify-inline-code)
+    (pydoc-linkify-data)
     (pydoc-insert-back-link))
 
   ;; make read-only and press q to quit. add some navigation keys
