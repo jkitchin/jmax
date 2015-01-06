@@ -1,6 +1,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;; You should not need to modify below here
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defcustom jmax-user-theme 'my "User defined theme to load")
 
 (require 'cl)           ;; common-lisp functions
 
@@ -91,8 +92,6 @@
 ;; add this directory to the path for loading lisp files
 (add-to-list 'load-path starter-kit-dir)
 
-(add-to-list 'custom-theme-load-path (expand-file-name "themes" starter-kit-dir))
-(load-theme 'my t) ; my old theme from grad school. it looks like xemacs.
 
 (setq abbrev-file-name (expand-file-name "user/abbrev_defs" starter-kit-dir))
 (setq save-abbrevs t) 
@@ -204,27 +203,6 @@
   (interactive)
   (setq line-spacing nil))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;; python customizations
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(setq python-indent-offset 4)
-
-;; Enter key executes newline-and-indent
-(defun set-newline-and-indent ()
-  "Map the return key with `newline-and-indent'"
-  (local-set-key (kbd "RET") 'newline-and-indent))
-
-(add-hook 'python-mode-hook 'set-newline-and-indent)
-(add-hook 'emacs-lisp-mode-hook 'set-newline-and-indent)
-
-;; turn off yasnippets in python mode
-(add-hook 'python-mode-hook #'(lambda () (yas-global-mode -1)))
-
-;; I want python to always show me the output. this advice makes that happen.
-(defadvice python-shell-send-buffer (after switch-to-python-output activate)
-  "Show python output in another frame after you run a script"
-  (switch-to-buffer-other-frame "*Python*"))
 
 (load-file (expand-file-name "email.el" starter-kit-dir))
 
@@ -268,6 +246,20 @@
 (when (file-exists-p user-dir)
   (mapc 'load (directory-files user-dir 't "^[^#].*el$")))
 
+(add-to-list 'custom-theme-load-path (expand-file-name "themes" starter-kit-dir))
+(load-theme jmax-user-theme t)
+
+
 (require 'jmax-bibtex)
+
+
+
+(defun vc-git-push ()
+  "Run git push."
+  (interactive)
+  (shell-command "git push"))
+
+(global-set-key (kbd "C-x v p") 'vc-git-push)
+
 
 (provide 'jmax)
