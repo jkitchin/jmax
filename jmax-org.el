@@ -177,7 +177,7 @@
 
 
 ;; language specific headers. I think this comes before the defaults
-(setq org-babel-default-header-args:emacs-lisp 
+(setq org-babel-default-header-args:emacs-lisp
       (cons '(:results . "value replace")
 	    (assq-delete-all :results org-babel-default-header-args)))
 
@@ -297,8 +297,8 @@ start  empty title path
  "msx"
  'org-msx-open)
 
-(org-add-link-type 
- "attachfile" 
+(org-add-link-type
+ "attachfile"
  (lambda (link-string) (org-open-file link-string))
  ;; formatting
  (lambda (keyword desc format)
@@ -308,19 +308,7 @@ start  empty title path
      ;; write out the latex command
      (format "\\attachfile{%s}" keyword)))))
 
-;; make access to python documentation available cross-platform
-(org-add-link-type
- "pydoc"
- (lambda (link-string)
-   (shell-command (format "python -m pydoc %s" link-string))))
 
-(defun pydoc (name)
-  "Display pydoc information for NAME in a buffer named *pydoc*."
-  (interactive "sName of function or module: ")
-  (switch-to-buffer-other-window "*pydoc*")
-  (erase-buffer)
-  (insert (shell-command-to-string (format "python -m pydoc %s" name)))
-  (goto-char (point-min)))
 
 ;; Setup the frame configuration for following links.
 (setq org-link-frame-setup (quote ((gnus . org-gnus-no-new-news)
@@ -342,11 +330,11 @@ start  empty title path
 ;; use ido completion wherever possible
 (setq org-completion-use-ido t)
 
-(setq org-latex-default-packages-alist 
+(setq org-latex-default-packages-alist
       '(("AUTO" "inputenc" t)
 	("" "lmodern" nil)
 	("T1" "fontenc" t)
-	("" "fixltx2e" nil)	
+	("" "fixltx2e" nil)
 ;	("" "charter" nil) ;; a decent font
 ;	("expert" "mathdesign" nil)
 	("" "graphicx" t)
@@ -366,7 +354,7 @@ start  empty title path
 	("" "natmove" nil)
 	("" "url" nil)
 	("" "minted" nil)
-	("" "underscore" nil)	
+	("" "underscore" nil)
 	("linktocpage,pdfstartview=FitH,colorlinks,
 linkcolor=blue,anchorcolor=blue,
 citecolor=blue,filecolor=blue,menucolor=blue,urlcolor=blue"
@@ -394,10 +382,10 @@ citecolor=blue,filecolor=blue,menucolor=blue,urlcolor=blue"
 
 ;; I have not had good luck with this on windows
 ;(setq org-latex-to-pdf-process '("texi2dvi --pdf --clean --verbose --batch"))
-	
+
 ;; avoid getting \maketitle right after begin{document}
 ;; you should put \maketitle if and where you want it.
-(setq org-latex-title-command "") 
+(setq org-latex-title-command "")
 
 ;; customized article. better margins
 (add-to-list 'org-latex-classes
@@ -426,7 +414,7 @@ citecolor=blue,filecolor=blue,menucolor=blue,urlcolor=blue"
 	       ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
 
 ;;;;;;; org path for loadable org-files
-(defvar org-load-path 
+(defvar org-load-path
   (list (file-name-as-directory
 	 (expand-file-name "org" starter-kit-dir)))
   "List of directories to find org-files that
@@ -471,7 +459,7 @@ FEATURE is a symbol, and it is loaded from an org-file by the name of FEATURE.or
 ;; (if (or
 ;;      (not (file-exists-p "org-ref.el"))
 ;;      (< (float-time (nth 5 (file-attributes "org-ref.el")))
-;; 	(float-time (nth 5 (file-attributes "org-ref.org")))))
+;;	(float-time (nth 5 (file-attributes "org-ref.org")))))
 ;;     (progn
 ;;       (org-babel-tangle-file (expand-file-name "org-ref.org" starter-kit-dir))
 ;;       (load-file (expand-file-name "org-ref.el" starter-kit-dir)))
@@ -480,7 +468,7 @@ FEATURE is a symbol, and it is loaded from an org-file by the name of FEATURE.or
 ;; (if (or
 ;;      (not (file-exists-p "doi-utils.el"))
 ;;      (< (float-time (nth 5 (file-attributes "doi-utils.el")))
-;; 	(float-time (nth 5 (file-attributes "doi-utils.org")))))
+;;	(float-time (nth 5 (file-attributes "doi-utils.org")))))
 ;;     (progn
 ;;       (org-babel-tangle-file (expand-file-name "doi-utils.org" starter-kit-dir))
 ;;       (load-file (expand-file-name "doi-utils.el" starter-kit-dir)))
@@ -489,7 +477,7 @@ FEATURE is a symbol, and it is loaded from an org-file by the name of FEATURE.or
 ;; (if (or
 ;;      (not (file-exists-p "org-show.el"))
 ;;      (< (float-time (nth 5 (file-attributes "org-show.el")))
-;; 	(float-time (nth 5 (file-attributes "org-show.org")))))
+;;	(float-time (nth 5 (file-attributes "org-show.org")))))
 ;;     (progn
 ;;       (org-babel-tangle-file (expand-file-name "org-show.org" starter-kit-dir))
 ;;       (load-file (expand-file-name "org-show.el" starter-kit-dir)))
@@ -554,18 +542,18 @@ FEATURE is a symbol, and it is loaded from an org-file by the name of FEATURE.or
     ;; we are not usually writing programs where it
     ;; makes sense to be too formal on variable
     ;; names.
-    "--disable=invalid-name " 
+    "--disable=invalid-name "
     ;; don't usually have modules, which triggers
     ;; this when there is not string at the top
-    "--disable=missing-docstring " 
+    "--disable=missing-docstring "
     ;; superfluous-parens is raised with print(),
     ;; which I am promoting for python3
     ;; compatibility.
     "--disable=superfluous-parens ";
-    
+
     ;; these do not seem important for my work.
     "--disable=too-many-locals ";
-    
+
     ;; this is raised in solving odes and is
     ;; unimportant for us.
     "--disable=unused-argument ";
@@ -595,7 +583,7 @@ Opens a buffer with links to what is found. This function installs pyflakes, pep
       (if (executable-find "pip")
 	  (shell-command "python -c \"import pip; pip.main(['install','pyflakes'])\"")
 	(shell-command "python -c \"from setuptools.command import easy_install; easy_install.main(['-U','pyflakes'])\"")))
-    
+
     (unless (executable-find "pep8")
       (if (executable-find "pip")
 	  (shell-command "python -c \"import pip; pip.main(['install','pep8'])\"")
@@ -608,7 +596,7 @@ Opens a buffer with links to what is found. This function installs pyflakes, pep
 
     ;; rm buffer if it exists
     (when (get-buffer pb) (kill-buffer pb))
-    
+
     ;; only run if in a python code-block
     (when (and (eq 'src-block (car eop))
 	       (string= "python" (org-element-property :language eop)))
@@ -618,7 +606,7 @@ Opens a buffer with links to what is found. This function installs pyflakes, pep
       ;; create code file
       (with-temp-file tempfile
 	(insert (org-element-property :value eop)))
-      
+
       (let ((status (shell-command
 		     (format "pyflakes %s" (file-name-nondirectory tempfile))))
 	    (output (delete "" (split-string
@@ -669,7 +657,7 @@ pyflakes checks your code for errors. You should probably fix all of these.
 	     ;; no match, just insert line
 	     (t
 	      (setq link (concat line "\n"))))
-	    
+
 	    (insert link))))
 
       (let ((status (shell-command
@@ -686,7 +674,7 @@ pyflakes checks your code for errors. You should probably fix all of these.
 ")
 	  (dolist (line output)
 	    ;; get the line number
-	    (if 
+	    (if
 		(string-match (format "^%s:\\([0-9]*\\):\\(.*\\)"
 				      (file-name-nondirectory tempfile))
 			      line)
@@ -721,7 +709,7 @@ pyflakes checks your code for errors. You should probably fix all of these.
 	(setq output (delete
 		      "No config file found, using default configuration"
 		      output))
-	
+
 	(kill-buffer "*Shell Command Output*")
 	(when output
 	  (set-buffer (get-buffer-create pb))
@@ -732,13 +720,13 @@ pyflakes checks your code for errors. You should probably fix all of these.
 
 	  (dolist (line output)
 	    ;; pylint gives a line and column number
-	    (if 
-		(string-match "[A-Z]:\\s-+\\([0-9]*\\),\\s-*\\([0-9]*\\):\\(.*\\)"			      
+	    (if
+		(string-match "[A-Z]:\\s-+\\([0-9]*\\),\\s-*\\([0-9]*\\):\\(.*\\)"
 			      line)
 		(let ((line-number (match-string 1 line))
 		      (column-number (match-string 2 line))
 		      (content (match-string 3 line)))
-		     
+
 		  (setq link (format "[[elisp:(progn (switch-to-buffer-other-window \"%s\")(goto-char %s)(forward-line %s)(forward-line 0)(forward-char %s))][%s]]\n"
 				     cb
 				     (org-element-property :begin eop)
@@ -748,13 +736,13 @@ pyflakes checks your code for errors. You should probably fix all of these.
 	      ;; no match, just insert line
 	      (setq link (concat line "\n")))
 	    (insert link))))
-    
+
       (when (get-buffer pb)
 	;; open the buffer
 	(switch-to-buffer-other-window pb)
 	(goto-char (point-min))
 	(insert "Press q to close the window\n")
-	(org-mode)       
+	(org-mode)
 	(org-cycle '(64))  ; open everything
 	;; make read-only and press q to quit
 	(setq buffer-read-only t)
@@ -765,7 +753,7 @@ pyflakes checks your code for errors. You should probably fix all of these.
 	  (forward-line 4)
 	  (message "pyflakes exited non-zero. please fix errors"))
 	(switch-to-buffer-other-window cb))
-      ;; final cleanup and delete file     
+      ;; final cleanup and delete file
       (delete-file tempfile)
       )))
 
@@ -781,7 +769,7 @@ pyflakes checks your code for errors. You should probably fix all of these.
   (ignore-errors
     (when jmax-run-pycheck
       (org-py-check)))
-  
+
   (save-window-excursion
     ;; execute the block as normal
     ad-do-it
@@ -792,7 +780,7 @@ pyflakes checks your code for errors. You should probably fix all of these.
 	(let ((err (with-current-buffer "*Org-Babel Error Output*"
 		     (buffer-string))))
 	  (when (not (string= err ""))
-	
+
 	    (goto-char (point-min))
 	    (forward-line)
 	    (setq buffer-read-only nil)
@@ -821,9 +809,9 @@ pyflakes checks your code for errors. You should probably fix all of these.
 (cond
  ((string= system-type "windows-nt")
   (setq-default ispell-program-name
-		(expand-file-name				     
+		(expand-file-name
 		 "Aspell-win32/bin/aspell.exe" starter-kit-dir))
   (flyspell-mode +1)
   (add-hook 'org-mode-hook 'turn-on-flyspell 'append)))
-  
+
 (message "jmax-org.el loaded")
