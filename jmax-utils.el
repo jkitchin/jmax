@@ -5,6 +5,22 @@
 
 ;;; Code:
 
+
+(defun kill-all-buffers ()
+  "Kill all buffers. leave one frame open."
+  (interactive)
+  (mapc 'kill-buffer (buffer-list))
+  (delete-other-windows))
+
+
+(defun kill-other-buffers ()
+    "Kill all other buffers but this one. leave one frame open."
+    (interactive)
+    (mapc 'kill-buffer 
+          (delq (current-buffer) (buffer-list)))
+    (delete-other-windows))
+
+
 (defun jeldoc (library)
   "Generate an org buffer containing the requires, variables and functions defined in LIBRARY.
 LIBRARY must be loaded before running this function."
