@@ -23,3 +23,11 @@
 
 ;; this is my pydoc
 (require 'pydoc)
+
+;; org-mode links for python
+(org-add-link-type "func"
+		   (lambda (path) (pydoc path)))
+
+;; mod:ase.Atoms
+(org-add-link-type "mod"
+		   (lambda (path) (pydoc path)))
