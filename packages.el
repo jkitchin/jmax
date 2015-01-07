@@ -34,7 +34,9 @@
 	's ; string functions
 	'dash ; list functions
 	'ht ; hash functions
-        'rainbow-mode)
+        'rainbow-mode
+	'ace-jump-mode
+	)
   "Libraries that should be installed by default.")
 
 (unless (every #'package-installed-p starter-kit-packages)
