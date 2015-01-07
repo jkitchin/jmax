@@ -85,6 +85,50 @@
       (ido-vertical-mode 1)
       (setq ido-vertical-define-keys 'C-n-C-p-up-down-left-right)))
 
+;; http://tuhdo.github.io/helm-intro.html
+(require 'helm)
+(require 'helm-config)
+(require 'helm-eshell)
+(require 'helm-files)
+(require 'helm-grep)
+
+(define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action) ; rebihnd tab to do persistent action
+(define-key helm-map (kbd "C-i") 'helm-execute-persistent-action) ; make TAB works in terminal
+(define-key helm-map (kbd "C-z")  'helm-select-action) ; list actions using C-z
+
+(define-key helm-grep-mode-map (kbd "<return>")  'helm-grep-mode-jump-other-window)
+(define-key helm-grep-mode-map (kbd "n")  'helm-grep-mode-jump-other-window-forward)
+(define-key helm-grep-mode-map (kbd "p") 'helm-grep-mode-jump-other-window-backward)
+
+(define-key helm-map (kbd "C-x 2") 'helm-select-2nd-action)
+(define-key helm-map (kbd "C-x 3") 'helm-select-3rd-action)
+(define-key helm-map (kbd "C-x 4") 'helm-select-4rd-action)
+
+(global-set-key (kbd "M-x") 'helm-M-x)
+(global-set-key (kbd "M-y") 'helm-show-kill-ring)
+(global-set-key (kbd "C-x b") 'helm-mini)
+(global-set-key (kbd "C-x r l") 'helm-bookmarks)
+(global-set-key (kbd "C-x C-f") 'helm-find-files)
+(global-set-key (kbd "C-c h s") 'helm-semantic-or-imenu)
+(global-set-key (kbd "C-c h m") 'helm-man-woman)
+(global-set-key (kbd "C-c h f") 'helm-find)
+(global-set-key (kbd "C-c h l") 'helm-locate)
+(global-set-key (kbd "C-c h o") 'helm-occur)
+(global-set-key (kbd "C-c h r") 'helm-resume)
+(global-set-key (kbd "C-c m") 'helm-all-mark-rings)
+
+(define-key 'help-command (kbd "C-f") 'helm-apropos)
+(define-key 'help-command (kbd "r") 'helm-info-emacs)
+
+;; use helm to list eshell history
+(add-hook 'eshell-mode-hook
+          #'(lambda ()
+              (define-key eshell-mode-map (kbd "M-l")  'helm-eshell-history)))
+
+  ;;; Save current position to mark ring
+(add-hook 'helm-goto-line-before-hook 'helm-save-current-pos-to-mark-ring)
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;; personal preferences
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
