@@ -533,8 +533,8 @@ FEATURE is a symbol, and it is loaded from an org-file by the name of FEATURE.or
     ;; this is triggered a lot from fsolve
     "--disable=unbalanced-tuple-unpacking "
     ;; these are really annoying with how we use jasp
-    "--disable=wildcard-import"
-    "--disable=redefined-builtin"
+    "--disable=wildcard-import "
+    "--disable=redefined-builtin "
     )
   "List of options to use with pylint.")
 
