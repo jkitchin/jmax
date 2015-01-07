@@ -532,6 +532,9 @@ FEATURE is a symbol, and it is loaded from an org-file by the name of FEATURE.or
     "--disable=redefined-outer-name "
     ;; this is triggered a lot from fsolve
     "--disable=unbalanced-tuple-unpacking "
+    ;; these are really annoying with how we use jasp
+    "--disable=wildcard-import"
+    "--disable=redefined-builtin"
     )
   "List of options to use with pylint.")
 
@@ -578,58 +581,60 @@ Opens a buffer with links to what is found. This function installs pyflakes, pep
       (with-temp-file tempfile
 	(insert (org-element-property :value eop)))
 
-      (let ((status (shell-command
-		     (format "pyflakes %s" (file-name-nondirectory tempfile))))
-	    (output (delete "" (split-string
-				(with-current-buffer "*Shell Command Output*"
-				  (buffer-string)) "\n"))))
-	(setq pyflakes-status status)
-	(kill-buffer "*Shell Command Output*")
-	(when output
-	  (set-buffer (get-buffer-create pb))
-	  (insert (format "\n* pyflakes output (status=%s)
-pyflakes checks your code for errors. You should probably fix all of these.
+      ;;       ;; pyflakes section
 
-" status))
-	  (dolist (line output)
-	    ;; get the line number
-	    (cond
-	     ;; this works on my Mac with pyflakes v0.8.1
-	     ;; file.py:1: mesg
-	     ((string-match (format "^%s:\\([0-9]*\\):\\(.*\\)"
-				    (file-name-nondirectory tempfile))
-			    line)
-	      (setq n (match-string 1 line))
-	      (setq content (match-string 2 line))
-	      (setq link (format "[[elisp:(progn (switch-to-buffer-other-window \"%s\")(goto-char %s)(forward-line %s))][%s]] %s\n"
-				 cb
-				 (org-element-property :begin eop)
-				 n
-				 (format "Line %s:" n)
-				 content)))
-	     ;; Sometimes there is a column number
-	     ;; it seems to be for certain kinds of errors
-	     ;; file.py:1(6): mesg
-	     ;; "file.py:\\([0-9]*\\)(\\([0-9]*\\)):\\(.*\\)"
-	     ((string-match (format "^%s:\\([0-9]*\\)(\\([0-9]*\\)):\\(.*\\)"
-				    (file-name-nondirectory tempfile))
-			    line)
-	      ;; do more stuff
-	      (setq n (match-string 1 line))
-	      (setq cn (match-string 2 line))
-	      (setq content (match-string 3 line))
-	      (setq link (format "[[elisp:(progn (switch-to-buffer-other-window \"%s\")(goto-char %s)(forward-line %s)(forward-char %s))][Line %s:]] %s\n"
-				 cb
-				 (org-element-property :begin eop)
-				 n
-				 cn
-				 n
-				 line)))
-	     ;; no match, just insert line
-	     (t
-	      (setq link (concat line "\n"))))
+      ;;       (let ((status (shell-command
+      ;;		     (format "pyflakes %s" (file-name-nondirectory tempfile))))
+      ;;	    (output (delete "" (split-string
+      ;;				(with-current-buffer "*Shell Command Output*"
+      ;;				  (buffer-string)) "\n"))))
+      ;;	(setq pyflakes-status status)
+      ;;	(kill-buffer "*Shell Command Output*")
+      ;;	(when output
+      ;;	  (set-buffer (get-buffer-create pb))
+      ;;	  (insert (format "\n* pyflakes output (status=%s)
+      ;; pyflakes checks your code for errors. You should probably fix all of these.
 
-	    (insert link))))
+      ;; " status))
+      ;;	  (dolist (line output)
+      ;;	    ;; get the line number
+      ;;	    (cond
+      ;;	     ;; this works on my Mac with pyflakes v0.8.1
+      ;;	     ;; file.py:1: mesg
+      ;;	     ((string-match (format "^%s:\\([0-9]*\\):\\(.*\\)"
+      ;;				    (file-name-nondirectory tempfile))
+      ;;			    line)
+      ;;	      (setq n (match-string 1 line))
+      ;;	      (setq content (match-string 2 line))
+      ;;	      (setq link (format "[[elisp:(progn (switch-to-buffer-other-window \"%s\")(goto-char %s)(forward-line %s))][%s]] %s\n"
+      ;;				 cb
+      ;;				 (org-element-property :begin eop)
+      ;;				 n
+      ;;				 (format "Line %s:" n)
+      ;;				 content)))
+      ;;	     ;; Sometimes there is a column number
+      ;;	     ;; it seems to be for certain kinds of errors
+      ;;	     ;; file.py:1(6): mesg
+      ;;	     ;; "file.py:\\([0-9]*\\)(\\([0-9]*\\)):\\(.*\\)"
+      ;;	     ((string-match (format "^%s:\\([0-9]*\\)(\\([0-9]*\\)):\\(.*\\)"
+      ;;				    (file-name-nondirectory tempfile))
+      ;;			    line)
+      ;;	      ;; do more stuff
+      ;;	      (setq n (match-string 1 line))
+      ;;	      (setq cn (match-string 2 line))
+      ;;	      (setq content (match-string 3 line))
+      ;;	      (setq link (format "[[elisp:(progn (switch-to-buffer-other-window \"%s\")(goto-char %s)(forward-line %s)(forward-char %s))][Line %s:]] %s\n"
+      ;;				 cb
+      ;;				 (org-element-property :begin eop)
+      ;;				 n
+      ;;				 cn
+      ;;				 n
+      ;;				 line)))
+      ;;	     ;; no match, just insert line
+      ;;	     (t
+      ;;	      (setq link (concat line "\n"))))
+
+      ;;	    (insert link))))
 
       (let ((status (shell-command
 		     (format "pep8 %s" (file-name-nondirectory tempfile))))
@@ -725,8 +730,7 @@ pyflakes checks your code for errors. You should probably fix all of these.
 	  (message "pyflakes exited non-zero. please fix errors"))
 	(switch-to-buffer-other-window cb))
       ;; final cleanup and delete file
-      (delete-file tempfile)
-      )))
+      (delete-file tempfile))))
 
 (defvar jmax-run-pycheck t
   "determine if we run pycheck before running")
