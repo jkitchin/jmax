@@ -2,9 +2,9 @@
 
 
 ;;; Commentary:
-;; 
+;;
 
-(require 'git-modeline)
+;; (require 'git-modeline)
 
 
 
@@ -142,39 +142,39 @@ This may happen before or after a merge.  Before a merge, we handle each line.  
 	      (mygit
 	       (format "git commit %s -m \"adding untracked file: %s.\""
 		       FROM FROM)))
-	 
+
 	     ;; user rename
 	     ((equal (list X Y) '("R" " "))
 	      (mygit (format "git commit %s -m \"rename %s to %s\"" FROM FROM TO))
 	      (mygit (format "git add %s" TO))
 	      (mygit (format "git commit %s -m \"adding %s\"" TO TO)))
-	 
+
 	     ;; rename and modify
 	     ((equal (list X Y) '("R" "M"))
 	      ;; commit the rename
 	      (mygit (format "git commit %s -m \"rename %s to %s\"" FROM FROM TO))
 	      (mygit (format "git commit %s -m \"changes in %s\"" TO TO)))
-	 
+
 	     ;; added file
 	     ((equal (list X Y) '("A" " "))
 	      (mygit (format "git commit %s -m  \"Adding %s\"" FROM FROM)))
-	 
+
 	     ;; deleted file
 	     ((equal (list X Y) '(" " "D"))
 	      (mygit (format "git commit %s -m \"Deleting %s\"" FROM FROM)))
-	 
+
 	     ;; modified file
 	     ((or (string= X "M")
 		  (string= Y "M"))
 	      (mygit (format "git add %s" FROM))
 	      (mygit (format "git commit %s -m \"changes in %s\"" FROM FROM)))
-      
+
 	     ;; catch everything else
 	     (t
 	      (mygit (format "git add %s" FROM))
 	      (mygit (format "git commit %s -m \"%s\"" FROM LINE))))))))
 
-  
+
 (defun ta-git-update-file ()
   "Update the current file.
 
@@ -182,7 +182,7 @@ This is tricky because we cannot just pull a file. We have to save all files, co
 
 The strategy is to check git status --porcelain first, and get the repo into a clean state. Then we do the pull. Then, we check again and get back to a clean state if needed."
   (interactive)
-  
+
   (save-some-buffers t t) ; make sure all files are saved.
   (with-current-directory
    ;; this switches us to the top git level which is where all the
@@ -191,7 +191,7 @@ The strategy is to check git status --porcelain first, and get the repo into a c
     (shell-command-to-string "git rev-parse --show-toplevel"))
    ;; first clean the repo
    (ta-git-make-repo-clean)
-   
+
    ;; Next we are going to fetch
    (mygit "git fetch")
 
