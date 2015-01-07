@@ -37,7 +37,7 @@
 (setq custom-file (expand-file-name "user/custom.el" starter-kit-dir))
 (when (file-exists-p custom-file)
   (load custom-file))
-      
+
 ;; bookmarks
 (require 'bookmark)
 (setq bookmark-default-file (expand-file-name "bookmarks" starter-kit-dir)
@@ -80,7 +80,7 @@
 
 ;; http://sachachua.com/blog/2014/03/emacs-basics-call-commands-name-m-x-tips-better-completion-using-ido-helm/
 (require 'ido-hacks nil t)
-(if (commandp 'ido-vertical-mode) 
+(if (commandp 'ido-vertical-mode)
     (progn
       (ido-vertical-mode 1)
       (setq ido-vertical-define-keys 'C-n-C-p-up-down-left-right)))
@@ -138,7 +138,7 @@
 
 
 (setq abbrev-file-name (expand-file-name "user/abbrev_defs" starter-kit-dir))
-(setq save-abbrevs t) 
+(setq save-abbrevs t)
 (setq-default abbrev-mode t)
 
 ;; kill mail buffers when exiting
@@ -220,7 +220,7 @@
       (insert-relative-path)
     (insert-absolute-path)))
 
-  
+
 (defun insert-buffer-filename()
   "Inserts filename associated with current buffer"
   (interactive)
@@ -259,7 +259,7 @@
 (load-file (expand-file-name "jmax-org.el" starter-kit-dir))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;; 
+;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; hide details in dired
@@ -294,7 +294,6 @@
 (load-theme jmax-user-theme t)
 
 
-(require 'jmax-bibtex)
 (require 'jmax-utils)
 
 
