@@ -535,6 +535,10 @@ FEATURE is a symbol, and it is loaded from an org-file by the name of FEATURE.or
     ;; these are really annoying with how we use jasp
     "--disable=wildcard-import "
     "--disable=redefined-builtin "
+    ;; I dont mind semicolon separated lines
+    "--disable=multiple-statements "
+    ;; pylint picks up np.linspace as a no-member error. That does not make sense.
+    "--disable=no-member "
     )
   "List of options to use with pylint.")
 
