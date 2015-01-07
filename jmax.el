@@ -128,7 +128,7 @@
   ;;; Save current position to mark ring
 (add-hook 'helm-goto-line-before-hook 'helm-save-current-pos-to-mark-ring)
 
-
+(require 'words)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;; personal preferences
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -295,7 +295,7 @@
 
 
 (require 'jmax-bibtex)
-
+(require 'jmax-utils)
 
 
 (defun vc-git-push ()
