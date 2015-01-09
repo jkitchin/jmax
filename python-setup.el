@@ -1,10 +1,7 @@
 ;;; python-setup.el --- jmax python setup code
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;; python customizations
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; try the launch pad python-mode
-;;; Code:
 
+;;; Code:
+;; try the launch pad python-mode
 (add-to-list 'load-path (expand-file-name "python-mode" starter-kit-dir))
 (autoload 'python-mode "python-mode" "Python Mode." t)
 (add-to-list 'auto-mode-alist '("\\.py\\'" . python-mode))
