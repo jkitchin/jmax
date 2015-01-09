@@ -288,7 +288,9 @@
 ;; We load all .el files in the user directory. No order is guaranteed.
 (add-to-list 'load-path user-dir)
 (when (file-exists-p user-dir)
-  (mapc 'load (directory-files user-dir 't "^[^#].*el$")))
+  (dolist (file (directory-files user-dir 't "^[^#].*el$"))
+    (message "Loading %s" file)
+    (load file)))
 
 (add-to-list 'custom-theme-load-path (expand-file-name "themes" starter-kit-dir))
 (load-theme jmax-user-theme t)
@@ -304,5 +306,6 @@
 
 (global-set-key (kbd "C-x v p") 'vc-git-push)
 
+(require 'python-setup)
 
 (provide 'jmax)
