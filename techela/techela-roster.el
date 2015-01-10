@@ -5,7 +5,7 @@
 
 
 ;;; Commentary:
-;; 
+;;
 
 ;;; Code:
 
@@ -20,15 +20,13 @@ Use it like this:
   (with-temp-buffer
     (insert-file-contents ta-roster)
     (let ((contents (cdr (csv-parse-buffer nil))))  ;; first line is header
-      (cons '("instructor"
-	      :name "Instructor account" :email "jkitchin@andrew.cmu.edu")
-	    (mapcar (lambda (x)
+      (mapcar (lambda (x)
 		      (list (nth 8 x)                     ; userid
 			    :name (format "%s %s"
 					  (nth 6 x)       ; first name
 					  (nth 5 x))      ; last name
 			    :email (nth 9 x)))
-		    contents)))))
+		    contents))))
 
 
 (defun ta-have-user-pubkey-p (userid)
@@ -61,7 +59,7 @@ Use it like this:
 	      ta-course-name (plist-get (cdr (assoc userid (ta-roster))) :name) userid)))))
   (org-mode))
 
-  
+
 (defun ta-update-roster ()
   "Update the list of students in conf/students.conf group.
 
@@ -83,7 +81,7 @@ dropped."
 				       (lambda () (org-entry-get (point) "CUSTOM_ID"))))
 					; else
 				  '())))
-			      
+
        (student-conf-file (expand-file-name
 			   "conf/students.conf"
 			   ta-gitolite-admin-dir))
@@ -100,7 +98,7 @@ dropped."
     ;; Now we update the roster.org
     (switch-to-buffer (get-buffer-create "*Roster update*"))
     (erase-buffer)
-    
+
     (when new-students
       (insert "New students added\n" "==================\n")
       (dolist (userid new-students nil)
@@ -127,7 +125,7 @@ dropped."
 					   (concat userid "@" ta-email-host)))
 	  (org-entry-put (point) "ADDED" (format-time-string "[%Y-%m-%d %a]" (current-time)))
 	  (save-buffer))))
-    
+
     ;; we need to remove the userid.pub file
     (when dropped-students
       (dolist (userid dropped-students nil)
@@ -149,13 +147,13 @@ dropped."
 	)
       (insert "\nDropped students\n" "==================\n"
 	      (mapconcat 'identity dropped-students "\n")))
-    
+
     (with-current-directory
      ta-gitolite-admin-dir
      (mygit "git add roster.org")
      (mygit "git commit roster.org -m \"Updated roster\"")
      (mygit "git push"))
-    
+
     ;; write out new conf file
     (with-temp-file student-conf-file
       (insert "@students = " (mapconcat 'identity new-roster-userids " ")))
@@ -179,7 +177,7 @@ dropped."
 					       ta-gitolite-admin-dir))
        (org-map-entries (lambda () (org-entry-get (point) "CUSTOM_ID")))))
     (read-from-minibuffer "Note: ")))
-   
+
   (with-current-buffer (find-file-noselect (expand-file-name
 					    "roster.org"
 					    ta-gitolite-admin-dir))
@@ -199,8 +197,8 @@ dropped."
      (mygit "git commit roster.org -m \"Updated roster with a note.\"")
      (mygit "git push"))
    )
-	
-  
+
+
 
 (provide 'techela-roster)
 
