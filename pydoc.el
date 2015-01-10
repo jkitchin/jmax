@@ -38,8 +38,10 @@
 (defun pydoc-get-name ()
   "Get NAME and store locally."
   (goto-char (point-min))
+  ;; the name sometimes is just a word, sometimes there is a - with a string
+  ;; after it.
   (when (re-search-forward "^NAME
-    \\([a-zA-Z0-9_]*\\(\\..*\\)?\\) -"
+    \\([a-zA-Z0-9_]*\\(\\..*\\)?\\)\\( -\\)?"
 			   nil t)
     (setq pydoc-name (match-string 1))))
 
@@ -50,13 +52,13 @@ opens the file."
   (goto-char (point-min))
   (when (re-search-forward "^FILE
     \\(.*\\)$" nil t)
-    
+
     (setq pydoc-file (match-string 1))
-    
+
     (let ((map (make-sparse-keymap))
 	  (start (match-beginning 1))
 	  (end (match-end 1)))
-      
+
       ;; set file to be clickable to open the source
       (define-key map [mouse-1]
 	`(lambda ()
@@ -83,7 +85,7 @@ opens the file."
 	    (buffer-substring
 	     (line-beginning-position)
 	     (line-end-position)))
-		
+
       (let ((map (make-sparse-keymap))
 	    (start (match-beginning 1))
 	    (end (match-end 1))
@@ -93,12 +95,12 @@ opens the file."
 				    (buffer-substring
 				     (line-beginning-position)
 				     (line-end-position))))))
-	
+
 	(define-key map [mouse-1]
 	  `(lambda ()
 	    (interactive)
 	    (pydoc ,package)))
-	  
+
 	(set-text-properties
 	 (+ (line-beginning-position) start)
 	 (+ (line-beginning-position) end)
@@ -122,7 +124,7 @@ These tend to be something like:
 	  (start (match-beginning 1))
 	  (end (match-end 1))
 	  (function (match-string 1)))
-		
+
       (define-key map [mouse-1]
 	`(lambda ()
 	   (interactive)
@@ -131,14 +133,14 @@ These tend to be something like:
 	   (re-search-forward
 	    ;; fragile if spacing is not right
 	    (format "def %s(" ,function nil t))))
-      
+
       (set-text-properties
        start end
        `(local-map, map
 		    font-lock-face (:foreground "brown")
 		    mouse-face highlight
 		    help-echo (format "mouse-1: click to open %s" ,function)))
-      
+
       (set-text-properties
        (match-beginning 2)
        (match-end 2)
@@ -160,7 +162,7 @@ These are in a special section called Functions."
 	    (start (match-beginning 1))
 	    (end (match-end 1))
 	    (function (match-string 1)))
-		
+
 	(define-key map [mouse-1]
 	  `(lambda ()
 	     (interactive)
@@ -215,7 +217,7 @@ we just colorize parameters in red."
 
   (goto-char (point-min))
   (while (re-search-forward ":\\(class\\|func\\|mod\\):`\\([^`]*\\)`" nil t)
-    (let ((map (make-sparse-keymap)))    
+    (let ((map (make-sparse-keymap)))
       ;; we run pydoc on the func
       (define-key map [mouse-1]
 	`(lambda ()
@@ -269,7 +271,7 @@ we just colorize parameters in red."
        (match-beginning 1)
        (match-end 1)
        '(font-lock-face (:foreground "DeepSkyBlue3")))
-      
+
       ;; arg
       (set-text-properties
        (match-beginning 2)
@@ -286,7 +288,7 @@ we just colorize parameters in red."
      (line-beginning-position)
      (line-end-position))))
 
-    
+
 (defun pydoc-linkify-classes ()
   "Find class lines, and colorize and linkify them."
   (goto-char (point-min))
@@ -294,7 +296,7 @@ we just colorize parameters in red."
   (while (re-search-forward "^\\s-+class \\(.*\\)(?\\(.*\\)?)?" nil t)
     ;; colorize the class
     (let ((map (make-sparse-keymap)))
-    
+
       ;; set file to be clickable to open the source
       (define-key map [mouse-1]
 	`(lambda ()
@@ -314,7 +316,7 @@ we just colorize parameters in red."
 
     ;; colorize and link superclass
     (let ((map (make-sparse-keymap)))
-    
+
       ;; we run pydoc on the superclass
       (define-key map [mouse-1]
 	`(lambda ()
@@ -341,7 +343,7 @@ This is not perfect, as the data entries are not always in the file defined, e.g
 	    (start (match-beginning 1))
 	    (end (match-end 1))
 	    (token (match-string 1)))
-		
+
 	(define-key map [mouse-1]
 	  `(lambda ()
 	     (interactive)
@@ -388,7 +390,7 @@ This is not perfect, as the data entries are not always in the file defined, e.g
 		  'font-lock-face '(:foreground "blue"  :underline t)
 		  'mouse-face 'highlight
 		  'help-echo "mouse-1: click to return")))))
-  
+
 
 
 ;;;###autoload
