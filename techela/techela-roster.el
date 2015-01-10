@@ -70,7 +70,7 @@ dropped."
   (let*
       ((roster (ta-roster))
        ;; instructor is just test account that acts like a student
-       (new-roster-userids (cons "instructor" (mapcar (lambda (x) (car x)) roster)))
+       (new-roster-userids (mapcar (lambda (x) (car x)) roster))
        (roster-org-file (expand-file-name "roster.org" ta-gitolite-admin-dir))
        (userids-in-roster-org (with-temp-buffer
 				(org-mode)
