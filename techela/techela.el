@@ -59,6 +59,47 @@ Check your internet connection")
     (message "You have no ping executable! I cannot check for internet connectivity.")
     ))
 
+(defun techela-register (course)
+  "Register for COURSE.
+This sets up your local machine and emails the instructor your
+ssh pub key. You cannot access the course until you get an email
+confirmation back."
+  (interactive
+   (list
+    (ido-completing-read
+     "Course name: "
+     (tq-config-get-user-courses))))
+
+  (tq-check-internet)
+
+  ;; Set this for the current session
+  (setq tq-current-course course)
+
+  ;; initialize to nil, just in case they were previously set
+  (setq tq-root-directory (file-name-as-directory
+			   (expand-file-name
+			    course
+			    (expand-file-name "~/techela"))))
+
+  (setq tq-course-directory (expand-file-name "course" tq-root-directory)
+	tq-config-file (expand-file-name ".techela" tq-root-directory))
+
+  ;; make root directory if needed, including parents
+  (unless (file-exists-p tq-root-directory)
+    (make-directory tq-root-directory t))
+
+  ;; load directories to variables if they exist
+  (let ((data (tq-config-read-data)))
+
+    (unless (setq tq-userid (gethash "userid" data))
+      (setq tq-userid (read-from-minibuffer "Enter userid: "))
+      (puthash "userid" tq-userid data)
+      (tq-config-write-data data))
+
+    (ta-setup-user)
+    (ta-setup-ssh)))
+
+
 (defun techela (course)
   "Open COURSE.
 If you have not registered for the course, you will be prompted
@@ -98,9 +139,6 @@ The user ssh.pub key must be registered in the course."
       (setq tq-userid (read-from-minibuffer "Enter userid: "))
       (puthash "userid" tq-userid data)
       (tq-config-write-data data))
-
-    (ta-setup-user)
-    (ta-setup-ssh)
 
     ;; clone course if we need it. This will be in a repo called "course"
     ;; do not clone if the directory exists.
