@@ -20,6 +20,8 @@
 ;; repo is clean.
 (let ((default-directory starter-kit-dir))
   (shell-command "git fetch")
+  (shell-command "git submodule init")
+  (shell-command "git submodule update")
   (let ((output (shell-command-to-string
 		 "git rev-list --count --left-right HEAD...origin/master"))
 	(local-changes) (remote-changes))
@@ -36,4 +38,3 @@
 (require 'packages)
 (require 'jmax)
 ;;; end init
-
