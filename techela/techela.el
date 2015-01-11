@@ -39,7 +39,7 @@
 Check your internet connection.")
 	  (message "Unable to contact techela.cheme.cmu.edu. Check your internet connection"))
 	t)
-       
+
        ((string= system-type "darwin")
 	(unless (= 0
 		   (shell-command "ping -c 1 techela.cheme.cmu.edu"))
@@ -47,7 +47,7 @@ Check your internet connection.")
 Check your internet connection")
 	  (error "Unable to contact techela.cheme.cmu.edu. Check your internet connection."))
 	t)
-       
+
        (t ;; all other systems
 	(unless (= 0
 		   (shell-command "ping -c 1 techela.cheme.cmu.edu"))
@@ -58,7 +58,7 @@ Check your internet connection")
     ;; no ping found !
     (message "You have no ping executable! I cannot check for internet connectivity.")
     ))
-    
+
 (defun techela (course)
   "Open COURSE.
 If you have not registered for the course, you will be prompted
@@ -74,7 +74,7 @@ The user ssh.pub key must be registered in the course."
      (tq-config-get-user-courses))))
 
   (tq-check-internet)
-  
+
   ;; Set this for the current session
   (setq tq-current-course course)
 
@@ -90,10 +90,10 @@ The user ssh.pub key must be registered in the course."
   ;; make root directory if needed, including parents
   (unless (file-exists-p tq-root-directory)
     (make-directory tq-root-directory t))
-  
+
   ;; load directories to variables if they exist
   (let ((data (tq-config-read-data)))
-   
+
     (unless (setq tq-userid (gethash "userid" data))
       (setq tq-userid (read-from-minibuffer "Enter userid: "))
       (puthash "userid" tq-userid data)
@@ -106,8 +106,10 @@ The user ssh.pub key must be registered in the course."
     ;; do not clone if the directory exists.
     (unless (and tq-course-directory (file-exists-p tq-course-directory))
       (let ((default-directory (file-name-as-directory tq-root-directory)))
-	(mygit (format "git clone git://%s/course" tq-git-server)))))
-  
+	(mygit (format "git clone %s@%s:course"
+		       tq-current-course
+		       tq-git-server)))))
+
   ;; let user know if an update is needed
   (with-current-directory
      tq-course-directory
@@ -121,7 +123,7 @@ The user ssh.pub key must be registered in the course."
   (tq-clean-line-endings)
   (save-buffer)
   (read-only-mode 1)
-  
+
   (techela-mode)
   (setq org-id-extra-files (files-in-below-directory tq-course-directory)))
 
@@ -153,7 +155,7 @@ The user ssh.pub key must be registered in the course."
 	   ;; we were clean. Let's pull anyway to get remote changes.
 	   (message "Checking for remote changes")
 	   (mygit "git pull"))
-	    
+
 	 ;; now, open the file
 	 (find-file (expand-file-name
 		     (concat label ".org")
@@ -206,7 +208,7 @@ Check *techela log* for error messages."
     (gb-set-filetag "TURNED-IN-FAILED" (current-time-string))
     (save-buffer)
     (switch-to-buffer "*techela log*")
-    (error "Problem pushing to server.  Check the logs."))  
+    (error "Problem pushing to server.  Check the logs."))
   (save-buffer)
   (message "Woohoo! You turned it in!"))
 
@@ -222,7 +224,7 @@ Check *techela log* for error messages."
     (with-current-directory
      (file-name-directory (buffer-file-name))
      (insert (nth 1 (mygit "git log --pretty=format:\"%h %ad | %s%d [%an]\" --graph --date=local")))
-     (goto-char (point-min))))) 
+     (goto-char (point-min)))))
 
 
 (defun tq-update-course ()
@@ -388,12 +390,12 @@ Messages\n==========\n")
      (insert (with-current-buffer "*techela log*" (buffer-string)))
      (insert "\n"))
    (message-goto-body) ; go back to beginning of email body
-   
+
    (next-line 2)         ; and down two lines
-   
+
    (message "Type C-c C-c to send message"))
 
-	   
+
 ;;;; links
 
 ;; This downloads the assignment repo for the student to work in
@@ -426,7 +428,7 @@ Messages\n==========\n")
 		      tq-git-server
 		      label))
        (find-file (concat label "/" label ".org")))))))
-       
+
 
 ;; these will usually be in class or optional exercises. This is a
 ;; link for clarity of intention for students.
@@ -487,7 +489,7 @@ This is normally only done after the deadline, when you cannot push to the git r
 
   (unless (executable-find "zip")
     (error "Could not find a zip executable."))
-  
+
   (let ((zip-name (concat tq-userid "-"
 			  (file-name-sans-extension
 			   (file-name-nondirectory
@@ -496,14 +498,14 @@ This is normally only done after the deadline, when you cannot push to the git r
     (tq-insert-system-info)
     (gb-set-filetag "TURNED-IN-BY-EMAIL:" (current-time-string))
     (save-some-buffers t)
-    
+
     ;; remove zip if it exists.
     (when (file-exists-p (concat zip-name ".zip"))
       (delete-file (concat zip-name ".zip")))
-    
+
     ;; add everything in this directory to get it clean, except for the zip file.
     (mygit "git add *")
-  
+
     (let ((status (car (mygit "git commit -am \"saving for email submit\""))))
       (unless (or (= 0 status)  ; no problem
 		  (= 1 status)) ; no change in files
@@ -516,7 +518,7 @@ This is normally only done after the deadline, when you cannot push to the git r
     (shell-command (format "zip -v -r %s .git *"
 			   zip-name))
 
-    ;; the .git folder is locally not in sync with the one turned in. 
+    ;; the .git folder is locally not in sync with the one turned in.
     (message-mail)
     (mml-attach-file (concat zip-name ".zip"))
     (message-goto-to)
@@ -566,7 +568,7 @@ a link in the heading."
 	  (org-open-link-from-string (format "[[#%s]]" label))
 	  (setq points (org-entry-get (point) "POINTS"))
 	  (setq category (org-entry-get (point) "CATEGORY"))))
-      
+
       ;; check if we need to update
       (if (file-exists-p (expand-file-name label tq-root-directory))
 	  (progn
@@ -582,13 +584,13 @@ a link in the heading."
 	       ;; accept conflicts if there are any
 	       (mygit "git commit -am \"accepting merge\""))
 	       )
-	  
+
 	    ;; The student assignment will be in root/label/label.org
 	    (setq fname (expand-file-name (concat label "/" label ".org") tq-root-directory))
-	      
+
 	    (when (file-exists-p fname)
 	      (setq grade (gb-get-grade fname)))
-	      	    
+
 	    (insert (format "|[[%s][%s]]|  %10s|%20s|%20s|\n" fname label grade points category)))
       ;; no dir found
       (insert (format "|%s|not found|%20s|%20s|\n" label points category)))))
@@ -649,7 +651,7 @@ a link in the heading."
       (let* ((fname (expand-file-name
 		     (concat label "/" label ".org") tq-root-directory))
 	     (grade))
-	
+
 	(when (file-exists-p fname)
 	  (message "getting grade for %s" fname)
 	  (setq grade (gb-get-grade fname)))
@@ -675,20 +677,19 @@ a link in the heading."
   :lighter " techela"
   :global t
   :keymap techela-mode-map
-  
+
   ;; (if techela-mode
   ;;     (progn
-  ;; 	;; this makes it update each time you check the menu
-  ;; 	(tq-get-assignment-menu)
-  ;; 	(add-hook 'menu-bar-update-hook 'tq-get-assignment-menu))
+  ;;	;; this makes it update each time you check the menu
+  ;;	(tq-get-assignment-menu)
+  ;;	(add-hook 'menu-bar-update-hook 'tq-get-assignment-menu))
   ;;   ;;else we are leaving techela mode
   ;;   (remove-hook 'menu-bar-update-hook 'tq-get-assignment-menu))
 
   )
-  
+
 
 
 (provide 'techela)
 
 ;;; techela.el ends here
-
