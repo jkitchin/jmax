@@ -11,7 +11,7 @@
 
 
 ;;; Commentary:
-;; 
+;;
 
 (require 'json)
 
@@ -39,11 +39,13 @@ DATA should be obtained and modified from `tq-config-read-data'."
 
 (defun tq-config-get-user-courses ()
   "Get a list of available courses."
-  '("f14-06625"))
+  '("f14-06625" "s15-06640"))
 
 
 (defun tq-config-get-admin-courses ()
-  '("f14-06625"))
+  "Returns a list of course names.
+For now they are hard-coded. One day this will be dynamic."
+  '("s15-06640" "f14-06625"))
 
 
 (defun ta-setup-user ()
@@ -86,7 +88,7 @@ git with this information where needed."
   ;; Users will be prompted for their andrew password
   (unless (file-exists-p (expand-file-name "~/.authinfo"))
     (with-temp-file (expand-file-name "~/.authinfo")))
-  
+
   (let ((contents (with-temp-buffer
 		    (insert-file-contents
 		     (expand-file-name "~/.authinfo"))
@@ -127,7 +129,7 @@ Make sure ssh is available. Generate ssh key, config and wrapper script. Email k
 
   ;; now we know the tq-root-directory directory exists, check
   ;; for userid and userid.pub, and make a pair if needed
-  
+
   ;; here we look for the existence of tq-root-directory/userid.pub which is a private ssh key
   (unless (file-exists-p (expand-file-name
 			  (concat tq-userid ".pub")
@@ -142,7 +144,7 @@ Make sure ssh is available. Generate ssh key, config and wrapper script. Email k
     (let ((ssh-config (expand-file-name
 		       "techela-config"
 		       tq-root-directory)))
-      
+
       (shell-command (format "touch \"%s\"" ssh-config))
 
       ;; now append an entry to a config file that techela_ssh uses
@@ -155,7 +157,7 @@ Make sure ssh is available. Generate ssh key, config and wrapper script. Email k
   IdentityFile \"%s\"
   StrictHostKeyChecking no
   UserKnownHostsFile /dev/null
-" tq-git-server tq-current-course 
+" tq-git-server tq-current-course
 (expand-file-name tq-userid tq-root-directory))))
 	(with-temp-file ssh-config
 	  (insert contents)
@@ -176,7 +178,7 @@ exec ssh -F \"%s\" -o \"BatchMode yes\" \"$@\"
       (set-file-modes (expand-file-name
 		       "techela_ssh"
 		       tq-root-directory) #o755)
-      
+
 
       ;; now create an email and send the key to the instructor
       (compose-mail)
@@ -219,7 +221,7 @@ exec ssh -F \"%s\" -o \"BatchMode yes\" \"$@\"
     (insert "jmax current commit: " (shell-command-to-string "git rev-parse HEAD"))
     (insert "jmax tag: " (shell-command-to-string "git tag")))
 
-  
+
   (insert "\n.techela contains:
 #+BEGIN====================================================================
 ")
