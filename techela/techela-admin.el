@@ -1,5 +1,5 @@
 ;;; techela-admin.el --- Techela Administration functions
-;; 
+;;
 
 ;;; Commentary:
 ;; Techela is a Technology enhanced learning and assessment
@@ -28,7 +28,7 @@
 (defvar ta-course-dir nil "Derived variable absolute path to the public course file.")
 (defvar ta-course-student-work-dir nil "Derived variable to the location of student work.")
 
-(defvar ta-rubrics '(("homework" . (("\"technical\"" . 0.7) ("\"presentation\"" . 0.2) ("\"typography\"" . 0.1)))
+(defvar ta-rubrics '(("homework" . (("\"technical\"" . 0.7) ("\"presentation\"" . 0.3)))
 		     ("exam" . (("\"technical\"" . 0.7) ("\"presentation\"" . 0.3)))
 		     ("multiple-choice" . (("\"participation\"" . 1.0)))
 		     ("participation" . (("\"participation\"" . 1.0))))
@@ -50,30 +50,30 @@
 		     (expand-file-name
 		      course-name
 		      (expand-file-name "~/techela-admin")))
-	
+
 	tq-config-file (expand-file-name
 			".techela-admin"
 			ta-root-dir))
 
   (unless (file-exists-p ta-root-dir)
     (make-directory ta-root-dir t))
-			
+
   (let ((data (tq-config-read-data)))
     (unless (setq ta-userid (gethash "userid" data))
       (setq ta-userid (read-from-minibuffer "Enter admin userid: "))
       (puthash "userid" ta-userid data)
       (tq-config-write-data data)))
-  
+
   (ta-setup-user)
 
   ;; this is a clunky way to get the ssh setup to work. this exists
   ;; because I wrote this first with users and admins separated, but I
   ;; need some overlapping functionality.
-  (setq tq-root-directory ta-root-dir 
+  (setq tq-root-directory ta-root-dir
 	tq-current-course course-name
 	tq-userid ta-userid)
   (ta-setup-ssh)
-  
+
   ;; we should have a ta-root-dir now, so we set all the derived variables
   (setq ta-gitolite-admin-dir (file-name-as-directory
 			       (expand-file-name
@@ -148,9 +148,9 @@
 			   (expand-file-name "gitolite-admin" ta-root-dir)))
 	  ("course" . ,(expand-file-name "course" ta-root-dir))
 	  ("student-work" . ,(expand-file-name "student-work" ta-root-dir))
-	  ("syllabus" . ,(expand-file-name "syllabus.org" ta-course-dir))	
+	  ("syllabus" . ,(expand-file-name "syllabus.org" ta-course-dir))
 	  ))
-  
+
   ;; open with the status view
   (ta-status))
 
@@ -175,7 +175,7 @@
 	      (t
 	       ;; construct the email address
 	       (format "%s@%s" x ta-email-host)))) (ta-get-userids) ",")))
-    
+
    ((string-match "\\w+\\(\\.\\w+\\)?@\\(\\w\\|\\.\\)+" userid)
     nil) ;; valid email found, no need to set anything.
    (t ;; construct the email address
@@ -262,11 +262,11 @@ permissions on an existing repo."
 		  (when RW+
 		    (format "    RW+ = %s\n" (mapconcat 'identity RW+ " ")))
 		  "\n")))
-       
+
        (tq-log "-------------------- ta-create-edit-repo ---------------------\n")
 
        (mygit (format "git add %s" (file-relative-name repo-file repo-conf-dir)))
-       
+
        (mygit (format "git commit %s -m \"create/edit %s\""
 		      (file-relative-name repo-file repo-conf-dir)
 		      reponame))
@@ -313,7 +313,7 @@ This sets that repo to R access for USERID. We do not pull the assignment here."
     (ido-completing-read "Userid: " (ta-get-userids))))
   (let* ((repo-name (ta-get-repo-name label userid)))
     ;; this pushes so the effect is immediate
-    (ta-create-edit-repo repo-name			 
+    (ta-create-edit-repo repo-name
 			 (list userid)))) ;; R permission
 
 
@@ -398,7 +398,7 @@ solution."
        ta-course-solutions-dir
        (mygit (format "git clone %s@%s:solutions/%s"
 		      ta-course-name ta-course-server label))
-       
+
        ;; now, copy assignment org in as basis for solution unless it now exists.
        (let ((assign-org (expand-file-name
 			  (concat label ".org")
@@ -427,7 +427,7 @@ solution."
 	    solution-dir
 	    (delete-directory ".git" t)
 	    (rename-file ".git-bak" ".git"))
-	   
+
 	   )))) ; copy contents only
 
     ;; open the file
@@ -454,7 +454,7 @@ See also `ta-close-solution'.
 	     (mygit "git add *")
 	     (mygit "git commit -am \"committing solution\"")
 	     (mygit "git push"))
-	    
+
 	   (shell-command
 	    (format "ssh %s@%s perms solutions/%s + READERS @students" ta-course-name ta-course-server label))))
 	 (error "%s not found" solution-repo-dir))))
@@ -530,7 +530,7 @@ section.
 "
   (interactive (list
 		(ido-completing-read
-		 "Label: "		 
+		 "Label: "
 		 (ta-get-possible-assignments)
 		 nil ; predicate
 		 t ; require match
@@ -542,12 +542,12 @@ section.
 			  (expand-file-name
 			   (format "%s.org" label) ;; the org-file
 			   (expand-file-name label ta-course-assignments-dir)))
- 
+
       (setq POINTS (gb-get-filetag "POINTS")
 	    CATEGORY (gb-get-filetag "CATEGORY")
 	    RUBRIC (gb-get-filetag "RUBRIC")
 	    DUEDATE (gb-get-filetag "DUEDATE"))
-    
+
       (unless (and POINTS CATEGORY RUBRIC DUEDATE)
 	(error "You must define the points, category, duedate and rubric in the assignment file"))
 
@@ -574,7 +574,7 @@ section.
 	      (goto-char (point-max))
 	      (org-entry-put (point) "CATEGORY" CATEGORY)
 	      (org-entry-put (point) "POINTS" POINTS)
-	      (org-entry-put (point) "CUSTOM_ID" label)	      
+	      (org-entry-put (point) "CUSTOM_ID" label)
 	      (org-entry-put (point) "RUBRIC" RUBRIC)
 	      (org-deadline nil DUEDATE)
 	      (goto-char (point-max))
@@ -586,7 +586,7 @@ section.
        (mygit (format "git commit syllabus.org -m \"added assignment %s" label))
        (mygit "git push"))
 
-    
+
       ;; update repo permissions
       (mapcar
        (lambda (userid)
@@ -604,10 +604,7 @@ section.
       ;; Now, give them read access on the assignment. The assignment
       ;; is created as a wild repo, so we do permissions different on
       ;; these than on other types of repos.
-      ;; TODO
-      (shell-command (format "ssh f14-06625@techela.cheme.cmu.edu perms assignments/%s + READERS @students" label))
-
-      )))
+      (shell-command (format "ssh %s@techela.cheme.cmu.edu perms assignments/%s + READERS @students" ta-course-name label)))))
 
 
 (defun ta-collect(label)
@@ -651,6 +648,7 @@ This does not pull the repos. See `ta-pull-repos'.
    (mygit "git commit syllabus.org -m \"collection\"")
    (mygit "git push")))
 
+
 (defun ta-pull-repos (label)
   "Pull the assignment LABEL repo for each student.  This is not
 a fast operation because it requires a pull for every
@@ -677,13 +675,13 @@ permissions of the repo to Read-only first."
       ;; make sure path to repo exists
       (unless (file-exists-p repo-dir-name)
 	(make-directory  (file-name-directory repo-dir-name) t))
-      
+
       (if (file-exists-p repo-dir)
 	  ;; we have a copy fo the work so we pull it.
 	  (with-current-directory
 	   repo-dir
 	   (mygit "git pull"))
-	
+
 	;; repo-dir did not exist. So we clone it.
 	(with-current-directory
 	 (file-name-directory repo-dir-name)
@@ -692,7 +690,7 @@ permissions of the repo to Read-only first."
 			ta-course-server
 			repo-name)))))
     (message "pulled %s" userid)))
-	
+
 
 (defun ta-return (label)
   "Return assignment LABEL for each student.
@@ -719,7 +717,7 @@ This means go into each repo, commit all changes, and push them."
 	   repo-dir)
 	(with-current-directory
 	 repo-dir
-	 
+
 	 ;; only push if changes detected
 	 (if (or (> (ta-git-n-untracked-files) 0) ; we have untracked files
 		 (> (ta-git-n-modified-files) 0)  ; we have modified files
@@ -745,13 +743,11 @@ This means go into each repo, commit all changes, and push them."
    (mygit "git commit syllabus.org -m \"collection\"")
    (mygit "git push")))
 
-  
-
 
 (defun ta-grade (label)
   "Collect and pull repos for assignment LABEL. Open the grading org-file.
 
-This is not fast. 
+This is not fast.
 "
   (interactive (list
 		(ido-completing-read
@@ -760,7 +756,7 @@ This is not fast.
 		 nil ; predicate
 		 t ; require match
 		 )))
-  
+
   ;; Now, make org-file
   (let ((grading-file (expand-file-name
 		       (format "gradebook/grading-%s.org" label)
@@ -771,8 +767,8 @@ This is not fast.
       ;; set permissions to R for students
       (ta-collect label)
       (message "%s has been collected" label)
-  
-      (ta-pull-repos label)  
+
+      (ta-pull-repos label)
       (message "%s has been pulled" label)
 
       (unless (file-exists-p (expand-file-name
@@ -806,7 +802,7 @@ This is not fast.
 				(expand-file-name "gradebook"
 						  ta-gitolite-admin-dir))
 			       repo-name))
-	     ;; missing org file						   
+	     ;; missing org file
 	     (insert (format "** TODO %s missing\n" repo-name)))))
 
       ;; loop is over. Put in last section
@@ -856,7 +852,7 @@ We do not check if our local copy is up to date first.  we probably should."
 		      (expand-file-name
 		       label
 		       ta-course-student-work-dir)))
-	   (repo (f-filename (ta-get-repo-name label userid)))	  
+	   (repo (f-filename (ta-get-repo-name label userid)))
 	   (repo-dir (file-name-as-directory
 			 (expand-file-name
 			  repo
@@ -953,7 +949,7 @@ This will be in student-work/label/userid-label/userid-label.org."
 			 repo
 			 ta-root-dir))))
     (message "looking for %s %s"  repo repo-dir)
-    (if (file-exists-p repo-dir)	
+    (if (file-exists-p repo-dir)
 	(with-current-directory
 	 repo-dir
 	 ;; initially there may not be tracking information, so we are specific in the pull
@@ -966,7 +962,7 @@ This will be in student-work/label/userid-label/userid-label.org."
 			  ta-course-student-work-dir)))
 	(unless (file-exists-p label-dir)
 	  (make-directory label-dir t))
-	
+
 	(with-current-directory
 	 label-dir
 	 (mygit (format "git clone %s@%s:%s"
@@ -1002,7 +998,7 @@ This will be in student-work/label/userid-label/userid-label.org."
 	    (org-file-path (expand-file-name
 			    org-file
 			    (expand-file-name label ta-course-assignments-dir))))
-       (insert (format "- [[file:%s][%s]]\n" org-file-path label)))))   
+       (insert (format "- [[file:%s][%s]]\n" org-file-path label)))))
  (org-mode))
 
 
@@ -1032,7 +1028,7 @@ This will be in student-work/label/userid-label/userid-label.org."
 	  (commits (ta-git-n-commits))
 	  (nlocal (nth 0 commits))
 	  (nremote (nth 1 commits)))
-     
+
      (if clean
 	 (progn
 	   (insert (format "* gitolite-admin is clean %s\n"
@@ -1054,7 +1050,7 @@ This will be in student-work/label/userid-label/userid-label.org."
 #+END_SRC
 
 ")))
-	   
+
        ;; Dirty folder
        (insert (format (concat "* gitolite-admin is "
 			       (propertize "dirty" 'font-lock-face '(:foreground "red"))
@@ -1125,7 +1121,7 @@ git status:
   :END:
 git status:
 %s") (format "(↑%s|↓%s)" nlocal nremote) git-status))
-       
+
        (insert "
 
 #+BEGIN_SRC emacs-lisp
@@ -1158,7 +1154,7 @@ git status:
 			   (if (-contains? (ta-get-assigned-assignments) label)
 			       (propertize " (assigned)" 'font-lock-face '(:foreground "forestgreen"))
 			     " (not assigned)")))
-      
+
       ;; get assignment status
       (with-current-directory
        (expand-file-name label ta-course-assignments-dir)
@@ -1172,7 +1168,7 @@ git status:
 			    (concat label ".org") (expand-file-name
 						   label ta-course-assignments-dir))
 			   (concat label ".org"))))
-       
+
        (if (string= "" git-assignment-status)
 	   (setq header (concat header " clean |"))
 	 (setq header (concat header " " (propertize "dirty" 'font-lock-face '(:foreground "red")) " |"))
@@ -1188,8 +1184,8 @@ git status:
    (ta-status))
 #+END_SRC
 " label)
-	 "\n"))))	     
-	 
+	 "\n"))))
+
       ;; solution
       (if (file-exists-p (expand-file-name label ta-course-solutions-dir))
 	  (with-current-directory
@@ -1202,13 +1198,13 @@ git status:
 				(concat label ".org") (expand-file-name
 						       label ta-course-solutions-dir))
 			       (concat label ".org"))))
-	   
+
 	   (if (string= "" git-solution-status)
 	       (setq header (concat header " solution clean |"))
 	     (setq header (concat header " solution " (propertize "dirty" 'font-lock-face '(:foreground "red")) " |"))
 
 	     (setq body (concat
-			 body			 
+			 body
 			 (shell-command-to-string "git status")
 			 (format "
 #+BEGIN_SRC emacs-lisp
@@ -1229,7 +1225,7 @@ git status:
       (insert header "\n" body "\n")
       )
     )
-	  
+
     ;; now menu options
     (insert "
 * Menu of options
@@ -1244,7 +1240,7 @@ git status:
 
 - [[elisp:(find-file ta-course-dir)][Open the course directory]]
 
-- [[elisp:(ta-email \"*all*\")][Email the class]]    
+- [[elisp:(ta-email \"*all*\")][Email the class]]
 
 - [[elisp:(find-file (expand-file-name \"roster.dat\" ta-gitolite-admin-dir))][Open the roster.dat]]   [[elisp:(find-file (expand-file-name \"roster.org\" ta-gitolite-admin-dir))][Open the roster.org]]
 - [[elisp:ta-update-roster][Update the roster]] (do this after you change roster.dat)
@@ -1302,7 +1298,7 @@ git status:
   (switch-to-buffer
    (get-buffer-create (format "* %s repos *" label)))
   (erase-buffer)
-  
+
   (dolist (userid (ta-get-userids))
     (let* ((dir (expand-file-name
 		 (format "%s-%s" userid label)
@@ -1320,15 +1316,15 @@ git status:
 	  (status) ; clean/dirty
 	  (s-commits) ; local/remote commits
 	  (s-modified)
-	  (s-untracked)	  
+	  (s-untracked)
 	  )
       (if (file-exists-p dir)
-	  
+
 	  (with-current-directory
 	   dir
 	   ;; c
 	   (setq result (shell-command-to-string "git status --porcelain")
-		 n-commits (ta-git-n-commits)  ; (local remote)	   
+		 n-commits (ta-git-n-commits)  ; (local remote)
 		 n-modified (ta-git-n-modified-files)
 		 n-untracked (ta-git-n-untracked-files))
 
@@ -1352,7 +1348,7 @@ git status:
 			      (propertize "  Remote " 'font-lock-face '(:foreground "red"))
 			    "  Remote ")
 			  (nth 1 n-commits))))
-		  		 		
+
 	   (setq s-modified (format "  Modified=%s" n-modified)
 		 s-untracked (format "  Untracked=%s" n-untracked))
 
@@ -1362,13 +1358,13 @@ git status:
 		    status
 		    s-commits
 		    s-modified
-		    s-untracked))	   	  	   		 
+		    s-untracked))
 	    )
 	;; missing directory
 	(insert (format "- %20s Missing\n" link)))))
     (org-mode)
-    ) 
-    
+    )
+
 
 (defun techela-open-file-fast (openCode)
   "Prompt to open a file from a pre-defined set in `my-filelist."
@@ -1378,11 +1374,11 @@ git status:
 	  (mapcar
 	   (lambda (x) (car x))
 	   techela-filelist
-	   ))))	   
+	   ))))
   (find-file (cdr (assoc openCode techela-filelist))))
-  
 
-(defalias 'to 'techela-open-file-fast 
+
+(defalias 'to 'techela-open-file-fast
   "alias for `techela-open-file-fast'")
 
 
@@ -1392,4 +1388,3 @@ git status:
 (provide 'techela-admin)
 
 ;;; techela-admin.el ends here
-
