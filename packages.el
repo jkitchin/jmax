@@ -29,13 +29,13 @@
 	'org-plus-contrib
 	'elpy
 	'jedi 'jedi-direx
-	'helm
+	'helm 'helm-themes
 	'f ; file functions https://github.com/rejeep/f.el
 	's ; string functions
 	'dash ; list functions
 	'ht ; hash functions
         'rainbow-mode
-	'ace-jump-mode
+	'ace-jump-mode 'ace-isearch
 	)
   "Libraries that should be installed by default.")
 
