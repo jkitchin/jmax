@@ -39,7 +39,7 @@ DATA should be obtained and modified from `tq-config-read-data'."
 
 (defun tq-config-get-user-courses ()
   "Get a list of available courses."
-  '("f14-06625" "s15-06640"))
+  '("s15-06640" "f14-06625"))
 
 
 (defun tq-config-get-admin-courses ()
