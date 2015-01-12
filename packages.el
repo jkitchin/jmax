@@ -18,8 +18,8 @@
 ;; elpy.
 (let ((package-archives '(("elpy" . "http://jorgenschaefer.github.io/packages/"))))
   (package-initialize)
-  (package-refresh-contents)
   (unless (package-installed-p 'elpy)
+    (package-refresh-contents)
     (package-install 'elpy)))
 
 
