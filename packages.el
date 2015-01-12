@@ -16,7 +16,7 @@
 ;; highlight-indentation, and more recent versions have bug that prevents elpy
 ;; from loading. This is a solution I developed to install the right versions for
 ;; elpy.
-(let ((package-archives '(("elpy" . "http://jorgenschaefer.github.io/packages"))))
+(let ((package-archives '(("elpy" . "http://jorgenschaefer.github.io/packages/"))))
   (package-initialize)
   (package-refresh-contents)
   (unless (package-installed-p 'elpy)
