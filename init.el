@@ -5,6 +5,9 @@
 ;; This is the first thing to get loaded.
 ;;
 
+(when (version< emacs-version "24.4")
+  (error "You need Emacs 24.4."))
+
 ;; remember this directory
 (defconst starter-kit-dir (file-name-directory (or load-file-name (buffer-file-name)))
     "directory where the starterkit is installed")
