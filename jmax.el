@@ -28,7 +28,6 @@
 ;; diminish keeps the modeline tidy
 (require 'diminish)
 
-
 ;; sensible undo
 (require 'undo-tree)
 (global-undo-tree-mode)
