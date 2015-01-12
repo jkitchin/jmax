@@ -7,12 +7,21 @@
 (setq package-archives
       '(("org"         . "http://orgmode.org/elpa/")
 	("gnu"         . "http://elpa.gnu.org/packages/")
-;	("original"    . "http://tromey.com/elpa/")
 	("melpa" . "http://melpa.org/packages/" )
-;	("marmalade"   . "http://marmalade-repo.org/packages/")
 	))
 
 (setq package-user-dir (expand-file-name "elpa"  starter-kit-dir))
+
+;; It seems that elpy requires a special version, 0.5.0 of
+;; highlight-indentation, and more recent versions have bug that prevents elpy
+;; from loading. This is a solution I developed to install the right versions for
+;; elpy.
+(let ((package-archives '(("elpy" . "http://jorgenschaefer.github.io/packages"))))
+  (package-initialize)
+  (package-refresh-contents)
+  (unless (package-installed-p 'elpy)
+    (package-install 'elpy)))
+
 
 (package-initialize)
 
@@ -25,7 +34,6 @@
 	'diminish
 	'eimp
 	'org-plus-contrib
-	'elpy
 	'jedi 'jedi-direx
 	'helm 'helm-themes
 	'f ; file functions https://github.com/rejeep/f.el
