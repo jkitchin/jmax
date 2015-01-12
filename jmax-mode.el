@@ -68,6 +68,21 @@
   (revert-buffer t t))
 
 
+(defun jmax-customize-user ()
+  "Open jmax/user/user.el. If it does not exist, copy the example
+one and open it."
+  (interactive)
+  (let ((user-file (expand-file-name
+		    "user/user.el"
+		    starter-kit-dir)))
+    (unless (file-exists-p user-file)
+      (copy-file (expand-file-name
+		  "user/user.example"
+		  starter-kit-dir)
+		 user-file))
+    (find-file user-file)))
+
+
 (easy-menu-define my-menu jmax-mode-map "My own menu"
   '("Jmax"
     [(format "Update (-%s)" (kg-get-num-incoming-changes)) kg-update t]
@@ -108,7 +123,8 @@
      ["  validate bibtex file" bibtex-validate (eq major-mode 'bibtex-mode)]
      ["  sort bibtex file" bibtex-sort-buffer (eq major-mode 'bibtex-mode)]
      ["  build bibliography pdf from bib file" org-ref-build-full-bibliography (eq major-mode 'bibtex-mode)]
-     )))
+     )
+    ["Customize user.el" jmax-customize-user t]))
 
 
 (define-minor-mode jmax-mode
