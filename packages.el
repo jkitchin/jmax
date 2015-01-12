@@ -20,12 +20,10 @@
   (list 'flx-ido 'ido-ubiquitous 'smex
         'yasnippet
         'magit
-	'bbdb 'bbdb-ext
         'auctex 'reftex
         'undo-tree
 	'diminish
 	'eimp
-	;'icicles
 	'org-plus-contrib
 	'elpy
 	'jedi 'jedi-direx
@@ -36,6 +34,7 @@
 	'ht ; hash functions
         'rainbow-mode
 	'ace-jump-mode 'ace-isearch
+	'use-package
 	)
   "Libraries that should be installed by default.")
 
