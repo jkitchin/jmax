@@ -154,7 +154,7 @@ Make sure ssh is available. Generate ssh key, config and wrapper script. Email k
 			(buffer-string)))
 	    (entry (format  "Host %s
   User %s
-  IdentityFile \"%s\"
+  IdentityFile %s
   StrictHostKeyChecking no
   UserKnownHostsFile /dev/null
 " tq-git-server tq-current-course
