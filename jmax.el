@@ -1,7 +1,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;; You should not need to modify below here
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defcustom jmax-user-theme 'my "User defined theme to load")
+(defcustom jmax-user-theme 'leuven
+  "User defined theme to load")
 
 (require 'cl)           ;; common-lisp functions
 
@@ -267,8 +268,8 @@
 (setq dired-details-hidden-string "")
 
 
-(require 'kitchingroup-mode)
-(kitchingroup-mode)
+(require 'jmax-mode)
+(jmax-mode 1)
 
 ;; variables that control bibtex key format for auto-generation
 ;; I want firstauthor-year-title-words
