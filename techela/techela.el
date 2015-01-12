@@ -145,8 +145,8 @@ The user ssh.pub key must be registered in the course."
     (unless (and tq-course-directory (file-exists-p tq-course-directory))
       (let ((default-directory (file-name-as-directory tq-root-directory)))
 	(when (not (= 0 (car (mygit (format "git clone %s@%s:course"
-					   tq-current-course
-					   tq-git-server)))))
+					    tq-current-course
+					    tq-git-server)))))
 	  (error "Could not clone course. Try again later.")))))
 
   ;; let user know if an update is needed
