@@ -3,7 +3,7 @@
 
 * Introduction
 
-Techela is a framework for teaching courses. It provides a way to easily distribute, collect, grade, and return digital assignments. 
+Techela is a framework for teaching courses. It provides a way to easily distribute, collect, grade, and return digital assignments.
 
 * Initial server setup
 The initial setup of a techela server is described here.
@@ -28,7 +28,7 @@ scp id_rsa.pub s15-06640@techela.cheme.cmu.edu:jkitchin-admin.pub
 
 Then, on the remote machine:
 #+BEGIN_SRC sh
-gitolite setup -pk jkitchin-admin.pub 
+gitolite setup -pk jkitchin-admin.pub
 #+END_SRC
 
 Initialized empty Git repository in /home/s15-06640/repositories/gitolite-admin.git/
@@ -39,7 +39,7 @@ WARNING: /home/s15-06640/.ssh/authorized_keys missing; creating a new one
     (this is normal on a brand new install)
 
 ** clone the admin repo
-Create a directory somewhere on your remote machine where you want the course to live. Then, clone the admin repo into it. 
+Create a directory somewhere on your remote machine where you want the course to live. Then, clone the admin repo into it.
 
 #+BEGIN_SRC sh
 git clone course-name@techela.cheme.cmu.edu:gitolite-admin
@@ -79,7 +79,7 @@ echo "student repo conf files go here" >> repos/README
 touch students.conf
 #+END_SRC
 
-That creates the course repo, and sets up the directories and files we need to create student repos. You have to commit and push these changes too. 
+That creates the course repo, and sets up the directories and files we need to create student repos. You have to commit and push these changes too.
 
 #+BEGIN_SRC sh
 git add repos students.conf
@@ -122,7 +122,7 @@ This form takes me straight there for 06-625 in the fall. You have to enter your
 <BODY onload="document.forms['foo'].submit();">
 
 <p><form name="foo"
-action="https://www.as.cmu.edu/fio/proc.formproc" 
+action="https://www.as.cmu.edu/fio/proc.formproc"
 method="post" <br />
 <input type="hidden" name="VAR1" value="Fall 2014, 06625 A, CHMCL & REACTV SYSTM"><br />
 <input type="hidden" name="ARGNUM" value=4>
@@ -169,15 +169,40 @@ You create a new assignment repo simply by:
 git clone org-course@techela.cheme.cmu.edu:a/label
 #+END_SRC
 
-This automatically creates the remote repo and local directory. Then, you add your content to it and push it back. 
+This automatically creates the remote repo and local directory. Then, you add your content to it and push it back.
 
-*** TODO how do you update the due dates? 
+*** TODO how do you update the due dates?
 these always end up changing, and we will need to update the syllabus, and possibly student files.
 
 * Providing anonymous access to the course directory in gitolite
 So that students can get started right away on the first day, we enable anonymous read access to the course directory. Here is how we set that up. Note, this only works for one course.
 
-Add this to your xinet.d directory 
+Add this to your xinet.d directory
+
+[2015-01-11 Sun]
+I do not remember which of these I actually did. I am using a non-anonymous access right now.
+
+#+BEGIN_SRC txt
+# default: off
+# description: The git dæmon allows git repositories to be exported using \
+#       the git:// protocol.
+
+service git
+{
+        disable         = daemon
+        socket_type     = stream
+        wait            = no
+        user            = daemon
+        server          = /usr/bin/git
+        server_args     = daemon --inetd --base-path=/home/f14-06625/repositorie\
+s  --syslog --verbose
+        log_on_failure  += USERID
+}
+
+#+END_SRC
+
+
+
 #+BEGIN_SRC text :tangle git
 # default: off
 # description: The git dæmon allows git repositories to be exported using \
