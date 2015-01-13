@@ -1244,6 +1244,7 @@ git status:
 
 - [[elisp:(find-file (expand-file-name \"roster.dat\" ta-gitolite-admin-dir))][Open the roster.dat]]   [[elisp:(find-file (expand-file-name \"roster.org\" ta-gitolite-admin-dir))][Open the roster.org]]
 - [[elisp:ta-update-roster][Update the roster]] (do this after you change roster.dat)
+- [[elisp:ta-check-pub-keys][Check ssh keys]]
 
 ** Assignment Actions
 
