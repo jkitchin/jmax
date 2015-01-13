@@ -271,7 +271,7 @@ Opens a buffer with links to what is found. This function installs pyflakes, pep
   "Non-nil means we run `org-py-check' before running")
 
 ; let this run before we run a code block
-(defadvice org-babel-execute:python (around pychecker nil nil)
+(defadvice org-babel-execute:python (around pychecker nil disable)
   "check python block for syntax and style errors before running"
   ;; we ignore errors so this does not affect people missing the
   ;; executables pep8, pylint and pyflakes, or who have installation
