@@ -14,6 +14,13 @@
 
 (setq package-user-dir (expand-file-name "elpa"  starter-kit-dir))
 
+;; we need this specific version of highlight-indentation
+(let ((package-archives '(("elpy" . "http://jorgenschaefer.github.io/packages/"))))
+  (package-initialize)
+  (package-refresh-contents)
+  (package-install 'highlight-indentation))
+
+
 (package-initialize)
 
 (defvar starter-kit-packages
