@@ -164,7 +164,7 @@
 ;; use syntax highlighting in org-file code blocks
 (setq org-src-fontify-natively t)
 ;; make code blocks stand out a little from my gray80 background
-(set-face-attribute 'org-block-background nil :background "gray")
+;; (set-face-attribute 'org-block-background nil :background "gray")
 
 ;; give us some hint we are running. We change the background color, and print
 ;; some messages.
