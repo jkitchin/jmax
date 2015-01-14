@@ -5,15 +5,17 @@
 ;; This is the first thing to get loaded.
 ;;
 
+;;; Code:
+
 (when (version< emacs-version "24.4")
   (warn "You probably need Emacs 24.4. You should upgrade. You may need to install leuven-theme manually."))
 
 ;; remember this directory
 (defconst starter-kit-dir (file-name-directory (or load-file-name (buffer-file-name)))
-    "directory where the starterkit is installed")
+    "Directory where the starterkit is installed.")
 
 (defvar user-dir (expand-file-name "user" starter-kit-dir)
-  "user directory for personal code")
+  "User directory for personal code.")
 
 (add-to-list 'load-path starter-kit-dir)
 (add-to-list 'load-path user-dir)
@@ -38,6 +40,14 @@
 	(shell-command "git submodule init")
 	(shell-command "git submodule update")))))
 
+
+;;; Commentary:
+;;
+
 (require 'packages)
 (require 'jmax)
-;;; end init
+
+
+(provide 'init)
+
+;;; init.el ends here
