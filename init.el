@@ -1,5 +1,8 @@
 ;;; init.el --- Where all the magic begins
 ;;
+
+;;; Commentary:
+;;
 ;; Part of the Emacs Starter Kit
 ;;
 ;; This is the first thing to get loaded.
@@ -39,10 +42,6 @@
 	(shell-command "git pull")
 	(shell-command "git submodule init")
 	(shell-command "git submodule update")))))
-
-
-;;; Commentary:
-;;
 
 (require 'packages)
 (require 'jmax)
