@@ -166,14 +166,17 @@
 ;; make code blocks stand out a little from my gray80 background
 (set-face-attribute 'org-block-background nil :background "gray")
 
-;; give us some hint we are running
+;; give us some hint we are running. We change the background color, and print
+;; some messages.
 (defadvice org-babel-execute-src-block (around progress nil activate)
-  (set-face-attribute
-   'org-block-background nil :background "LightSteelBlue")
-  (message "Running your code block")
-  ad-do-it
-  (set-face-attribute 'org-block-background nil :background "gray")
-  (message "Done with code block"))
+  (let ((original-background (face-attribute 'org-block-background :background)))
+    (set-face-attribute
+     'org-block-background nil :background "LightSteelBlue")
+    (message "Running your code block")
+    ad-do-it
+    (set-face-attribute
+     'org-block-background nil :background original-background)
+    (message "Done with code block")))
 
 
 ;; language specific headers. I think this comes before the defaults
