@@ -6,7 +6,7 @@
 ;;
 
 (when (version< emacs-version "24.4")
-  (error "You need Emacs 24.4."))
+  (warn "You probably need Emacs 24.4. You should upgrade."))
 
 ;; remember this directory
 (defconst starter-kit-dir (file-name-directory (or load-file-name (buffer-file-name)))
