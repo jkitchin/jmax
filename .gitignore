@@ -1,3 +1,4 @@
+emacs-24.3
 *.elc
 *.pyc
 elpa
@@ -61,7 +62,6 @@ org-ref.el
 /examples/cmu-phd-dissertation/dissertation.pdf
 /examples/cmu-memo/samplememo.pdf
 /doi-utils.el
-emacs-24.4
 ltxpng
 /org-show.el
 /emacs-ipython-notebook/
