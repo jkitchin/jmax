@@ -37,6 +37,9 @@
 		   (lambda (path) (pydoc path)))
 
 
+(org-add-link-type "pydoc"
+		   (lambda (path) (pydoc path)))
+
 
 (defvar jmax-pylint-options
   '(
