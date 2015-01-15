@@ -19,26 +19,45 @@
 
 ;;; Code:
 
-(defvar ta-course-server "techela.cheme.cmu.edu" "Hostname where the course is served.")
+(defvar ta-course-server "techela.cheme.cmu.edu"
+  "Hostname where the course is served.")
+
 (defvar ta-course-name nil "The course currently in action.")
+
 (defvar ta-root-dir nil "The root directory for course files.")
 
-(defvar ta-gitolite-admin-dir nil "Derived variable that stores the location of the admin directory.")
-(defvar ta-roster nil "Derived variable absolute path to the roster file")
-(defvar ta-course-dir nil "Derived variable absolute path to the public course file.")
-(defvar ta-course-student-work-dir nil "Derived variable to the location of student work.")
+(defvar ta-gitolite-admin-dir nil
+  "Derived variable that stores the location of the admin directory.")
 
-(defvar ta-rubrics '(("homework" . (("\"technical\"" . 0.7) ("\"presentation\"" . 0.3)))
-		     ("exam" . (("\"technical\"" . 0.7) ("\"presentation\"" . 0.3)))
+(defvar ta-roster nil
+  "Derived variable absolute path to the roster file")
+
+(defvar ta-course-dir nil
+  "Derived variable absolute path to the public course file.")
+
+(defvar ta-course-student-work-dir nil
+  "Derived variable to the location of student work.")
+
+
+(defvar ta-email-host "andrew.cmu.edu"
+  "Hostname to construct email address from for userids with no @
+  in them.  I would like to deprecate this so techela is not CMU
+  centric, but to do that I need to require a roster format and
+  register students by email address.")
+
+
+(defvar ta-rubrics '(("homework" . (("\"technical\"" . 0.7)
+				    ("\"presentation\"" . 0.3)))
+		     ("exam" . (("\"technical\"" . 0.7)
+				("\"presentation\"" . 0.3)))
 		     ("multiple-choice" . (("\"participation\"" . 1.0)))
 		     ("participation" . (("\"participation\"" . 1.0))))
-  "List of rubrics for assignments. Each element should be a list of components in alist form.")
+  "List of rubrics for assignments. Each element should be a list
+  of components in alist form.")
 
-;; i would like to deprecate this so techela is not CMU centric, but to do that I need to require a roster format.
-(defvar ta-email-host "andrew.cmu.edu" "Hostname to construct email address from for userids with no @ in them.")
 
-(defun techela-admin (course-name)
-  "Open the course dashboard for COURSE-NAME."
+(defun techela-admin-register (course-name)
+  "Setup an admin directory and send ssh pub key."
   (interactive
    (list
     (ido-completing-read
@@ -73,6 +92,42 @@
 	tq-current-course course-name
 	tq-userid ta-userid)
   (ta-setup-ssh)
+  (message "Your pub key has been sent. Please wait for further instructions."))
+
+
+(defun techela-admin (course-name)
+  "Open the course dashboard for COURSE-NAME."
+  (interactive
+   (list
+    (ido-completing-read
+     "Course name: "
+     (tq-config-get-admin-courses))))
+
+  (setq ta-course-name course-name
+	ta-root-dir (file-name-as-directory
+		     (expand-file-name
+		      course-name
+		      (expand-file-name "~/techela-admin")))
+
+	tq-config-file (expand-file-name
+			".techela-admin"
+			ta-root-dir))
+
+  (unless (file-exists-p ta-root-dir)
+    (make-directory ta-root-dir t))
+
+  (let ((data (tq-config-read-data)))
+    (unless (setq ta-userid (gethash "userid" data))
+      (setq ta-userid (read-from-minibuffer "Enter admin userid: "))
+      (puthash "userid" ta-userid data)
+      (tq-config-write-data data)))
+
+  ;; this is a clunky way to get the ssh setup to work. this exists
+  ;; because I wrote this first with users and admins separated, but I
+  ;; need some overlapping functionality.
+  (setq tq-root-directory ta-root-dir
+	tq-current-course course-name
+	tq-userid ta-userid)
 
   ;; we should have a ta-root-dir now, so we set all the derived variables
   (setq ta-gitolite-admin-dir (file-name-as-directory
@@ -133,13 +188,15 @@
   (unless (file-exists-p ta-gitolite-admin-dir)
     (with-current-directory
      ta-root-dir
-     (mygit (format "git clone %s@%s:gitolite-admin" ta-course-name ta-course-server))))
+     (mygit (format "git clone %s@%s:gitolite-admin"
+		    ta-course-name ta-course-server))))
 
   ;; Make sure we have the course folder
   (unless (file-exists-p ta-course-dir)
     (with-current-directory
      ta-root-dir
-     (mygit (format "git clone %s@%s:course" ta-course-name ta-course-server))))
+     (mygit (format "git clone %s@%s:course"
+		    ta-course-name ta-course-server))))
 
   (setq techela-filelist
 	`(("gitolite-admin" . ,(expand-file-name "gitolite-admin" ta-root-dir))
@@ -150,6 +207,14 @@
 	  ("student-work" . ,(expand-file-name "student-work" ta-root-dir))
 	  ("syllabus" . ,(expand-file-name "syllabus.org" ta-course-dir))
 	  ))
+
+  ;; load custom setupfile when it exists.
+  (when (file-exists-p (expand-file-name
+			"lisp/setup.el"
+			ta-course-dir))
+    (load-file (expand-file-name
+			"lisp/setup.el"
+			ta-course-dir)))
 
   ;; open with the status view
   (ta-status))
@@ -583,7 +648,7 @@ section.
       ;; Finally, we need to commit the syllabus change, and push it.
       (with-current-directory
        ta-course-dir
-       (mygit (format "git commit syllabus.org -m \"added assignment %s" label))
+       (mygit (format "git commit syllabus.org -m \"added assignment %s\"" label))
        (mygit "git push"))
 
 
