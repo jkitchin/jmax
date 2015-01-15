@@ -168,15 +168,27 @@
 
 ;; give us some hint we are running. We change the background color, and print
 ;; some messages.
-(defadvice org-babel-execute-src-block (around progress nil activate)
-  (let ((original-background (face-attribute 'org-block-background :background)))
-    (set-face-attribute
-     'org-block-background nil :background "LightSteelBlue")
-    (message "Running your code block")
-    ad-do-it
-    (set-face-attribute
-     'org-block-background nil :background original-background)
-    (message "Done with code block")))
+;; (defvar jmax-src-block-background
+;;   nil
+;;   "Stores initial background color of org source blocks.")
+
+;; (defadvice org-babel-execute-src-block (around progress nil activate)
+;;   ;; store current background first time.
+;;   (unless jmax-src-block-background
+;;     (setq jmax-src-block-background (face-attribute 'org-block-background :background)))
+;;   ;; change color of block before running.
+
+;;   (message "Running your code block")
+;;   (set-face-attribute
+;;    'org-block-background nil :background "LightSteelBlue")
+;;   (message "src blocks are %s" (face-attribute 'org-block-background :background))
+;;   (error "r")
+;;   (unwind-protect
+;;         ad-do-it
+;;     ;; reset the color.
+;;     (set-face-attribute
+;;      'org-block-background nil :background jmax-src-block-background))
+;;   (message "Done with code block"))
 
 
 ;; language specific headers. I think this comes before the defaults
