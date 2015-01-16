@@ -164,6 +164,14 @@ The user ssh.pub key must be registered in the course."
   (read-only-mode 1)
 
   (techela-mode)
+
+  ;; load custom setupfile when it exists.
+  (when (file-exists-p (expand-file-name
+			"lisp/setup.el"
+			tq-course-directory))
+    (load-file (expand-file-name
+			"lisp/setup.el"
+			tq-course-directory)))
   (setq org-id-extra-files (files-in-below-directory tq-course-directory)))
 
 
