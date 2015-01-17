@@ -497,11 +497,15 @@ FEATURE is a symbol, and it is loaded from an org-file by the name of FEATURE.or
 (add-to-list 'org-export-filter-headline-functions 'sa-ignore-headline)
 (add-to-list 'org-export-filter-headline-functions 'headline-nonumber)
 
-
-
 ;; refresh images after running a block
+(defun org-refresh-images ()
+  "Refreshes images displayed inline."
+  (interactive)
+  (org-remove-inline-images)
+  (org-display-inline-images))
+
 (add-hook 'org-babel-after-execute-hook
-	  (lambda () (org-display-inline-images nil t)))
+	  (lambda () (org-refresh-images)))
 
 
 ;; Define a new toggling function for equations.
