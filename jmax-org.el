@@ -237,56 +237,6 @@
 
 ;; give me some warning of upcoming deadlines
 (setq org-deadline-warning-days 0)
-(setq org-agenda-custom-commands
-      '(("w" "Weekly Review"
-          (
-           ;; put a random entry at the top
-           ;(get-random-bibtex-entry)
-
-           ;; deadlines
-          (tags-todo "+DEADLINE<=\"<today>\""
-                     ((org-agenda-overriding-header "Late Deadlines")
-                      ;(org-agenda-tags-todo-honor-ignore-options t)
-                      ;(org-agenda-todo-ignore-scheduled t)
-                      ;(org-agenda-todo-ignore-deadlines t)
-		      ))
-
-          ;; scheduled  past due
-          (tags-todo "+SCHEDULED<=\"<today>\""
-                     ((org-agenda-overriding-header "Late Scheduled")
-                      ;(org-agenda-tags-todo-honor-ignore-options t)
-                      ;(org-agenda-todo-ignore-scheduled t)
-                      ;(org-agenda-todo-ignore-deadlines t)
-		      ))
-
-	  ;; now the agenda
-	  (agenda ""
-		  ((org-agenda-overriding-header "weekly agenda")
-		   (org-agenda-ndays 7)
-		   (org-agenda-tags-todo-honor-ignore-options t)
-		   (org-agenda-todo-ignore-scheduled nil)
-		   (org-agenda-todo-ignore-deadlines nil)
-		   (org-deadline-warning-days 0)
-		   ))
-	  (todo "TASK")
-	  ;; and last a global todo list
-          (todo "TODO"))) ;; review waiting items ...other commands
-			     ;; here
-	("h" "Work todos" tags-todo
-         "-personal-doat={.+}-dowith={.+}/!-TASK"
-         ((org-agenda-todo-ignore-scheduled t)))
-        ("H" "All work todos" tags-todo "-personal/!-TASK-MAYBE"
-         ((org-agenda-todo-ignore-scheduled nil)))
-        ("A" "Work todos with doat or dowith" tags-todo
-         "-personal+doat={.+}|dowith={.+}/!-TASK"
-         ((org-agenda-todo-ignore-scheduled nil)))
-        ("j" "TODO dowith and TASK with"
-         ((org-sec-with-view "TODO dowith")
-          (org-sec-where-view "TODO doat")
-          (org-sec-assigned-with-view "TASK with")
-          (org-sec-stuck-with-view "STUCK with")))
-        ("J" "Interactive TODO dowith and TASK with"
-         ((org-sec-who-view "TODO dowith")))))
 
 ;; record time I finished a task when I change it to DONE
 (setq org-log-done 'time)
