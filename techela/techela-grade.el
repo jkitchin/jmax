@@ -41,11 +41,11 @@
     (setq tuples (remove '("P" . 1.0) tuples))
     (setq tuples (remove '("F" . 1.0) tuples))
 
-    
+
     (catch 'grade
-      (dolist (tuple tuples) 
+      (dolist (tuple tuples)
 	(let ((lettergrade (car tuple))
-	      (multiplier (cdr tuple)))	  
+	      (multiplier (cdr tuple)))
 	  (when multiplier
 	    (when (< fraction multiplier)
 	      (throw 'grade last-letter-grade))
@@ -95,21 +95,7 @@ placed after the new link when it is done."
   (end-of-line))
 
 
-(defun gb-feedback-typo()
-  "insert typo feedback. Bound to \\[gb-feedback-typo]."
-  (interactive)
-  ;; get location
-  (let ((current-point (point))
-        (current-line (count-lines (point-min) (point))))
-
-    (save-excursion
-      (goto-char (point-min))
-      (unless (re-search-forward "* feedback\n" (point-max) 'end)
-        (insert "\n* feedback\n"))
-
-      (goto-char (point-max))
-      (insert  (format "[[elisp:(goto-char %s)][(%s) line %s:]] typo\n\n"
-                       current-point (user-login-name)  current-line)))))
+(interactive)
 
 
 (defun gb-grade ()
@@ -124,7 +110,7 @@ This assumes the assignment label is the filename you are in."
 	  (tbuf (find-file-noselect (expand-file-name "syllabus.org" ta-course-dir))))
       (unless (-contains? (ta-get-assigned-assignments) label)
 	(error "%s is not an assignment" label))
-      
+
       ;; get the rubric from the syllabus, to make sure it has not been
       ;; altered by a student
       (set-buffer tbuf)
@@ -135,7 +121,7 @@ This assumes the assignment label is the filename you are in."
       (setq rubric (read (org-entry-get (point) "RUBRIC")))
       (set-buffer cb)
       (kill-buffer tbuf)
-      
+
       ;; Now, loop over rubric
       (setq categories (mapcar (lambda (x) (car x)) rubric))
       (setq LGS (mapcar (lambda (cell)
@@ -158,11 +144,12 @@ This assumes the assignment label is the filename you are in."
       (goto-char (point-min))
       (unless (re-search-forward "* Grade" (point-max) 'end)
 	(insert "\n* Grade\n"))
-      
-					; (org-open-link-from-string "[[*Grade]]")    
+
+					; (org-open-link-from-string "[[*Grade]]")
       (cl-mapcar (lambda (category grade) (gb-set-filetag category grade))
 		 categories LGS)
       (gb-set-filetag "GRADE" (format "%1.3f" grade))
+      (gb-set-filetag "GRADED-BY" user-full-name)
       (save-buffer)
       (kill-buffer))))
 
@@ -241,7 +228,7 @@ This assumes the assignment label is the filename you are in."
     (define-key gb-map (kbd "M-s t") 'gb-feedback-typo)
     (define-key gb-map (kbd "M-s g") 'gb-grade)
     (define-key gb-map (kbd "M-s r") 'gb-return)
-    (define-key gb-map (kbd "M-s q") 'gb-save-and-close-buffer)    
+    (define-key gb-map (kbd "M-s q") 'gb-save-and-close-buffer)
     gb-map)
   "Keymap for function `grade-mode'.")
 
