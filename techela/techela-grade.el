@@ -95,7 +95,21 @@ placed after the new link when it is done."
   (end-of-line))
 
 
-(interactive)
+(defun gb-feedback-typo()
+  "insert typo feedback. Bound to \\[gb-feedback-typo]."
+  (interactive)
+  ;; get location
+  (let ((current-point (point))
+        (current-line (count-lines (point-min) (point))))
+
+    (save-excursion
+      (goto-char (point-min))
+      (unless (re-search-forward "* feedback\n" (point-max) 'end)
+        (insert "\n* feedback\n"))
+
+      (goto-char (point-max))
+      (insert  (format "[[elisp:(goto-char %s)][(%s) line %s:]] typo\n\n"
+                       current-point (user-login-name)  current-line)))))
 
 
 (defun gb-grade ()
