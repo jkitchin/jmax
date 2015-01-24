@@ -17,10 +17,6 @@
 (defconst starter-kit-dir (file-name-directory (or load-file-name (buffer-file-name)))
     "Directory where the starterkit is installed.")
 
-;; let emacs know this is our ".emacs.d". This is where additional user files should be saved. (locate-user-emacs-file "user.el")
-(setq user-emacs-directory (file-name-as-directory
-			    (expand-file-name "user" starter-kit-dir)))
-
 (defvar user-dir (expand-file-name "user" starter-kit-dir)
   "User directory for personal code.")
 

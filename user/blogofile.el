@@ -1,6 +1,6 @@
 ;; emacs-lisp code to prepare blogofile posts. The YAML header is
 ;; constructed from properties of the heading. The title of the post
-;; comes from the heading.
+;; comes from the heading. 
 
 ;; John Kitchin
 
@@ -21,7 +21,7 @@
 (defvar bf-posts-directory (concat bf-root-dir "_posts/")
   "Directory where all html versions of posts are stored.")
 
-(defvar bf-url-base "http://kitchingroup.cheme.cmu.edu/"
+(defvar bf-url-base "http://jkitchin.github.io/"
   "Base url of the whole site")
 
 (defvar bf-image-url-base "/img/"
@@ -47,7 +47,7 @@ properties stripped"
 
 all keys and values are taken from properties."
   (interactive)
-
+  
   ;; first we get the properties from the entry
   (setq title (bf-get-post-title))
 
@@ -60,9 +60,9 @@ all keys and values are taken from properties."
 		 (org-entry-get nil "updated")    ; then
 	       (format-time-string "%Y/%m/%d %H:%M:%S") ; else current time
 	       ))
-
+    
   ;; the property is a string
-  (setq categories (if (org-entry-get nil "categories")
+  (setq categories (if (org-entry-get nil "categories")    
 		       (org-entry-get nil "categories")    ;then
 		     '())) ; else
 
@@ -71,7 +71,7 @@ all keys and values are taken from properties."
 		 (org-entry-get nil "tags")
 	       ;; else
 	       '()))
-
+  
   ;; now construct the YAML header
   (mapconcat 'identity
 	     `("---"
@@ -94,19 +94,19 @@ all keys and values are taken from properties."
     (progn                                   ; else
       (setq date (format-time-string "%Y/%m/%d %H:%M:%S"))
       (org-entry-put nil "date" date)))
-
+  
   ;; we need to get the title
   (setq title (bf-get-post-title))
-
+    
   ;; construct the directory to save in
   (setq post-dir (format "%s" (concat (mapconcat 'identity (bf-parse-date date) "-")
-                                 "-"
+                                 "-" 
                                  (mapconcat 'identity (split-string title) "-")
                                  "/")))
 
   (setq media-dir (format "%s" (concat bf-media-directory post-dir)))
   (setq media-url (format "%s" (concat bf-media-url-base post-dir)))
-
+  
 
   (make-directory media-dir t) ; make if needed
   `(,media-dir ,media-url))
@@ -124,7 +124,7 @@ all keys and values are taken from properties."
         (media-url (nth 1 MD)))
     ;; parse tree
     (setq url-list (org-element-map parsetree 'link
-      (lambda (link)
+      (lambda (link) 
 	(message "%s" link)
         (let* ((type (nth 0 link))
                (plist (nth 1 link))
@@ -141,8 +141,8 @@ all keys and values are taken from properties."
 	  ;; "fuzzy" links are not working. I think these are internal links.
           (cond
            ;; image
-           ((and (string= type "file") (file-name-extension fname) (string-match "png" (file-name-extension fname)))
-            (progn
+           ((and (string= type "file") (file-name-extension fname) (string-match "png" (file-name-extension fname))) 
+            (progn 
               (copy-file path (concat media-dir fname) t)
               (format "<img src=\"%s%s\"> " media-url fname)))
            ;; regular file with content
@@ -180,12 +180,12 @@ all keys and values are taken from properties."
     (if (string= url "nil")
 	(setq output text) ; no change
       (setq output (format "%s" url)))
-
+     
     ;; increment counter
     (setq bf-link-counter (+ bf-link-counter 1))
     output))
 
-(defun bf-get-HTML ()
+(defun bf-get-HTML () 
   (let (;(bibliography (org-ref-get-html-bibliography))
 	(org-export-filter-link-functions '(ox-mrkup-filter-link))
 	(async nil)
@@ -208,12 +208,12 @@ all keys and values are taken from properties."
   (let ((url-to-org (bf-get-url-to-org-source))
 	(yaml (bf-get-YAML-heading))
 	(body (bf-get-HTML)))
-
+	
     (with-temp-buffer
       (insert yaml)
       (insert body)
-      (insert
-       (format "<p>Copyright (C) %s by John Kitchin. See the <a href=\"/copying.html\">License</a> for information about copying.<p>"
+      (insert 
+       (format "<p>Copyright (C) %s by John Kitchin. See the <a href=\"/copying.html\">License</a> for information about copying.<p>" 
 	       (format-time-string "%Y")))
       (insert (format "<p><a href=\"%s\">org-mode source</a><p>"
 		      url-to-org))
@@ -229,10 +229,10 @@ all keys and values are taken from properties."
     (progn                                   ; else
       (setq date (format-time-string "%Y/%m/%d %H:%M:%S"))
       (org-entry-put nil "date" date)))
-
+  
   ;; we need to get the title
   (setq title (bf-get-post-title))
-
+    
   ;; construct the filename
   (setq permalink (format "%s" (concat bf-url-base
 		       "blog/"
@@ -268,14 +268,14 @@ would lead to this post filename
     (progn                                   ; else
       (setq date (format-time-string "%Y/%m/%d %H:%M:%S"))
       (org-entry-put nil "date" date)))
-
+  
   ;; we need to get the title
   (setq title (bf-get-post-title))
-
+    
   ;; construct the filename
-  (format "%s" (concat bf-posts-directory
+  (format "%s" (concat bf-posts-directory 
 		       (mapconcat 'identity (bf-parse-date date) "-")
-		       "-"
+		       "-" 
 		       (mapconcat 'identity (split-string title) "-")
 		       ".html")))
 
@@ -286,21 +286,21 @@ would lead to this post filename
   (setq date (if (org-entry-get nil "date")    ; has a date property
 		 (org-entry-get nil "date")    ; then
 	       (format-time-string "%Y/%m/%d %H:%M:%S"))) ; else
-
+	       
   ;; this is the URL to where the org file will be on the blog
-  (setq path (concat "/org/"
+  (setq path (concat "/org/" 
 		     (mapconcat 'identity (bf-parse-date date) "/")))
 
-  (concat path
-	  "/"
-	  (mapconcat 'identity (split-string title) "-")
+  (concat path 
+	  "/" 
+	  (mapconcat 'identity (split-string title) "-") 
 	  ".org"))
 
 (defun bf-parse-date (datestring)
   "get year, month and day out of date property"
   (let ((date (car (split-string datestring " "))))
     (split-string date "/")))
-
+	
 
 (defun bf-copy-org-to-blog ()
   "copy the org-file to blog/year/month/day/title.org"
@@ -312,13 +312,13 @@ would lead to this post filename
 	       ))
   ;; now make directories to contain the org file. The org-source is saved at
   ;; /org/year/month/day/post.org
-  (setq path (concat bf-blog-directory
+  (setq path (concat bf-blog-directory 
 		     (mapconcat 'identity (bf-parse-date date) "/")))
-
+		     
   (make-directory path t)
   ; now we need to save the org file
   ; first we get a filename with complete path
-  (setq org-file (concat bf-blog-directory
+  (setq org-file (concat bf-blog-directory 
 			 (mapconcat 'identity (bf-parse-date date) "/")
 			 "/"
 			 (mapconcat 'identity (split-string title) "-")
@@ -328,7 +328,7 @@ would lead to this post filename
   (org-narrow-to-subtree)
   (let ((contents (buffer-string)))
     (with-temp-file org-file
-      (insert contents)))
+      (insert contents)))      
   (widen))
 
 (defun bf-blogpost ()
@@ -340,13 +340,11 @@ would lead to this post filename
     (org-narrow-to-subtree)
     (setq thisb (current-buffer))
     (setq post-filename (bf-get-post-filename))
-    (org-entry-put (point) "POST_FILENAME" post-filename)
-    (org-entry-put (point) "PERMALINK" (bf-get-permalink))
     (org-entry-put nil "updated" (format-time-string "%Y/%m/%d %H:%M:%S"))
     (save-buffer)
     (bf-copy-org-to-blog)
     (let ((content (bf-get-post-html)))
-      (with-temp-file post-filename
+      (with-temp-file post-filename 
 	(insert content)))
     ;; clean up
     (kill-buffer "*Org HTML Export*")

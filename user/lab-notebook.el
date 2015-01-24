@@ -3,24 +3,9 @@
 
 
 ;;; Commentary:
-;;
+;; 
 
 ;;; Code:
-
-(defvar lab-notebook
-  "/Users/jkitchin/Dropbox/org-mode/notebook.org"
-  "File to store notebook entries in.")
-
-(defun ln-add-entry (title &optional date)
-  "Add entry with TITLE into the lab notebook. With optional DATE, file it."
-  (interactive "sTitle: ")
-  (find-file lab-notebook)
-  (org-datetree-find-date-create (or date (calendar-current-date)))
-  (end-of-line)
-  (save-restriction
-    (org-narrow-to-subtree)
-    (goto-char (point-max))
-    (insert (format "\n**** %s\n" title))))
 
 (defun dwin-vc ()
   "Do what I need in vc next.
@@ -34,12 +19,12 @@ Add current file if not in vc, then prompt for commit message"
 	 (state (elt deduction 3)))
 
     (cond
-     (backend  ;; we are in a vc directory
+     (backend  ;; we are in a vc directory   
       (when (file-exists-p (buffer-file-name))
 	;; register the file if it is not
 	(when (eq state 'unregistered)
 	  (vc-register))
-
+      
 	;; Now commit it if needed. We know about edited, added,
 	;; unregistered files. these should all be committed.
 	(cond
@@ -79,7 +64,7 @@ This will prompt you to commit a file when you kill a buffer
             map)
   ;; body
   (add-hook 'kill-buffer-hook 'dwin-vc nil 'make-it-local))
-
+ 
 
 (provide 'lab-notebook)
 
