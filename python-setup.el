@@ -18,8 +18,9 @@
   "Show python output in another frame after you run a script."
   (switch-to-buffer-other-frame "*Python*"))
 
-
 (elpy-enable)
+
+(elpy-use-ipython)
 
 ;; this is my pydoc
 

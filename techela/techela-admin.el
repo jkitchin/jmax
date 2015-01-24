@@ -739,17 +739,20 @@ permissions of the repo to Read-only first."
 
       ;; make sure path to repo exists
       (unless (file-exists-p repo-dir-name)
-	(make-directory  (file-name-directory repo-dir-name) t))
+	(make-directory (file-name-directory repo-dir-name) t))
 
       (if (file-exists-p repo-dir)
-	  ;; we have a copy fo the work so we pull it.
-	  (with-current-directory
-	   repo-dir
-	   (mygit "git pull"))
+	  ;; we have a copy of the work so we pull it.
+	  (progn
+	    (message "Updating existing %s" repo-dir)
+	    (with-current-directory
+	     repo-dir
+	     (mygit "git pull")))
 
 	;; repo-dir did not exist. So we clone it.
 	(with-current-directory
 	 (file-name-directory repo-dir-name)
+	 (message "Cloning %s/%s" repo-dir-name repo-name)
 	 (mygit (format "git clone %s@%s:%s"
 			ta-course-name
 			ta-course-server
@@ -846,7 +849,7 @@ This is not fast.
       (insert "#+TITLE: Grading
 #+AUTHOR: " (user-full-name) "
 #+DATE: " (format-time-string "[%Y-%m-%d %a]" (current-time)) "
-
+#+ASSIGNMENT: " label "
 * Grading for " label " [/]\n")
       ;; randomize the userids so they get graded in a different order
       ;; each time. This is to reduce systematic variation in which
@@ -1068,11 +1071,19 @@ This will be in student-work/label/userid-label/userid-label.org."
 
 
 (defun ta-save-commit-and-push ()
-  "Save current buffer, commit changes, and push."
+  "Save current buffer, commit changes, and push.
+Check if a gradebook histogram is present and add it too. That is
+a special case I have not figured out how to solve more
+generally."
   (interactive)
   (save-buffer)
   (mygit (format "git add %s" (buffer-file-name)))
   (mygit (format "git commit %s -m \"save changes\"" (buffer-file-name)))
+  (when (gb-get-filetag "ASSIGNMENT")
+    (when (file-exists-p (format "%s-hist.png" (gb-get-filetag "ASSIGNMENT")))
+      (mygit (format "git add %s" (format "%s-hist.png" (gb-get-filetag "ASSIGNMENT"))))
+      (mygit (format "git commit %s -m \"saving histogram\""
+		     (format "%s-hist.png" (gb-get-filetag "ASSIGNMENT"))))))
   (mygit "git push"))
 
 
