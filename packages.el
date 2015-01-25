@@ -35,7 +35,7 @@
 	'elpy
 	'org-plus-contrib
 	'jedi 'jedi-direx
-	'helm 'helm-themes
+	'helm 'helm-themes 'helm-bibtex
 	'f ; file functions https://github.com/rejeep/f.el
 	's ; string functions
 	'dash ; list functions
