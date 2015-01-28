@@ -1,7 +1,7 @@
 ;;; words.el --- Functions to operate on word at point or region
 
 ;;; Commentary:
-;; 
+;;
 
 ;;; Code:
 
@@ -60,6 +60,18 @@
       (thing-at-point 'word)))))
 
 
+(defun words-wos ()
+  "Open the word at point or selection in Web of Science."
+  ;; the url was derived from this page: http://wokinfo.com/webtools/searchbox/
+  (interactive)
+  (browse-url
+   (format "http://gateway.webofknowledge.com/gateway/Gateway.cgi?topic=%s&GWVersion=2&SrcApp=WEB&SrcAuth=HSB&DestApp=UA&DestLinkType=GeneralSearchSummary"
+    (if (region-active-p)
+	(mapconcat 'identity (split-string
+			      (buffer-substring (region-beginning)
+						(region-end))) "+")
+      (thing-at-point 'word)))))
+
 
 (defun words-twitter ()
   "Search twitter for word at point or selection."
@@ -76,7 +88,7 @@
 (defun words-atd ()
   "Send paragraph at point to After the deadline for spell and grammar checking."
   (interactive)
-  
+
   (let* ((url-request-method "POST")
 	 (url-request-data (format
 			    "key=some-random-text-&data=%s"
@@ -88,7 +100,7 @@
 		 (xml-parse-region url-http-end-of-headers (point-max))))
 	 (results (car xml))
 	 (errors (xml-get-children results 'error)))
-    
+
     (switch-to-buffer-other-frame "*ATD*")
     (erase-buffer)
     (dolist (err errors)
@@ -220,7 +232,7 @@ end tell")))
     ("G" "google-scholar" words-google-scholar)
     ("S" "spell/grammar" words-atd)
     ("w" "twitter" words-twitter)))
- 
+
 
 (defun words ()
   "Offer menu of functions to run defined in `words-funcs'."
