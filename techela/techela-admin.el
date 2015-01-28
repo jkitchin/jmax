@@ -1473,7 +1473,7 @@ git status:
 	      assignment)))))
 
 
-(defun ta-get-assignment-dirs ()
+(defun ta-get-solutions-dirs ()
   "Pull solutions to local machine."
   (interactive)
   (dolist (assignment  (loop for line in
