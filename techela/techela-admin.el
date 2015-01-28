@@ -1449,6 +1449,52 @@ git status:
 
 
 
+(defun ta-get-assignment-dirs ()
+  "Pull assignments to local machine."
+  (interactive)
+  (dolist (assignment  (loop for line in
+			     (split-string
+			      (shell-command-to-string
+			       (format "%s %s@%s info"
+				       (expand-file-name
+					"techela_ssh"
+					tq-root-directory)
+				       ta-course-name
+				       ta-course-server))
+			      "\n")
+			     if (string-match "\\(assignments/[^[]]*.*\\)" line)
+			     collect (match-string 1 line)))
+    (unless (file-exists-p  (expand-file-name assignment ta-course-assignments-dir))
+      (with-current-directory
+       ta-course-assignments-dir
+       (mygit "git clone %s@%s:%s"
+	      ta-course-name
+	      ta-course-server
+	      assignment)))))
+
+
+(defun ta-get-assignment-dirs ()
+  "Pull solutions to local machine."
+  (interactive)
+  (dolist (assignment  (loop for line in
+			     (split-string
+			      (shell-command-to-string
+			       (format "%s %s@%s info"
+				       (expand-file-name
+					"techela_ssh"
+					tq-root-directory)
+				       ta-course-name
+				       ta-course-server))
+			      "\n")
+			     if (string-match "\\(solutions/[^[]]*.*\\)" line)
+			     collect (match-string 1 line)))
+    (unless (file-exists-p  (expand-file-name assignment ta-course-solutions-dir))
+      (with-current-directory
+       ta-course-solutions-dir
+       (mygit "git clone %s@%s:%s"
+	      ta-course-name
+	      ta-course-server
+	      assignment)))))
 
 
 (provide 'techela-admin)
