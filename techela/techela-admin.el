@@ -1467,10 +1467,10 @@ git status:
     (unless (file-exists-p  (expand-file-name assignment ta-course-assignments-dir))
       (with-current-directory
        ta-course-assignments-dir
-       (mygit "git clone %s@%s:%s"
-	      ta-course-name
-	      ta-course-server
-	      assignment)))))
+       (mygit (format "git clone %s@%s:%s"
+		      ta-course-name
+		      ta-course-server
+		      assignment))))))
 
 
 (defun ta-get-solutions-dirs ()
@@ -1491,10 +1491,10 @@ git status:
     (unless (file-exists-p  (expand-file-name assignment ta-course-solutions-dir))
       (with-current-directory
        ta-course-solutions-dir
-       (mygit "git clone %s@%s:%s"
-	      ta-course-name
-	      ta-course-server
-	      assignment)))))
+       (mygit (format "git clone %s@%s:%s"
+		      ta-course-name
+		      ta-course-server
+		      assignment))))))
 
 
 (provide 'techela-admin)
