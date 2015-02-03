@@ -1333,6 +1333,7 @@ git status:
 
 - [[elisp:ta-show-assigned-assignments][Show list of assigned assignments]]
 
+- [[elisp:ta-helm-gradebook][Gradebook]]
 
 *** Individual Student Actions
 
