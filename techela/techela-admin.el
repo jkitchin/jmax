@@ -400,8 +400,8 @@ This sets that repo to R access for USERID. We do not pull the assignment here."
      repo-dir
      (let ((process-environment (cons *GIT_SSH* process-environment)))
        (start-process-shell-command
-	"ta-return"
-	"*ta return*"
+	"ta-return-to"
+	"*ta return to*"
 	"git add * && git commit -am \"Returning\" && git push")))))
 
 
