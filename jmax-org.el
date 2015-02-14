@@ -1,6 +1,11 @@
+;;; jmax-org.el --- jmax customization for org-mode
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;  You should not need to modify paths below here
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;; Commentary:
+;;
+
 (require 'ox-beamer)
 (require 'ox-texinfo)
 (require 'ox-org)
@@ -9,6 +14,8 @@
 (require 'org-inlinetask)
 (require 'org-mouse)
 (require 'org-contacts)
+
+;;; Code:
 
 (add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode))
 (global-set-key "\C-cl" 'org-store-link)
@@ -248,8 +255,7 @@
        "Visit the msx file on PATH.
 
 uses the dos command:
-start  empty title path
-"
+start  empty title path"
        (cond
 	((string= "windows-nt" system-type)
 	 (shell-command
@@ -382,12 +388,11 @@ citecolor=blue,filecolor=blue,menucolor=blue,urlcolor=blue"
 (defvar org-load-path
   (list (file-name-as-directory
 	 (expand-file-name "org" starter-kit-dir)))
-  "List of directories to find org-files that
-  `org-babel-load-file' can load code from")
+  "List of directories to find org-files that `org-babel-load-file' can load code from.")
 
 (defun org-require (feature)
   "Load a FEATURE from an org-file.
-FEATURE is a symbol, and it is loaded from an org-file by the name of FEATURE.org, that is in the `org-load-path'. The FEATURE is loaded from `org-babel-load-file'."
+FEATURE is a symbol, and it is loaded from an org-file by the name of FEATURE.org, that is in the `org-load-path'.  The FEATURE is loaded from `org-babel-load-file'."
   (let ((org-file (concat (symbol-name feature) ".org"))
 	(path))
 
@@ -428,14 +433,18 @@ FEATURE is a symbol, and it is loaded from an org-file by the name of FEATURE.or
 
 
 (defun sa-ignore-headline (contents backend info)
-  "Ignore headlines with tag `ignoreheading'. This may mess up your labels, since the exporter still creates a label for it."
+  "Ignore headlines with tag `ignoreheading'.
+This may mess up your labels, since the exporter still creates a label for it.
+Argument CONTENTS Contents of the headline.
+Argument BACKEND The backend exporter.
+Argument INFO Parse-tree from org-mode."
   (when (and (org-export-derived-backend-p backend 'latex 'html 'ascii)
                   (string-match "\\`.*ignoreheading.*\n"
                                 (downcase contents)))
     (replace-match "" nil nil contents)))
 
 (defun headline-nonumber (contents backend info)
-  "make headlines with nonumber"
+  "Make headlines with nonumber."
   (when (and (org-export-derived-backend-p backend 'latex 'html 'ascii)
                   (string-match "\\`.*nonumber.*\n"
                                 (downcase contents)))
@@ -460,7 +469,7 @@ FEATURE is a symbol, and it is loaded from an org-file by the name of FEATURE.or
 
 ;; Define a new toggling function for equations.
 (defun org-toggle-latex-overlays (arg)
-  "Toggle LaTeX fragments. The prefix ARG is passed to `org-preview-latex-fragment'."
+  "Toggle LaTeX fragments.  The prefix ARG is passed to `org-preview-latex-fragment'."
   (interactive "P")
   (if org-latex-fragment-image-overlays
       (org-remove-latex-fragment-image-overlays)
@@ -470,7 +479,7 @@ FEATURE is a symbol, and it is loaded from an org-file by the name of FEATURE.or
 
 
 (defadvice org-ctrl-c-ctrl-c (around latex-overlays nil activate)
-  "ignore latex overlays in C-cC-c"
+  "Ignore latex overlays in C-cC-c."
   (let ((org-latex-fragment-image-overlays nil))
     ad-do-it))
 
@@ -485,3 +494,7 @@ FEATURE is a symbol, and it is loaded from an org-file by the name of FEATURE.or
   (add-hook 'org-mode-hook 'turn-on-flyspell 'append)))
 
 (message "jmax-org.el loaded")
+
+(provide 'jmax-org)
+
+;;; jmax-org.el ends here
