@@ -1,28 +1,38 @@
-;;; words.el --- Functions to operate on word at point or region
+;;; words.el --- Functions to operate on word at point or region  -*- lexical-binding: t -*-
+;;; Header:
 
-;;; Commentary: These functions mostly provide easy access to web-based searches
-;;; of the word at point, or the selected words.
-;; words-dictionary
-;; words-thesaurus
-;; words-google
-;; words-google-scholar
-;; words-scopus
-;; words-wos :: Search Web of Science
-;; words-twitter
-;; words-atd :: a spell/grammar checker
-;; words-crossref
-;; words-bibtex :: search default bibtex file
-;; words-mdfind :: search local computer with mdfind (Mac)
-;; words-finder :: search local computer with finder (Mac)
-;;
-;; wos :: open Web of Science
-;; pubmed :: open pubmed
-;; scopus :: open Scopus
-;;
-;; words :: offers a menu of functions for word at point or region
+;;; Commentary:
+
+;; These functions mostly provide easy access to web-based searches of the word at point, or the selected words. The following functions are available.
+
+;; - words-dictionary
+;; - words-thesaurus
+;; - words-atd :: a spell/grammar checker
+
+;; - words-google
+;; - words-twitter
+
+;; - words-google-scholar
+;; - words-scopus
+;; - words-wos :: Search Web of Science
+;; - words-crossref
+
+;; - words-bibtex :: search default bibtex file
+
+;; - words-mdfind :: search local computer with mdfind (Mac)
+;; - words-finder :: search local computer with finder (Mac)
+
+;; These functions just open websites for convenience.
+;; - wos :: open Web of Science
+;; - pubmed :: open pubmed
+;; - scopus :: open Scopus
+
+;; - words :: offers a menu of functions for word at point or region
 
 ;;; Code:
 
+;; ** Dictionary/thesaurus/grammar
+;; #+BEGIN_SRC emacs-lisp
 (defun words-dictionary ()
   "Look up word at point in an online dictionary."
   (interactive)
@@ -39,69 +49,6 @@
    (format
     "http://www.thesaurus.com/browse/%s"
     (thing-at-point 'word))))
-
-
-(defun words-google ()
-  "Google the word at point or selection."
-  (interactive)
-  (browse-url
-   (format
-    "http://www.google.com/search?q=%s"
-    (if (region-active-p)
-	(url-hexify-string (buffer-substring (region-beginning)
-					     (region-end)))
-      (thing-at-point 'word)))))
-
-
-(defun words-google-scholar ()
-  "Google scholar the word at point or selection."
-  (interactive)
-  (browse-url
-   (format
-    "http://scholar.google.com/scholar?q=%s"
-    (if (region-active-p)
-	(url-hexify-string (buffer-substring (region-beginning)
-					     (region-end)))
-      (thing-at-point 'word)))))
-
-
-(defun words-scopus ()
-  "Scopus the word at point or selection."
-  (interactive)
-  (browse-url
-   (format
-    "http://www.scopus.com//search/submit/basic.url?field1=TITLE-ABS-KEY&searchterm1=%s"
-    (if (region-active-p)
-	(mapconcat 'identity (split-string
-			      (buffer-substring (region-beginning)
-						(region-end))) "+")
-      (thing-at-point 'word)))))
-
-
-(defun words-wos ()
-  "Open the word at point or selection in Web of Science."
-  ;; the url was derived from this page: http://wokinfo.com/webtools/searchbox/
-  (interactive)
-  (browse-url
-   (format "http://gateway.webofknowledge.com/gateway/Gateway.cgi?topic=%s&GWVersion=2&SrcApp=WEB&SrcAuth=HSB&DestApp=UA&DestLinkType=GeneralSearchSummary"
-    (if (region-active-p)
-	(mapconcat 'identity (split-string
-			      (buffer-substring (region-beginning)
-						(region-end))) "+")
-      (thing-at-point 'word)))))
-
-
-(defun words-twitter ()
-  "Search twitter for word at point or selection."
-  (interactive)
-  (browse-url
-   (format
-    "https://twitter.com/search?q=%s"
-    (if (region-active-p)
-	(url-hexify-string (buffer-substring (region-beginning)
-					     (region-end)))
-      (thing-at-point 'word)))))
-
 
 (defun words-atd ()
   "Send paragraph at point to After the deadline for spell and grammar checking."
@@ -143,6 +90,71 @@ Description: %s
 Suggestions: %s
 
 " s type desc opt-string))))))
+;; #+END_SRC
+
+;; ** web functions
+;; #+BEGIN_SRC emacs-lisp
+(defun words-google ()
+  "Google the word at point or selection."
+  (interactive)
+  (browse-url
+   (format
+    "http://www.google.com/search?q=%s"
+    (if (region-active-p)
+	(url-hexify-string (buffer-substring (region-beginning)
+					     (region-end)))
+      (thing-at-point 'word)))))
+
+(defun words-twitter ()
+  "Search twitter for word at point or selection."
+  (interactive)
+  (browse-url
+   (format
+    "https://twitter.com/search?q=%s"
+    (if (region-active-p)
+	(url-hexify-string (buffer-substring (region-beginning)
+					     (region-end)))
+      (thing-at-point 'word)))))
+;; #+END_SRC
+
+;; ** Scientific search functions
+;; #+BEGIN_SRC emacs-lisp
+(defun words-google-scholar ()
+  "Google scholar the word at point or selection."
+  (interactive)
+  (browse-url
+   (format
+    "http://scholar.google.com/scholar?q=%s"
+    (if (region-active-p)
+	(url-hexify-string (buffer-substring (region-beginning)
+					     (region-end)))
+      (thing-at-point 'word)))))
+
+
+(defun words-scopus ()
+  "Scopus the word at point or selection."
+  (interactive)
+  (browse-url
+   (format
+    "http://www.scopus.com//search/submit/basic.url?field1=TITLE-ABS-KEY&searchterm1=%s"
+    (if (region-active-p)
+	(mapconcat 'identity (split-string
+			      (buffer-substring (region-beginning)
+						(region-end))) "+")
+      (thing-at-point 'word)))))
+
+
+(defun words-wos ()
+  "Open the word at point or selection in Web of Science."
+  ;; the url was derived from this page: http://wokinfo.com/webtools/searchbox/
+  (interactive)
+  (browse-url
+   (format "http://gateway.webofknowledge.com/gateway/Gateway.cgi?topic=%s&GWVersion=2&SrcApp=WEB&SrcAuth=HSB&DestApp=UA&DestLinkType=GeneralSearchSummary"
+    (if (region-active-p)
+	(mapconcat 'identity (split-string
+			      (buffer-substring (region-beginning)
+						(region-end))) "+")
+      (thing-at-point 'word)))))
 
 
 (defun words-crossref ()
@@ -156,8 +168,33 @@ Suggestions: %s
 			    (region-beginning)
 			    (region-end)))
       (read-string "string: ")))))
+;; #+end_src
+
+;; ** Convenience functions for scientific queries
+;; These just open websites, with no search queries.
+
+;; #+BEGIN_SRC emacs-lisp
+(defun wos ()
+  "Open Web of Science search page in browser."
+  (interactive)
+  (browse-url "http://apps.webofknowledge.com"))
 
 
+(defun pubmed ()
+  "Open Pubmed in browser."
+  (interactive)
+  (browse-url "http://www.ncbi.nlm.nih.gov/pubmed"))
+
+
+(defun scopus ()
+  "Open Scopus in browser."
+  (interactive)
+  (browse-url "http://www.scopus.com"))
+;; #+END_SRC
+
+;; ** bibtex search
+
+;; #+BEGIN_SRC emacs-lisp
 (defun words-bibtex ()
   "Find selected region or word at point in variable `reftex-default-bibliography'."
   (interactive)
@@ -170,7 +207,11 @@ Suggestions: %s
 	(region-end))
      (thing-at-point 'word))))
 
+;; #+END_SRC
 
+;; ** Search functions for Mac
+
+;; #+BEGIN_SRC emacs-lisp
 (defun words-mdfind ()
   "Search for file names matching word or selection at point using mdfind.
 Opens an org-buffer with links to results."
@@ -216,24 +257,12 @@ end tell")))
 
     ;; from org-mac-link
     (do-applescript applescript)))
+;; #+END_SRC
 
 
-(defun wos ()
-  "Open Web of Science search page in browser."
-  (interactive)
-  (browse-url "http://apps.webofknowledge.com"))
 
-
-(defun pubmed ()
-  "Open Pubmed in browser."
-  (interactive)
-  (browse-url "http://www.ncbi.nlm.nih.gov/pubmed"))
-
-(defun scopus ()
-  "Open Scopus in browser."
-  (interactive)
-  (browse-url "http://www.scopus.com"))
-
+;; ** words menu
+;; #+BEGIN_SRC emacs-lisp
 
 (defvar words-funcs '()
  "Functions to run in `words'.  Each entry is a list of (char menu-name function).")
@@ -268,7 +297,15 @@ end tell")))
        (assoc
 	(char-to-string input) words-funcs)
        2))))
+;; #+END_SRC
 
+;;; End:
+;; #+BEGIN_SRC emacs-lisp
 (provide 'words)
-
 ;;; words.el ends here
+;; #+END_SRC
+
+
+;; # Local Variables:
+;; # lentic-init: lentic-orgel-org-init
+;; # End:
