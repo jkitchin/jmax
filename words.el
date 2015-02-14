@@ -1,7 +1,25 @@
 ;;; words.el --- Functions to operate on word at point or region
 
-;;; Commentary:
+;;; Commentary: These functions mostly provide easy access to web-based searches
+;;; of the word at point, or the selected words.
+;; words-dictionary
+;; words-thesaurus
+;; words-google
+;; words-google-scholar
+;; words-scopus
+;; words-wos :: Search Web of Science
+;; words-twitter
+;; words-atd :: a spell/grammar checker
+;; words-crossref
+;; words-bibtex :: search default bibtex file
+;; words-mdfind :: search local computer with mdfind (Mac)
+;; words-finder :: search local computer with finder (Mac)
 ;;
+;; wos :: open Web of Science
+;; pubmed :: open pubmed
+;; scopus :: open Scopus
+;;
+;; words :: offers a menu of functions for word at point or region
 
 ;;; Code:
 
