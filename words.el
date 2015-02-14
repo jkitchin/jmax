@@ -29,6 +29,17 @@
 
 ;; - words :: offers a menu of functions for word at point or region
 
+;; ;;; Using :lentic to edit this file
+;; This file is a native emacs-lisp file. But, we can use lentic to help edit in either emacs-lisp or org-mode. On opening the emacs-lisp file, you can split the buffer into emacs-lisp and org-mode views.
+
+;; C-c , t    split right
+;; C-c , b    split below
+
+;; Then you can edit the code in one window, and the narrative text in the other window in org-mode. The best of both worlds!
+
+;; C-c , h will move the curse to here from the org file to the emacs-lisp file.
+;; C-c , s will swap the windows.
+
 ;;; Code:
 
 ;; ** Dictionary/thesaurus/grammar
