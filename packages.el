@@ -43,6 +43,7 @@
         'rainbow-mode
 	'ace-jump-mode 'ace-isearch
 	'use-package
+	'hydra 'key-chord
 	)
   "Libraries that should be installed by default.")
 
