@@ -2,9 +2,11 @@
 ;;; Header:
 ;; Author: John Kitchin
 
+;; Requires: (hydra) (key-chord)
+
 ;;; Commentary:
 
-;; These functions mostly provide easy access to web-based searches of the word at point, or the selected words. The following functions are available.
+;; These functions mostly provide easy access to web-based searches of the word at point, or the selected words.  The following functions are available.
 
 ;; - words-dictionary
 ;; - words-thesaurus
@@ -17,6 +19,7 @@
 ;; - words-scopus
 ;; - words-wos :: Search Web of Science
 ;; - words-crossref
+;; - words-pubmed
 
 ;; - words-bibtex :: search default bibtex file
 
@@ -29,14 +32,15 @@
 ;; - scopus :: open Scopus
 
 ;; - words :: offers a menu of functions for word at point or region
+;; - words/body will open a "hydra" menu.  It is bound to f2, or the key-chord "ww"
 
-;; ;;; Using :lentic to edit this file
-;; This file is a native emacs-lisp file. But, we can use lentic to help edit in either emacs-lisp or org-mode. On opening the emacs-lisp file, you can split the buffer into emacs-lisp and org-mode views.
+;; ** Using :lentic to edit this file
+;; This file is a native emacs-lisp file.  But, we can use lentic to help edit in either emacs-lisp or org-mode.  On opening the emacs-lisp file, you can split the buffer into emacs-lisp and org-mode views.
 
 ;; C-c , t    split right
 ;; C-c , b    split below
 
-;; Then you can edit the code in one window, and the narrative text in the other window in org-mode. The best of both worlds!
+;; Then you can edit the code in one window, and the narrative text in the other window in org-mode.  The best of both worlds!
 
 ;; C-c , h will move the curse to here from the org file to the emacs-lisp file.
 ;; C-c , s will swap the windows.
@@ -143,19 +147,6 @@ Suggestions: %s
       (thing-at-point 'word)))))
 
 
-(defun words-scopus ()
-  "Scopus the word at point or selection."
-  (interactive)
-  (browse-url
-   (format
-    "http://www.scopus.com//search/submit/basic.url?field1=TITLE-ABS-KEY&searchterm1=%s"
-    (if (region-active-p)
-	(mapconcat 'identity (split-string
-			      (buffer-substring (region-beginning)
-						(region-end))) "+")
-      (thing-at-point 'word)))))
-
-
 (defun words-wos ()
   "Open the word at point or selection in Web of Science."
   ;; the url was derived from this page: http://wokinfo.com/webtools/searchbox/
@@ -169,8 +160,21 @@ Suggestions: %s
       (thing-at-point 'word)))))
 
 
+(defun words-scopus ()
+  "Scopus the word at point or selection."
+  (interactive)
+  (browse-url
+   (format
+    "http://www.scopus.com//search/submit/basic.url?field1=TITLE-ABS-KEY&searchterm1=%s"
+    (if (region-active-p)
+	(mapconcat 'identity (split-string
+			      (buffer-substring (region-beginning)
+						(region-end))) "+")
+      (thing-at-point 'word)))))
+
+
 (defun words-crossref ()
-  "Search region in CrossRef."
+  "Search region or word at point in CrossRef."
   (interactive)
   (browse-url
    (format
@@ -179,7 +183,20 @@ Suggestions: %s
 	(url-hexify-string (buffer-substring
 			    (region-beginning)
 			    (region-end)))
-      (read-string "string: ")))))
+      (thing-at-point 'word)))))
+
+
+(defun words-pubmed ()
+  "Search region or word at point in pubmed."
+  (interactive)
+  (browse-url
+   (format
+    "http://www.ncbi.nlm.nih.gov/pubmed/?term=%s"
+    (if (use-region-p)
+	(url-hexify-string (buffer-substring
+			    (region-beginning)
+			    (region-end)))
+      (thing-at-point 'word)))))
 ;; #+end_src
 
 ;; ** Convenience functions for scientific queries
@@ -202,6 +219,12 @@ Suggestions: %s
   "Open Scopus in browser."
   (interactive)
   (browse-url "http://www.scopus.com"))
+
+
+(defun crossref ()
+  "Open Crossref in browser."
+  (interactive)
+  (browse-url "http://search.crossref.org"))
 ;; #+END_SRC
 
 ;; ** bibtex search
@@ -272,10 +295,10 @@ end tell")))
 ;; #+END_SRC
 
 
-
 ;; ** words menu
-;; #+BEGIN_SRC emacs-lisp
+;; A keystroke driven menu to access words functions. I favor the hydra interface now. One advantage of this interface is that it is user extendable, by adding entries to the words-funcs variable. It would take some work to get that to work in hydra.
 
+;; #+BEGIN_SRC emacs-lisp
 (defvar words-funcs '()
  "Functions to run in `words'.  Each entry is a list of (char menu-name function).")
 
@@ -309,6 +332,40 @@ end tell")))
        (assoc
 	(char-to-string input) words-funcs)
        2))))
+;; #+END_SRC
+
+;; ** A hydra interface to words
+;; hydra (http://oremacs.com/2015/01/20/introducing-hydra/) is a relatively new menu type interface to select actions with single key strokes. It is a nicer implementation than what I setup in the words function above.
+
+;; https://github.com/abo-abo/hydra
+
+;; We set a global key and a key-chord to launch this hydra.
+
+;; #+BEGIN_SRC emacs-lisp
+(require 'hydra)
+(setq hydra-is-helpful t)
+
+(require 'key-chord)
+(key-chord-mode 1)
+(key-chord-define-global
+ "ww"
+ (defhydra words-hydra (global-map "<f2>")
+   "words"
+   ("d" words-dictionary "dictionary")
+   ("t" words-thesaurus "thesaurus")
+   ("S" words-atd "spell/grammar")
+   ("g" words-google "google")
+   ("T" words-twitter "Twitter")
+   ("w" words-wos "Web of Science")
+   ("G" words-google-scholar "Google scholar")
+   ("c" words-crossref "CrossRef")
+   ("s" words-scopus "Scopus")
+   ("p" words-pubmed "Pubmed")
+   ("b" words-bibtex "bibtex")
+   ("f" words-finder "Mac Finder")
+   ("m" words-mdfind "mdfind")
+   ("q" nil "cancel")))
+
 ;; #+END_SRC
 
 ;;; End:
