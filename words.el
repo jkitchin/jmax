@@ -1,5 +1,6 @@
 ;;; words.el --- Functions to operate on word at point or region  -*- lexical-binding: t -*-
 ;;; Header:
+;; Author: John Kitchin
 
 ;;; Commentary:
 
