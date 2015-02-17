@@ -192,30 +192,30 @@
 (defun get-path()
   "opens dired so you can navigate to a file to insert a path to it in the current buffer"
   (interactive)
-  ; store current buffer so we can change back to it
-  (setq current_buffer (current-buffer))
-  (setq buffer_name (buffer-file-name)) ; filename current buffer points to
+  ; store current point so we can change back to it later
+  (setq current_point (point-marker))
   ; now call dired to navigate to the path you want
-  (dired ()))
+  (dired nil))
 
 (defun insert-relative-path()
   "inserts the relative path between the original buffer and current file selected in dired"
   (interactive)
-  (setq selected_file (dired-get-filename))
-  (switch-to-buffer current_buffer) ; back to the original buffer
-  (insert  (file-relative-name selected_file)))
+  (let ((selected_file (dired-get-filename)))
+    (switch-to-buffer (marker-buffer current_point))
+    (goto-char current_point)
+    (insert (file-relative-name selected_file))))
 
 (defun insert-absolute-path()
   "Inserts the absolute path to the file selected in dired"
   (interactive)
-  (setq selected_file (dired-get-filename)) ; this is the file the cursor is on
-  (switch-to-buffer current_buffer) ; back to the original buffer
-  (insert  (expand-file-name selected_file)))
+  (let ((selected_file (dired-get-filename))) ; this is the file the cursor is on
+    (switch-to-buffer (marker-buffer current_point))
+    (goto-char current_point)
+    (insert  (expand-file-name selected_file))))
 
 (defun insert-path (&optional arg)
   "insert relative path unles prefix is used, then absolute path"
   (interactive "P")
-  (message "arg = %s" arg)
   (if (equal arg nil)
       (insert-relative-path)
     (insert-absolute-path)))
