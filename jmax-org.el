@@ -49,7 +49,7 @@
 ;; B   org-previous-block
 ;; u   (org-speed-move-safe (quote outline-up-heading))
 ;; j   org-goto
-;; g   (org-refle t)
+;; g   (org-refile t)
 
 ;; Outline Visibility
 ;; ------------------
