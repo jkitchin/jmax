@@ -90,10 +90,9 @@ As part of the National Energy Technology Laboratory's Regional University Allia
 Full details of the calculations and analysis.
 \end{suppinfo}
 
-bibliography:references
+bibliography:references.bib
 
 \newpage
 *Graphical TOC Entry*
 
 # \includegraphics{toc-entry-graphic}
-

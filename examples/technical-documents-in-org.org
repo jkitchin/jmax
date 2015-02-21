@@ -25,7 +25,7 @@ You can learn a lot about org-mode by reading the [[info:org#Top][manual]]. Ther
 ** Basics
 You can mark text as *bold*, /italic/, _underlined_, +struck-through+, =verbatim=, and ~code~.
 
-Paragraphs are separated by blank lines. 
+Paragraphs are separated by blank lines.
 
 ** Subscripts and superscripts
 
@@ -37,9 +37,15 @@ Usually you use ^ for superscripts and _ for subscripts. The things super or sub
 
 ** Symbols
 Org-mode recognizes many different symbols, including the greek letters, e.g. \alpha, and \Omega. You can make \deg symbol and an \AA symbol. These do not need to be contained in math environments. Some more of my favorites include \times, and  \rightarrow. You can toggle symbols over these commands with this command: elisp:org-toggle-pretty-entities or C-c C-x \.
+#+OPTIONS: ^:{}
+atoms_position
+
+\alpha  x^2 x^{2}
 
 ** Chemical formulas
 You should always enter chemical formulas like this: NH_{3}. No other way is good.  Here are some example formulas: CH_{4}, ABO_{3-\delta}, FeO^{+1}, H_{2}SO_{4}, Ca(NO_{3})_{2}.
+
+\ce{NH3}  \ce{CH4}  NH$_3$
 
 Note this is org syntax /not/ LaTeX syntax. You do not need the math-mode you need in LaTeX. Keep your org syntax clean and do not use math-mode like you do in LaTeX.
 
@@ -47,14 +53,14 @@ Note this is org syntax /not/ LaTeX syntax. You do not need the math-mode you ne
 
 You are safest using a link to the headline text like this. See section [[*Chemical formulas]]. Note the * in the link, and the missing space after the *. This will get converted to the section number in your LaTeX file.
 
-It is possible to create a "label" to a section. You must set a CUSTOM_ID property on the headline. You then refer to that section with this kind of link: see section [[#sec:headline-label]]. 
+It is possible to create a "label" to a section. You must set a CUSTOM_ID property on the headline. You then refer to that section with this kind of link: see section [[#sec:headline-label]]
 
 You should include the word "section" in front of the ref link in any case because the link is just converted to a number in LaTeX.
 
 #+BEGIN_EXAMPLE
 ,*** A headline with a custom id property
     :PROPERTIES:
-    :CUSTOM_ID: sec:headline-label
+    :CUSTOM_ID: sec:headline-label-test
     :END:
 #+END_EXAMPLE
 
@@ -64,7 +70,7 @@ You should include the word "section" in front of the ref link in any case becau
     :END:
 This section is intentionally empty.
 
-*** An empty section \label{sec:not-recommended}
+*** An empty section label:sec:not-recommended
 
 If you are used to section labels in LaTeX, you might put the label directly in the heading. This works, but is not recommended because it seems ugly.
 Nothing to see here in Section ref:sec:not-recommended. It does work though. For now.
@@ -93,9 +99,10 @@ You can insert citation links by pressing C-c ]. Type a few letters to search fo
 
 cite:calle-vallejo2013:outer,akhade2012:surface,chao2012:mesoporous,mao2013:emit
 
+
 * Equations
 
-There are a few ways to enter equations. If your equation should be inline, e.g. \(e^x = 4\) use this format. 
+There are a few ways to enter equations. If your equation should be inline, e.g. \(e^x = 4\) use this format.
 
 An alternative format that displays the equation on its own line is this: \[e^x = 4\]
 
@@ -127,13 +134,13 @@ If you do not like the numbers use align*:
 \begin{align*}
 &OVac\_FormE(cID) \rightarrow OVac\_FormE(mID, mag, num\_atoms, \\
 &orientation, correction, calc\_quantity, \\
-&calculator, figure) 
+&calculator, figure)
 \end{align*}
 
-Put the labels at the end of the equation, as in this example: eqref:eq:multiline. 
+Put the labels at the end of the equation, as in this example: eqref:eq:multiline.
 
 * Source code
-One of the main reasons to use org-mode is the integration of source code. 
+One of the main reasons to use org-mode is the integration of source code.
 
 #+BEGIN_SRC python
 import matplotlib.pyplot as plt
@@ -162,8 +169,8 @@ By default images are shown with the jmax setup. You can toggle them off like th
 
 It is a good practice for the label to have a prefix on it of fig: so that later you can easily spot figure labels from table and equation labels.
 
-#+caption: A descriptive sentence about the figure. 
-#+label: fig:test-label   
+#+caption: A descriptive sentence about the figure.
+#+label: fig:test-label
 [[./fig1.png]]
 
 The default export behavior is not that nice at setting the width. You can set that the way you want like this:
@@ -198,7 +205,7 @@ Fusce bibendum sem turpis, at venenatis magna laoreet in. Sed convallis pretium 
 #+caption: A wrapped figure that takes up 1/3 of the text, on the right.
 [[./fig1.png]]
 
-Mauris placerat faucibus scelerisque. Nunc interdum egestas nunc ut vestibulum. Maecenas commodo justo sit amet scelerisque auctor. Morbi lacinia sem sit amet lectus vehicula porttitor. Pellentesque at dictum metus, quis ornare arcu. Integer tellus turpis, rhoncus nec accumsan in, posuere sit amet arcu. Nullam tempus neque vel condimentum porttitor. Nullam vitae tincidunt felis. Nunc egestas, nunc sit amet tristique adipiscing, ante nulla imperdiet nisi, nec eleifend enim felis et urna. Sed sit amet erat scelerisque, sollicitudin nibh vitae, varius nunc. Mauris posuere scelerisque augue nec placerat. Morbi in elementum risus. Fusce quis condimentum turpis. Sed eleifend libero et diam consectetur, a rhoncus purus porta. Nulla consectetur blandit porta. 
+Mauris placerat faucibus scelerisque. Nunc interdum egestas nunc ut vestibulum. Maecenas commodo justo sit amet scelerisque auctor. Morbi lacinia sem sit amet lectus vehicula porttitor. Pellentesque at dictum metus, quis ornare arcu. Integer tellus turpis, rhoncus nec accumsan in, posuere sit amet arcu. Nullam tempus neque vel condimentum porttitor. Nullam vitae tincidunt felis. Nunc egestas, nunc sit amet tristique adipiscing, ante nulla imperdiet nisi, nec eleifend enim felis et urna. Sed sit amet erat scelerisque, sollicitudin nibh vitae, varius nunc. Mauris posuere scelerisque augue nec placerat. Morbi in elementum risus. Fusce quis condimentum turpis. Sed eleifend libero et diam consectetur, a rhoncus purus porta. Nulla consectetur blandit porta.
 
 * Tables
 
@@ -221,6 +228,7 @@ The example above is a literal example so you can compare the table syntax with 
 |----------+----------|
 |        1 |        8 |
 |        4 |        5 |
+
 
 We use =#+tblname:= to give the table a name we can reference later. Table ref:tab:example1 shows a simple table. We can add vertical lines by setting a LaTeX attribute :align; this attribute also specifies the alignment of each cell. In the next example, we specify vertical lines with |, make the first column centered, and the second column left aligned. You have to put a horizontal line everywhere you want it. We will also specify that the table be placed "Here".
 
@@ -288,13 +296,13 @@ If you just want a convenient temporary table of contents use M-x speedbar.
 elisp:speedbar
 
 ** Preventing export of some headings
-You can mark some headings with a tag that is listed in 
+You can mark some headings with a tag that is listed in
 
 #+BEGIN_EXAMPLE
 #+EXPORT_EXCLUDE_TAGS: noexport
 #+END_EXAMPLE
 
-to mark it for noexport. Put your cursor on the headline, type C-c C-c and type in the tag name. 
+to mark it for noexport. Put your cursor on the headline, type C-c C-c and type in the tag name.
 
 *** Heading marked for noexport					   :noexport:
 
@@ -313,7 +321,7 @@ Similarly, you get a list of tables with list-of-tables:lot, or by running elisp
 org-mode is not LaTeX, and it cannot do everything LaTeX does. It can do a lot though. To get LaTeX, we have to provide org-mode with the required packages, and tell it what kind of document to export. The default type is an article. We provide some additional document types:
 - cmu-article is like an article, but with one-inch margins
 
-Those types use what we define as the default LaTeX packages to include. 
+Those types use what we define as the default LaTeX packages to include.
 The order of these is important, and changing it can result in LaTeX errors. If you need additional packages for your document, you need to tell org-mode about them like this:
 
 #+BEGIN_EXAMPLE
@@ -324,7 +332,7 @@ You can learn more about exporting here [[info:org#Exporting]], and about LaTeX 
 
 Here is a brief description of these packages (Thanks to Jake Boes).
 *** [AUTO] inputenc
-This package translates various standard and other input-encodings into a 'LaTeX internal language'. i.e. typing in non-ASCII characters into the document will be translated into a character number '228'.The character number that inputenc assigns is specified by the editor setup 'AUTO'. TeX then reads the character number and inputenc returns a properly formatted LaTeX string '\"a' for character number '228'. This package is often used in conjunction with fontenc. 
+This package translates various standard and other input-encodings into a 'LaTeX internal language'. i.e. typing in non-ASCII characters into the document will be translated into a character number '228'.The character number that inputenc assigns is specified by the editor setup 'AUTO'. TeX then reads the character number and inputenc returns a properly formatted LaTeX string '\"a' for character number '228'. This package is often used in conjunction with fontenc.
 
 http://www.ctan.org/pkg/inputenc
 
@@ -435,11 +443,11 @@ You can type C-c C-e j o to build and open a pdf file. This is most often what y
 M-x ox-manuscript-export-and-build-and-open
 
 ** Exporting a manuscript for submission
-Most journals do not want your bibtex file, nor do they use pdflatex. They want a standalone LaTeX file that contains the bibliography and which typically uses eps graphics. We create that file from the org-file with C-c C-e j m. 
+Most journals do not want your bibtex file, nor do they use pdflatex. They want a standalone LaTeX file that contains the bibliography and which typically uses eps graphics. We create that file from the org-file with C-c C-e j m.
 
 M-x ox-manuscript-build-submission-manuscript-and-open
 
-The resulting tex file will have no extensions on the included graphics, so that LaTeX can choose the appropriate file. You need to provide the eps or pdf graphics. The bibliography will be embedded at the end of the file. 
+The resulting tex file will have no extensions on the included graphics, so that LaTeX can choose the appropriate file. You need to provide the eps or pdf graphics. The bibliography will be embedded at the end of the file.
 
 
 ** CMU Qualifier
@@ -493,5 +501,3 @@ bibliographystyle:unsrt
 
 # <<bibliography>>
 bibliography:kitchin.bib
-
-
