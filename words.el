@@ -365,7 +365,6 @@ end tell")))
    ("f" words-finder "Mac Finder")
    ("m" words-mdfind "mdfind")
    ("q" nil "cancel")))
-
 ;; #+END_SRC
 
 ;;; End:
