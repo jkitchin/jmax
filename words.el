@@ -349,7 +349,7 @@ end tell")))
 (key-chord-mode 1)
 (key-chord-define-global
  "ww"
- (defhydra words-hydra (global-map "<f2>")
+ (defhydra words-hydra (:color blue)
    "words"
    ("d" words-dictionary "dictionary")
    ("t" words-thesaurus "thesaurus")
