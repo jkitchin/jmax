@@ -165,6 +165,9 @@
    (plantuml . t)
    (R . t)))
 
+;; Interpret "_" and "^" for export when braces are used.
+(setq org-export-with-sub-superscripts '{})
+
 ;; no extra indentation
 (setq org-src-preserve-indentation t)
 
