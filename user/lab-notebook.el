@@ -1,12 +1,36 @@
-;;; lab-notebook.el --- lab-notebook-mode
-
-
+;;; lab-notebook.el ---    -*- lexical-binding: t -*-
+;;; Header:
 
 ;;; Commentary:
-;; 
+
+;; ;;; Reminders about lentic:
+;; Lentic key binding reminders
+;; C-c , h  Move here in other view
+;; C-c , s  Swap windows
+;; [[elisp:lentic-mode-split-window-right]]  C-c o to open this link and make the view
 
 ;;; Code:
+;; ** Setup
+;; #+BEGIN_SRC emacs-lisp
+(defvar nb-notebook-file
+  "~/Dropbox/org-mode/lab-notebook.org"
+  "Notebook file where entries are stored.")
+;; #+END_SRC
+;; ** A capture template
+;; #+BEGIN_SRC emacs-lisp
+;; capture to a notebook
+(add-to-list
+ 'org-capture-templates
+ '("n" "Notebook" entry (file+datetree nb-notebook-file "Notebook")
+  "* %?\nEntered on %U\n  %i\n"))
 
+;; #+END_SRC
+
+;; ** Integration with git
+;; In the interest of streamlining interactions with version control, here we anticipate our needs and make a function to "do what I need" next in vc. On an empty directory, make it under version control, on a new file, make it under version control. otherwise, commit the changes.
+
+;; #+BEGIN_SRC emacs-lisp
+(require 'vc)
 (defun dwin-vc ()
   "Do what I need in vc next.
 Add current file if not in vc, then prompt for commit message"
@@ -19,12 +43,12 @@ Add current file if not in vc, then prompt for commit message"
 	 (state (elt deduction 3)))
 
     (cond
-     (backend  ;; we are in a vc directory   
+     (backend  ;; we are in a vc directory
       (when (file-exists-p (buffer-file-name))
 	;; register the file if it is not
 	(when (eq state 'unregistered)
 	  (vc-register))
-      
+
 	;; Now commit it if needed. We know about edited, added,
 	;; unregistered files. these should all be committed.
 	(cond
@@ -46,9 +70,24 @@ Add current file if not in vc, then prompt for commit message"
      (t
       (message "Not in a VC repo. Perhaps run vc-create-repo?"))
      )))
+;; #+END_SRC
+
+
+;; ** lab-notebook
+;; We want a nice function to open our lab notebook, with helm buffer to select headlines.
+;; #+BEGIN_SRC emacs-lisp
+(defun lab-notebook ()
+  (interactive)
+  (find-file nb-notebook-file)
+  (helm-org-in-buffer-headings)
+  (lab-notebook-mode))
+;; #+END_SRC
 
 
 
+
+;; ** A minor mode
+;; #+BEGIN_SRC emacs-lisp
 ;;;###autoload
 (define-minor-mode lab-notebook-mode
   "Toggle lab notebook mode.
@@ -64,8 +103,19 @@ This will prompt you to commit a file when you kill a buffer
             map)
   ;; body
   (add-hook 'kill-buffer-hook 'dwin-vc nil 'make-it-local))
- 
 
+
+;; #+END_SRC
+
+
+
+
+;; * The end
+;; #+BEGIN_SRC emacs-lisp
 (provide 'lab-notebook)
+;; #+END_SRC
+;; ;;; lab-notebook.el ends here
 
-;;; lab-notebook.el ends here
+;; # Local Variables:
+;; # lentic-init: lentic-orgel-org-init
+;; # End:
