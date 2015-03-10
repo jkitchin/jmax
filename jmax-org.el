@@ -1,7 +1,4 @@
 ;;; jmax-org.el --- jmax customization for org-mode
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;  You should not need to modify paths below here
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;; Commentary:
 ;;
@@ -27,11 +24,53 @@
 (global-set-key "\C-cL" 'org-insert-link-global)
 (global-set-key "\C-co" 'org-open-at-point-global)
 
-(require 'org-id)
+;; I like to press enter to follow a link. mouse clicks also work.
+(setq org-return-follows-link t)
+
+;; Setup the frame configuration for following links.
+(setq org-link-frame-setup (quote ((gnus . org-gnus-no-new-news)
+                                   (file . find-file))))
+
+; Use the current window for C-c ' source editing
+(setq org-src-window-setup 'current-window)
+
+;; use this code in emacs-lisp for folding code.
+(global-set-key (kbd "C-M-]") (lambda () (interactive) (org-cycle t)))
+(global-set-key (kbd "M-]") (lambda ()
+                              (interactive)
+                              (ignore-errors
+                                (end-of-defun)
+                                (beginning-of-defun))
+                              (org-cycle)))
+
+;; use ido completion wherever possible
+(setq org-completion-use-ido t)
+
+;; I do not like this mode
+(auto-fill-mode -1)
+
+;; turn off auto-fill in org-mode. It is not enough to turn it off
+;; everywhere.
+(remove-hook 'text-mode-hook #'turn-on-auto-fill)
+
+;; allow lists with letters in them.
+(setq org-list-allow-alphabetical t)
+
+;; capture key binding
+(define-key global-map "\C-cc" 'org-capture)
+
+;; setup archive location in archive directory in current folder
+(setq org-archive-location "archive/%s_archive::")
+
+;; * Org-id
+
 (setq org-id-link-to-org-use-id 'create-if-interactive)
 (setq org-link-search-must-match-exact-headline 'query-to-create)
-(setq org-image-actual-width '(600))
+(setq org-id-locations-file
+      (expand-file-name "user/.org-id-locations" starter-kit-dir))
+(require 'org-id)
 
+;; * Speed commands
 ;; activate single letter commands at beginning of a headline.
 ;; User-defined Speed commands
 ;; ===========================
@@ -106,8 +145,6 @@
 
 (setq org-use-speed-commands t)
 
-;; I like to press enter to follow a link. mouse clicks also work.
-(setq org-return-follows-link t)
 
 ;; renumber footnotes when new ones are inserted
 (setq org-footnote-auto-adjust t)
@@ -122,6 +159,7 @@
 ;; store clock entries in a drawer
 (setq org-clock-into-drawer t)
 
+;; * Expansions for blocks
 ;; add <p for python expansion
 (add-to-list 'org-structure-template-alist
              '("p" "#+BEGIN_SRC python\n?\n#+END_SRC" "<src lang=\"python\">\n?\n</src>"))
@@ -142,6 +180,7 @@
 (add-to-list 'org-structure-template-alist
              '("sh" "#+BEGIN_SRC sh\n?\n#+END_SRC" "<src lang=\"shell\">\n?\n</src>"))
 
+;; * Babel settings
 ;; do not evaluate code on export by default
 (setq org-export-babel-evaluate nil)
 
@@ -165,48 +204,19 @@
    (plantuml . t)
    (R . t)))
 
-;; Interpret "_" and "^" for export when braces are used.
-(setq org-export-with-sub-superscripts '{})
-
-;; no extra indentation
+;; no extra indentation in the source blocks
 (setq org-src-preserve-indentation t)
 
 ;; use syntax highlighting in org-file code blocks
 (setq org-src-fontify-natively t)
-;; make code blocks stand out a little from my gray80 background
-;; (set-face-attribute 'org-block-background nil :background "gray")
-
-;; give us some hint we are running. We change the background color, and print
-;; some messages.
-;; (defvar jmax-src-block-background
-;;   nil
-;;   "Stores initial background color of org source blocks.")
-
-;; (defadvice org-babel-execute-src-block (around progress nil activate)
-;;   ;; store current background first time.
-;;   (unless jmax-src-block-background
-;;     (setq jmax-src-block-background (face-attribute 'org-block-background :background)))
-;;   ;; change color of block before running.
-
-;;   (message "Running your code block")
-;;   (set-face-attribute
-;;    'org-block-background nil :background "LightSteelBlue")
-;;   (message "src blocks are %s" (face-attribute 'org-block-background :background))
-;;   (error "r")
-;;   (unwind-protect
-;;         ad-do-it
-;;     ;; reset the color.
-;;     (set-face-attribute
-;;      'org-block-background nil :background jmax-src-block-background))
-;;   (message "Done with code block"))
-
 
 ;; language specific headers. I think this comes before the defaults
+;; for emacs-lisp I want results to be value
 (setq org-babel-default-header-args:emacs-lisp
       (cons '(:results . "value replace")
 	    (assq-delete-all :results org-babel-default-header-args)))
 
-;; set default :results to output
+;; for everything else set default :results to output
 (setq org-babel-default-header-args
       (cons '(:results . "output replace")
 	    (assq-delete-all :results org-babel-default-header-args)))
@@ -216,22 +226,11 @@
       (cons '(:exports . "both")
 	    (assq-delete-all :exports org-babel-default-header-args)))
 
-;; I do not like this mode
-(auto-fill-mode -1)
+;; Interpret "_" and "^" for export when braces are used.
+(setq org-export-with-sub-superscripts '{})
 
-;; turn off auto-fill in org-mode. It is not enough to turn it off
-;; everywhere.
-(remove-hook 'text-mode-hook #'turn-on-auto-fill)
 
-;; allow lists with letters in them.
-(setq org-list-allow-alphabetical t)
-
-;;;;;; capture
-(define-key global-map "\C-cc" 'org-capture)
-
-;; setup archive location in archive directory in current folder
-(setq org-archive-location "archive/%s_archive::")
-
+;; * Agenda setup
 ; I don't want to see things that are done. turn that off here.
 ; http://orgmode.org/manual/Global-TODO-list.html#Global-TODO-list
 (setq org-agenda-skip-scheduled-if-done t)
@@ -251,6 +250,7 @@
 ;; record time I finished a task when I change it to DONE
 (setq org-log-done 'time)
 
+;; * New org-links
 ;; support for links to microsoft docx,pptx,xlsx files
 ;; standard org-mode opens these as zip-files
 ;;  http://orgmode.org/manual/Adding-hyperlink-types.html
@@ -284,26 +284,7 @@ start  empty title path"
 
 
 
-;; Setup the frame configuration for following links.
-(setq org-link-frame-setup (quote ((gnus . org-gnus-no-new-news)
-                                   (file . find-file))))
-
-; Use the current window for C-c ' source editing
-(setq org-src-window-setup 'current-window)
-
-
-;; use this code in emacs-lisp for folding code.
-(global-set-key (kbd "C-M-]") (lambda () (interactive) (org-cycle t)))
-(global-set-key (kbd "M-]") (lambda ()
-                              (interactive)
-                              (ignore-errors
-                                (end-of-defun)
-                                (beginning-of-defun))
-                              (org-cycle)))
-
-;; use ido completion wherever possible
-(setq org-completion-use-ido t)
-
+;; * Export settings
 (setq org-latex-default-packages-alist
       '(("AUTO" "inputenc" t)
 	("" "lmodern" nil)
@@ -387,6 +368,14 @@ citecolor=blue,filecolor=blue,menucolor=blue,urlcolor=blue"
 	       ("\\paragraph{%s}" . "\\paragraph*{%s}")
 	       ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
 
+
+(require 'ox-cmu-qualifier)
+(require 'ox-cmu-ms-report)
+(require 'ox-cmu-dissertation)
+(require 'ox-manuscript)
+(require 'ox-archive)
+
+;; * org-require
 ;;;;;;; org path for loadable org-files
 (defvar org-load-path
   (list (file-name-as-directory
@@ -426,15 +415,40 @@ FEATURE is a symbol, and it is loaded from an org-file by the name of FEATURE.or
 (require 'jmax-bibtex)
 
 
+;; * Images in org-mode
+(setq org-image-actual-width '(600))
 
-(require 'ox-cmu-qualifier)
-(require 'ox-cmu-ms-report)
-(require 'ox-cmu-dissertation)
-(require 'ox-manuscript)
-(require 'ox-archive)
+;; refresh images after running a block
+(defun org-refresh-images ()
+  "Refreshes images displayed inline."
+  (interactive)
+  (org-remove-inline-images)
+  (org-display-inline-images))
+
+(add-hook 'org-babel-after-execute-hook
+	  (lambda () (org-refresh-images)))
+
+
+;; * Adapting C-c C-c for Latex overlays
+;; Define a new toggling function for equations.
+(defun org-toggle-latex-overlays (arg)
+  "Toggle LaTeX fragments.  The prefix ARG is passed to `org-preview-latex-fragment'."
+  (interactive "P")
+  (if org-latex-fragment-image-overlays
+      (org-remove-latex-fragment-image-overlays)
+    (org-preview-latex-fragment arg)))
+
+(org-defkey org-mode-map "\C-c\C-x\C-l"    'org-toggle-latex-overlays)
+
+
+(defadvice org-ctrl-c-ctrl-c (around latex-overlays nil activate)
+  "Ignore latex overlays in C-cC-c."
+  (let ((org-latex-fragment-image-overlays nil))
+    ad-do-it))
 
 
 
+;; * Miscellaneous
 (defun sa-ignore-headline (contents backend info)
   "Ignore headlines with tag `ignoreheading'.
 This may mess up your labels, since the exporter still creates a label for it.
@@ -459,33 +473,6 @@ Argument INFO Parse-tree from org-mode."
 (add-to-list 'org-export-filter-headline-functions 'sa-ignore-headline)
 (add-to-list 'org-export-filter-headline-functions 'headline-nonumber)
 
-;; refresh images after running a block
-(defun org-refresh-images ()
-  "Refreshes images displayed inline."
-  (interactive)
-  (org-remove-inline-images)
-  (org-display-inline-images))
-
-(add-hook 'org-babel-after-execute-hook
-	  (lambda () (org-refresh-images)))
-
-
-;; Define a new toggling function for equations.
-(defun org-toggle-latex-overlays (arg)
-  "Toggle LaTeX fragments.  The prefix ARG is passed to `org-preview-latex-fragment'."
-  (interactive "P")
-  (if org-latex-fragment-image-overlays
-      (org-remove-latex-fragment-image-overlays)
-    (org-preview-latex-fragment arg)))
-
-(org-defkey org-mode-map "\C-c\C-x\C-l"    'org-toggle-latex-overlays)
-
-
-(defadvice org-ctrl-c-ctrl-c (around latex-overlays nil activate)
-  "Ignore latex overlays in C-cC-c."
-  (let ((org-latex-fragment-image-overlays nil))
-    ad-do-it))
-
 
 ;; setup english dictionary and spell check on windows.
 (cond
@@ -496,6 +483,7 @@ Argument INFO Parse-tree from org-mode."
   (flyspell-mode +1)
   (add-hook 'org-mode-hook 'turn-on-flyspell 'append)))
 
+;; * The end
 (message "jmax-org.el loaded")
 
 (provide 'jmax-org)
