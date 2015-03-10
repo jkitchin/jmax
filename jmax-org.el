@@ -414,7 +414,6 @@ FEATURE is a symbol, and it is loaded from an org-file by the name of FEATURE.or
 (org-require 'pubmed)
 (require 'jmax-bibtex)
 
-
 ;; * Images in org-mode
 (setq org-image-actual-width '(600))
 
