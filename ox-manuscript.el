@@ -111,6 +111,32 @@ if you should continue to the next step."
 				  ("\\paragraph{%s}" . "\\paragraph*{%s}")
 				  ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
 
+;; ** Nature
+;; http://www.nature.com/srep/authors/submissions.html
+;; the example shows unnumbered sections which might require a full exporter to get.
+(add-to-list 'org-latex-classes '("nature"
+"\\documentclass[fleqn,10pt]{wlscirep}
+ [NO-DEFAULT-PACKAGES]
+ [PACKAGES]
+ [EXTRA]"
+				  ("\\section{%s}" . "\\section*{%s}")
+				  ("\\subsection{%s}" . "\\subsection*{%s}")
+				  ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+				  ("\\paragraph{%s}" . "\\paragraph*{%s}")
+				  ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+
+
+;; ** RSC
+;; See http://www.rsc.org/Publishing/Journals/guidelines/AuthorGuidelines/AuthoringTools/Templates/tex.asp
+;; I think their structure is too complex for ox-manuscript, and a real exporter would be required.
+
+;; ** Science Magazine
+;; Support for LaTeX in Science borders on ridiculous - LaTeX to HTML to Word - via DOS...
+;; http://www.sciencemag.org/site/feature/contribinfo/prep/TeX_help/index.xhtml
+;; No support in ox-manuscript for this.
+
+;; ** Wiley
+;; I have not been able to find a LaTeX package for Wiley
 
 ;; * Functions
 
@@ -158,7 +184,6 @@ file."
   (let* ((org-file (file-name-nondirectory (buffer-file-name)))
          (tex-file (replace-regexp-in-string "org$" "tex" org-file))
          (tex-contents (with-temp-buffer (insert-file-contents tex-file) (buffer-string))))
-    (message tex-file)
     (with-temp-file tex-file (insert (replace-regexp-in-string
                                       (concat "\\(\\includegraphics"
                                               "\\(\[?[^\].*\]?\\)?\\)"       ;; match optional [stuff]
@@ -166,9 +191,9 @@ file."
                                       "\\1{\\3}"  tex-contents)))))
 
 (defun ox-manuscript-bibliography-to-bbl ()
-  "Replace \bibliography{} in tex file with contents of the bbl file.
-
-we check for a bbl file, and if there is not one, we run pdflatex, then bibtex to get one."
+  "Replace \\bibliography{} in tex file with contents of the bbl file.
+We check for a bbl file, and if there is not one, we run
+pdflatex, then bibtex to get one."
   (interactive)
   (let* ((org-file (file-name-nondirectory (buffer-file-name)))
          (bbl-file (replace-regexp-in-string "org$" "bbl" org-file))
@@ -465,7 +490,7 @@ single, standalone tex-file."
 (defun ox-manuscript-build-submission-manuscript (&optional async subtreep visible-only body-only options)
   "Create manuscript for submission.
 This removes the .png extensions from graphics, and replaces the
-bibliography with the contents of the bbl file. the result is a
+bibliography with the contents of the bbl file. The result is a
 single, standalone tex-file, and the corresponding pdf."
   (interactive)
   (let* ((org-file (file-name-nondirectory (buffer-file-name)))
@@ -478,7 +503,6 @@ single, standalone tex-file, and the corresponding pdf."
     (ox-manuscript-latex tex-file)
     (ox-manuscript-latex tex-file)
     (ox-manuscript-cleanup)
-
     (format "Manuscript built on %s with org-mode %s" (current-time-string) (org-version))
     pdf-file))
 
@@ -502,6 +526,80 @@ single, standalone tex-file, and the corresponding pdf."
 	(message-goto-to)))
 
 
+(defun ox-manuscript-make-submission-archive ()
+  "Create a directory containing the tex file and images.
+This is a standalone directory that is suitable for
+submission. We assume the tex file in this directory is suitable
+for submission."
+  (interactive)
+  (let* ((org-file (buffer-name))
+	 (org-file-abs-path (buffer-file-name))
+	 (base-name (file-name-sans-extension org-file))
+	 ;; directory to save all exports in, using the current date
+	 (tex-archive (concat base-name
+			      "-"
+			      (format-time-string "%Y-%m-%d/" (current-time))))
+	 (tex-file (concat (file-name-sans-extension org-file) ".tex"))
+	 (tex-bak-file (concat (file-name-sans-extension org-file) ".tex.bak"))
+	 (base-tex-file (file-name-nondirectory tex-file))
+	 (bbl-file (replace-regexp-in-string "tex$" "bbl" tex-file))
+	 (tex-contents (with-temp-buffer
+			 (insert-file-contents tex-file)
+			 (buffer-string))))
+
+    ;; make backup of tex file so we can restore later
+    (copy-file tex-file tex-bak-file)
+
+    ;; make archive directory
+    (make-directory tex-archive t)
+
+    ;; find images and flatten their paths
+    (with-temp-file tex-file
+      (insert tex-contents)
+      (goto-char (point-min))
+      (while (re-search-forward
+	      "\\(?1:\\includegraphics\\(?2:[?[^].*]?\\)?\\){\\(?3:[^}].*\\)\\.png}"
+	      nil t)
+	(let* ((eps-file (concat (match-string 3) ".eps"))
+	       (pdf-file (concat (match-string 3) ".pdf"))
+	       (png-file (concat (match-string 3) ".png"))
+	       (fname (file-name-nondirectory (match-string 3))))
+
+	  ;; flatten the filename in the tex-file
+	  (replace-match (format "\\1{%s}" fname))
+
+	  ;;  Copy the image to the tex-archive. Priority goes as eps, pdf then png
+	  (cond
+	    ((file-exists-p eps-file)
+	     (copy-file eps-file (expand-file-name eps-file tex-archive) t))
+	    ((file-exists-p pdf-file)
+	     (copy-file pdf-file (expand-file-name pdf-file tex-archive) t))
+	    ((file-exists-p png-file)
+	     (copy-file png-file (expand-file-name png-file tex-archive) t))
+	    (t
+	     (error "No file found: %s" (match-string 0)))))))
+
+    ;; remove image extensions and clean up bibliography
+    (ox-manuscript-remove-image-extensions)
+    (ox-manuscript-bibliography-to-bbl)
+
+    ;; the tex-file is no longer valid in the current directory because the
+    ;; paths to images are wrong. So we move it to where it belongs.
+    (rename-file tex-file (expand-file-name tex-file tex-archive) t)
+
+    ;; restore the original version
+    (rename-file tex-bak-file tex-file)
+
+    ;; We should build and open the pdf-file. That should just be running latex twice.
+    ;; we do that manually in the archive directory.
+    (let ((default-directory (expand-file-name tex-archive)))
+      (shell-command "pdflatex -shell-escape %s" base-tex-file)
+      (shell-command "pdflatex -shell-escape %s" base-tex-file))
+    (org-open-file (concat
+		    (file-name-sans-extension
+		     (expand-file-name tex-file tex-archive))
+		    ".pdf"))))
+
 ;; * The backend options
 (org-export-define-derived-backend 'cmu-manuscript 'latex
   :menu-entry
@@ -513,7 +611,8 @@ single, standalone tex-file, and the corresponding pdf."
 	(?e "As PDF and email" ox-manuscript-export-and-build-and-email)
 	(?s "As submission manuscript tex" ox-manuscript-export-submission-manuscript)
 	(?M "As submission manuscript pdf" ox-manuscript-build-submission-manuscript)
-	(?m "As submission manuscript pdf and open" ox-manuscript-build-submission-manuscript-and-open))))
+	(?m "As submission manuscript pdf and open" ox-manuscript-build-submission-manuscript-and-open)
+	(?a "As submission archive"))))
 
 (provide 'ox-manuscript)
 
