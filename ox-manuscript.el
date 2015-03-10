@@ -40,7 +40,6 @@
 
 ;; * Custom variables
 
-
 (defgroup ox-manuscript nil
   "Customization group for ox-manuscript.")
 
@@ -135,14 +134,20 @@ file.  DEPTH='deep will also remove the tex source and pdf file."
          (extensions '(".aux" ".pyg" ".bbl" ".blg" ".toc"
 		       ".log" ".out" ".spl" "_flymake.out"
 		       "Notes.bib" ".dvi"))
-         (temp-files (mapcar (lambda (extension) (concat org-base extension)) extensions)))
+         (temp-files (mapcar (lambda (extension)
+			       (concat org-base extension))
+			     extensions)))
     (mapcar (lambda (temp-file)
-              (if (file-exists-p temp-file) (delete-file temp-file))) temp-files)
+              (if (file-exists-p temp-file)
+		  (delete-file temp-file)))
+	    temp-files)
     (when (file-exists-p "texput.log") (delete-file "texput.log"))
     (when depth
       (cond ((eq depth 'deep)
-	     (when (file-exists-p (concat org-base ".tex")) (delete-file (concat org-base ".tex")))
-	     (when (file-exists-p (concat org-base ".pdf")) (delete-file (concat org-base ".pdf"))))))))
+	     (when (file-exists-p (concat org-base ".tex"))
+	       (delete-file (concat org-base ".tex")))
+	     (when (file-exists-p (concat org-base ".pdf"))
+	       (delete-file (concat org-base ".pdf"))))))))
 
 (defun ox-manuscript-remove-image-extensions ()
   "Removes .png extensions from \includegraphics directives in an exported latex file.
@@ -160,6 +165,41 @@ file."
                                               "{\\([^}].*\\)\.\\(png\\)}")
                                       "\\1{\\3}"  tex-contents)))))
 
+(defun ox-manuscript-bibliography-to-bbl ()
+  "Replace \bibliography{} in tex file with contents of the bbl file.
+
+we check for a bbl file, and if there is not one, we run pdflatex, then bibtex to get one."
+  (interactive)
+  (let* ((org-file (file-name-nondirectory (buffer-file-name)))
+         (bbl-file (replace-regexp-in-string "org$" "bbl" org-file))
+         (tex-file (replace-regexp-in-string "org$" "tex" org-file))
+	 (bib-file (file-name-sans-extension tex-file)))
+
+    ;; if no .bbl run commands to get one.
+    (unless (file-exists-p bbl-file)
+      (ox-manuscript-latex tex-file)
+      (ox-manuscript-bibtex tex-file))
+
+    (find-file tex-file)
+    (goto-char (point-min))
+    (re-search-forward "bibliography{" (point-max))
+    (beginning-of-line)
+    (kill-line)
+    (insert-file-contents bbl-file)
+    (delete-file bbl-file)
+    (save-buffer)
+    (kill-buffer)))
+
+
+(defun ox-manuscript-run-bibtex-p ()
+  "Return whether we need to run bibtex or not.
+Based on there being a cite link in the buffer.  We assume there
+is a bibliography and style defined if a cite is found.  no check
+is made for that."
+  (interactive)
+  (save-excursion
+    (goto-char (point-min))
+    (re-search-forward "cite:" nil t)))
 
 ;; * Build functions
 
@@ -345,50 +385,18 @@ intermediate output steps."
 	      '("*latex*" "*bibtex*" "*makeindex*" "*Occur*"))
       "done"))
 
-    (message "Finished with status = %s. %s exists = %s in %s." status pdf-file (file-exists-p pdf-file) default-directory)
+    (message "Finished with status = %s. %s exists = %s in %s."
+	     status pdf-file (file-exists-p pdf-file) default-directory)
     0))
 
+;; We use our function for building the manuscript
 (setq org-latex-pdf-process 'ox-manuscript-latex-pdf-process)
-
-(defun ox-manuscript-bibliography-to-bbl ()
-  "Replace \bibliography{} in tex file with contents of the bbl file.
-
-we check for a bbl file, and if there is not one, we run pdflatex, then bibtex to get one."
-  (interactive)
-  (let* ((org-file (file-name-nondirectory (buffer-file-name)))
-         (bbl-file (replace-regexp-in-string "org$" "bbl" org-file))
-         (tex-file (replace-regexp-in-string "org$" "tex" org-file))
-	 (bib-file (file-name-sans-extension tex-file)))
-
-    ;; if no .bbl run commands to get one.
-    (unless (file-exists-p bbl-file)
-      (ox-manuscript-latex tex-file)
-      (ox-manuscript-bibtex tex-file))
-
-    (find-file tex-file)
-    (goto-char (point-min))
-    (re-search-forward "bibliography{" (point-max))
-    (beginning-of-line)
-    (kill-line)
-    (insert-file-contents bbl-file)
-    (delete-file bbl-file)
-    (save-buffer)
-    (kill-buffer)))
-
-
-(defun ox-manuscript-run-bibtex-p ()
-  "Return whether we need to run bibtex or not.
-Based on there being a cite link in the buffer.  We assume there
-is a bibliography and style defined if a cite is found.  no check
-is made for that."
-  (interactive)
-  (save-excursion
-    (goto-char (point-min))
-    (re-search-forward "cite:" nil t)))
 
 
 (defun ox-manuscript-build ()
-  "Build manuscript.  This is done manually here for building the submission manuscript pdf."
+  "Build manuscript.
+This is done manually here for building the submission manuscript
+pdf."
   (interactive)
 
   (let* ((org-file (file-name-nondirectory (buffer-file-name)))
@@ -403,7 +411,8 @@ is made for that."
     (ox-manuscript-latex tex-file)
 
     (ox-manuscript-cleanup)
-    (format "Manuscript built on %s with org-mode %s" (current-time-string) (org-version))
+    (format "Manuscript built on %s with org-mode %s"
+	    (current-time-string) (org-version))
 
     ;; return pdf name
     pdf-file))
