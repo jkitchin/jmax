@@ -547,6 +547,10 @@ for submission."
 			 (insert-file-contents tex-file)
 			 (buffer-string))))
 
+    ;; Make sure we have a tex-file
+    (unless (file-exists-p tex-file)
+      (ox-manuscript-build-submission-manuscript-and-open))
+
     ;; make backup of tex file so we can restore later
     (copy-file tex-file tex-bak-file)
 
