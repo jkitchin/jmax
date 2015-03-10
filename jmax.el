@@ -58,11 +58,6 @@
 (require 'jmax-mode)
 (jmax-mode 1)
 
-;; * Theme
-
-(add-to-list 'custom-theme-load-path (expand-file-name "themes" starter-kit-dir))
-(load-theme jmax-user-theme t)
-
 
 ;; * personal preferences
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -310,7 +305,11 @@
 
 (require 'jmax-utils)
 
-
 (require 'python-setup)
+
+;; * Theme
+;; load this last so that the user theme can be loaded
+(add-to-list 'custom-theme-load-path (expand-file-name "themes" starter-kit-dir))
+(load-theme jmax-user-theme t)
 
 (provide 'jmax)
