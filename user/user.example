@@ -1,128 +1,129 @@
 ;; -*- mode: Lisp -*-
-;; This is an example user.el file for configuring jmax.
+;; This is an example user.el file for configuring jmax. Uncomment things you like.
 
-(setq reftex-default-bibliography '("~/Dropbox/bibliography/references.bib"))
+; (setq reftex-default-bibliography '("~/Dropbox/bibliography/references.bib"))
 
 ;; see org-ref for use of these variables
-(setq org-ref-bibliography-notes "~/Dropbox/bibliography/notes.org"
-      org-ref-default-bibliography '("~/Dropbox/bibliography/references.bib")
-      org-ref-pdf-directory "~/Dropbox/bibliography/bibtex-pdfs/")
+; (setq org-ref-bibliography-notes "~/Dropbox/bibliography/notes.org"
+;      org-ref-default-bibliography '("~/Dropbox/bibliography/references.bib")
+;      org-ref-pdf-directory "~/Dropbox/bibliography/bibtex-pdfs/")
 
 ;; [[http://emacsredux.com/blog/2014/03/22/a-peek-at-emacs-24-dot-4-focus-hooks/][A peek at Emacs 24.4: Focus Hooks - Emacs Redux]]
 ;; save all buffers when you lose emacs focus
-(add-hook 'focus-out-hook (lambda () (save-some-buffers t)))
+; (add-hook 'focus-out-hook (lambda () (save-some-buffers t)))
 
 
 ;; add some additional themes
-(add-to-list 'custom-theme-load-path (expand-file-name "themes/emacs-color-theme-solarized" starter-kit-dir))
+; (add-to-list 'custom-theme-load-path (expand-file-name "themes/emacs-color-theme-solarized" starter-kit-dir))
 
-(add-to-list 'custom-theme-load-path (expand-file-name "themes/replace-colorthemes" starter-kit-dir))
+; (add-to-list 'custom-theme-load-path (expand-file-name "themes/replace-colorthemes" starter-kit-dir))
 
-(add-to-list 'load-path (expand-file-name "themes/tomorrow-theme/Gnu Emacs" starter-kit-dir))
+; (add-to-list 'load-path (expand-file-name "themes/tomorrow-theme/Gnu Emacs" starter-kit-dir))
 
-(add-to-list 'custom-theme-load-path (expand-file-name "themes/tomorrow-theme/Gnu Emacs" starter-kit-dir))
+; (add-to-list 'custom-theme-load-path (expand-file-name "themes/tomorrow-theme/Gnu Emacs" starter-kit-dir))
 
-(setq jmax-user-theme 'leuven)
+; (setq jmax-user-theme 'leuven)
 
 
 ;; flyspell mode for spell checking everywhere
-(add-hook 'org-mode-hook 'turn-on-flyspell 'append)
+; (add-hook 'org-mode-hook 'turn-on-flyspell 'append)
 
 ;; [[https://github.com/grettke/home/blob/master/ALEC.txt][home/ALEC.txt at master · grettke/home]]
-(setq org-catch-invisible-edits 'error)
+; (setq org-catch-invisible-edits 'error)
 
 
 
-;; try autocomplete again for emacs-lisp
-(require 'auto-complete-config)
-(ac-config-default)
-(global-auto-complete-mode t)
-(auto-complete-mode t)
+;; ;; try autocomplete again for emacs-lisp
+;; (require 'auto-complete-config)
+;; (ac-config-default)
+;; (global-auto-complete-mode t)
+;; (auto-complete-mode t)
 
 
-;; adapted from [[http://doc.rix.si/org/fsem.html][Hardcore Freestyle Emacs]]
-(column-number-mode t)
-(rainbow-mode 1)
-(diminish 'rainbow-mode)
-(global-auto-revert-mode t)
+;; ;; adapted from [[http://doc.rix.si/org/fsem.html][Hardcore Freestyle Emacs]]
+;; (column-number-mode t)
+;; (rainbow-mode 1)
+;; (diminish 'rainbow-mode)
+;; (global-auto-revert-mode t)
 
-(global-linum-mode 0)
-(global-whitespace-mode 0)
-;; (global-relative-line-numbers-mode 0)
-(global-hl-line-mode 0)
-;; (column-highlight-mode 0)
-(hl-line-mode 0)
+;; (global-linum-mode 0)
+;; (global-whitespace-mode 0)
+;; ;; (global-relative-line-numbers-mode 0)
+;; (global-hl-line-mode 0)
+;; ;; (column-highlight-mode 0)
+;; (hl-line-mode 0)
 
-(defun rrix/enable-hl-line ()
-       (hl-line-mode 1))
+;; (defun rrix/enable-hl-line ()
+;;        (hl-line-mode 1))
 
-(mapc (function (lambda (mode)
-                 (message (symbol-name mode))
-                 (add-hook mode 'rrix/enable-hl-line)))
-      '(erc-mode-hook
-        gnus-group-mode-hook
-        gnus-summary-mode-hook
-        org-agenda-mode-hook
-        eshell-mode-hook))
+;; (mapc (function (lambda (mode)
+;;                  (message (symbol-name mode))
+;;                  (add-hook mode 'rrix/enable-hl-line)))
+;;       '(erc-mode-hook
+;;         gnus-group-mode-hook
+;;         gnus-summary-mode-hook
+;;         org-agenda-mode-hook
+;;         eshell-mode-hook))
 
-(require 'diminish)
-(diminish 'visual-line-mode "")
+;; (require 'diminish)
+;; (diminish 'visual-line-mode "")
 
-(global-visual-line-mode)
-(setq-default fill-column 80
-              whitespace-line-column 80)
+;; (global-visual-line-mode)
+;; (setq-default fill-column 80
+;;               whitespace-line-column 80)
 
-(require 'whitespace)
-(diminish 'whitespace-mode "ᗣ")
-(diminish 'global-whitespace-mode "ᗣ")
-(add-hook 'before-save-hook 'whitespace-cleanup)
+;; (require 'whitespace)
+;; (diminish 'whitespace-mode "ᗣ")
+;; (diminish 'global-whitespace-mode "ᗣ")
+;; (add-hook 'before-save-hook 'whitespace-cleanup)
 
-(add-hook 'before-save-hook 'delete-trailing-whitespace)
-(define-key global-map (kbd "RET") 'newline-and-indent)
+;; (add-hook 'before-save-hook 'delete-trailing-whitespace)
+;; (define-key global-map (kbd "RET") 'newline-and-indent)
 
-(defun rrix/setup-text-mode ()
-       "function that applies all of my text-mode customizations"
-       (whitespace-mode 1))
-(add-hook 'text-mode-hook 'rrix/setup-text-mode)
+;; (defun rrix/setup-text-mode ()
+;;        "function that applies all of my text-mode customizations"
+;;        (whitespace-mode 1))
+;; (add-hook 'text-mode-hook 'rrix/setup-text-mode)
 
-(setq whitespace-style '(indentation::space
-                         space-after-tab
-                         space-before-tab
-                         trailing
-;;                         lines-tail
-                         tab-mark
-                         face
-                         tabs))
+;; (setq whitespace-style '(indentation::space
+;;                          space-after-tab
+;;                          space-before-tab
+;;                          trailing
+;; ;;                         lines-tail
+;;                          tab-mark
+;;                          face
+;;                          tabs))
 
-(define-key global-map (kbd "C-c SPC") 'ace-jump-mode)
-(setq linum-delay t
-      linum-eager nil)
-(add-hook 'prog-mode-hook '(lambda () (linum-mode 1)))
+;; (define-key global-map (kbd "C-c SPC") 'ace-jump-mode)
+;; (setq linum-delay t
+;;       linum-eager nil)
+;; (add-hook 'prog-mode-hook '(lambda () (linum-mode 1)))
 
-(require 'flymake)
-(flymake-mode 0)
-(diminish 'flymake-mode "")
+;; (require 'flymake)
+;; (flymake-mode 0)
+;; (diminish 'flymake-mode "")
 
-(require 'hideshow)
-(add-hook 'prog-mode-hook (lambda () (hs-minor-mode 1)))
-(diminish 'hs-minor-mode "F")
+;; (require 'hideshow)
+;; (add-hook 'prog-mode-hook (lambda () (hs-minor-mode 1)))
+;; (diminish 'hs-minor-mode "F")
 
-(require 'git-messenger)
-(add-hook 'prog-mode-hook (lambda ()
-                           (local-set-key (kbd "C-c v p")
-			   'git-messenger:popup-message)
-			   ))
-
-
-
-(require 'ace-isearch)
-(global-ace-isearch-mode +1)
+;; (require 'git-messenger)
+;; (add-hook 'prog-mode-hook (lambda ()
+;;                            (local-set-key (kbd "C-c v p")
+;;			   'git-messenger:popup-message)
+;;			   ))
 
 
-;; http://sachachua.com/blog/series/emacs-kaizen/
-(require 'use-package)
-(use-package ace-jump-zap
-  :ensure ace-jump-zap
-  :bind
-  (("M-z" . ace-jump-zap-up-to-char-dwim)
-   ("C-M-z" . ace-jump-zap-to-char-dwim)))
+
+;; (require 'ace-isearch)
+;; (global-ace-isearch-mode +1)
+
+
+;; ;; http://sachachua.com/blog/series/emacs-kaizen/
+;; (require 'use-package)
+;; (use-package ace-jump-zap
+;;   :ensure ace-jump-zap
+;;   :bind
+;;   (("M-z" . ace-jump-zap-up-to-char-dwim)
+;;    ("C-M-z" . ace-jump-zap-to-char-dwim)))
+;; ;
