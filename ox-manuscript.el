@@ -176,7 +176,7 @@ file.  DEPTH='deep will also remove the tex source and pdf file."
 	       (delete-file (concat org-base ".pdf"))))))))
 
 (defun ox-manuscript-remove-image-extensions ()
-  "Removes .png extensions from \includegraphics directives in an exported latex file.
+  "Removes .png/pdf/eps extensions from \includegraphics directives in an exported latex file.
 
 Run this from an org-buffer after you have exported it to a LaTeX
 file."
@@ -187,7 +187,7 @@ file."
     (with-temp-file tex-file (insert (replace-regexp-in-string
                                       (concat "\\(\\includegraphics"
                                               "\\(\[?[^\].*\]?\\)?\\)"       ;; match optional [stuff]
-                                              "{\\([^}].*\\)\.\\(png\\)}")
+                                              "{\\([^}].*\\)\.\\(png\\|pdf\\|eps\\)}")
                                       "\\1{\\3}"  tex-contents)))))
 
 (defun ox-manuscript-bibliography-to-bbl ()
@@ -526,12 +526,14 @@ single, standalone tex-file, and the corresponding pdf."
 	(message-goto-to)))
 
 
-(defun ox-manuscript-make-submission-archive ()
+(defun ox-manuscript-make-submission-archive (&optional async subtreep visible-only body-only options)
   "Create a directory containing the tex file and images.
 This is a standalone directory that is suitable for
 submission. We assume the tex file in this directory is suitable
-for submission."
+for submission, e.g. it was created from
+`ox-manuscript-build-submission-manuscript-and-open'."
   (interactive)
+  (save-buffer)
   (let* ((org-file (buffer-name))
 	 (org-file-abs-path (buffer-file-name))
 	 (base-name (file-name-sans-extension org-file))
@@ -547,14 +549,22 @@ for submission."
 			 (insert-file-contents tex-file)
 			 (buffer-string))))
 
-    ;; Make sure we have a tex-file
-    (unless (file-exists-p tex-file)
-      (ox-manuscript-build-submission-manuscript-and-open))
+    ;; Make sure we have a tex-file and it is newer
+    (unless (and  (file-exists-p tex-file)
+		  (file-newer-than-file-p tex-file org-file))
+      ;;  and if not, build a tex file
+      (ox-manuscript-export-and-build-and-open async subtreep visible-only body-only options)
+         ;; remove image extensions
+      (ox-manuscript-remove-image-extensions)
+      ;; fix bibliography
+      (ox-manuscript-bibliography-to-bbl))
 
     ;; make backup of tex file so we can restore later
-    (copy-file tex-file tex-bak-file)
+    (copy-file tex-file tex-bak-file t)
 
-    ;; make archive directory
+    ;; delete tex-archive if it exists then make a new one
+    (when (file-exists-p tex-archive)
+      (delete-directory tex-archive t))
     (make-directory tex-archive t)
 
     ;; find images and flatten their paths
@@ -562,30 +572,29 @@ for submission."
       (insert tex-contents)
       (goto-char (point-min))
       (while (re-search-forward
-	      "\\(?1:\\includegraphics\\(?2:[?[^].*]?\\)?\\){\\(?3:[^}].*\\)\\.png}"
+	      "\\(?1:\\includegraphics\\(?2:[?[^].*]?\\)?\\){\\(?3:[^}].*\\)}"
 	      nil t)
 	(let* ((eps-file (concat (match-string 3) ".eps"))
 	       (pdf-file (concat (match-string 3) ".pdf"))
 	       (png-file (concat (match-string 3) ".png"))
 	       (fname (file-name-nondirectory (match-string 3))))
-
-	  ;; flatten the filename in the tex-file
-	  (replace-match (format "\\1{%s}" fname))
-
 	  ;;  Copy the image to the tex-archive. Priority goes as eps, pdf then png
 	  (cond
 	    ((file-exists-p eps-file)
-	     (copy-file eps-file (expand-file-name eps-file tex-archive) t))
+	     (copy-file eps-file (expand-file-name (concat fname ".eps") tex-archive) t))
 	    ((file-exists-p pdf-file)
-	     (copy-file pdf-file (expand-file-name pdf-file tex-archive) t))
+	     (copy-file pdf-file (expand-file-name (concat fname ".pdf") tex-archive) t))
 	    ((file-exists-p png-file)
-	     (copy-file png-file (expand-file-name png-file tex-archive) t))
+	     (copy-file png-file (expand-file-name (concat fname ".png") tex-archive) t))
 	    (t
-	     (error "No file found: %s" (match-string 0)))))))
-
-    ;; remove image extensions and clean up bibliography
-    (ox-manuscript-remove-image-extensions)
-    (ox-manuscript-bibliography-to-bbl)
+	     (error "No file found: %s (%s %s %s)"
+		    (match-string 3)
+		    eps-file
+		    pdf-file
+		    png-file
+		    )))
+		  ;; flatten the filename in the tex-file
+	  (replace-match (format "\\1{%s}" fname)))))
 
     ;; the tex-file is no longer valid in the current directory because the
     ;; paths to images are wrong. So we move it to where it belongs.
@@ -594,11 +603,14 @@ for submission."
     ;; restore the original version
     (rename-file tex-bak-file tex-file)
 
-    ;; We should build and open the pdf-file. That should just be running latex twice.
-    ;; we do that manually in the archive directory.
-    (let ((default-directory (expand-file-name tex-archive)))
-      (shell-command "pdflatex -shell-escape %s" base-tex-file)
-      (shell-command "pdflatex -shell-escape %s" base-tex-file))
+    ;; We should build and open the pdf-file. That should just be running latex
+    ;; twice.  we do that manually in the archive directory.
+    (let ((default-directory (file-name-as-directory
+			      (expand-file-name tex-archive))))
+      ;; I do not know why shell-command does not work here.
+      (call-process "pdflatex" nil nil nil "-shell-escape" base-tex-file)
+      (call-process "pdflatex" nil nil nil "-shell-escape" base-tex-file)
+      (ox-manuscript-cleanup))
     (org-open-file (concat
 		    (file-name-sans-extension
 		     (expand-file-name tex-file tex-archive))
@@ -616,7 +628,7 @@ for submission."
 	(?s "As submission manuscript tex" ox-manuscript-export-submission-manuscript)
 	(?M "As submission manuscript pdf" ox-manuscript-build-submission-manuscript)
 	(?m "As submission manuscript pdf and open" ox-manuscript-build-submission-manuscript-and-open)
-	(?a "As submission archive"))))
+	(?a "As submission archive" ox-manuscript-make-submission-archive))))
 
 (provide 'ox-manuscript)
 
