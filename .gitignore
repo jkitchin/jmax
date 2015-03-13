@@ -78,3 +78,5 @@ examples/cmu-memo
 devel
 .DS_Store
 bibtex-utils/.hg*
+/.projectile
+/doi-utils/
