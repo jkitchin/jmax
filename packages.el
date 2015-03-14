@@ -26,6 +26,7 @@
 
 (defvar starter-kit-packages
   (list 'flx-ido 'ido-ubiquitous 'smex
+	'dired-details 'dired-details+
         'yasnippet
         'magit
         'auctex 'reftex
