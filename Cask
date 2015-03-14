@@ -34,4 +34,5 @@
  (depends-on "dired-details")
  (depends-on "dired-details+")
  (depends-on "pydoc")
+ (depends-on "git-timemachine")
 )
