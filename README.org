@@ -1,5 +1,7 @@
 #+TITLE: jmax - John's customizations to maximize Emacs
-
+#+BEGIN_HTML
+<a href="https://travis-ci.org/jkitchin/jmax"><img src="https://travis-ci.org/jkitchin/jmax.svg?branch=master"></a>
+#+END_HTML
 Try it you might like it. These customizations have been compiled and derived from prelude and the emacs24-starterkit, and my own emacs hackery.
 
 * Installation
@@ -51,7 +53,7 @@ brew install emacs --with-gnutls --with-imagemagick --with-librsvg --with-x --us
 
 This got me:
 #+BEGIN_EXAMPLE
-GNU Emacs 24.4.50.1 (x86_64-apple-darwin13.3.0, NS appkit-1265.21 Version 10.9.4 (Build 13E28)) of 2014-08-07 
+GNU Emacs 24.4.50.1 (x86_64-apple-darwin13.3.0, NS appkit-1265.21 Version 10.9.4 (Build 13E28)) of 2014-08-07
 #+END_EXAMPLE
 
 I installed git from http://git-scm.com/download/mac
@@ -101,7 +103,7 @@ file:jmax.el does most of the setup that is not related to org-mode. It provides
 ** Scientific manuscript preparation
 See [[./examples]] for many examples of preparing scientific manuscripts for submission to ACS, APS, Elsevier and Springer journals.
 
-We have a pretty decent way of handling citations and references provided by [[file:org-ref/org-ref.org]]. This file sets up how bibtex keys are made and provides a lot of new links for org-mode for citations, references, labels, and bibliography files. 
+We have a pretty decent way of handling citations and references provided by [[file:org-ref/org-ref.org]]. This file sets up how bibtex keys are made and provides a lot of new links for org-mode for citations, references, labels, and bibliography files.
 
 See this example for the basics [[file:examples/technical-documents-in-org.org]].
 
@@ -115,5 +117,3 @@ Ever wanted to package up an org-file and all the figures, files and directories
 
 ** Handy email functions
 [[file:email.el]] provides functions to email a region, or an org-heading conveniently.
-
-
