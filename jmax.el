@@ -78,7 +78,7 @@
 
 ;; bookmarks
 (require 'bookmark)
-(setq bookmark-default-file (expand-file-name "bookmarks" starter-kit-dir)
+(setq bookmark-default-file (expand-file-name "user/bookmarks" starter-kit-dir)
       bookmark-save-flag 1)
 
 ;; saner regex syntax
