@@ -45,6 +45,7 @@
 	'ace-jump-mode 'ace-isearch
 	'use-package
 	'hydra 'key-chord
+	'git-timemachine
 	)
   "Libraries that should be installed by default.")
 
