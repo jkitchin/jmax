@@ -12,8 +12,8 @@ before_install:
   - sudo unzip -qq -d /opt /tmp/cask-master.zip
   - sudo ln -sf /opt/cask-master/bin/cask /usr/local/bin/cask
   - cask
-  - git submodule init
-  - git submodule update
+#  - git submodule init
+#  - git submodule update
 env:
 #  - EMACS=emacs24
   - EMACS=emacs-snapshot
