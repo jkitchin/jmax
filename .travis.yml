@@ -19,4 +19,3 @@ env:
   - EMACS=emacs-snapshot
 script:
   - emacs --version
-  - make test
