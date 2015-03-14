@@ -1,5 +1,9 @@
+(source elpy "http://jorgenschaefer.github.io/packages/")
+(source org)
 (source gnu)
+(source melpa-stable)
 (source melpa)
+
 
 (package-file "jmax.el")
 
