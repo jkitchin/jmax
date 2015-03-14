@@ -414,6 +414,17 @@ FEATURE is a symbol, and it is loaded from an org-file by the name of FEATURE.or
 (require 'pubmed)
 (require 'jmax-bibtex)
 
+;; variables that control bibtex key format for auto-generation
+;; I want firstauthor-year-title-words
+;; this usually makes a legitimate filename to store pdfs under.
+(setq bibtex-autokey-year-length 4
+      bibtex-autokey-name-year-separator "-"
+      bibtex-autokey-year-title-separator "-"
+      bibtex-autokey-titleword-separator "-"
+      bibtex-autokey-titlewords 2
+      bibtex-autokey-titlewords-stretch 1
+      bibtex-autokey-titleword-length 5)
+
 ;; * Images in org-mode
 (setq org-image-actual-width '(600))
 
