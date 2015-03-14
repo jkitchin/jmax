@@ -28,6 +28,16 @@
 
 ;;; Code:
 
+;; we load the user/preload.el file if it exists. This lets users define
+;; variables that might affect packages when they are loaded, e.g. key-bindings,
+;; etc... In particular, this is needed for setting some key-bindings in
+;; jmax-bibtex.
+
+(let ((preload (expand-file-name "user/preload.el" starter-kit-dir)))
+  (when (file-exists-p preload)
+    (load preload)))
+
+
 ;; * Packages
 (defcustom jmax-user-theme 'leuven
   "User defined theme to load")
@@ -91,16 +101,6 @@
 
 ;; * personal preferences
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; variables that control bibtex key format for auto-generation
-;; I want firstauthor-year-title-words
-;; this usually makes a legitimate filename to store pdfs under.
-(setq bibtex-autokey-year-length 4
-      bibtex-autokey-name-year-separator "-"
-      bibtex-autokey-year-title-separator "-"
-      bibtex-autokey-titleword-separator "-"
-      bibtex-autokey-titlewords 2
-      bibtex-autokey-titlewords-stretch 1
-      bibtex-autokey-titleword-length 5)
 
 ;; add this directory to the path for loading lisp files
 (add-to-list 'load-path starter-kit-dir)
