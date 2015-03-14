@@ -31,7 +31,7 @@
  (depends-on "ace-jump-mode")
  (depends-on "ace-isearch")
  (depends-on "auctex")
- (depends-on "dired-details"
+ (depends-on "dired-details")
  (depends-on "dired-details+")
  (depends-on "pydoc")
 )
