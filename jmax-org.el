@@ -409,7 +409,7 @@ FEATURE is a symbol, and it is loaded from an org-file by the name of FEATURE.or
 (add-to-list 'load-path
 	     (expand-file-name "org-ref" starter-kit-dir))
 
-(org-require 'org-ref)
+(require 'org-ref)
 (require 'doi-utils)
 (require 'pubmed)
 (require 'jmax-bibtex)
