@@ -411,7 +411,9 @@ FEATURE is a symbol, and it is loaded from an org-file by the name of FEATURE.or
 
 (require 'org-ref)
 (require 'doi-utils)
+(require 'isbn)
 (require 'pubmed)
+(require 'arxiv)
 (require 'jmax-bibtex)
 
 ;; variables that control bibtex key format for auto-generation
