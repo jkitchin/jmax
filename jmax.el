@@ -28,16 +28,6 @@
 
 ;;; Code:
 
-;; we load the user/preload.el file if it exists. This lets users define
-;; variables that might affect packages when they are loaded, e.g. key-bindings,
-;; etc... In particular, this is needed for setting some key-bindings in
-;; jmax-bibtex.
-
-(let ((preload (expand-file-name "user/preload.el" starter-kit-dir)))
-  (when (file-exists-p preload)
-    (load preload)))
-
-
 ;; * Packages
 (defcustom jmax-user-theme 'leuven
   "User defined theme to load")
