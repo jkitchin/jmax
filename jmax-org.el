@@ -486,6 +486,64 @@ FEATURE is a symbol, and it is loaded from an org-file by the name of FEATURE.or
 	    (kill-line)))))))
 
 (add-hook 'org-babel-after-execute-hook 'org-babel-python-strip-session-chars)
+
+;; * Restarting an org-babel session
+(defun src-block-in-session-p (&optional name)
+  "Return if src-block is in a session of NAME.
+NAME may be nil for unnamed sessions"
+  (interactive "sSession name: ")
+  (let* ((info (org-babel-get-src-block-info))
+         (lang (nth 0 info))
+         (body (nth 1 info))
+         (params (nth 2 info))
+         (session (cdr (assoc :session params))))
+
+    (cond
+     ;; unnamed session
+     ((and (null session)
+	   (null name))
+      t)
+     ;; Matching names
+     ((and
+       (stringp name)
+       (stringp session)
+       (string= name session))
+      t)
+     ;; no match
+     (t nil))))
+
+
+(defun org-babel-restart-session-to-point ()
+  "Restart session up to the src-block in the current point.
+Goes to beginning of buffer and executes each code block that has
+the same language and session as the current block."
+  (interactive)
+  (unless (org-in-src-block-p)
+    (error "You must be in a src-block to run this command"))
+  (let* ((current-point (point))
+	 (info (org-babel-get-src-block-info))
+         (lang (nth 0 info))
+         (body (nth 1 info))
+         (params (nth 2 info))
+         (session (cdr (assoc :session params))))
+    (save-excursion
+      (org-element-map
+	  (org-element-parse-buffer)
+	  'src-block
+	(lambda (block)
+	  (goto-char (org-element-property :begin block))
+
+	  (let* ((this-info (org-babel-get-src-block-info))
+		 (this-lang (nth 0 this-info))
+		 (this-body (nth 1 this-info))
+		 (this-params (nth 2 this-info))
+		 (this-session (cdr (assoc :session this-params))))
+	    (when
+		(and
+		 (< (point) current-point)
+		 (string= lang this-lang)
+		 (src-block-in-session-p session))
+	      (org-babel-execute-maybe))))))))
 ;; * Miscellaneous
 (defun sa-ignore-headline (contents backend info)
   "Ignore headlines with tag `ignoreheading'.
