@@ -463,7 +463,8 @@ FEATURE is a symbol, and it is loaded from an org-file by the name of FEATURE.or
 ;; * Python sessions
 (defun org-babel-python-strip-session-chars ()
   "Remove >>> and ... from a Python session output."
-  (when (and (string=
+  (when (and (org-element-property :parameters (org-element-at-point))
+	     (string=
 	      "python"
 	      (org-element-property :language (org-element-at-point)))
 	     (string-match
