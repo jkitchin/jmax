@@ -2,7 +2,7 @@
 
 ;;; Commentary:
 ;;
-
+(require 'org)
 (require 'ox-beamer)
 (require 'ox-texinfo)
 (require 'ox-org)
