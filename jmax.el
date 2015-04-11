@@ -188,8 +188,10 @@
 (require 'helm-files)
 (require 'helm-grep)
 
-(define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action) ; rebihnd tab to do persistent action
-(define-key helm-map (kbd "C-i") 'helm-execute-persistent-action) ; make TAB works in terminal
+;; (define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action)
+					; rebind tab to do persistent action
+;; (define-key helm-map (kbd "C-i") 'helm-execute-persistent-action)
+					; make TAB works in terminal
 (define-key helm-map (kbd "C-z")  'helm-select-action) ; list actions using C-z
 
 (define-key helm-grep-mode-map (kbd "<return>")  'helm-grep-mode-jump-other-window)
@@ -269,10 +271,10 @@
   (interactive)
   (insert (buffer-file-name)))
 
-(global-unset-key "\C-cg")
-(global-set-key "\C-cg" 'get-path)
-(global-set-key "\C-cp" 'insert-path)
-(global-set-key "\C-cf" 'insert-buffer-filename)
+(global-unset-key "\C-xg")
+(global-set-key "\C-xg" 'get-path)
+(global-set-key "\C-xp" 'insert-path)
+(global-set-key "\C-xf" 'insert-buffer-filename)
 
 
 (defun unfill-paragraph ()
