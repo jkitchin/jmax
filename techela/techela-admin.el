@@ -1045,7 +1045,7 @@ This will be in student-work/label/userid-label/userid-label.org."
 (defun ta-show-assigned-assignments ()
  "Show assigned assignments in an org buffer."
  (interactive)
- (switch-to-buffer-other-frame (get-uffer-create "*techela-assignments*"))
+ (switch-to-buffer-other-frame (get-buffer-create "*techela-assignments*"))
  (erase-buffer)
 
  (dolist (label (ta-get-assigned-assignments))
