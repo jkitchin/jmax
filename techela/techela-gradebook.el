@@ -14,7 +14,7 @@ which are GRADED.  This returns a list of (assignment points
 category)"
   (interactive)
   (save-current-buffer
-    
+
     (with-current-buffer
 	(find-file-noselect  (expand-file-name "syllabus.org" ta-course-dir))
       (org-map-entries
@@ -51,7 +51,7 @@ category)"
 		      fname
 		      (format "%s-%s.org" userid label)))))
 
-    
+
 (defun ta-get-user-grade (label userid)
   "Returns the numeric fractional grade in a file."
   (interactive
@@ -104,8 +104,8 @@ column 5 is the fractional grade * points * category weight"
 	)))
    ;; map over list of graded assignments
    (mapcar 'car (ta-get-assigned-assignments-points-categories))))
- 
-		
+
+
 (defun ta-get-user-overall-grade (userid)
   "Return list of lastname, firstname, userid, fractional and letter grade for USERID."
   (interactive
@@ -118,7 +118,7 @@ column 5 is the fractional grade * points * category weight"
 	 (possible (mapcar (lambda (x) (nth 6 x)) grades))
 	 (fgrade (/ (apply '+ earned) (apply '+ possible)))
 	 (lg (gb-fraction-to-lettergrade fgrade)))
-    
+
     ;; getting names of the student from the roster
     (with-temp-buffer
       (insert-file-contents ta-roster)
@@ -178,7 +178,7 @@ column 5 is the fractional grade * points * category weight"
 	(action . (("Individual grades" . ta-helm-student-grades)
 		   ("Overall grade" . ta-helm-student-overall-grade)))))
 
-  
+
 (defun ta-helm-student-overall-grade (userid)
   "Print overall grade for USERID in a buffer."
   (switch-to-buffer (get-buffer-create "*gradebook*"))
@@ -186,9 +186,28 @@ column 5 is the fractional grade * points * category weight"
   (insert
    (destructuring-bind (lname fname id fgrade lgrade)
        (ta-get-user-overall-grade userid)
-     
+
      (format "%s %s (%s) %1.3f %s"
 	     fname lname id fgrade lgrade))))
+
+
+(defun ta-student-overall-grades ()
+  "Print overall grades in a buffer."
+  (interactive)
+  (switch-to-buffer (get-buffer-create "*overall gradebook*"))
+  (erase-buffer)
+  (org-mode)
+  (insert "| First name | Last Name | id | Grade | Letter grade |\n|-\n")
+  (dolist (userid (mapcar 'car (ta-roster)))
+    (insert
+     (destructuring-bind (lname fname id fgrade lgrade)
+	 (ta-get-user-overall-grade userid)
+
+       (format "| %s | %s | [[elisp:(ta-helm-student-grades \"%s\")][%s]] |  %1.3f | %s | \n"
+	       fname lname id id fgrade lgrade))))
+  (previous-line 2)
+  (org-table-align)
+  (goto-char (point-max)))
 
 
 (defun ta-helm-student-grades (userid)
@@ -197,7 +216,7 @@ column 5 is the fractional grade * points * category weight"
   (erase-buffer)
   (insert (format "#+TITLE: Grade report for %s\n"
 		  (destructuring-bind (lname fname id fgrade lgrade)
-		      (ta-get-user-overall-grade userid)	     
+		      (ta-get-user-overall-grade userid)
 		    (format "%s %s (%s)
 Final grade: %1.3f %s\n"
 			    fname lname id fgrade lgrade))))
@@ -215,7 +234,7 @@ Final grade: %1.3f %s\n"
 	      "\n"))
   (goto-char (point-min))
   (org-mode))
-     
+
 
 (defun ta-helm-gradebook ()
   "A helm interface to the gradebook."
