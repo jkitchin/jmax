@@ -47,7 +47,7 @@
 (defvar org-show-original-tags-column org-tags-column "Save value so we can change back to it")
 
 (defvar *org-show-flyspell-mode* (when (boundp flyspell-mode)
-				   (flyspell-mode))
+				   flyspell-mode)
   "whether flyspell mode is enabled at beginning of show")
 
 (defvar *org-show-running* nil
@@ -61,7 +61,7 @@
   (let ((map (make-sparse-keymap)))
     (define-key map [next] 'org-show-next-slide)
     (define-key map [prior] 'org-show-previous-slide)
-    
+
     (define-key map [f5] 'org-show-start-slideshow)
     (define-key map [f6] 'org-show-execute-slide)
     (define-key map (kbd "C--") 'org-show-decrease-text-size)
@@ -104,7 +104,7 @@
     ;; we are leaving flyspell mode
     (when  *org-show-flyspell-mode*
       (flyspell-mode-on))
-    
+
     ;; close the show.
     (when *org-show-running*
        (org-show-stop-slideshow))))
@@ -119,7 +119,7 @@
   Hide all drawers."
   (interactive)
   (setq org-show-presentation-file (expand-file-name (buffer-name)))
-  (delete-other-windows)  
+  (delete-other-windows)
 
   ;; make sure nothing is folded. This seems to be necessary to
   ;; prevent an error on narrowing then trying to make latex fragments
@@ -141,10 +141,10 @@
      ;; view images if there is one. WE only do this this for the first one.
      ((and (goto-char (point-min))
            (re-search-forward "\\[\\[\\(.*\\.\\(jpg\\|gif\\|png\\)\\)" nil t))
-      
+
       (unless (file-exists-p "org-show-images")
 	(make-directory "org-show-images"))
-      
+
       (let* ((png-file (match-string 1))
 	     (temp-png (expand-file-name (concat "org-show-images/" (secure-hash 'sha1
 					    (with-temp-buffer
@@ -154,14 +154,14 @@
         (add-to-list 'org-show-temp-images temp-png)
 	(unless (file-exists-p temp-png)
 	  (copy-file png-file temp-png t))
-      
-	(split-window-right)      
-      
+
+	(split-window-right)
+
 	(other-window 1)
 	(find-file temp-png)
         (when org-show-mogrify-p
           (eimp-fit-image-width-to-window nil)))
-                  
+
       (other-window 1) ; back to slide
       (goto-char (point-min))
       (text-scale-set org-show-text-scale)
@@ -213,7 +213,7 @@
 
 (defun org-show-open-slide ()
  "Start show at this slide"
- (setq org-show-presentation-file (expand-file-name (buffer-name))) 
+ (setq org-show-presentation-file (expand-file-name (buffer-name)))
  (org-show-initialize)
  (let ((n (cdr (assoc (nth 4 (org-heading-components)) org-show-slide-titles))))
    (setq org-show-current-slide-number n)
@@ -227,23 +227,23 @@
   (setq  org-show-slide-titles '()
          org-show-temp-images '()
          org-show-slide-list '())
-     
+
   (let ((n 0))
     (org-map-entries
      (lambda ()
        (when (string-match-p ":slide:" (or (nth 5 (org-heading-components)) ""))
 	 (setq n (+ n 1))
-         
-	 (add-to-list 'org-show-slide-titles 
+
+	 (add-to-list 'org-show-slide-titles
 		      (cons (nth 4 (org-heading-components)) n) t)
 
-	 (add-to-list 'org-show-slide-list 
+	 (add-to-list 'org-show-slide-list
 		      (cons n (set-marker (make-marker) (point))) t))))))
 
 (defun org-show-start-slideshow ()
   "Start the slide show, at the beginning"
   (interactive)
-    
+
   (setq *org-show-running* t)
   (setq org-show-presentation-file (expand-file-name (buffer-name)))
   (beginning-of-buffer)
@@ -279,7 +279,7 @@
   (mapcar (lambda (x)
 	    (let ((bname (file-name-nondirectory x)))
 	      (when (get-buffer bname)
-                (set-buffer bname) 
+                (set-buffer bname)
                 (save-buffer)
 		(kill-buffer bname)))
 
@@ -333,13 +333,13 @@
 		  (car x)
 		  (nth 4 (org-heading-components))) t))
 	      org-show-slide-list))
-    
+
     (switch-to-buffer "*List of Slides*")
     (org-mode)
     (erase-buffer)
-    
+
     (insert (mapconcat 'identity links ""))
-  
+
     ;(setq buffer-read-only t)
     (use-local-map (copy-keymap org-mode-map))
     (local-set-key "q" #'(lambda () (interactive) (kill-buffer)))))
@@ -355,7 +355,7 @@
   (text-scale-set 6)
   (let* ((vpos (/ (- 20
 		     1 ;; For the mode-line
-		     (1- (length strings)) 
+		     (1- (length strings))
 		     (length strings))
 		  2))
 	 (width 43)
