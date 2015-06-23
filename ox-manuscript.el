@@ -449,16 +449,16 @@ pdf."
   (ox-manuscript-cleanup 'deep)
 
   ;; insert bibliography if needed
-  (save-excursion
-    (beginning-of-buffer)
-    (unless (re-search-forward "^bibliography:" nil t)
-      (end-of-buffer)
-      (insert
-       (format
-	"\n\nbibliography:%s"
-	(mapconcat (lambda (x)
-		     (file-relative-name x (file-name-directory (buffer-file-name))))
-		   org-ref-default-bibliography ",")))))
+  ;; (save-excursion
+  ;;   (beginning-of-buffer)
+  ;;   (unless (re-search-forward "^bibliography:" nil t)
+  ;;     (end-of-buffer)
+  ;;     (insert
+  ;;      (format
+  ;;	"\n\nbibliography:%s"
+  ;;	(mapconcat (lambda (x)
+  ;;		     (file-relative-name x (file-name-directory (buffer-file-name))))
+  ;;		   org-ref-default-bibliography ",")))))
   (save-buffer)
   (prog1
       (org-latex-export-to-pdf async subtreep visible-only body-only options)
@@ -616,6 +616,34 @@ for submission, e.g. it was created from
 		     (expand-file-name tex-file tex-archive))
 		    ".pdf"))))
 
+
+(defun ox-manuscript-build-with-comments (&optional async subtreep visible-only body-only options)
+  "Builds a manuscript with comments.
+This assumes you use `org-comment' and have it setup to use todonotes.
+(setq org-comment-latex-export-function 'org-comment-export-latex-todonote)
+
+This function modifies the exported LaTeX so you do not have to
+put the packages in the org file.
+"
+  (interactive)
+  (let* ((tex-file (org-latex-export-to-latex async subtreep visible-only body-only options))
+	 (tex-contents (with-temp-buffer
+			 (insert-file-contents tex-file)
+			 (buffer-string))))
+    (with-temp-file tex-file
+      (insert tex-contents)
+      (goto-char (point-min))
+      (re-search-forward "\\\\begin{document}")
+      (insert "
+\\presetkeys{todonotes}{fancyline, color=blue!30}{}
+\\todotoc
+\\listoftodos")
+      (re-search-backward "\\\\begin{document}")
+      (backward-char)
+      (end-of-line)
+      (insert "\\usepackage[colorinlistoftodos]{todonotes}")))
+  (org-open-file  (ox-manuscript-build)))
+
 ;; * The backend options
 (org-export-define-derived-backend 'cmu-manuscript 'latex
   :menu-entry
@@ -625,9 +653,14 @@ for submission, e.g. it was created from
 	(?p "As manuscript PDF file" ox-manuscript-export-and-build)
 	(?o "As manuscript PDF and open" ox-manuscript-export-and-build-and-open)
 	(?e "As PDF and email" ox-manuscript-export-and-build-and-email)
-	(?s "As submission manuscript tex" ox-manuscript-export-submission-manuscript)
-	(?M "As submission manuscript pdf" ox-manuscript-build-submission-manuscript)
-	(?m "As submission manuscript pdf and open" ox-manuscript-build-submission-manuscript-and-open)
+	(?s "As submission manuscript tex"
+	    ox-manuscript-export-submission-manuscript)
+	(?M "As submission manuscript pdf"
+	    ox-manuscript-build-submission-manuscript)
+	(?m "As submission manuscript pdf and open"
+	    ox-manuscript-build-submission-manuscript-and-open)
+	(?c "As manuscript PDF with comments"
+	    ox-manuscript-build-with-comments)
 	(?a "As submission archive" ox-manuscript-make-submission-archive))))
 
 (provide 'ox-manuscript)
