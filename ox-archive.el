@@ -41,8 +41,7 @@
 
 All references to files will be copied to the archive. Directories are not copied."
   (interactive "sZip basename (no extension): ")
-  (let* (
-	 (org-file (buffer-name))
+  (let* ((org-file (buffer-name))
 	 (org-file-abs-path (buffer-file-name))
 	 (base-name (file-name-sans-extension org-file))
 	 ;; directory to save all exports in, using the current date
@@ -54,8 +53,7 @@ All references to files will be copied to the archive. Directories are not copie
 	    zip-base-name))
 	 ;; Name of the zip file we will use.
 	 (org-archive-zip (concat org-archive ".zip"))
-	 link-list
-	 )
+	 link-list)
 
     ;; delete zip file if it exists
     (when (file-exists-p org-archive-zip)
@@ -83,7 +81,8 @@ All references to files will be copied to the archive. Directories are not copie
 		       (temporary-file-directory org-archive)
 		       (new-file)
 		       )
-		  (message (format "%s %s" path (file-directory-p path)))
+		  (message (format "path:%s is-dir:%s" path (file-directory-p path)))
+		  (message (format "type:%s content:%s" type content))
 		  (cond
 		   ;; regular file with content
 		   ((and (string= type "file")  content)
@@ -126,8 +125,8 @@ All references to files will be copied to the archive. Directories are not copie
 	(message "handing link %s: %s\n" counter text)
 	;; get the nth link from our list
 	(let ((link (nth counter link-list)))
-	  (message "  %s replacement is %s\n" counter link)
-	  (if (not (string= link "nil"))
+	  (message "  %s replacement is %S\n" counter link)
+	  (if (and link (not (string= link "nil")))
 	      (progn
 		(message "  replacing with %s\n\n" (format "%s" link))
 		;; replace output with our modified content
@@ -145,20 +144,19 @@ All references to files will be copied to the archive. Directories are not copie
 		    org-file-abs-path
 		    (format-time-string "%Y-%m-%d" (current-time))))
 
-    ;; add bibliography references if they exist.
-    (org-ref-extract-bibtex-entries)
-
     ;; write file to temporary directory
     (write-file (expand-file-name org-file org-archive))
 
+    ;; add bibliography references if they exist.
+    (org-ref-extract-bibtex-entries)
+    (save-buffer)
     ;; zip contents into a zip file
     (shell-command (concat "zip -v -r " org-archive-zip " *"))
-    ;;(message "\n\n ------    %s\n\n" (buffer-file-name))
+
     ;; move the zip archive up a level
     (rename-file org-archive-zip (concat "../"org-archive ".zip"))
-    ;(kill-buffer)
+    (kill-buffer)
 
-    (switch-to-buffer org-file)
     ;; get rid of temp-dir
     (delete-directory org-archive t)
     org-archive-zip))
