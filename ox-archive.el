@@ -29,7 +29,7 @@
 ;;
 ;; (ox-archive-create-zip) will create a zip file with the basename of
 ;; the org-file and the tag provided.
-;;  
+;;
 ;; (ox-archive-create-and-mail) creates the zip file and attaches it
 ;; to an email.
 ;;
@@ -37,7 +37,7 @@
 ;; on Linux.
 
 (defun ox-archive-create-zip (&optional zip-base-name)
-  "create a zip archive from the current org-file. You provide the basename for the zip file (do not includ the extension).
+  "create a zip archive from the current org-file. You provide the basename for the zip file (do not include the extension).
 
 All references to files will be copied to the archive. Directories are not copied."
   (interactive "sZip basename (no extension): ")
@@ -46,34 +46,34 @@ All references to files will be copied to the archive. Directories are not copie
 	 (org-file-abs-path (buffer-file-name))
 	 (base-name (file-name-sans-extension org-file))
 	 ;; directory to save all exports in, using the current date
-	 (org-archive 
+	 (org-archive
 	  (if (string= zip-base-name "")
 	      (concat base-name
-		      "-" 
+		      "-"
 		      (format-time-string "%Y-%m-%d" (current-time)))
 	    zip-base-name))
 	 ;; Name of the zip file we will use.
 	 (org-archive-zip (concat org-archive ".zip"))
 	 link-list
 	 )
-    
+
     ;; delete zip file if it exists
     (when (file-exists-p org-archive-zip)
       (delete-file org-archive-zip))
 
     ;; delete the directory if it exists
-    (when (file-exists-p org-archive) 
+    (when (file-exists-p org-archive)
       (delete-directory org-archive t))
 
     ;; make directory
     (make-directory org-archive t)
 
     ;; get list of links, copy files and save names
-    (setq link-list 
+    (setq link-list
 	  (let ((parsetree (org-element-parse-buffer))
 		(counter 0))
 	    (org-element-map parsetree 'link
-	      (lambda (link) 
+	      (lambda (link)
 		(let* ((type (nth 0 link))
 		       (plist (nth 1 link))
 		       (content (nth 2 link))
@@ -82,20 +82,20 @@ All references to files will be copied to the archive. Directories are not copie
 		       (fname (car (last (split-string path "/"))))
 		       (temporary-file-directory org-archive)
 		       (new-file)
-		       )     
+		       )
 		  (message (format "%s %s" path (file-directory-p path)))
 		  (cond
 		   ;; regular file with content
 		   ((and (string= type "file")  content)
 		    ;; replace links to directories
-		    
+
 		    (if (file-directory-p path)
-			(progn	
+			(progn
 			  (let ((tmpdir (make-temp-file (file-name-directory path) t "-test")))
 			    (copy-directory path tmpdir t nil nil)
 			    (format "[[./%s/%s][%s]]" (file-name-nondirectory tmpdir) fname content)))
 		      ;; else a regular file
-		      (setq new-file  (make-temp-file (file-name-sans-extension fname) nil 
+		      (setq new-file  (make-temp-file (file-name-sans-extension fname) nil
 						      (concat "." (file-name-extension fname))))
 		      (with-temp-file new-file
 			(insert-file-contents path))
@@ -104,12 +104,12 @@ All references to files will be copied to the archive. Directories are not copie
 		   ;; regular file with no content
 		   ((and (string= type "file"))
 		    (if (file-directory-p path)
-			(progn	
+			(progn
 			  (let ((tmpdir (make-temp-file (file-name-directory path) t "-test")))
 			    (copy-directory path tmpdir t nil nil)
 			    (format "[[./%s/%s]]" (file-name-nondirectory tmpdir) fname)))
 		      ;; else a regular file
-		      (setq new-file  (make-temp-file (file-name-sans-extension fname) nil 
+		      (setq new-file  (make-temp-file (file-name-sans-extension fname) nil
 						      (concat "." (file-name-extension fname))))
 		      (with-temp-file new-file
 			(insert-file-contents path))
@@ -127,7 +127,7 @@ All references to files will be copied to the archive. Directories are not copie
 	;; get the nth link from our list
 	(let ((link (nth counter link-list)))
 	  (message "  %s replacement is %s\n" counter link)
-	  (if (not (string= link "nil")) 
+	  (if (not (string= link "nil"))
 	      (progn
 		(message "  replacing with %s\n\n" (format "%s" link))
 		;; replace output with our modified content
@@ -136,16 +136,16 @@ All references to files will be copied to the archive. Directories are not copie
 	    (setq output (format "%s" text)))
 	  (setq counter (+ counter 1))
 	  output))
-      
+
       (let ((org-export-filter-link-functions '(ox-mrkup-filter-link)))
 	(org-org-export-as-org)))
-    
+
     (switch-to-buffer "*Org ORG Export*")
     (insert (format "# archived from %s on %s\n"
 		    org-file-abs-path
 		    (format-time-string "%Y-%m-%d" (current-time))))
 
-    ;; add bibliography references if they exist. 
+    ;; add bibliography references if they exist.
     (org-ref-extract-bibtex-entries)
 
     ;; write file to temporary directory
@@ -161,7 +161,7 @@ All references to files will be copied to the archive. Directories are not copie
     (switch-to-buffer org-file)
     ;; get rid of temp-dir
     (delete-directory org-archive t)
-    org-archive-zip))  
+    org-archive-zip))
 
 (defun ox-archive-create-and-mail (&optional tag)
   "create a zip file from current org-file and attach it to an email"
