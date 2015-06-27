@@ -258,6 +258,59 @@ Suggestions: %s
 ;; #+END_SRC
 
 ;; ** Search functions for Mac
+(defvar words-voice "Vicki"
+  "Mac voice to use for speaking.")
+
+(defun words-speak (&optional text)
+  "Speak word at point or region. Mac only."
+  (interactive)
+  (unless text
+    (setq text (if (use-region-p)
+		   (buffer-substring
+		    (region-beginning) (region-end))
+		 (thing-at-point 'word))))
+  ;; escape some special applescript chars
+  (setq text (replace-regexp-in-string "\\\\" "\\\\\\\\" text))
+  (setq text (replace-regexp-in-string "\"" "\\\\\"" text))
+  (do-applescript
+   (format
+    "say \"%s\" using \"%s\""
+    text
+    words-voice)))
+
+(defvar words-languages
+  '()
+  "List of cons cells (language . code)")
+
+(setq words-languages  '(("German" . "de")
+			 ("Italian" . "it")
+			 ("Chinese" . "zh")
+			 ("Spanish" . "es")))
+
+(defun words-translate (to-language)
+  "Translate word at point or selection TO-LANGUAGE.
+http://mymemory.translated.net
+TO-LANGUAGE is the code, see http://www.iana.org/assignments/language-subtag-registry/language-subtag-registry.
+Assumes selected code is in English."
+  (interactive
+   (list
+    (ido-completing-read
+     "Language: "
+     (mapcar 'car words-languages) nil t)))
+  (let* ((text (if (use-region-p)
+		   (buffer-substring
+		    (region-beginning)
+		    (region-end))
+		 (thing-at-point 'word)))
+	 (url (format "http://mymemory.translated.net/api/get?q=%s!&langpair=en|%s"
+		      text
+		      (cdr (assoc to-language words-languages))))
+	 (json (with-current-buffer
+		   (url-retrieve-synchronously url)
+		 (json-read-from-string
+		  (buffer-substring url-http-end-of-headers (point-max))))))
+	 (message "Translation: %s"
+	  (cdr (assoc 'translatedText (cdr (assoc 'responseData json)))))))
 
 ;; #+BEGIN_SRC emacs-lisp
 (defun words-mdfind ()
@@ -326,7 +379,8 @@ end tell")))
     ("m" "dfind" words-mdfind)
     ("G" "google-scholar" words-google-scholar)
     ("S" "spell/grammar" words-atd)
-    ("w" "twitter" words-twitter)))
+    ("w" "twitter" words-twitter)
+    ("T" "alk" words-speak)))
 
 
 (defun words ()
@@ -378,6 +432,7 @@ end tell")))
    ("b" words-bibtex "bibtex")
    ("f" words-finder "Mac Finder")
    ("m" words-mdfind "mdfind")
+   ("k" words-speak "Speak")
    ("q" nil "cancel")))
 ;; #+END_SRC
 
