@@ -282,6 +282,11 @@ Suggestions: %s
   '()
   "List of cons cells (language . code)")
 
+(defvar words-speakers
+  '(("German" . "Anna")
+    ("Chinese" . "Ting-Ting"))
+  "Speakers for different languages")
+
 (setq words-languages  '(("German" . "de")
 			 ("Italian" . "it")
 			 ("Chinese" . "zh")
@@ -309,8 +314,13 @@ Assumes selected code is in English."
 		   (url-retrieve-synchronously url)
 		 (json-read-from-string
 		  (buffer-substring url-http-end-of-headers (point-max))))))
-	 (message "Translation: %s"
-	  (cdr (assoc 'translatedText (cdr (assoc 'responseData json)))))))
+    (let ((words-voice (or (cdr (assoc to-language words-speakers))
+			   "Vicki")))
+      (words-speak
+       (cdr (assoc 'translatedText (cdr (assoc 'responseData json))))))
+
+    (message "Translation: %s"
+	     (cdr (assoc 'translatedText (cdr (assoc 'responseData json)))))))
 
 ;; #+BEGIN_SRC emacs-lisp
 (defun words-mdfind ()
@@ -433,6 +443,7 @@ end tell")))
    ("f" words-finder "Mac Finder")
    ("m" words-mdfind "mdfind")
    ("k" words-speak "Speak")
+   ("r" words-translate "Translate")
    ("q" nil "cancel")))
 ;; #+END_SRC
 
