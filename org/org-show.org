@@ -139,7 +139,7 @@ Write some code to generate it, and put it in an emacs-lisp-slide block. org-sho
 #+END_SRC
 ** Code blocks should be runnable and editable                        :slide:
 
-#+BEGIN_SRC python
+#+BEGIN_SRC python results: output
 print 6 + 62
 #+END_SRC
 
