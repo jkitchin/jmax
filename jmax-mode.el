@@ -87,10 +87,10 @@ one and open it."
   '("Jmax"
     [(format "Update (-%s)" (kg-get-num-incoming-changes)) kg-update t]
     ("email"
-    ["email region" email-region t]
-    ["email org-mode heading" email-heading t]
-    ["email org-mode as PDF" ox-manuscript-export-and-build-and-email t]
-    ["email org-archive" ox-archive-create-and-mail t])
+     ["email region" email-region t]
+     ["email org-mode heading" email-heading t]
+     ["email org-mode as PDF" ox-manuscript-export-and-build-and-email t]
+     ["email org-archive" ox-archive-create-and-mail t])
     ("org-mode"
      ["Toggle symbols" org-toggle-pretty-entities t]
      ["Toggle inline images" org-toggle-inline-images t]
@@ -124,6 +124,25 @@ one and open it."
      ["  sort bibtex file" bibtex-sort-buffer (eq major-mode 'bibtex-mode)]
      ["  build bibliography pdf from bib file" org-ref-build-full-bibliography (eq major-mode 'bibtex-mode)]
      )
+    ("doi-utils"
+     ["Insert bibtex entry from doi" doi-utils-add-bibtex-entry-from-doi t]
+     ["Insert bibtex entry from crossref" doi-utils-add-entry-from-crossref-query t]
+     )
+    ("words"
+     ["Menu" words t]
+     ["Web of Knowledge" wos t]
+     ["Scopus" scopus t]
+     ["Pubmed" pubmed t]
+     ["Crossref" crossref t]
+     ["Lookup in Google" words-google t]
+     ["Lookup in Twitter" words-twitter t]
+     ["Lookup in WOS" words-wos t]
+     ["Lookup in Scopus" words-scopus t]
+     ["Lookup in Pubmed" words-pubmed t]
+     ["Lookup in Crossref" words-crossref t]
+     ["Lookup in Arxiv" words-arxiv]
+     ["Lookup in Dictionary" words-dictionary t]
+     ["Lookup in Thesaurus" words-thesaurus t])
     ["Customize user.el" jmax-customize-user t]))
 
 
