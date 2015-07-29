@@ -1,0 +1,342 @@
+# this is a list of keywords to highlight in python-keyword-mode
+# Each headline is the keyword, and has a property of :python: which is used to access pydoc information
+# The contents of the heading are shown as a tooltip.
+* trapz
+  :PROPERTIES:
+  :python:   numpy.trapz
+  :END:
+integral = np.trapz(y, x)
+
+* fsolve
+  :PROPERTIES:
+  :python:   scipy.optimize.fsolve
+  :END:
+ans, = fsolve(func, guess) # note the comma after ans. That "unpacks" the array
+sol, info, ier, message = fsolve(objective, 0.5, full_output=True)
+
+# args passed to objective function
+
+def objective(x, arg):
+
+fsolve(objective, ig, args=(1.0,))
+* root
+  :PROPERTIES:
+  :python:   scipy.optimize.root
+  :END:
+
+* odeint
+  :PROPERTIES:
+  :python:   scipy.integrate.odeint
+  :END:
+
+tspan = np.linspace(0, 1)  # hours
+sol = odeint(ode, Ca0,  tspan)
+sol, infodict = odeint(dydx, y0, xspan, full_output=True)
+
+# multiple equations
+def batch(C, t):
+    Ca, Cb = C
+    return [dCadt, dCbdt]
+
+init = [CA0, 0.0] # initial conditions
+tspan = np.linspace(0, 30) # min
+sol = odeint(batch, init, tspan)
+
+* fmin
+  :PROPERTIES:
+  :python:   scipy.optimize.fmin
+  :END:
+from scipy.optimize import fmin
+
+xi_guess = 0.03
+sol, = fmin(G_tot, xi_guess)
+
+* fmin_slsqp
+  :PROPERTIES:
+  :python:   scipy.optimize.fmin_slsqp
+  :END:
+Aeq = np.array([[ 1,    0,    1,    0],  # C balance
+                [ 1,    1,    2,    0],  # O balance
+                [ 0,    2,    0,    2]]) # H balance
+
+# equimolar feed of 1 mol H2O and 1 mol CO
+beq = np.array([1,  # mol C fed
+                2,  # mol O fed
+                2]) # mol H fed
+
+def ec1(nj):
+    'conservation of atoms constraint'
+    return np.dot(Aeq, nj) - beq
+
+from scipy.optimize import fmin_slsqp
+n0 = [0.5, 0.5, 0.5, 0.5]  # initial guesses
+N = fmin_slsqp(func, n0, f_eqcons=ec1)
+* linspace
+  :PROPERTIES:
+  :python:   numpy.linspace
+  :END:
+
+a = np.linspace(a, b)
+
+* logspace
+  :PROPERTIES:
+  :python:   numpy.logspace
+  :END:
+20 points from 10e-2 to 10e2
+
+np.logspace(-2, 2, 20)
+
+* xlabel
+  :PROPERTIES:
+  :python:   matplotlib.pyplot.xlabel
+  :END:
+
+plt.xlabel('some string')
+
+* ylabel
+  :PROPERTIES:
+  :python:   matplotlib.pyplot.ylabel
+  :END:
+
+plt.ylabel('some string')
+
+* legend
+  :PROPERTIES:
+  :python:   matplotlib.pyplot.legend
+  :END:
+
+plt.legend()
+plt.legend(['a', 'b'])
+
+* plot
+  :PROPERTIES:
+  :python:   matplotlib.pyplot.plot
+  :END:
+
+plt.plot(x, y)
+plt.plot(x, y, 'r-')  # with a red line
+plt.plot(x, y, label='legend string')
+
+* savefig
+  :PROPERTIES:
+  :python:   matplotlib.pyplot.savefig
+  :END:
+
+plt.savefig('image-name.png')
+
+* tight_layout
+  :PROPERTIES:
+  :python:   matplotlib.pyplot.tight_layout
+  :END:
+plt.tight_layout()
+Usually makes the figure fit nicely.
+* subplot
+  :PROPERTIES:
+  :python:   matplotlib.pyplot.subplot
+  :END:
+plt.subplot(rows, columns, plotnumber)
+
+* xlim
+  :PROPERTIES:
+  :python:   matplotlib.pyplot.xlim
+  :END:
+Set x-limit
+plt.xlim([0, 2])
+
+* ylim
+  :PROPERTIES:
+  :python:   matplotlib.pyplot.ylim
+  :END:
+set y-limits
+plt.ylim([0, 2])
+
+* odelay
+  :PROPERTIES:
+  :python:   pycse.odelay
+  :END:
+
+def event(F, V):
+    value = F - 0.2
+    isterminal = True
+    direction = 0
+    return value, isterminal, direction
+
+x, sol, TE, YE, IE = odelay(dFdx, F0, xspan, [event])
+
+* format
+  :PROPERTIES:
+  :python:   format
+  :END:
+
+s = 'an integer: {0}'.format(5)
+
+#+BEGIN_SRC python
+print('a float with 2 decimals: {0:1.2f}'.format(5))
+#+END_SRC
+
+#+RESULTS:
+: a float with 2 decimals: 5.00
+
+* dot
+  :PROPERTIES:
+  :python:   numpy.dot
+  :END:
+
+np.dot(A, B)
+
+* array
+  :PROPERTIES:
+  :python:   numpy.array
+  :END:
+
+a = np.array(some_list)
+a.T # transpose the array
+
+* vectorize
+  :PROPERTIES:
+  :python:   numpy.vectorize
+  :END:
+
+"Vectorizes a function so it works element-wise on a list/array"
+
+@np.vectorize
+def func():
+* prod
+  :PROPERTIES:
+  :python:   numpy.prod
+  :END:
+K = np.prod(yj**nuj)
+* sum
+  :PROPERTIES:
+  :python:   numpy.sum
+  :END:
+np.sum(nj)
+
+* enumerate
+  :PROPERTIES:
+  :python:   enumerate
+  :END:
+provide index and value from an iterable item.
+
+for i, Fi0 in enumerate([1.0, 0.1, 0.0]):
+
+* zip
+  :PROPERTIES:
+  :python:   zip
+  :END:
+return list of tuples with an element from each list
+
+zip(species, exitC)
+
+* inv
+  :PROPERTIES:
+  :python:   numpy.linalg.inv
+  :END:
+Inverse of an array
+
+np.linalg.inv(XTX)
+
+* column_stack
+  :PROPERTIES:
+  :python:   numpy.column_stack
+  :END:
+
+X = np.column_stack([x, x**0])
+
+* regress
+  :PROPERTIES:
+  :python:   pycse.regress
+  :END:
+alpha = 1 - 0.95
+p, pint, se = regress(X, y, alpha)
+
+* deriv
+  :PROPERTIES:
+  :python:   pycse.deriv
+  :END:
+
+dydx = deriv(x, y)
+
+* polyfit
+  :PROPERTIES:
+  :python:   numpy.polyfit
+  :END:
+pCa = np.polyfit(t, Ca, 4)
+np.polyder(pCa)
+
+* polyder
+  :PROPERTIES:
+  :python:   numpy.polyder
+  :END:
+pCa = np.polyfit(t, Ca, 4)
+* polyval
+  :PROPERTIES:
+  :python:   numpy.polyval
+  :END:
+pCa = np.polyfit(t, Ca, 4)
+fCa = np.polyval(pCa, t)
+
+* curve_fit
+  :PROPERTIES:
+  :python:   scipy.optimize.curve_fit
+  :END:
+from scipy.optimize import curve_fit
+
+x = np.array([0.5, 0.387, 0.24, 0.136, 0.04, 0.011])
+y = np.array([1.255, 1.25, 1.189, 1.124, 0.783, 0.402])
+
+# this is the function we want to fit to our data
+def func(x, a, b):
+    'nonlinear function in a and b to fit to data'
+    return a * x / (b + x)
+
+initial_guess = [1.2, 0.03]
+
+pars, pcov = curve_fit(func, x, y, p0=initial_guess)
+
+* nlinfit
+  :PROPERTIES:
+  :python:   pycse.nlinfit
+  :END:
+from pycse import nlinfit
+
+x = np.array([0.5, 0.387, 0.24, 0.136, 0.04, 0.011])
+y = np.array([1.255, 1.25, 1.189, 1.124, 0.783, 0.402])
+
+
+def func(x, a, b):
+    'nonlinear function in a and b to fit to data'
+    return a * x / (b + x)
+
+initial_guess = [1.2, 0.03]
+alpha = 0.05
+pars, pint, se = nlinfit(func, x, y, initial_guess, alpha)
+
+* BVP_nl
+  :PROPERTIES:
+  :python:   pycse.BVP_nl
+  :END:
+
+CBAR = BVP_nl(F, RBAR, BCS, init)
+* scipy.optimize
+  :PROPERTIES:
+  :python:   scipy.optimize
+  :END:
+The optimization package in scipy. Contains fmin, fsolve and others.
+* scipy.integrate
+  :PROPERTIES:
+  :python:   scipy.integrate
+  :END:
+The ode integration package in scipy
+
+* matplotlib.pyplot
+  :PROPERTIES:
+  :python:   matplotlib.pyplot
+  :END:
+The scripting interface to matplotlib. Sort of like Matlab.
+
+* pycse
+  :PROPERTIES:
+  :python:   pycse
+  :END:
+The python computations in Science and engineering package. Contains convenience functions like regression with confidence intervals and ode integration with events.
