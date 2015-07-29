@@ -139,7 +139,7 @@ Write some code to generate it, and put it in an emacs-lisp-slide block. org-sho
 #+END_SRC
 ** Code blocks should be runnable and editable                        :slide:
 
-#+BEGIN_SRC python
+#+BEGIN_SRC python results: output
 print 6 + 62
 #+END_SRC
 
@@ -332,14 +332,14 @@ That is the end!
 
 (defvar org-show-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map [next] 'org-show-next-slide)
-    (define-key map [prior] 'org-show-previous-slide)
+    (define-key map [next] 'org-show-next-slide) ;; [next] may be available using Fn-<down>
+    (define-key map [prior] 'org-show-previous-slide) ;; ;; [prior] may be available using Fn-<up>
     
     (define-key map [f5] 'org-show-start-slideshow)
     (define-key map [f6] 'org-show-execute-slide)
     (define-key map (kbd "C--") 'org-show-decrease-text-size)
     (define-key map (kbd "C-=") 'org-show-increase-text-size)
-    (define-key map (kbd "\e\eg") 'org-show-goto-slide)
+    (define-key map (kbd "\e\eg") 'org-show-goto-slide) ;; \e\e corresponds to ESC-Meta key-chord
     (define-key map (kbd "\e\et") 'org-show-toc)
     (define-key map (kbd "\e\eq") 'org-show-stop-slideshow)
     map)
