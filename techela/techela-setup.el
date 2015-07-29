@@ -39,13 +39,13 @@ DATA should be obtained and modified from `tq-config-read-data'."
 
 (defun tq-config-get-user-courses ()
   "Get a list of available courses."
-  '("s15-06640" "f14-06625"))
+  '("f15-06625"))
 
 
 (defun tq-config-get-admin-courses ()
   "Returns a list of course names.
 For now they are hard-coded. One day this will be dynamic."
-  '("s15-06640" "f14-06625"))
+  '("f15-06625" "s15-06640" "f14-06625"))
 
 
 (defun ta-setup-user ()
@@ -197,8 +197,7 @@ exec ssh -F \"%s\" -o \"BatchMode yes\" \"$@\"
 		(buffer-string)))
       (delete-file "SYSTEM-INFO")
       (message-send-and-exit)
-      (message "Your techela key has been sent to the course instructor. It is saved in ~/techela/%s/%s and ~/techela/%s/%s.pub. Do not delete these, as they give you access to the class. Please wait for a reply with further directions." tq-current-course tq-userid tq-current-course tq-userid)))
-    )
+(message "Your techela key has been sent to the course instructor. It is saved in ~/techela/%s/%s and ~/techela/%s/%s.pub. Do not delete these, as they give you access to the class. Please wait for a reply with further directions." tq-current-course tq-userid tq-current-course tq-userid))))
 
 (defun ta-describe ()
   "Open a buffer with information about the setup for techela."

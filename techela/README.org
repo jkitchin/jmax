@@ -42,6 +42,8 @@ WARNING: /home/s15-06640/.ssh/authorized_keys missing; creating a new one
 Create a directory somewhere on your remote machine where you want the course to live. Then, clone the admin repo into it.
 
 #+BEGIN_SRC sh
+mkdir /path/to/course
+cd /path/to/course
 git clone course-name@techela.cheme.cmu.edu:gitolite-admin
 #+END_SRC
 
@@ -54,26 +56,65 @@ Go ahead and configure git if you have not already done so.
 Now, we create the course repo. This is the repo that all students will have access to. We define the @instructors team
 
 
-Add this to gitolite.conf.
+Add this to gitolite-admin/conf/gitolite.conf.
 
 #+BEGIN_EXAMPLE
-@instructors = jkitchin mehakc
+repo gitolite-admin
+    RW+     =   jkitchin-admin
 
-repo course
-    RW+ = jkitchin
-    RW = @instructors
-    R = @students
-
+@instructors = jkitchin irems hthirumai
 # file containing all student usernames
 include "students.conf"
 
-# we create a single file for each student repo
-include "repos/*.conf"
+repo @all
+    RW+ = jkitchin
+    RW = @instructors
+
+# public course for students
+repo course
+    RW+ = jkitchin
+    RW = @instructors
+    R = @students daemon
+
+# we create a single file for each student repo.
+# the repos are grouped in the student-work directory.
+include "student-work/*/*.conf"
+
+# enable convenient creation of assignment repos. I can just clone
+# these to make it work. When you push to these, they are readable to
+# the students. This might be problematic if they clone them to
+# early. They will have to pull again. But it makes it trivial to
+# create the assignments without getting into the conf file.
+#
+# git clone f15-06625@techela.cheme.cmu.edu:assignments/label
+#
+# automatically creates the repo. To give students read access, run
+# this command.
+#
+# ssh f15-06625@techela.cheme.cmu.edu perms assignments/label + READERS @students
+repo assignments/[a-z].*
+    C = jkitchin
+    RW+ = jkitchin
+    R = READERS
+
+# wild-repo for the solutions
+#
+# git clone f15-06625@techela.cheme.cmu.edu:solutions/label
+#
+# to add read permission
+# ssh f15-06625@techela.cheme.cmu.edu perms solutions/label + READERS @students
+# to remove read permission
+# ssh f15-06625@techela.cheme.cmu.edu perms solutions/label - READERS @students
+repo solutions/[a-z].*
+    C = jkitchin
+    RW+ = jkitchin
+    R = READERS
 #+END_EXAMPLE
 
+Now, we create a non-empty directory so we can commit it, and touch the students.conf file.
 #+BEGIN_SRC sh
-mkdir repos
-touch repos/README
+mkdir student-work
+touch student-work/README
 echo "student repo conf files go here" >> repos/README
 
 touch students.conf
@@ -182,7 +223,7 @@ Add this to your xinet.d directory
 [2015-01-11 Sun]
 I do not remember which of these I actually did. I am using a non-anonymous access right now.
 
-#+BEGIN_SRC txt
+#+BEGIN_SRC txt :tangle /etc/xinetd.d/git-daemon
 # default: off
 # description: The git dæmon allows git repositories to be exported using \
 #       the git:// protocol.
@@ -203,7 +244,7 @@ s  --syslog --verbose
 
 
 
-#+BEGIN_SRC text :tangle git
+#+BEGIN_SRC text :tangle /etc/xinetd.d/git
 # default: off
 # description: The git dæmon allows git repositories to be exported using \
 #       the git:// protocol.
