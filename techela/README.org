@@ -158,6 +158,7 @@ File containing registered students. This should be the datafile downloaded from
 
 This form takes me straight there for 06-625 in the fall. You have to enter your andrewid and password.
 
+[2015-07-29 Wed] this does not work in s3
 #+BEGIN_SRC text :tangle roster.html
 <HTML><HEAD><TITLE>06-625 Roster</TITLE></HEAD>
 <BODY onload="document.forms['foo'].submit();">
@@ -165,7 +166,7 @@ This form takes me straight there for 06-625 in the fall. You have to enter your
 <p><form name="foo"
 action="https://www.as.cmu.edu/fio/proc.formproc"
 method="post" <br />
-<input type="hidden" name="VAR1" value="Fall 2014, 06625 A, CHMCL & REACTV SYSTM"><br />
+<input type="hidden" name="VAR1" value="Fall 2015, 06625 A, CHMCL & REACTV SYSTM"><br />
 <input type="hidden" name="ARGNUM" value=4>
 <input type="hidden" name="FUNCNAME" value="run_datafile">
 <input type="hidden" name="VAR2" value="screen"><br />
@@ -180,6 +181,9 @@ method="post" <br />
 (org-babel-tangle)
 (browse-url "roster.html")
 #+END_SRC
+
+#+RESULTS:
+: #<process open roster.html>
 
 When you change the roster, you need to run elisp:ta-update-roster which will automatically update students.conf, and roster.org
 
@@ -223,7 +227,8 @@ Add this to your xinet.d directory
 [2015-01-11 Sun]
 I do not remember which of these I actually did. I am using a non-anonymous access right now.
 
-#+BEGIN_SRC txt :tangle /etc/xinetd.d/git-daemon
+/etc/xinetd.d/git-daemon
+#+BEGIN_SRC txt
 # default: off
 # description: The git dæmon allows git repositories to be exported using \
 #       the git:// protocol.
@@ -243,8 +248,8 @@ s  --syslog --verbose
 #+END_SRC
 
 
-
-#+BEGIN_SRC text :tangle /etc/xinetd.d/git
+/etc/xinetd.d/git
+#+BEGIN_SRC text
 # default: off
 # description: The git dæmon allows git repositories to be exported using \
 #       the git:// protocol.
@@ -273,10 +278,19 @@ usermod -a -G org-course daemon
 
 And finally give the group read access to the course repository. Note that you have to give +x access to the parent directories.
 
+You need to open .gitolite.rc and change
+$REPO_UMASK = 0077;
+
+to
+
+$REPO_UMASK = 0022;
+
+Then, run these.
+
 #+BEGIN_SRC sh
 chmod g+x /home/org-course
 chmod g+x /home/org-course/repositories
-chmod -R g+rx /home/org-course/repositories/course.git
+chmod -R g+rX /home/org-course/repositories/course.git
 #+END_SRC
 
 * Running your course

@@ -14,6 +14,7 @@
 ;;
 
 (require 'json)
+(require 'python-keywords)
 
 ;;; Code:
 
