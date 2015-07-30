@@ -145,7 +145,7 @@ The user ssh.pub key must be registered in the course."
     (unless (and tq-course-directory (file-exists-p tq-course-directory))
       (let ((default-directory (file-name-as-directory tq-root-directory)))
 	;; this should work with anonymous access.
-	(shell-command "git clone f15-06625@techela.cheme.cmu.edu:course")))
+	(shell-command "git clone f15-06625@techela.cheme.cmu.edu:course"))))
 ;	(when (not (= 0 (car (mygit (format "git clone %s@%s:course"
 ;					    tq-current-course
 ;					    tq-git-server)))))
