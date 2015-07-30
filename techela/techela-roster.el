@@ -53,7 +53,10 @@ Use it like this:
     (insert
      (format
       "%15s missing  %s\n"
-      userid
+      (format "[[elisp:(progn (find-file \"%s\") (re-search-forward \"%s\")(show-subtree))][%s]]"
+	      (expand-file-name "roster.org" ta-gitolite-admin-dir)
+	      userid
+	      userid)
       (format "[[elisp:(progn (ta-email \"%s\")(message-goto-subject)(insert \"(%s) Missing ssh pub key\")(message-goto-body)(insert \"Dear %s,\\n\\nI need you to run M-x techela to generate and send my your ssh.pub key. Please see me or the TAs if you need help.\\n\\nThanks,\\nProfessor Kitchin\\n\"))][Email %s]]"
 	      userid
 	      ta-course-name (plist-get (cdr (assoc userid (ta-roster))) :name) userid)))))
