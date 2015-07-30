@@ -4,6 +4,7 @@
 ;;
 
 ;;; Code:
+(require 'button-lock)
 
 (defun get-python-keywords ()
   "Return data structure of python keywords from glossary."
