@@ -41,6 +41,14 @@ Use it like this:
     ta-gitolite-admin-dir)
    (file-exists-p (format "%s.pub" userid))))
 
+(defun ta-open-roster-to-user (userid)
+  "Open roster.org to USERID."
+  (interactive "sUserid: ")
+  (find-file (expand-file-name "roster.org" ta-gitolite-admin-dir))
+  (goto-char (point-min))
+  (re-search-forward userid)
+  (show-subtree))
+
 
 (defun ta-check-pub-keys ()
   "Generate a buffer showing which students we are missing ssh.pub keys."
@@ -53,8 +61,7 @@ Use it like this:
     (insert
      (format
       "%15s missing  %s\n"
-      (format "[[elisp:(progn (find-file \"%s\") (re-search-forward \"%s\")(show-subtree))][%s]]"
-	      (expand-file-name "roster.org" ta-gitolite-admin-dir)
+      (format "[[elisp:(ta-open-roster-to-user \"%s\")][%s]]"
 	      userid
 	      userid)
       (format "[[elisp:(progn (ta-email \"%s\")(message-goto-subject)(insert \"(%s) Missing ssh pub key\")(message-goto-body)(insert \"Dear %s,\\n\\nI need you to run M-x techela to generate and send my your ssh.pub key. Please see me or the TAs if you need help.\\n\\nThanks,\\nProfessor Kitchin\\n\"))][Email %s]]"
