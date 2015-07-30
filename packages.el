@@ -46,6 +46,7 @@
 	'use-package
 	'hydra 'key-chord
 	'git-timemachine
+	'button-lock
 	)
   "Libraries that should be installed by default.")
 
