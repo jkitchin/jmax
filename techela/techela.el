@@ -13,6 +13,9 @@
 (require 'techela-setup)
 (require 'techela-grade)
 
+(defvar tq-git-course "http://github.com/jkitchin/"
+  "The git server there the anonymous access course is served.")
+
 (defvar tq-git-server "techela.cheme.cmu.edu"
   "The git server where techela courses are served.")
 
@@ -144,10 +147,12 @@ The user ssh.pub key must be registered in the course."
     ;; do not clone if the directory exists.
     (unless (and tq-course-directory (file-exists-p tq-course-directory))
       (let ((default-directory (file-name-as-directory tq-root-directory)))
-	(when (not (= 0 (car (mygit (format "git clone %s@%s:course"
-					    tq-current-course
-					    tq-git-server)))))
-	  (error "Could not clone course. Try again later.")))))
+	(shell-command ("git clone %s/%s course" tq-git-course tq-current-course))
+	;; (when (not (= 0 (car (mygit (format "git clone %s@%s:course"
+	;;				    tq-current-course
+	;;				    tq-git-server)))))
+	;;   (error "Could not clone course. Try again later."))
+	)))
 
   ;; let user know if an update is needed
   (with-current-directory
