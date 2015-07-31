@@ -147,7 +147,9 @@ The user ssh.pub key must be registered in the course."
     ;; do not clone if the directory exists.
     (unless (and tq-course-directory (file-exists-p tq-course-directory))
       (let ((default-directory (file-name-as-directory tq-root-directory)))
-	(shell-command ("git clone %s/%s course" tq-git-course tq-current-course))
+	(shell-command (format
+			"git clone %s/%s course"
+			tq-git-course tq-current-course))
 	;; (when (not (= 0 (car (mygit (format "git clone %s@%s:course"
 	;;				    tq-current-course
 	;;				    tq-git-server)))))
