@@ -20,7 +20,7 @@
     (message-goto-to)))
 
 (defun email-buffer ()
-  "Send region as the body of an email."
+  "Send buffer as the body of an email."
   (interactive)
   (let ((content (buffer-string)))
     (compose-mail)
