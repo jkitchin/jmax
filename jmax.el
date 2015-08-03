@@ -173,11 +173,11 @@
       (setq ido-vertical-define-keys 'C-n-C-p-up-down-left-right)))
 
 ;; * smex, remember recently and most frequently used commands
-(require 'smex)
-(setq smex-save-file (expand-file-name "user/.smex-items" starter-kit-dir))
-(smex-initialize)
-(global-set-key (kbd "M-x") 'smex)
-(global-set-key (kbd "M-X") 'smex-major-mode-commands)
+;; (require 'smex)
+;; (setq smex-save-file (expand-file-name "user/.smex-items" starter-kit-dir))
+;; (smex-initialize)
+;; (global-set-key (kbd "M-x") 'smex)
+;; (global-set-key (kbd "M-X") 'smex-major-mode-commands)
 
 
 ;; * Helm
