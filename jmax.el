@@ -183,6 +183,7 @@
 ;; * Helm
 ;; http://tuhdo.github.io/helm-intro.html
 (require 'helm)
+(setq helm-command-prefix-key "C-c h")
 (require 'helm-config)
 (require 'helm-eshell)
 (require 'helm-files)
