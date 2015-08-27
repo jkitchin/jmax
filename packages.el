@@ -16,7 +16,7 @@
 
 ;; we need this specific version of highlight-indentation. This is a little
 ;; hackery to make sure we get the version from the elpy repo.
-(unless (file-directory-p (expand-file-name "elpa/highlight-indentation-0.5.0" starter-kit-dir))
+(unless (file-directory-p (expand-file-name "elpa/highlight-indentation-0.6.0" starter-kit-dir))
   (let ((package-archives '(("elpy" . "http://jorgenschaefer.github.io/packages/"))))
     (package-initialize)
     (package-refresh-contents)
