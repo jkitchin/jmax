@@ -3,7 +3,7 @@
 
 * Introduction
 
-Techela is a framework for teaching courses. It provides a way to easily distribute, collect, grade, and return digital assignments.
+Techela is a framework for teaching courses. It provides a way to distribute, collect, grade, and return digital assignments.
 
 * Initial server setup
 The initial setup of a techela server is described here.
@@ -26,7 +26,7 @@ You need to get your ssh pub key in the directory. From your local machine, in t
 scp id_rsa.pub s15-06640@techela.cheme.cmu.edu:jkitchin-admin.pub
 #+END_SRC
 
-Then, on the remote machine:
+Then, on the remote git server machine:
 #+BEGIN_SRC sh
 gitolite setup -pk jkitchin-admin.pub
 #+END_SRC
@@ -276,14 +276,14 @@ We have to add daemon to the course group.
 usermod -a -G org-course daemon
 #+END_SRC
 
-And finally give the group read access to the course repository. Note that you have to give +x access to the parent directories.
+And finally give the group read access to the course repository. Note that you have to give +X access to the parent directories.
 
 You need to open .gitolite.rc and change
 $REPO_UMASK = 0077;
 
 to
 
-$REPO_UMASK = 0022;
+$REPO_UMASK = 0027;
 
 Then, run these.
 
