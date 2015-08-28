@@ -57,13 +57,15 @@
       (message "installing %s" package)
       (package-install package))))
 
-;; Make sure some packages are byte-compiled. This should only happen the first time.
-;; I committed some packages to git without .elc files.
-(loop for library in '("org")
+;; Make sure some packages are byte-compiled. This should only happen the first
+;; time.  I committed some packages to git without .elc files, so it seems like
+;; this is a good idea.
+(loop for library in '("org" "org-plus-contrib")
       do
-      (unless (string= "elc" (file-name-extension (locate-library library)))
-	(byte-recompile-directory
-	 (file-name-directory (locate-library library))
-	 0)))
+      (when (locate-library library)
+	(unless (string= "elc" (file-name-extension (locate-library library)))
+	  (byte-recompile-directory
+	   (file-name-directory (locate-library library))
+	   0))))
 
 (provide 'packages)
