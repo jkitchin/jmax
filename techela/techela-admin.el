@@ -38,7 +38,6 @@
 (defvar ta-course-student-work-dir nil
   "Derived variable to the location of student work.")
 
-
 (defvar ta-email-host "andrew.cmu.edu"
   "Hostname to construct email address from for userids with no @
   in them.  I would like to deprecate this so techela is not CMU
@@ -243,11 +242,13 @@
 
    ((string-match "\\w+\\(\\.\\w+\\)?@\\(\\w\\|\\.\\)+" userid)
     nil) ;; valid email found, no need to set anything.
-   (t ;; construct the email address
+   (t	 ;; construct the email address
     (setq userid (format "%s@%s" userid ta-email-host))))
 
   (compose-mail-other-frame)
   (message-goto-to)
+  (insert "jkitchin@andrew.cmu.edu")
+  (message-goto-bcc)
   (insert userid)
   (message-goto-subject)
   (insert (format "[%s]" ta-course-name))
