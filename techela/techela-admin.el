@@ -223,37 +223,35 @@
   "Return list of userids from a roster file."
   (mapcar (lambda (x) (car x)) (ta-roster)))
 
+(defun ta-helm-emails (candidate)
+  (mapconcat 'identity (helm-marked-candidates) ","))
 
-(defun ta-email (userid)
-  "Email USERID with completion.  Select *all* to email everyone.  multiple selections are not possible."
-  (interactive (list (ido-completing-read "Userid: " (append '("*all*") (ta-get-userids)))))
-
-  (cond
-   ((string= userid "*all*")
-    (setq userid
-	  (mapconcat
-	   (lambda (x)
-	     (cond
-	      ((string-match "@" x) ;assume a userid with @ in it is an email address
-	       x)
-	      (t
-	       ;; construct the email address
-	       (format "%s@%s" x ta-email-host)))) (ta-get-userids) ",")))
-
-   ((string-match "\\w+\\(\\.\\w+\\)?@\\(\\w\\|\\.\\)+" userid)
-    nil) ;; valid email found, no need to set anything.
-   (t	 ;; construct the email address
-    (setq userid (format "%s@%s" userid ta-email-host))))
-
-  (compose-mail-other-frame)
-  (message-goto-to)
-  (insert "jkitchin@andrew.cmu.edu")
-  (message-goto-bcc)
-  (insert userid)
-  (message-goto-subject)
-  (insert (format "[%s]" ta-course-name))
-  ;; we end here. you fill in the subject and finish the email.
-  )
+(defun ta-email ()
+  "Email USERID with helm completion.  Select *all* to email everyone."
+  (interactive)
+  (let* ((all-emails (mapconcat
+		      (lambda (userid)
+			(format "%s@%s" userid ta-email-host))
+		      (ta-get-userids)
+		      ","))
+	 (userid (helm :sources `((name . "Emails")
+				  (candidates . ,(append
+						  (list  (cons "*all*" all-emails))
+						  (mapcar
+						   (lambda (user)
+						     (let ((name (plist-get (cdr  user) :name))
+							   (email (plist-get (cdr  user) :email)))
+						       (cons (format "%-40s| %s" name email)
+							     email)))
+						   (ta-roster))))
+				  (action . ta-helm-emails)))))
+    (compose-mail-other-frame)
+    (message-goto-to)
+    (insert "jkitchin@andrew.cmu.edu")
+    (message-goto-bcc)
+    (insert userid)
+    (message-goto-subject)
+    (insert (format "(%s)" ta-course-name))))
 
 
 (defun ta-email@assignment ()
