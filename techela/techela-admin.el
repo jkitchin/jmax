@@ -226,25 +226,30 @@
 (defun ta-helm-emails (candidate)
   (mapconcat 'identity (helm-marked-candidates) ","))
 
-(defun ta-email ()
-  "Email USERID with helm completion.  Select *all* to email everyone."
+(defun ta-email (&optional input-userid)
+  "Email USERID with helm completion.  Select *all* to email everyone.
+Alternatively provide INPUT-USERID as the email address(es) to
+send email to."
   (interactive)
   (let* ((all-emails (mapconcat
 		      (lambda (userid)
 			(format "%s@%s" userid ta-email-host))
 		      (ta-get-userids)
 		      ","))
-	 (userid (helm :sources `((name . "Emails")
-				  (candidates . ,(append
-						  (list  (cons "*all*" all-emails))
-						  (mapcar
-						   (lambda (user)
-						     (let ((name (plist-get (cdr  user) :name))
-							   (email (plist-get (cdr  user) :email)))
-						       (cons (format "%-40s| %s" name email)
-							     email)))
-						   (ta-roster))))
-				  (action . ta-helm-emails)))))
+	 (userid))
+    (if input-userid
+	(setq userid input-userid)
+      (setq userid (helm :sources `((name . "Emails")
+				    (candidates . ,(append
+						    (list  (cons "*all*" all-emails))
+						    (mapcar
+						     (lambda (user)
+						       (let ((name (plist-get (cdr  user) :name))
+							     (email (plist-get (cdr  user) :email)))
+							 (cons (format "%-40s| %s" name email)
+							       email)))
+						     (ta-roster))))
+				    (action . ta-helm-emails)))))
     (compose-mail-other-frame)
     (message-goto-to)
     (insert "jkitchin@andrew.cmu.edu")
@@ -883,10 +888,19 @@ This is not fast.
 
 ")
 		   (format "
-3. [[elisp:ta-save-commit-and-push][Save and push this file]]" grading-file grading-file))
+4. [[elisp:ta-commit-gradesheet][Save and push this file]]" grading-file grading-file))
       ))
   (grade-mode))
 
+(defun ta-commit-gradesheet ()
+  "Commit gradesheet and the histogram that should be with it."
+  (interactive)
+  (let* ((fname (file-name-nondirectory (buffer-file-name)))
+	 (assignment (replace-regexp-in-string "grading-\\|\\.org" "" fname))
+	 (hist (concat assignment "-hist.png")))
+    (mygit (format "git add %s" hist))
+    (mygit (format "git commit %s -m \"adding histogram\"" hist))
+    (ta-save-commit-and-push)))
 
 (defun ta-update-all-student-work ()
   "Loop through all assignment repos and pull/clone them locally.
