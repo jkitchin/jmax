@@ -384,7 +384,7 @@ repo remote origin: %s
 
     (compose-mail-other-frame)
     (message-goto-to)
-    (insert "jboes@andrew.cmu.edu,mehakc@andrew.cmu.edu")
+    (insert "hthiruma@andrew.cmu.edu,irems@andrew.cmu.edu")
     (message-goto-subject)
     (insert (format "[%s] email" tq-current-course))
     (message-goto-body)
