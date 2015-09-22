@@ -10,23 +10,40 @@
 ;;; Code:
 
 
-(defun ta-roster ()
-  "Return a data structure of userids and names.
+;; (defun ta-roster ()
+;;   "Return a data structure of userids and names.
 
+;; The data structure is (userid :name Full name :email userid@somewhere.edu
+
+;; Use it like this:
+;;  (plist-get (cdr (assoc \"jboes\" (ta-roster))) :name)"
+;;   (with-temp-buffer
+;;     (insert-file-contents ta-roster)
+;;     (let ((contents (cdr (csv-parse-buffer nil))))  ;; first line is header
+;;       (mapcar (lambda (x)
+;;		      (list (nth 8 x)                     ; userid
+;;			    :name (format "%s %s"
+;;					  (nth 6 x)       ; first name
+;;					  (nth 5 x))      ; last name
+;;			    :email (nth 9 x)))
+;;	      contents))))
+
+(defun ta-roster ()
+  "Return a data structure of userids and names from roster.org
 The data structure is (userid :name Full name :email userid@somewhere.edu
 
 Use it like this:
  (plist-get (cdr (assoc \"jboes\" (ta-roster))) :name)"
-  (with-temp-buffer
-    (insert-file-contents ta-roster)
-    (let ((contents (cdr (csv-parse-buffer nil))))  ;; first line is header
-      (mapcar (lambda (x)
-		      (list (nth 8 x)                     ; userid
-			    :name (format "%s %s"
-					  (nth 6 x)       ; first name
-					  (nth 5 x))      ; last name
-			    :email (nth 9 x)))
-		    contents))))
+  (find-file (expand-file-name "roster.org" ta-gitolite-admin-dir))
+  (prog1
+      (org-map-entries
+       (lambda ()
+	 (list
+	  (org-entry-get (point) "CUSTOM_ID")
+	  :name (nth 4 (org-heading-components))
+	  :email (org-entry-get (point) "EMAIL")))
+       "f15_06625+EMAIL={.}")
+    (kill-buffer)))
 
 
 (defun ta-have-user-pubkey-p (userid)
