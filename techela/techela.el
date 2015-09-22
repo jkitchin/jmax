@@ -360,8 +360,9 @@ These will be committed so that future merges are possible. You should probably 
 (defun tq-agenda()
   "Show the agenda from the syllabus"
   (interactive)
-  (let ((org-agenda-files `(,(expand-file-name "syllabus.org" tq-course-directory))))
-    (org-agenda "" "c")))
+  (let ((org-agenda-files
+	 `(,(expand-file-name "syllabus.org" tq-course-directory))))
+    (org-agenda "" "t")))
 
 
 (defun tq-email-tas ()
@@ -499,7 +500,7 @@ Messages\n==========\n")
    (tq-index)
    (occur path)))
 
-
+(require 'techela-gradebook)
 (org-add-link-type
  "mc"
  ;; multiple choice link.
@@ -511,7 +512,7 @@ Messages\n==========\n")
        (goto-char (point-max))
        (unless (bolp)
 	 (insert "\n"))
-       (insert (format "# you chose %s" link))))))
+       (gb-set-filetag (org-entry-get (point) "ID") link)))))
 
 ;; Link to record answers. ans:label::data
 ;; save in tq-userid-label-data.dat
