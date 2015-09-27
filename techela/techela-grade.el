@@ -98,6 +98,7 @@ placed after the new link when it is done."
 (defun gb-feedback-typo()
   "insert typo feedback. Bound to \\[gb-feedback-typo]."
   (interactive)
+
   ;; get location
   (let ((current-point (point))
         (current-line (count-lines (point-min) (point))))
@@ -108,8 +109,25 @@ placed after the new link when it is done."
         (insert "\n* feedback\n"))
 
       (goto-char (point-max))
+      (let ((ntypos (gb-get-filetag "NTYPOS")))
+	(if ntypos
+	    (gb-set-filetag "NTYPOS" (+ 1 (string-to-int ntypos)))
+      (gb-set-filetag "NTYPOS" 1)))
       (insert  (format "[[elisp:(goto-char %s)][(%s) line %s:]] typo\n\n"
                        current-point (user-login-name)  current-line)))))
+
+
+(defun gb-ontime-p ()
+  "Return if the assignment is on time."
+  (interactive)
+
+  (let ((duedate (replace-regexp-in-string
+		  ">"
+		  " 23:59:59>" (gb-get-filetag "DUEDATE")))
+	(turned-in (format-time-string
+		    "[%Y-%m-%d %a %H:%M]"
+		    (date-to-time (gb-get-filetag "TURNED-IN")))))
+    (org-time< turned-in duedate)))
 
 
 (defun gb-grade ()
