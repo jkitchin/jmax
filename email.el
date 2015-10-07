@@ -47,13 +47,18 @@
   (setq *email-heading-point* nil)
   (org-set-property "SENT-ON" (current-time-string))
   ;; reset this incase you added new ones
-  (org-set-property "TO" *email-to-addresses*)
+  (org-set-property "TO" (mapconcat 'identity  *email-to-addresses* ", "))
   (org-set-property "Message-ID" *email-mu4e-link-to-message*)
+  (org-todo "DONE")
+  ;; remove unsent tag if it is there, and add sent
+  (let ((tags (org-get-tags-at)))
+    (add-to-list 'tags "sent")
+    (setq tags (-remove-item "unsent" tags))
+    (org-set-tags-to tags))
 
   (dolist (email *email-to-addresses*)
     (let ((contact (org-contacts-filter nil nil `("EMAIL" . ,email))))
       (when (= 1 (length contact))
-	(message-box "%s %s" msgid contact)
 	(setq contact (car contact))
 	(org-entry-put
 	 (nth 1 contact) "LAST_SENT_EMAIL"
@@ -62,7 +67,11 @@
 
 (defun email-send-action ()
   "Send action for `compose-mail'."
-  (setq *email-to-addresses* (mail-fetch-field "To"))
+  (setq
+   *email-to-addresses*
+   (mapcar
+    'cadr
+    (mail-extract-address-components (mail-fetch-field "TO") t)))
   (setq *email-mu4e-link-to-message*
 	(format "[[mu4e:msgid:%s][%s (%s)]]"
 		;; borrowed from https://github.com/girzel/gnorb/blob/master/gnorb-utils.el#L137
@@ -114,7 +123,7 @@ subsequent sends."
 	  (message-goto-body)
 	(message-goto-to)))))
 
-(defun email-heading-body ()
+(defun email-heading-body (&optional send)
   "Send the current org-mode heading content as the body of an email.
 
 use these properties to create the email.
@@ -125,6 +134,8 @@ SUBJECT (or use the headline)
 OTHER-HEADERS is an alist specifying additional
 header fields.  Elements look like (HEADER . VALUE) where both
 HEADER and VALUE are strings.
+
+optional SEND, sends immediately.
 
 Save when it was sent as a SENT property. This is overwritten on
 subsequent sends."
@@ -161,7 +172,9 @@ subsequent sends."
         (insert BCC))
       (if TO
           (message-goto-body)
-        (message-goto-to)))))
+        (message-goto-to))
+      (when send
+	(message-send-and-exit)))))
 
 
 (defun email-region-as-attachment (start end)
@@ -204,6 +217,8 @@ Argument END end of region."
       (when (file-exists-p pdf)
 	(mml-attach-file pdf))
       (message-goto-to))))
+
+
 
 (provide 'email)
 
