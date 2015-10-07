@@ -2,7 +2,7 @@
 ;; options for git
 
 ;;; Commentary:
-;; 
+;;
 
 ;;; Code:
 
@@ -32,7 +32,7 @@ Optional argument ARGS extra arguments."
   "Set the working directory temporarily set to DIRECTORY and run BODY.
 DIRECTORY is expanded"
 `(let ((default-directory (file-name-as-directory
-			   (expand-file-name ,directory)))) 
+			   (expand-file-name ,directory))))
    ,@body))
 
 
@@ -52,7 +52,7 @@ returns (status output)"
 	(format
 	 "GIT_SSH=%s"
 	 (expand-file-name
-	  "techela_ssh" 
+	  "techela_ssh"
 	  tq-root-directory)))
   (let ((process-environment (cons *GIT_SSH* process-environment))
         (status) (output))
@@ -177,12 +177,14 @@ Opens all course files, then does the search."
     (save-restriction
       (org-narrow-to-subtree)
       (org-element-map (org-element-parse-buffer) 'link
-	(lambda (link)       
+	(lambda (link)
 	  (let ((type (nth 0 link))
 		(plist (nth 1 link)))
 	    (when (equal (plist-get plist ':type) "file")
-	      (add-to-list '*org-files* 
-			   (expand-file-name (plist-get plist :path)) t))))))
+	      (add-to-list '*org-files*
+			   (expand-file-name
+			    (plist-get plist :path))
+			   t))))))
 
     (switch-to-buffer "*techela toc*")
     (erase-buffer)
@@ -198,12 +200,12 @@ Opens all course files, then does the search."
 	   ;; remove links in headlines
 	   (setq h (replace-regexp-in-string "\\[" "" h))
 	   (setq h (replace-regexp-in-string "\\]" "" h))
-	   
+
 	   (with-current-buffer   (get-buffer-create "*techela toc*")
 	     (dotimes (i (nth 0 components))
 	       (insert "*"))
-	     
-	     (insert " " 
+
+	     (insert " "
 		     (format "[[elisp:(progn (find-file \"%s\")(goto-char %s))][%s]]"
 			     f ; the filename
 			     p ; where we are in the file
@@ -225,15 +227,15 @@ Opens all course files, then does the search."
       (find-file f)
       (read-only-mode -1)
       (org-element-map (org-element-parse-buffer) 'link
-	(lambda (link)       
+	(lambda (link)
 	  (let ((type (nth 0 link))
 		(plist (nth 1 link)))
-	    
+
 	    (when (equal (plist-get plist ':type) "index")
-	      (add-to-list '*index-links* 
+	      (add-to-list '*index-links*
 			   (cons (plist-get plist :path)
 				 (format "[[elisp:(progn (switch-to-buffer \"%s\")(goto-char %s))][%s]] (%s)"
-								 
+
 					 (current-buffer)          ;; buffer name
 					 (plist-get plist :begin)  ;; position of link
 					 (save-excursion
@@ -241,7 +243,7 @@ Opens all course files, then does the search."
 					   (if (thing-at-point 'sentence)
 					       (replace-regexp-in-string "\n" "" (thing-at-point 'sentence))
 					     "link"))
-					 (file-name-nondirectory (buffer-file-name))))))))))				
+					 (file-name-nondirectory (buffer-file-name))))))))))
     (setq *index-links*  (cl-sort *index-links* 'string-lessp :key 'car))
 
     ;; now first letters
@@ -259,8 +261,8 @@ Opens all course files, then does the search."
       (while (and *index-links* (string= letter (substring (car (car *index-links*)) 0 1)))
 	(let ((link (pop *index-links*)))
 	  (insert (format "%s %s\n\n" (car link) (cdr link)))))))
-  (switch-to-buffer "*index*")) 
-    
+  (switch-to-buffer "*index*"))
+
 (defun tq-increase-text-size ()
   "Increase text size."
   (interactive)
@@ -318,7 +320,7 @@ shuffling is done in place."
 ((element . count))"
   (let ((counts '())
 	place)
-    (dolist (el list)   
+    (dolist (el list)
       (setq place (assoc el  counts))
     (if place
 	(setf (cdr place) (+ 1 (cdr place)))
@@ -337,7 +339,7 @@ shuffling is done in place."
   ;; now we get the files. they are in ~/techela-admin/course-name/student-work/assignment/*/label.dat
   (let* ((student-work-dir (expand-file-name
 			    "student-work"
-			    (expand-file-name			     
+			    (expand-file-name
 			     tq-current-course
 			     (expand-file-name "~/techela-admin"))))
 	 (files (f-entries (expand-file-name

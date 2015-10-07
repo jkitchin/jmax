@@ -182,6 +182,8 @@ This assumes the assignment label is the filename you are in."
 		 categories LGS)
       (gb-set-filetag "GRADE" (format "%1.3f" grade))
       (gb-set-filetag "GRADED-BY" user-full-name)
+      (unless (gb-ontime-p)
+	(gb-set-filetag "LATE" "Your assignment was late. You may be subject to a 50% penalty in the future."))
       (save-buffer)
       (kill-buffer))))
 
