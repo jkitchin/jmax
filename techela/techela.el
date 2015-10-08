@@ -239,30 +239,30 @@ The user ssh.pub key must be registered in the course."
 Check *techela log* for error messages."
   (interactive)
 
-  (tq-insert-system-info) ; creates a file
+  (tq-insert-system-info)
+
+  ;; Let's assume turning in will work, and set the time.
   (gb-set-filetag "TURNED-IN" (current-time-string))
-  (gb-set-filetag "TURNED-IN-FAILED" nil) ; rm it in case it exists to
-					  ; avoid confusion if it
-					  ; succeeds this time.
-  (save-some-buffers t t) ; make sure all buffers are saved
+
+  (save-some-buffers t t)		; make sure all buffers are saved
 
   ;; add everything in this directory
   (mygit "git add *")
 
   (let ((status (car (mygit "git commit -am \"turning in\""))))
-    (unless (or (= 0 status)  ; no problem
-		(= 1 status)) ; no change in files
+    (unless (or (= 0 status)		; no problem
+		(= 1 status))		; no change in files
+      (gb-set-filetag "TURNED-IN" (concat "Failed: " (current-time-string)))
       (switch-to-buffer "*techela log*")
       (error "Problem committing.  Check the logs")))
 
-  ;(mygit "git tag -f -a turned_in -m \"Tagging version turned in.\"")
-
   (unless (= 0 (car (mygit "git push -u origin master")))
     (mygit "git commit --amend -m \"*** TURNING IN FAILED ***.\"")
-    (gb-set-filetag "TURNED-IN-FAILED" (current-time-string))
+    (gb-set-filetag "TURNED-IN" (concat "Failed: " (current-time-string)))
     (save-buffer)
     (switch-to-buffer "*techela log*")
     (error "Problem pushing to server.  Check the logs."))
+
   (save-buffer)
   (message "Woohoo! You turned it in!"))
 
