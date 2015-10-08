@@ -39,7 +39,7 @@
 ;; repo is clean.
 (if jmax-auto-update
     (let ((default-directory starter-kit-dir))
-      (shell-command "git fetch")
+      (shell-command "git fetch origin master")
       (shell-command "git submodule init")
       (shell-command "git submodule update")
       (let ((output (shell-command-to-string
@@ -51,7 +51,7 @@
 	  (when (let ((last-nonmenu-event nil))
 		      (y-or-n-p "jmax is not up to date. Update now?"))
 		(message "updating jmax now")
-		(shell-command "git pull")
+		(shell-command "git pull origin master")
 		(shell-command "git submodule init")
 		(shell-command "git submodule update"))))))
 
