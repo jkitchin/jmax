@@ -621,7 +621,9 @@ The optional FILES keyword is a list of additional files to copy into the archiv
     (org-open-file (concat
 		    (file-name-sans-extension
 		     (expand-file-name tex-file tex-archive))
-		    ".pdf"))))
+		    ".pdf"))
+    ;; return directory
+    tex-archive))
 
 
 (defun ox-manuscript-build-with-comments (&optional async subtreep visible-only body-only options)
