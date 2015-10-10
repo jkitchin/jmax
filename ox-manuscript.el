@@ -526,12 +526,14 @@ single, standalone tex-file, and the corresponding pdf."
 	(message-goto-to)))
 
 
-(defun ox-manuscript-make-submission-archive (&optional async subtreep visible-only body-only options)
+(defun ox-manuscript-make-submission-archive (&optional async subtreep visible-only body-only options &rest files)
   "Create a directory containing the tex file and images.
 This is a standalone directory that is suitable for
 submission. We assume the tex file in this directory is suitable
 for submission, e.g. it was created from
-`ox-manuscript-build-submission-manuscript-and-open'."
+`ox-manuscript-build-submission-manuscript-and-open'.
+
+The optional FILES keyword is a list of additional files to copy into the archive folder."
   (interactive)
   (save-buffer)
   (let* ((org-file (buffer-name))
@@ -554,7 +556,7 @@ for submission, e.g. it was created from
 		  (file-newer-than-file-p tex-file org-file))
       ;;  and if not, build a tex file
       (ox-manuscript-export-and-build-and-open async subtreep visible-only body-only options)
-         ;; remove image extensions
+      ;; remove image extensions
       (ox-manuscript-remove-image-extensions)
       ;; fix bibliography
       (ox-manuscript-bibliography-to-bbl))
@@ -580,20 +582,20 @@ for submission, e.g. it was created from
 	       (fname (file-name-nondirectory (match-string 3))))
 	  ;;  Copy the image to the tex-archive. Priority goes as eps, pdf then png
 	  (cond
-	    ((file-exists-p eps-file)
-	     (copy-file eps-file (expand-file-name (concat fname ".eps") tex-archive) t))
-	    ((file-exists-p pdf-file)
-	     (copy-file pdf-file (expand-file-name (concat fname ".pdf") tex-archive) t))
-	    ((file-exists-p png-file)
-	     (copy-file png-file (expand-file-name (concat fname ".png") tex-archive) t))
-	    (t
-	     (error "No file found: %s (%s %s %s)"
-		    (match-string 3)
-		    eps-file
-		    pdf-file
-		    png-file
-		    )))
-		  ;; flatten the filename in the tex-file
+	   ((file-exists-p eps-file)
+	    (copy-file eps-file (expand-file-name (concat fname ".eps") tex-archive) t))
+	   ((file-exists-p pdf-file)
+	    (copy-file pdf-file (expand-file-name (concat fname ".pdf") tex-archive) t))
+	   ((file-exists-p png-file)
+	    (copy-file png-file (expand-file-name (concat fname ".png") tex-archive) t))
+	   (t
+	    (error "No file found: %s (%s %s %s)"
+		   (match-string 3)
+		   eps-file
+		   pdf-file
+		   png-file
+		   )))
+	  ;; flatten the filename in the tex-file
 	  (replace-match (format "\\1{%s}" fname)))))
 
     ;; the tex-file is no longer valid in the current directory because the
@@ -602,6 +604,11 @@ for submission, e.g. it was created from
 
     ;; restore the original version
     (rename-file tex-bak-file tex-file)
+
+    ;; copy the optional additional files
+    (mapcar (lambda (f)
+	      (copy-file f (file-name-as-directory tex-archive)))
+	    files)
 
     ;; We should build and open the pdf-file. That should just be running latex
     ;; twice.  we do that manually in the archive directory.
