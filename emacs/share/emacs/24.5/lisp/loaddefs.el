@@ -31994,8 +31994,8 @@ Zone out, completely.
 ;;;;;;  "vc/ediff-ptch.el" "vc/ediff-vers.el" "vc/ediff-wind.el"
 ;;;;;;  "vc/pcvs-info.el" "vc/pcvs-parse.el" "vc/pcvs-util.el" "vc/vc-dav.el"
 ;;;;;;  "vcursor.el" "vt-control.el" "vt100-led.el" "w32-common-fns.el"
-;;;;;;  "w32-fns.el" "w32-vars.el" "x-dnd.el") (21847 29282 296813
-;;;;;;  800000))
+;;;;;;  "w32-fns.el" "w32-vars.el" "x-dnd.el") (21801 62875 733721
+;;;;;;  600000))
 
 ;;;***
 
