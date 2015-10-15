@@ -1,7 +1,6 @@
 #!/bin/bash
-
-rm -fr elpa emacs
-
 git pull origin master
+rm -fr elpa emacs
+git checkout elpa emacs
 
 #end
