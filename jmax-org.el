@@ -628,6 +628,7 @@ session as the current block. ARG has same meaning as in
 	;; move forward so we can find the next block
 	(forward-line)))))
 
+
 (defun org-babel-kill-session ()
   "Kill session for current code block."
   (interactive)
@@ -637,6 +638,7 @@ session as the current block. ARG has same meaning as in
     (org-babel-switch-to-session)
     (kill-buffer)))
 
+
 (defun org-babel-remove-result-buffer ()
   "Remove results from every code block in buffer."
   (interactive)
@@ -645,37 +647,7 @@ session as the current block. ARG has same meaning as in
     (while (re-search-forward org-babel-src-block-regexp nil t)
       (org-babel-remove-result))))
 
-;; (defun org-babel-restart-session-to-point ()
-;;   "Restart session up to the src-block in the current point.
-;; Goes to beginning of buffer and executes each code block that has
-;; the same language and session as the current block."
-;;   (interactive)
-;;   (unless (org-in-src-block-p)
-;;     (error "You must be in a src-block to run this command"))
-;;   (let* ((current-point (point))
-;;	 (info (org-babel-get-src-block-info))
-;;          (lang (nth 0 info))
-;;          (body (nth 1 info))
-;;          (params (nth 2 info))
-;;          (session (cdr (assoc :session params))))
-;;     (save-excursion
-;;       (org-element-map
-;;	  (org-element-parse-buffer)
-;;	  'src-block
-;;	(lambda (block)
-;;	  (goto-char (org-element-property :begin block))
 
-;;	  (let* ((this-info (org-babel-get-src-block-info))
-;;		 (this-lang (nth 0 this-info))
-;;		 (this-body (nth 1 this-info))
-;;		 (this-params (nth 2 this-info))
-;;		 (this-session (cdr (assoc :session this-params))))
-;;	    (when
-;;		(and
-;;		 (< (point) current-point)
-;;		 (string= lang this-lang)
-;;		 (src-block-in-session-p session))
-;;	      (org-babel-execute-maybe))))))))
 ;; * Miscellaneous
 (defun sa-ignore-headline (contents backend info)
   "Ignore headlines with tag `ignoreheading'.
