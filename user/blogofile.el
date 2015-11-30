@@ -368,11 +368,14 @@ would lead to this post filename
       ;; clean up
       (kill-buffer "*Org HTML Export*")
       (switch-to-buffer thisb)
-      (goto-char (point-min)) ; beginning of buffer
+      (goto-char (point-min))		; beginning of buffer
       (widen)))
 
-  (org-todo 'done) ; should mark headline done
-  )
+  (org-todo 'done)			; should mark headline done
+  ;; now build and deploy
+  (with-current-directory
+   "~/blogofile-jkitchin.github.com"
+   (shell-command "make build && make deploy")))
 
 
 (global-set-key [f8] 'bf-blogpost)
