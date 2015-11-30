@@ -49,7 +49,6 @@
   ;; reset this incase you added new ones
   (org-set-property "TO" (mapconcat 'identity  *email-to-addresses* ", "))
   (org-set-property "Message-ID" *email-mu4e-link-to-message*)
-  (org-todo "DONE")
   ;; remove unsent tag if it is there, and add sent
   (let ((tags (org-get-tags-at)))
     (add-to-list 'tags "sent")
