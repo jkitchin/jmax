@@ -1,5 +1,5 @@
 #+LATEX_CLASS: cmu-article
-#+OPTIONS: toc:nil ^:{} 
+#+OPTIONS: toc:nil ^:{}
 #+EXPORT_EXCLUDE_TAGS: noexport
 
 # here is where you include the relevant packages. These are pretty
@@ -33,7 +33,7 @@
 # This is optional, if you do not want to acknowledge anyone, delete this line
 #+ACKNOWLEDGEMENTS: put your acknowledgment in one long line. Not more than a paragraph.
 
-#+ABSTRACT: put one paragraph abstract here. in proper LaTeX, all in one line.
+#+ABSTRACT: put one paragraph abstract here. in proper LaTeX, all in one line. For example \ce{CO2} does not like \(d\)-bands. Use $math-mode$ or \(math-mode\).
 
 * Introduction
 Use citations cite:chretien-density-2006. Always put punctuation to the right in org-mode. natbib will sort it out in the export correctly.
@@ -66,5 +66,3 @@ You may not have an appendix. If not, delete this section.
 * build								   :noexport:
 
 [[elisp:(cmu-ms-report-export-to-pdf-and-open)]]
-
-
