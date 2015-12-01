@@ -13,7 +13,7 @@
 (require 'org-contacts)
 
 ;;; Code:
-
+;;* Basic variables
 (add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode))
 (global-set-key "\C-cl" 'org-store-link)
 (global-set-key "\C-ca" 'org-agenda)
@@ -70,7 +70,7 @@
       (expand-file-name "user/.org-id-locations" starter-kit-dir))
 (require 'org-id)
 
-;; * Speed commands
+;;* Speed commands
 ;; activate single letter commands at beginning of a headline.
 ;; User-defined Speed commands
 ;; ===========================
@@ -180,7 +180,7 @@
 (add-to-list 'org-structure-template-alist
              '("sh" "#+BEGIN_SRC sh\n?\n#+END_SRC" "<src lang=\"shell\">\n?\n</src>"))
 
-;; * Babel settings
+;;* Babel settings
 ;; do not evaluate code on export by default
 (setq org-export-babel-evaluate nil)
 
@@ -230,7 +230,7 @@
 (setq org-export-with-sub-superscripts '{})
 
 
-;; * Agenda setup
+;;* Agenda setup
 ; I don't want to see things that are done. turn that off here.
 ; http://orgmode.org/manual/Global-TODO-list.html#Global-TODO-list
 (setq org-agenda-skip-scheduled-if-done t)
@@ -250,7 +250,7 @@
 ;; record time I finished a task when I change it to DONE
 (setq org-log-done 'time)
 
-;; * New org-links
+;;* New org-links
 ;; support for links to microsoft docx,pptx,xlsx files
 ;; standard org-mode opens these as zip-files
 ;;  http://orgmode.org/manual/Adding-hyperlink-types.html
@@ -284,7 +284,7 @@ start  empty title path"
 
 
 
-;; * Export settings
+;;* Export settings
 (setq org-latex-default-packages-alist
       '(("AUTO" "inputenc" t)
 	("" "lmodern" nil)
@@ -375,8 +375,8 @@ citecolor=blue,filecolor=blue,menucolor=blue,urlcolor=blue"
 (require 'ox-manuscript)
 (require 'ox-archive)
 
-;; * org-require
-;;;;;;; org path for loadable org-files
+;;* org-require
+;; org path for loadable org-files
 ;; (defvar org-load-path
 ;;   (list (file-name-as-directory
 ;;	 (expand-file-name "org" starter-kit-dir)))
@@ -406,7 +406,7 @@ citecolor=blue,filecolor=blue,menucolor=blue,urlcolor=blue"
 
 (require 'org-show)
 
-;; https://github.com/jkitchin/org-ref
+;;* https://github.com/jkitchin/org-ref
 (add-to-list 'load-path
 	     (expand-file-name "org-ref" starter-kit-dir))
 
@@ -428,7 +428,7 @@ citecolor=blue,filecolor=blue,menucolor=blue,urlcolor=blue"
       bibtex-autokey-titlewords-stretch 1
       bibtex-autokey-titleword-length 5)
 
-;; * Images in org-mode
+;;* Images in org-mode
 (setq org-image-actual-width '(600))
 
 ;; refresh images after running a block
@@ -461,7 +461,7 @@ citecolor=blue,filecolor=blue,menucolor=blue,urlcolor=blue"
 
 
 
-;; * Python sessions
+;;* Python sessions
 (defun org-babel-python-strip-session-chars ()
   "Remove >>> and ... from a Python session output."
   (when (and (org-element-property :parameters (org-element-at-point))
@@ -489,7 +489,7 @@ citecolor=blue,filecolor=blue,menucolor=blue,urlcolor=blue"
 
 (add-hook 'org-babel-after-execute-hook 'org-babel-python-strip-session-chars)
 
-;; * Asynchronous Python
+;;** Asynchronous Python
 (defun org-babel-async-execute:python ()
   "Execute the python src-block at point asynchronously.
 :var headers are supported.
@@ -570,7 +570,7 @@ of the code block."
 	(delete-file ,tempfile)
 	(delete-process process)))))
 
-;; * Restarting an org-babel session
+;;** Restarting an org-babel session
 
 (defun src-block-in-session-p (&optional name)
   "Return if src-block is in a session of NAME.
@@ -648,7 +648,7 @@ session as the current block. ARG has same meaning as in
       (org-babel-remove-result))))
 
 
-;; * Miscellaneous
+;;** Miscellaneous
 (defun sa-ignore-headline (contents backend info)
   "Ignore headlines with tag `ignoreheading'.
 This may mess up your labels, since the exporter still creates a label for it.
@@ -673,6 +673,51 @@ Argument INFO Parse-tree from org-mode."
 (add-to-list 'org-export-filter-headline-functions 'sa-ignore-headline)
 (add-to-list 'org-export-filter-headline-functions 'headline-nonumber)
 
+
+
+(defun helm-insert-org-entity ()
+  "Helm interface to insert an entity from `org-entities'.
+F1 inserts utf-8 character
+F2 inserts entity code
+F3 inserts LaTeX code (does not wrap in math-mode)
+F4 inserts HTML code"
+  (interactive)
+  (helm :sources (reverse
+		  (let ((sources '())
+			toplevel
+			secondlevel)
+		    (dolist (element (append
+				      '("* User" "** User entities")
+				      org-entities-user org-entities))
+		      (when (and (stringp element)
+				 (s-starts-with? "* " element))
+			(setq toplevel element))
+		      (when (and (stringp element)
+				 (s-starts-with? "** " element))
+			(setq secondlevel element)
+			(add-to-list
+			 'sources
+			 `((name . ,(concat
+				     toplevel
+				     (replace-regexp-in-string
+				      "\\*\\*" " - " secondlevel)))
+			   (candidates . nil)
+			   (action . (("insert utf-8 char" . (lambda (candidate)
+							       (insert (nth 6 candidate))))
+				      ("insert org entity" . (lambda (candidate)
+							   (insert (concat "\\" (car candidate)))))
+				      ("insert latex" . (lambda (candidate)
+							  (insert (nth 1 candidate))))
+				      ("insert html" . (lambda (candidate)
+							 (insert (nth 3 candidate)))))))))
+		      (when (and element (listp element))
+			(setf (cdr (assoc 'candidates (car sources)))
+			      (append
+			       (cdr (assoc 'candidates (car sources)))
+			       (list (cons
+				      (format "%10s %s" (nth 6 element) element)
+				      element))))))
+		    sources))))
 
 ;; setup english dictionary and spell check on windows.
 (cond
