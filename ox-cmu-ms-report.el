@@ -59,14 +59,13 @@
 	 (title (plist-get info :title)))
      ;; org-mode escapes these in the abstract. This is hackery to
      ;; undo it. It is probably not fail-proof
-     (message "%s" abstract)
      (setq abstract (org-export-data abstract info))
-     ;(setq abstract (replace-regexp-in-string "\\\\\\$" "$" abstract))
+     (setq abstract (replace-regexp-in-string "\\\\\\$" "$" abstract))
      (setq abstract (replace-regexp-in-string "\\\\{" "{" abstract))
      (setq abstract (replace-regexp-in-string "\\\\}" "}" abstract))
      (setq abstract (replace-regexp-in-string "\\\\_" "_" abstract))
      (setq abstract (replace-regexp-in-string "\\$\\\\backslash\\$" "\\\\" abstract))
-     (concat 
+     (concat
    "
 \\begin{document}
 \\thispagestyle{empty}
@@ -75,8 +74,8 @@
     \\begin{center}
         \\vspace*{1cm}
         \\LARGE
-        " 
-   ;; note the use of org-export-data, it did not work to just put title in here. 
+        "
+   ;; note the use of org-export-data, it did not work to just put title in here.
    (format "\\textbf{%s}" (org-export-data title info)) "
 
         \\vspace{2.5cm}
@@ -106,7 +105,7 @@
 \\raggedbottom
 
 % scan your signature page and name it signature.pdf
-" 
+"
 	(when signature-page
 	  (format "\\includepdf[pages=1]{%s}" (org-export-data signature-page info)))
 
@@ -128,8 +127,7 @@ abstract
 \\newpage
 \n\n"
 contents
-"\n\\end{document}"
-))))
+"\n\\end{document}"))))
 
 
 ;;;###autoload
@@ -242,7 +240,7 @@ Return PDF file's name."
       (lambda (file) (org-latex-compile file)))))
 
 ;;;###autoload
-(defun cmu-ms-report-export-to-pdf-and-open 
+(defun cmu-ms-report-export-to-pdf-and-open
   (&optional async subtreep visible-only body-only ext-plist)
   (interactive)
 
