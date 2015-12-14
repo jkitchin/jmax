@@ -761,6 +761,13 @@ permissions of the repo to Read-only first."
     (message "pulled %s" userid)))
 
 
+(defun ta-pull-all-repos ()
+  "Pull all repos of assigned assignments."
+  (interactive)
+  (loop for assignment in (ta-get-assigned-assignments)
+	do (ta-pull-repos assignment)))
+
+
 (defun ta-return (label)
   "Return assignment LABEL for each student.
 
@@ -1316,7 +1323,7 @@ git status:
 
 ** Course Actions
 
-- [[elisp:(find-file ta-course-dir)][Open the course directory]]
+- [[elisp:(find-file ta-course-dir)][Open the course directory]] [[elisp:(find-file (expand-file-name \"syllabus.org\" ta-course-dir))][Syllabus]]
 
 - [[elisp:(ta-email \"*all*\")][Email the class]]
 
