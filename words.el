@@ -210,6 +210,19 @@ Suggestions: %s
 			    (region-beginning)
 			    (region-end)))
       (thing-at-point 'word)))))
+
+
+(defun words-semantic-scholar ()
+  "Search region or word at point in www.semanticscholar.org"
+  (interactive)
+  (browse-url
+   (format
+    "https://www.semanticscholar.org/search?q=%s"
+    (if (use-region-p)
+	(url-hexify-string (buffer-substring
+			    (region-beginning)
+			    (region-end)))
+      (thing-at-point 'word)))))
 ;; #+end_src
 
 ;; ** Convenience functions for scientific queries
@@ -437,6 +450,7 @@ end tell")))
    ("G" words-google-scholar "Google scholar")
    ("c" words-crossref "CrossRef")
    ("s" words-scopus "Scopus")
+   ("o" words-semantic-scholar "Semantic Scholar")
    ("p" words-pubmed "Pubmed")
    ("a" words-arxiv "Arxiv")
    ("b" words-bibtex "bibtex")
