@@ -149,12 +149,7 @@ The user ssh.pub key must be registered in the course."
       (let ((default-directory (file-name-as-directory tq-root-directory)))
 	(shell-command (format
 			"git clone %s/%s course"
-			tq-git-course tq-current-course))
-	;; (when (not (= 0 (car (mygit (format "git clone %s@%s:course"
-	;;				    tq-current-course
-	;;				    tq-git-server)))))
-	;;   (error "Could not clone course. Try again later."))
-	)))
+			tq-git-course tq-current-course)))))
 
   ;; let user know if an update is needed
   (with-current-directory
