@@ -1373,7 +1373,7 @@ git status:
 
 (require 'techela-git)
 (defun ta-repos-status (label)
-  "List status of repos for assignment label."
+  "List status of repos for assignment LABEL."
   (interactive (list
 		(ido-completing-read
 		 "Label: "
@@ -1427,12 +1427,17 @@ git status:
 		 (concat
 		  (format "%s%s"
 			  (if (not (= 0 (nth 0 n-commits)))
-			      (propertize "  Local " 'font-lock-face '(:foreground "red"))
+			      (propertize
+			       "  Local "
+			       'font-lock-face
+			       '(:foreground "red"))
 			    "  Local ")
 			  (nth 0 n-commits))
 		  (format "%s%s"
 			  (if (not (= 0 (nth 0 n-commits)))
-			      (propertize "  Remote " 'font-lock-face '(:foreground "red"))
+			      (propertize
+			       "  Remote "
+			       'font-lock-face '(:foreground "red"))
 			    "  Remote ")
 			  (nth 1 n-commits))))
 
@@ -1445,23 +1450,20 @@ git status:
 		    status
 		    s-commits
 		    s-modified
-		    s-untracked))
-	    )
+		    s-untracked)))
 	;; missing directory
 	(insert (format "- %20s Missing\n" link)))))
-    (org-mode)
-    )
+  (org-mode))
 
 
 (defun techela-open-file-fast (openCode)
-  "Prompt to open a file from a pre-defined set in `my-filelist."
+  "Prompt to open a file from a pre-defined set in `techela-filelist'."
   (interactive
    (list (ido-completing-read
 	  "Open:"
 	  (mapcar
 	   (lambda (x) (car x))
-	   techela-filelist
-	   ))))
+	   techela-filelist))))
   (find-file (cdr (assoc openCode techela-filelist))))
 
 
@@ -1485,7 +1487,8 @@ git status:
 			      "\n")
 			     if (string-match "\\(assignments/[^[]]*.*\\)" line)
 			     collect (match-string 1 line)))
-    (unless (file-exists-p  (expand-file-name assignment ta-course-assignments-dir))
+    (unless (file-exists-p
+	     (expand-file-name assignment ta-course-assignments-dir))
       (with-current-directory
        ta-course-assignments-dir
        (mygit (format "git clone %s@%s:%s"
@@ -1509,7 +1512,10 @@ git status:
 			      "\n")
 			     if (string-match "\\(solutions/[^[]]*.*\\)" line)
 			     collect (match-string 1 line)))
-    (unless (file-exists-p  (expand-file-name assignment ta-course-solutions-dir))
+    (unless (file-exists-p
+	     (expand-file-name
+	      assignment
+	      ta-course-solutions-dir))
       (with-current-directory
        ta-course-solutions-dir
        (mygit (format "git clone %s@%s:%s"
