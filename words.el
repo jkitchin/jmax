@@ -1,8 +1,11 @@
 ;;; words.el --- Functions to operate on word at point or region  -*- lexical-binding: t -*-
-;;; Header:
-;; Author: John Kitchin
 
-;; Requires: ((hydra 0) (key-chord 0))
+;; Copyright(C) 2014,2015 John Kitchin
+
+;; Author: John Kitchin  <jkitchin@andrew.cmu.edu>
+
+;; Version: 0.1.0
+;; Package-Requires: ((hydra "0")
 
 ;;; Commentary:
 
