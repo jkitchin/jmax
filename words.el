@@ -6,7 +6,8 @@
 
 ;;; Commentary:
 
-;; These functions mostly provide easy access to web-based searches of the word at point, or the selected words.  The following functions are available.
+;; These functions mostly provide easy access to web-based searches of the word
+;; at point, or the selected words. The following functions are available.
 
 ;; - words-dictionary
 ;; - words-thesaurus
@@ -32,23 +33,13 @@
 ;; - scopus :: open Scopus
 
 ;; - words :: offers a menu of functions for word at point or region
-;; - words/body will open a "hydra" menu.  It is bound to f2, or the key-chord "ww"
-
-;; ** Using :lentic to edit this file
-;; This file is a native emacs-lisp file.  But, we can use lentic to help edit in either emacs-lisp or org-mode.  On opening the emacs-lisp file, you can split the buffer into emacs-lisp and org-mode views.
-
-;; C-c , t    split right
-;; C-c , b    split below
-
-;; Then you can edit the code in one window, and the narrative text in the other window in org-mode.  The best of both worlds!
-
-;; C-c , h will move the curse to here from the org file to the emacs-lisp file.
-;; C-c , s will swap the windows.
+;; - words/body will open a "hydra" menu.
 
 ;;; Code:
+(require 'hydra)
+(setq hydra-is-helpful t)
 
-;; ** Dictionary/thesaurus/grammar
-;; #+BEGIN_SRC emacs-lisp
+;;** Dictionary/thesaurus/grammar
 (defun words-dictionary ()
   "Look up word at point in an online dictionary."
   (interactive)
@@ -106,10 +97,9 @@ Description: %s
 Suggestions: %s
 
 " s type desc opt-string))))))
-;; #+END_SRC
 
-;; ** web functions
-;; #+BEGIN_SRC emacs-lisp
+
+;;** Web functions
 (defun words-google ()
   "Google the word at point or selection."
   (interactive)
@@ -131,10 +121,9 @@ Suggestions: %s
 	(url-hexify-string (buffer-substring (region-beginning)
 					     (region-end)))
       (thing-at-point 'word)))))
-;; #+END_SRC
 
-;; ** Scientific search functions
-;; #+BEGIN_SRC emacs-lisp
+
+;;** Scientific search functions
 (defun words-google-scholar ()
   "Google scholar the word at point or selection."
   (interactive)
@@ -225,10 +214,9 @@ Suggestions: %s
       (thing-at-point 'word)))))
 ;; #+end_src
 
-;; ** Convenience functions for scientific queries
+;;** Convenience functions for scientific queries
 ;; These just open websites, with no search queries.
 
-;; #+BEGIN_SRC emacs-lisp
 (defun wos ()
   "Open Web of Science search page in browser."
   (interactive)
@@ -251,11 +239,10 @@ Suggestions: %s
   "Open Crossref in browser."
   (interactive)
   (browse-url "http://search.crossref.org"))
-;; #+END_SRC
 
-;; ** bibtex search
 
-;; #+BEGIN_SRC emacs-lisp
+;;** Bibtex search
+
 (defun words-bibtex ()
   "Find selected region or word at point in variable `reftex-default-bibliography'."
   (interactive)
@@ -268,9 +255,7 @@ Suggestions: %s
 	(region-end))
      (thing-at-point 'word))))
 
-;; #+END_SRC
-
-;; ** Search functions for Mac
+;;** Search functions for Mac
 (defvar words-voice "Vicki"
   "Mac voice to use for speaking.")
 
@@ -307,8 +292,8 @@ Suggestions: %s
 
 (defun words-translate (to-language)
   "Translate word at point or selection TO-LANGUAGE.
-http://mymemory.translated.net
-TO-LANGUAGE is the code, see http://www.iana.org/assignments/language-subtag-registry/language-subtag-registry.
+http://mymemory.translated.net TO-LANGUAGE is the code, see
+http://www.iana.org/assignments/language-subtag-registry/language-subtag-registry.
 Assumes selected code is in English."
   (interactive
    (list
@@ -335,7 +320,6 @@ Assumes selected code is in English."
     (message "Translation: %s"
 	     (cdr (assoc 'translatedText (cdr (assoc 'responseData json)))))))
 
-;; #+BEGIN_SRC emacs-lisp
 (defun words-mdfind ()
   "Search for file names matching word or selection at point using mdfind.
 Opens an org-buffer with links to results."
@@ -381,13 +365,16 @@ end tell")))
 
     ;; from org-mac-link
     (do-applescript applescript)))
-;; #+END_SRC
 
 
-;; ** words menu
-;; A keystroke driven menu to access words functions. I favor the hydra interface now. One advantage of this interface is that it is user extendable, by adding entries to the words-funcs variable. It would take some work to get that to work in hydra.
 
-;; #+BEGIN_SRC emacs-lisp
+;;** words menu
+
+;; A keystroke driven menu to access words functions. I favor the hydra
+;; interface now. One advantage of this interface is that it is user extendable,
+;; by adding entries to the words-funcs variable. It would take some work to get
+;; that to work in hydra.
+
 (defvar words-funcs '()
  "Functions to run in `words'.  Each entry is a list of (char menu-name function).")
 
@@ -422,24 +409,17 @@ end tell")))
        (assoc
 	(char-to-string input) words-funcs)
        2))))
-;; #+END_SRC
 
-;; ** A hydra interface to words
-;; hydra (http://oremacs.com/2015/01/20/introducing-hydra/) is a relatively new menu type interface to select actions with single key strokes. It is a nicer implementation than what I setup in the words function above.
+
+;;** A hydra interface to words
+
+;; hydra (http://oremacs.com/2015/01/20/introducing-hydra/) is a relatively new
+;; menu type interface to select actions with single key strokes. It is a nicer
+;; implementation than what I setup in the words function above.
 
 ;; https://github.com/abo-abo/hydra
 
-;; We set a global key and a key-chord to launch this hydra.
-
-;; #+BEGIN_SRC emacs-lisp
-(require 'hydra)
-(setq hydra-is-helpful t)
-
-(require 'key-chord)
-(key-chord-mode 1)
-(key-chord-define-global
- "ww"
- (defhydra words-hydra (:color blue)
+(defhydra words-hydra (:color blue)
    "words"
    ("d" words-dictionary "dictionary")
    ("t" words-thesaurus "thesaurus")
@@ -458,14 +438,13 @@ end tell")))
    ("m" words-mdfind "mdfind")
    ("k" words-speak "Speak")
    ("r" words-translate "Translate")
-   ("q" nil "cancel")))
-;; #+END_SRC
+   ("q" nil "cancel"))
+
 
 ;;; End:
-;; #+BEGIN_SRC emacs-lisp
 (provide 'words)
 ;;; words.el ends here
-;; #+END_SRC
+
 
 
 ;; # Local Variables:
