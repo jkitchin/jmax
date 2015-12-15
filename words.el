@@ -5,7 +5,7 @@
 ;; Author: John Kitchin  <jkitchin@andrew.cmu.edu>
 
 ;; Version: 0.1.0
-;; Package-Requires: ((hydra "0")
+;; Package-Requires: ((hydra "0"))
 
 ;;; Commentary:
 
