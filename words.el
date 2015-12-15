@@ -2,7 +2,7 @@
 ;;; Header:
 ;; Author: John Kitchin
 
-;; Requires: ((hydra) (key-chord))
+;; Requires: ((hydra 0) (key-chord 0))
 
 ;;; Commentary:
 
