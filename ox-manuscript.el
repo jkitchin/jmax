@@ -62,6 +62,19 @@ if you should continue to the next step."
   :group 'ox-manuscript)
 
 ;; * Journal templates
+;; Bare-bones template
+(add-to-list 'org-latex-classes
+	     '("no-article"
+	       "\\documentclass{article}
+ [NO-DEFAULT-PACKAGES]
+ [PACKAGES]
+ [EXTRA]"
+	       ("\\section{%s}" . "\\section*{%s}")
+	       ("\\subsection{%s}" . "\\subsection*a{%s}")
+	       ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+	       ("\\paragraph{%s}" . "\\paragraph*{%s}")
+	       ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+
 ;; ** <<ACS journals>>
 (add-to-list 'org-latex-classes
 	     '("achemso"
