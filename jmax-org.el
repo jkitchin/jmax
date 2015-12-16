@@ -412,9 +412,9 @@ citecolor=blue,filecolor=blue,menucolor=blue,urlcolor=blue"
 
 (require 'org-ref)
 (require 'doi-utils)
-(require 'isbn)
-(require 'pubmed)
-(require 'arxiv)
+(require 'org-ref-isbn)
+(require 'org-ref-pubmed)
+(require 'org-ref-arxiv)
 (require 'jmax-bibtex)
 
 ;; variables that control bibtex key format for auto-generation
