@@ -136,7 +136,7 @@ HEADER and VALUE are strings.
 
 optional SEND, sends immediately.
 
-Save when it was sent as a SENT property. This is overwritten on
+Save when it was sent as a SENT property.  This is overwritten on
 subsequent sends."
   (interactive)
 					; store location.
@@ -174,26 +174,6 @@ subsequent sends."
         (message-goto-to))
       (when send
 	(message-send-and-exit)))))
-
-
-(defun email-region-as-attachment (start end)
-  "Send the region as an attachment in an email.
-Argument START start of region.
-Argument END end of region."
-  (interactive "r")
-  (save-restriction
-    (narrow-to-region start end)
-    (let ((content (buffer-substring start end))
-	  (cb (buffer-name))
-	  )
-      (set-buffer (get-buffer-create "*org-email-region*"))
-      (org-mode)
-      (insert content)
-      ;(org-ref-extract-bibtex-entries)
-      (compose-mail-other-frame TO SUBJECT OTHER-HEADERS)
-      (mml-attach-buffer "*org-email-region*")
-      (message-goto-to))))
-
 
 
 (defun email-bibtex-entry ()
