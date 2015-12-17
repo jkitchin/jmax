@@ -1,7 +1,7 @@
 ;;; jmax-utils.el --- Utility functions in jmax
 
 ;;; Commentary:
-;; 
+;;
 
 ;;; Code:
 
@@ -16,7 +16,7 @@
 (defun kill-other-buffers ()
     "Kill all other buffers but this one. leave one frame open."
     (interactive)
-    (mapc 'kill-buffer 
+    (mapc 'kill-buffer
           (delq (current-buffer) (buffer-list)))
     (delete-other-windows))
 
@@ -24,9 +24,9 @@
 (defun jeldoc (library)
   "Generate an org buffer containing the requires, variables and functions defined in LIBRARY.
 LIBRARY must be loaded before running this function."
-  
+
   (interactive "sLibrary to build doc for: ")
-  
+
   (let* ((lib-file (locate-library library))
 	 ;; these are the things defined in the library
 	 (elements (cdr
@@ -49,7 +49,7 @@ LIBRARY must be loaded before running this function."
 			    (and (consp x)
 				 (eq 'defun (car x))))
 			  elements))))
-    
+
     (switch-to-buffer "*org-doc*")
     (erase-buffer)
     (insert (format "#+TITLE: Documentation for %s
@@ -79,7 +79,7 @@ LIBRARY must be loaded before running this function."
     ;; insert link to generate a jeldoc buffer for each require
     (dolist (req requires)
       (insert (format "- [[elisp:(jeldoc \"%s\")][%s]]\n" req req)))
-	    
+
     (insert "* Variables\n")
     (dolist (var (sort vars 'string-lessp))
       (insert (format "** %s
@@ -93,7 +93,7 @@ Value:
 		      )))
 
     (insert "* Functions\n\n")
-    
+
     (dolist (func (sort funcs 'string-lessp))
       (insert (format "** %s %s
 Documentation: %s
@@ -112,12 +112,20 @@ Code:
 			;; we do not have c-source, so check if func
 			;; is defined in a c file here.
 			(if
-			    (string= "c"
-				     (file-name-extension
-				      (find-lisp-object-file-name
-				       func
-				       (symbol-function func))))
+			    (string=
+			     "c"
+			     (if (find-lisp-object-file-name
+				  func
+				  (symbol-function func))
+
+				 (format "%s"
+					 (file-name-extension
+					  (find-lisp-object-file-name
+					   func
+					   (symbol-function func))))
+			       ""))
 			    (symbol-function func)
+			    func)
 			  ;;else
 			  (condition-case nil
 			      (let ((bp (find-function-noselect func t)))
@@ -126,8 +134,7 @@ Code:
 				(when (sexp-at-point)
 				  (mark-sexp)
 				  (buffer-substring (point) (mark))))
-			    (error func))
-			    )))))
+			    (error func)))))))
     (org-mode)
 
     ;; replace `' with links to describe function or variable, unless
@@ -154,7 +161,7 @@ Code:
 			  result result)))
 	   ;; unknown quoted thing, just return it back
 	   (t
-	    result)))))
+	    (format "%s" result))))))
     ;; finally jump to Requires section
     (org-open-link-from-string "[[*Requires]]")))
 
