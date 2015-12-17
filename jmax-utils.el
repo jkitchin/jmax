@@ -7,14 +7,14 @@
 
 
 (defun kill-all-buffers ()
-  "Kill all buffers. leave one frame open."
+  "Kill all buffers.  Leave one frame open."
   (interactive)
   (mapc 'kill-buffer (buffer-list))
   (delete-other-windows))
 
 
 (defun kill-other-buffers ()
-    "Kill all other buffers but this one. leave one frame open."
+    "Kill all other buffers but this one.  Leave one frame open."
     (interactive)
     (mapc 'kill-buffer
           (delq (current-buffer) (buffer-list)))
@@ -163,7 +163,7 @@ Code:
 	   (t
 	    (format "%s" result))))))
     ;; finally jump to Requires section
-    (org-open-link-from-string "[[*Requires]]")))
+    (org-open-link-from-string "[[*Requires]]"))
 
 (provide 'jmax-utils)
 
