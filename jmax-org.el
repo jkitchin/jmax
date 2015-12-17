@@ -462,6 +462,25 @@ citecolor=blue,filecolor=blue,menucolor=blue,urlcolor=blue"
 
 
 ;;* Python sessions
+(defun org-mode-tab (&optional arg)
+  "In org-mode make tab cycle on headlines, or insert 4 spaces."
+  (interactive "P")
+  (cond
+   ;; Cycle headlines
+   ((org-on-heading-p)
+    (org-cycle arg))
+   ;; expand source blocks
+   ((looking-back (format
+		   "^<%s"
+		   (regexp-opt (mapcar 'car org-structure-template-alist)))
+		  (line-beginning-position))
+    (org-try-structure-completion))
+   ;; or insert 4 spaces
+   (t
+    (insert "    "))))
+
+(define-key org-mode-map (kbd "<tab>") 'org-mode-tab)
+
 (defun org-babel-python-strip-session-chars ()
   "Remove >>> and ... from a Python session output."
   (when (and (org-element-property :parameters (org-element-at-point))
