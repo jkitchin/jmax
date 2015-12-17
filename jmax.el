@@ -28,7 +28,7 @@
 
 ;;; Code:
 
-;; * Packages
+;;* Packages
 (defcustom jmax-user-theme 'leuven
   "User defined theme to load")
 
@@ -89,7 +89,7 @@
 (jmax-mode 1)
 
 
-;; * personal preferences
+;;* personal preferences
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; add this directory to the path for loading lisp files
@@ -144,7 +144,7 @@
 ;; automatically show completions for execute-extended-command
 (icomplete-mode 1)
 
-;; * ido completion
+;;* ido completion
 (require 'ido)
 (require 'ido-ubiquitous)
 (require 'flx-ido)
@@ -160,7 +160,7 @@
 (ido-mode +1)
 (ido-ubiquitous-mode +1)
 
-;; ** smarter fuzzy matching for ido
+;;** smarter fuzzy matching for ido
 (flx-ido-mode +1)
 ;; disable ido faces to see flx highlights
 (setq ido-use-faces nil)
@@ -172,7 +172,7 @@
       (ido-vertical-mode 1)
       (setq ido-vertical-define-keys 'C-n-C-p-up-down-left-right)))
 
-;; * smex, remember recently and most frequently used commands
+;;* smex, remember recently and most frequently used commands
 ;; (require 'smex)
 ;; (setq smex-save-file (expand-file-name "user/.smex-items" starter-kit-dir))
 ;; (smex-initialize)
@@ -180,7 +180,7 @@
 ;; (global-set-key (kbd "M-X") 'smex-major-mode-commands)
 
 
-;; * Helm
+;;* Helm
 ;; http://tuhdo.github.io/helm-intro.html
 (require 'helm)
 (setq helm-command-prefix-key "C-c h")
@@ -229,7 +229,7 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; * utility functions
+;;* utility functions
 ;http://www.gnu.org/software/emacs/manual/html_node/elisp/File-Name-Expansion.html#File-Name-Expansion
 
 (defun get-path()
@@ -304,7 +304,7 @@
 
 (global-set-key (kbd "C-x v p") 'vc-git-push)
 
-;; * other loads
+;;* other loads
 
 (load-file (expand-file-name "email.el" starter-kit-dir))
 
@@ -330,7 +330,7 @@
 
 (require 'python-setup)
 
-;; * Theme
+;;* Theme
 ;; load this last so that the user theme can be loaded
 (add-to-list 'custom-theme-load-path (expand-file-name "themes" starter-kit-dir))
 (load-theme jmax-user-theme t)
