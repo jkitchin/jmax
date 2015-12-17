@@ -62,7 +62,7 @@
 ;; setup archive location in archive directory in current folder
 (setq org-archive-location "archive/%s_archive::")
 
-;; * Org-id
+;;* Org-id
 
 (setq org-id-link-to-org-use-id 'create-if-interactive)
 (setq org-link-search-must-match-exact-headline 'query-to-create)
@@ -159,7 +159,7 @@
 ;; store clock entries in a drawer
 (setq org-clock-into-drawer t)
 
-;; * Expansions for blocks
+;;* Expansions for blocks
 ;; add <p for python expansion
 (add-to-list 'org-structure-template-alist
              '("p" "#+BEGIN_SRC python\n?\n#+END_SRC" "<src lang=\"python\">\n?\n</src>"))
@@ -400,7 +400,7 @@ citecolor=blue,filecolor=blue,menucolor=blue,urlcolor=blue"
 ;;     (let ((default-directory (file-name-directory path)))
 ;;       (org-babel-load-file path))))
 
-;; (org-require 'org-show)
+
 (add-to-list 'load-path
 	     (expand-file-name "org" starter-kit-dir))
 
@@ -415,7 +415,7 @@ citecolor=blue,filecolor=blue,menucolor=blue,urlcolor=blue"
 (require 'org-ref-isbn)
 (require 'org-ref-pubmed)
 (require 'org-ref-arxiv)
-(require 'jmax-bibtex)
+(require 'org-ref-bibtex)
 
 ;; variables that control bibtex key format for auto-generation
 ;; I want firstauthor-year-title-words
@@ -428,7 +428,7 @@ citecolor=blue,filecolor=blue,menucolor=blue,urlcolor=blue"
       bibtex-autokey-titlewords-stretch 1
       bibtex-autokey-titleword-length 5)
 
-;;* Images in org-mode
+;;* Images in org-mode - default width
 (setq org-image-actual-width '(600))
 
 ;; refresh images after running a block
@@ -442,7 +442,7 @@ citecolor=blue,filecolor=blue,menucolor=blue,urlcolor=blue"
 	  (lambda () (org-refresh-images)))
 
 
-;; * Adapting C-c C-c for Latex overlays
+;;* Adapting C-c C-c for Latex overlays
 ;; Define a new toggling function for equations.
 (defun org-toggle-latex-overlays (arg)
   "Toggle LaTeX fragments.  The prefix ARG is passed to `org-preview-latex-fragment'."
@@ -728,7 +728,7 @@ F4 inserts HTML code"
   (flyspell-mode +1)
   (add-hook 'org-mode-hook 'turn-on-flyspell 'append)))
 
-;; * The end
+;;* The end
 (message "jmax-org.el loaded")
 
 (provide 'jmax-org)
