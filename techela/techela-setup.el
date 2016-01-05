@@ -46,7 +46,7 @@ DATA should be obtained and modified from `tq-config-read-data'."
 (defun tq-config-get-admin-courses ()
   "Returns a list of course names.
 For now they are hard-coded. One day this will be dynamic."
-  '("f15-06625" "s15-06640" "f14-06625"))
+  '("s16-06640" "f15-06625" "s15-06640" "f14-06625"))
 
 
 (defun ta-setup-user ()
