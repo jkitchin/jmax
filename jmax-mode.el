@@ -28,6 +28,7 @@
 
 (defvar jmax-mode-map
   (let ((map (make-sparse-keymap)))
+    ;; Note \e\e is Esc Esc
     (define-key map (kbd "\e\er") 'email-region)
     (define-key map (kbd "\e\eh") 'email-heading)
     (define-key map (kbd "\e\ep") 'ox-manuscript-export-and-build-and-email)
