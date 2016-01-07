@@ -170,7 +170,10 @@ Selection is done with helm."
 	      "README.org"
 	      (expand-file-name "kitchingroup" kitchinhub-root))))
 
+;; Some new bindings to add to vc-prefix-map
 (define-key 'vc-prefix-map "t" 'magit-status)
+(define-key 'vc-prefix-map "p" 'magit-push)
+(define-key 'vc-prefix-map "P" 'magit-pull)
 
 (provide 'kitchinhub)
 
