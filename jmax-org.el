@@ -419,6 +419,8 @@ citecolor=blue,filecolor=blue,menucolor=blue,urlcolor=blue"
 (require 'org-ref-pubmed)
 (require 'org-ref-arxiv)
 (require 'org-ref-bibtex)
+(require 'org-ref-pdf)
+(require 'org-ref-url-utils)
 
 ;; variables that control bibtex key format for auto-generation
 ;; I want firstauthor-year-title-words
