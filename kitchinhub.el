@@ -173,6 +173,12 @@ Selection is done with helm."
 ;; Some new bindings to add to vc-prefix-map
 (define-key 'vc-prefix-map "t" 'magit-status)
 
+(defun vc-git-push ()
+  "Run git push."
+  (interactive)
+  (shell-command "git push"))
+
+(define-key 'vc-prefix-map "p" 'vc-git-push)
 (define-key 'vc-prefix-map "P" 'magit-pull)
 
 (provide 'kitchinhub)
