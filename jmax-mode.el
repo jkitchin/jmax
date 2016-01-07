@@ -100,12 +100,10 @@ one and open it."
       ["Insert ref link" org-ref-insert-ref-link t]
       ["Open notes at point" org-ref-open-notes-at-point t]
       ["Open PDF at point" org-ref-open-pdf-at-point t]
-      ["Open url at point" org-ref-open-url-at-point t]
-      )
+      ["Open url at point" org-ref-open-url-at-point t])
      ("export"
       ["manuscript PDF" ox-manuscript-export-and-build-and-open t]
-      ["submission PDF" ox-manuscript-build-submission-manuscript-and-open t]
-      ))
+      ["submission PDF" ox-manuscript-build-submission-manuscript-and-open t]))
     ("bibtex"
      ["find non-ascii characters" org-ref-find-non-ascii-characters t]
      ["extract bibtex entries from org" org-ref-extract-bibtex-entries t]
@@ -122,12 +120,10 @@ one and open it."
      ["  Open entry in Pubmed" jmax-bibtex-pubmed (eq major-mode 'bibtex-mode)]
      ["  validate bibtex file" bibtex-validate (eq major-mode 'bibtex-mode)]
      ["  sort bibtex file" bibtex-sort-buffer (eq major-mode 'bibtex-mode)]
-     ["  build bibliography pdf from bib file" org-ref-build-full-bibliography (eq major-mode 'bibtex-mode)]
-     )
+     ["  build bibliography pdf from bib file" org-ref-build-full-bibliography (eq major-mode 'bibtex-mode)])
     ("doi-utils"
      ["Insert bibtex entry from doi" doi-utils-add-bibtex-entry-from-doi t]
-     ["Insert bibtex entry from crossref" doi-utils-add-entry-from-crossref-query t]
-     )
+     ["Insert bibtex entry from crossref" doi-utils-add-entry-from-crossref-query t])
     ("words"
      ["Menu" words t]
      ["Web of Knowledge" wos t]
@@ -143,6 +139,11 @@ one and open it."
      ["Lookup in Arxiv" words-arxiv]
      ["Lookup in Dictionary" words-dictionary t]
      ["Lookup in Thesaurus" words-thesaurus t])
+    ["Help with jmax" (find-file (expand-file-name
+			"jmax.org"
+			(file-name-directory
+			 (locate-library "jmax"))))
+     t]
     ["Customize user.el" jmax-customize-user t]))
 
 
