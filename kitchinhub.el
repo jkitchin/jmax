@@ -149,6 +149,29 @@ Selection is done with helm."
 		   github-fallback-source)))
 
 
+(defun kitchingroup ()
+  "Open the Kitchin Group README.org file."
+  (interactive)
+
+  ;; clone if we don't have it
+  (unless (file-directory-p (expand-file-name "kitchingroup" kitchinhub-root))
+    (let ((default-directory kitchinhub-root))
+      (shell-command "git clone git@github.com:KitchinHUB/kitchingroup.git")))
+
+  ;; Make sure we are up to date. Stash any changes we made, pull, and reapply them
+  (let ((default-directory (file-name-as-directory
+			    (expand-file-name "kitchingroup" kitchinhub-root))))
+    (shell-command "git stash")
+    (shell-command "git pull")
+    (shell-command "git stash pop"))
+
+  ;; Now open the README
+  (find-file (expand-file-name
+	      "README.org"
+	      (expand-file-name "kitchingroup" kitchinhub-root))))
+
+(define-key 'vc-prefix-map "t" 'magit-status)
+
 (provide 'kitchinhub)
 
 ;;; kitchinhub.el ends here
