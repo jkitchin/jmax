@@ -296,14 +296,6 @@
   (interactive)
   (setq line-spacing nil))
 
-
-(defun vc-git-push ()
-  "Run git push."
-  (interactive)
-  (shell-command "git push"))
-
-(global-set-key (kbd "C-x v p") 'vc-git-push)
-
 ;;* other loads
 
 (load-file (expand-file-name "email.el" starter-kit-dir))
