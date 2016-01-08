@@ -2,7 +2,8 @@
 
 
 ;;; Commentary:
-;;
+;; `org-wdiff' for two files
+;; `org-wdiff-git' for git revisions
 
 ;;; Code:
 
