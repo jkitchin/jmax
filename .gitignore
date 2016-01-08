@@ -3,6 +3,7 @@ emacs-24.3
 *.elc
 *.pyc
 elpa
+melpa
 sandbox*
 auto-save-list
 ac-comphist.dat
