@@ -320,7 +320,8 @@ You can mark the paragraph with `mark-paragraph'.
 
       (princ s)
       (princ "\n\nHere is how org-mode sees the element.\n\n")
-      (pp oeap))))
+      (pp oeap)
+      (emacs-keybinding-command-tooltip-mode))))
 
 
 (defun match-next-ore-file (&optional limit)
