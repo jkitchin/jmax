@@ -6,6 +6,8 @@
 
 ;;; Code:
 
+(require 'emacs-keybinding-command-tooltip-mode)
+
 (defvar ore-user-directory "~/.emacs.d/ore/"
   "Directory to store user additions to the notes.")
 
