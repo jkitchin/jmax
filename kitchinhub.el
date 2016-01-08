@@ -178,8 +178,13 @@ Selection is done with helm."
   (interactive)
   (shell-command "git push"))
 
+(defun vc-git-pull ()
+  "Run git pull"
+  (interactive)
+  (shell-command "git pull"))
+
 (define-key 'vc-prefix-map "p" 'vc-git-push)
-(define-key 'vc-prefix-map "P" 'magit-pull)
+(define-key 'vc-prefix-map "P" 'vc-git-pull)
 
 (provide 'kitchinhub)
 
