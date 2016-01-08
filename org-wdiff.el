@@ -11,6 +11,11 @@
 ;; This is not perfect, but it seems to work well on relatively simple changes
 ;; in org-files.
 
+;; TODO: accept/reject all changes
+;; TODO: convert to LaTeX/HTML showing diff
+;; TODO: track change mode
+;; Related: https://github.com/joostkremers/criticmarkup-emacs
+
 ;;; Code:
 
 (defcustom org-wdiff-cmd
@@ -118,7 +123,12 @@
   (when (not (= (point) (point-max)))
     (unless (or (get-text-property (point) 'deleted)
 		(get-text-property (point) 'inserted))
-      (next-revision))))
+      (next-revision)))
+
+  ;; return point if on a revision, nil if at end of buffer.
+  (if (eobp)
+      nil
+    (point)))
 
 (defun previous-revision ()
   "Move point to beginning of the previous revision."
@@ -190,6 +200,21 @@
   (next-revision))
 
 
+(defun accept-all-revisions ()
+  "Accept all revisions."
+  (goto-char (point-min))
+  (while (next-revision)
+    (accept-revision)))
+
+
+(defun reject-all-revisions ()
+  "Accept all revisions."
+  (goto-char (point-min))
+  (while (next-revision)
+    (reject-revision)))
+
+
+
 (defun org-wdiff-save ()
   "Save the *org-wdiff-git* buffer in the file it was made from."
   (interactive)
@@ -201,7 +226,9 @@
     (define-key map "n" 'next-revision)
     (define-key map "p" 'previous-revision)
     (define-key map "a" 'accept-revision)
+    (define-key map "A" 'accept-all-revisions)
     (define-key map "r" 'reject-revision)
+    (define-key map "R" 'reject-all-revisions)
     (define-key map "q" 'quit-window)
     (define-key map "s" 'org-wdiff-save)
     map)
