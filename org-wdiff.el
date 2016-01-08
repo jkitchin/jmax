@@ -63,6 +63,7 @@
 						     commit fname
 						     fname)))
 				   (switch-to-buffer-other-window (get-buffer-create "*org-wdiff*"))
+				   (erase-buffer)
 				   (insert (shell-command-to-string cmd))
 				   (org-wdiff-fontify)))))))))
 
