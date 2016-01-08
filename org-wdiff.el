@@ -46,7 +46,7 @@
 
 
 (defun org-wdiff-git (commit)
-  "Perform a wdiff on the current version to the one in COMMIT."
+  "Perform a wdiff on the current version to the one in a git COMMIT."
   (interactive
    (list
     (helm :sources `((name . "commits")
@@ -55,14 +55,16 @@
 						    msg)
 						(string-match "|.*$" s)
 						(cons (concat commit " " (match-string 0 s)) commit)))
-					    (split-string (shell-command-to-string "git hist") "\n")))
+					    (split-string
+					     (shell-command-to-string "git hist") "\n")))
 		     (action . (lambda (commit)
 				 (let* ((fname (buffer-file-name))
 					(cmd (format "%s <(git show %s:%s) %s"
 						     org-wdiff-cmd
 						     commit fname
 						     fname)))
-				   (switch-to-buffer-other-window (get-buffer-create "*org-wdiff*"))
+				   (switch-to-buffer-other-window
+				    (get-buffer-create "*org-wdiff*"))
 				   (erase-buffer)
 				   (insert (shell-command-to-string cmd))
 				   (org-wdiff-fontify)))))))))
