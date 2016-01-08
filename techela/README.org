@@ -115,7 +115,7 @@ Now, we create a non-empty directory so we can commit it, and touch the students
 #+BEGIN_SRC sh
 mkdir student-work
 touch student-work/README
-echo "student repo conf files go here" >> repos/README
+echo "student repo conf files go here" >> student-work/README
 
 touch students.conf
 #+END_SRC
@@ -196,7 +196,6 @@ This is the student facing part of the course. The syllabus should go in here, a
 *************** TODO document the course setup. It is done via gitolite
 *************** END
 
-
 ** ../student-work
 Student repos will be cloned into this directory. This is where you will pull their work after it is collected.
 
@@ -276,7 +275,6 @@ We have to add daemon to the course group.
 usermod -a -G org-course daemon
 #+END_SRC
 
-And finally give the group read access to the course repository. Note that you have to give +X access to the parent directories.
 
 You need to open .gitolite.rc and change
 $REPO_UMASK = 0077;
@@ -285,7 +283,7 @@ to
 
 $REPO_UMASK = 0027;
 
-Then, run these.
+Then, run these. And finally give the group read access to the course repository. Note that you have to give +X access to the parent directories.
 
 #+BEGIN_SRC sh
 chmod g+x /home/org-course

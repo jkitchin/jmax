@@ -10,40 +10,40 @@
 ;;; Code:
 
 
-;; (defun ta-roster ()
-;;   "Return a data structure of userids and names.
-
-;; The data structure is (userid :name Full name :email userid@somewhere.edu
-
-;; Use it like this:
-;;  (plist-get (cdr (assoc \"jboes\" (ta-roster))) :name)"
-;;   (with-temp-buffer
-;;     (insert-file-contents ta-roster)
-;;     (let ((contents (cdr (csv-parse-buffer nil))))  ;; first line is header
-;;       (mapcar (lambda (x)
-;;		      (list (nth 8 x)                     ; userid
-;;			    :name (format "%s %s"
-;;					  (nth 6 x)       ; first name
-;;					  (nth 5 x))      ; last name
-;;			    :email (nth 9 x)))
-;;	      contents))))
-
 (defun ta-roster ()
-  "Return a data structure of userids and names from roster.org
+  "Return a data structure of userids and names.
+
 The data structure is (userid :name Full name :email userid@somewhere.edu
 
 Use it like this:
  (plist-get (cdr (assoc \"jboes\" (ta-roster))) :name)"
-  (find-file (expand-file-name "roster.org" ta-gitolite-admin-dir))
-  (prog1
-      (org-map-entries
-       (lambda ()
-	 (list
-	  (org-entry-get (point) "CUSTOM_ID")
-	  :name (nth 4 (org-heading-components))
-	  :email (org-entry-get (point) "EMAIL")))
-       "f15_06625+EMAIL={.}")
-    (kill-buffer)))
+  (with-temp-buffer
+    (insert-file-contents ta-roster)
+    (let ((contents (cdr (csv-parse-buffer nil))))  ;; first line is header
+      (mapcar (lambda (x)
+		      (list (nth 8 x)                     ; userid
+			    :name (format "%s %s"
+					  (nth 6 x)       ; first name
+					  (nth 5 x))      ; last name
+			    :email (nth 9 x)))
+	      contents))))
+
+;; (defun ta-roster ()
+;;   "Return a data structure of userids and names from roster.org
+;; The data structure is (userid :name Full name :email userid@somewhere.edu
+
+;; Use it like this:
+;;  (plist-get (cdr (assoc \"jboes\" (ta-roster))) :name)"
+;;   (find-file (expand-file-name "roster.org" ta-gitolite-admin-dir))
+;;   (prog1
+;;       (org-map-entries
+;;        (lambda ()
+;;	 (list
+;;	  (org-entry-get (point) "CUSTOM_ID")
+;;	  :name (nth 4 (org-heading-components))
+;;	  :email (org-entry-get (point) "EMAIL")))
+;;        "f15_06625+EMAIL={.}")
+;;     (kill-buffer)))
 
 
 (defun ta-have-user-pubkey-p (userid)
@@ -105,7 +105,8 @@ dropped."
 				    (progn
 				      (insert-file-contents roster-org-file)
 				      (org-map-entries
-				       (lambda () (org-entry-get (point) "CUSTOM_ID"))))
+				       (lambda ()
+					 (org-entry-get (point) "CUSTOM_ID"))))
 					; else
 				  '())))
 
@@ -150,7 +151,8 @@ dropped."
 	  (org-entry-put (point) "EMAIL" (if (string-match "@" userid)
 					     userid
 					   (concat userid "@" ta-email-host)))
-	  (org-entry-put (point) "ADDED" (format-time-string "[%Y-%m-%d %a]" (current-time)))
+	  (org-entry-put (point) "ADDED"
+			 (format-time-string "[%Y-%m-%d %a]" (current-time)))
 	  (save-buffer))))
 
     ;; we need to remove the userid.pub file
@@ -162,16 +164,17 @@ dropped."
 	   (if (file-exists-p user-pub-key)
 	       (progn
 		 (mygit (format "git rm %s" user-pub-key))
-		 (mygit (format "git commit %s -m \"deleted %s. %s dropped the class\""
-				user-pub-key user-pub-key userid)))
+		 (mygit (format
+			 "git commit %s -m \"deleted %s. %s dropped the class\""
+			 user-pub-key user-pub-key userid)))
 	     (warn "%s not found for %s" user-pub-key userid))))
 	;; tag students in roster.org with dropped
 	(with-current-buffer (find-file-noselect roster-org-file)
 	  (org-open-link-from-string (format "[[#%s]]" userid))
-	  (org-entry-put (point) "DROPPED" (format-time-string "[%Y-%m-%d %a]" (current-time)))
+	  (org-entry-put (point) "DROPPED"
+			 (format-time-string "[%Y-%m-%d %a]" (current-time)))
 	  (org-set-tags-to "dropped")
-	  (save-buffer))
-	)
+	  (save-buffer)))
       (insert "\nDropped students\n" "==================\n"
 	      (mapconcat 'identity dropped-students "\n")))
 
@@ -189,8 +192,7 @@ dropped."
     (with-current-directory
      (file-name-directory student-conf-file)
      (mygit "git commit students.conf -m \"updated the students.conf\"")
-     (mygit "git push")
-     )))
+     (mygit "git push"))))
 
 
 (defun ta-add-roster-note (note userid)
@@ -222,9 +224,7 @@ dropped."
      ta-gitolite-admin-dir
      (mygit "git add roster.org")
      (mygit "git commit roster.org -m \"Updated roster with a note.\"")
-     (mygit "git push"))
-   )
-
+     (mygit "git push")))
 
 
 (provide 'techela-roster)

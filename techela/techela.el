@@ -59,8 +59,7 @@ Check your internet connection")
 	  (error "Unable to contact techela.cheme.cmu.edu. Check your internet connection."))
 	t))
     ;; no ping found !
-    (message "You have no ping executable! I cannot check for internet connectivity.")
-    ))
+    (message "You have no ping executable! I cannot check for internet connectivity.")))
 
 (defun techela-register (course)
   "Register for COURSE.
