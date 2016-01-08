@@ -5,11 +5,18 @@
 ;; `org-wdiff' for two files
 ;; `org-wdiff-git' for git revisions
 
+;; There is a minor mode that enables something like track changes for
+;; accepting/rejecting revisions reported by wdiff.
+
+;; This is not perfect, but it seems to work well on relatively simple changes
+;; in org-files.
+
 ;;; Code:
 
 (defcustom org-wdiff-cmd
   "wdiff -w [-- -x --] -y {++ -z ++} "
   "Command to run wdiff with.")
+
 
 (defcustom org-wdiff-deleted-regexp
   "\\[--\\(\\([[:ascii:]]\\)+?\\)--\\]"
@@ -24,9 +31,14 @@
   `((t :foreground "red" :weight bold))
   "Deleted text.")
 
+
 (defface git-diff-insertion-face
   `((t :foreground "blue" :weight bold))
   "Inserted text.")
+
+
+(defvar org-wdiff-original-filename nil
+  "Global variable for saving file.")
 
 
 (defun org-wdiff-fontify ()
@@ -79,16 +91,17 @@
 					(cmd (format "%s <(git show %s:%s) %s"
 						     org-wdiff-cmd
 						     commit fname
-						     fname)))
-				   (switch-to-buffer-other-window
-				    (get-buffer-create "*org-wdiff-git*"))
+						     fname))
+					(buf (get-buffer-create "*org-wdiff-git*")))
+				   (setq org-wdiff-original-filename fname)
+				   (switch-to-buffer-other-window buf)
 				   (funcall mmode)
 				   (erase-buffer)
 				   (let ((default-directory git-root))
 				     (insert (shell-command-to-string cmd)))
 				   (org-wdiff-fontify)
-				   (goto-char (point-min))
-				   (track-changes-mode)))))))))
+				   (track-changes-mode)
+				   (goto-char (point-min))))))))))
 
 
 (defun next-revision ()
@@ -126,7 +139,7 @@
 
 
 (defun accept-revision ()
-  "Accept the revision at point."
+  "Accept the revision at point and go to next revision."
   (interactive)
   (cond
    ;; delete the whole marked text
@@ -147,7 +160,8 @@
 	(replace-match "")
 	(re-search-backward "{\\+\\+")
 	(setq start (point))
-	(replace-match ""))))))
+	(replace-match "")))))
+  (next-revision))
 
 
 (defun reject-revision ()
@@ -172,7 +186,14 @@
 	(setq end (point))
 	(re-search-backward "{\\+\\+")
 	(setq start (point))
-	(setf (buffer-substring start end) ""))))))
+	(setf (buffer-substring start end) "")))))
+  (next-revision))
+
+
+(defun org-wdiff-save ()
+  "Save the *org-wdiff-git* buffer in the file it was made from."
+  (interactive)
+  (write-file org-wdiff-original-filename))
 
 
 (defvar track-changes-mode-map
@@ -182,7 +203,7 @@
     (define-key map "a" 'accept-revision)
     (define-key map "r" 'reject-revision)
     (define-key map "q" 'quit-window)
-    (define-key map "s" 'save-buffer)
+    (define-key map "s" 'org-wdiff-save)
     map)
   "Keymap for track-changes-mode.")
 
@@ -194,7 +215,6 @@
   :init-value nil
   :lighter "Track Changes"
   :keymap track-changes-mode-map)
-
 
 
 (provide 'org-wdiff)
