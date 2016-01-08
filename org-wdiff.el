@@ -44,7 +44,7 @@
 
 (defun org-wdiff (oldfile newfile)
   "Perform a word diff on OLDFILE and NEWFILE."
-  (interactive)
+  (interactive "fOld file: \nfNew file:")
   (switch-to-buffer-other-window (get-buffer-create "*org-wdiff*"))
   (erase-buffer)
   (org-mode)
@@ -52,7 +52,9 @@
   (insert
    (shell-command-to-string
     (format "%s %s %s" org-wdiff-cmd oldfile newfile)))
-  (org-wdiff-fontify))
+  (org-wdiff-fontify)
+  (track-change-mode))
+
 
 
 (defun org-wdiff-git (commit)
@@ -72,6 +74,7 @@
 					 (file-relative-name
 					  (buffer-file-name)
 					  (vc-git-root (buffer-file-name))))
+					(git-root (vc-git-root (buffer-file-name)))
 					(mmode major-mode)
 					(cmd (format "%s <(git show %s:%s) %s"
 						     org-wdiff-cmd
@@ -81,12 +84,11 @@
 				    (get-buffer-create "*org-wdiff-git*"))
 				   (funcall mmode)
 				   (erase-buffer)
-				   (insert (shell-command-to-string cmd))
+				   (let ((default-directory git-root))
+				     (insert (shell-command-to-string cmd)))
 				   (org-wdiff-fontify)
-				   (local-set-key "n" 'next-revision)
-				   (local-set-key "p" 'previous-revision)
-				   (local-set-key "a" 'accept-revision)
-				   (local-set-key "r" 'reject-revision)))))))))
+				   (goto-char (point-min))
+				   (track-changes-mode)))))))))
 
 
 (defun next-revision ()
@@ -125,18 +127,18 @@
 
 (defun accept-revision ()
   "Accept the revision at point."
-  ;; Just delete the markers
   (interactive)
   (cond
+   ;; delete the whole marked text
    ((get-text-property (point) 'deleted)
     (save-excursion
       (let (start end)
 	(re-search-forward "--\\]")
 	(setq end (point))
-	(replace-match "")
 	(re-search-backward "\\[--")
 	(setq start (point))
-	(replace-match ""))))
+	(setf (buffer-substring start end) ""))))
+   ;; Just delete the markers
    ((get-text-property (point) 'inserted)
     (save-excursion
       (let (start end)
@@ -152,14 +154,17 @@
   "Reject the revision at point."
   (interactive)
   (cond
+   ;; delete the markers, keep the text
    ((get-text-property (point) 'deleted)
     (save-excursion
       (let (start end)
 	(re-search-forward "--\\]")
 	(setq end (point))
+	(replace-match "")
 	(re-search-backward "\\[--")
 	(setq start (point))
-	(setf (buffer-substring start end) ""))))
+	(replace-match ""))))
+   ;; delete the whole marked text
    ((get-text-property (point) 'inserted)
     (save-excursion
       (let (start end)
@@ -168,6 +173,28 @@
 	(re-search-backward "{\\+\\+")
 	(setq start (point))
 	(setf (buffer-substring start end) ""))))))
+
+
+(defvar track-changes-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map "n" 'next-revision)
+    (define-key map "p" 'previous-revision)
+    (define-key map "a" 'accept-revision)
+    (define-key map "r" 'reject-revision)
+    (define-key map "q" 'quit-window)
+    (define-key map "s" 'save-buffer)
+    map)
+  "Keymap for track-changes-mode.")
+
+
+(define-minor-mode track-changes-mode
+  "Minor mode for track-changes.
+
+\\{track-changes-mode-map}"
+  :init-value nil
+  :lighter "Track Changes"
+  :keymap track-changes-mode-map)
+
 
 
 (provide 'org-wdiff)
