@@ -1,8 +1,144 @@
 #+TITLE: jmax - awesome editing in emacs
+#+AUTHOR: John Kitchin
 
 * Introduction
 jmax is a customization of emacs that facilitates writing technical documents. I found it takes extensive customization to get emacs to do what you want, and this is my collection of customizations.
 
+Check out the org-mode manual info:org.
+
+** Markup shortcuts
+
+jmax defines some shortcuts for org-mode markup. You can select text and type the shortcut to wrap the region in the markup, or type the short cut to wrap the character at point or create the markup with the cursor inside it to keep typing.
+
+| markup            | keyshortcut | emacs-command                   |
+|-------------------+-------------+---------------------------------|
+| *Bold*            | s-b         | `bold-region-or-point'          |
+| /italics/         | s-i         | `italics-region-or-point'       |
+| =verbatim=        | s-v         | `verbatim-region-or-point'      |
+| ~code~            | s-c         | `code-region-or-point'          |
+| _underline_       | s-u         | `underline-region-or-point'     |
+| +strike+          | s-+         | `strikethrough-region-or-point' |
+| _{subscript}      | s--         | `subscript-region-or-point'     |
+| ^{superscript}    | s-=         | `superscript-region-or-point'   |
+| \(equation\)      | s-4         | `latex-math-region-or-point'    |
+| $inline eqn$      | C-u s-4     |                                 |
+| @@latex:snippet@@ | C-u C-u 4   |                                 |
+| °                 | s-y         | `helm-insert-org-entity'        |
+| \deg              | s-y f2      |                                 |
+| \textdegree{}     | s-y f3      |                                 |
+| &deg;             | s-y f4      |                                 |
+
+Use  `helm-insert-org-entity' (s-y) for all accented characters
+
+Here are some common ones, but there are alot of them!
+
+| angstrom | ("AA" "\\AA{}" nil "&Aring;" "A" "Å" "Å")     |
+|          | ("oslash" "\\o{}" nil "&oslash;" "o" "ø" "ø") |
+|          | ("uuml" "\\\"{u}" nil "&uuml;" "ue" "ü" "ü")  |
+
+** src-block expansion in org-mode
+
+The following examples show the shortcuts defined in jmax for expansion. Put your cursor after the shortcut and press tab to expand them.
+
+<p
+#+BEGIN_SRC python
+
+#+END_SRC
+
+<por
+#+BEGIN_SRC python :results output raw
+
+#+END_SRC
+
+<pv
+#+BEGIN_SRC python :results value
+
+#+END_SRC
+
+<el
+#+BEGIN_SRC emacs-lisp
+
+#+END_SRC
+
+<sh
+#+BEGIN_SRC sh
+
+#+END_SRC
+
+<lh
+#+latex_header:
+
+<lc
+#+latex_class:
+
+<lco
+#+latex_class_options:
+
+<ao
+#+attr_org:
+
+#+attr_latex:
+
+** LaTeX export classes in jmax
+The default article class is not usually what you want your PDF documents to look like.
+
+- cmu-article :: an article with 1inch margins and default packages
+- article-no-defaults :: bare article class with no default packages
+
+** Getting help in Emacs
+jmax does a few things to help you get help.
+
+1. `emacs-keybinding-command-tooltip-mode'
+   This minor mode recognizes command/variable syntax, fontifies it, puts a tooltip on it, and makes it clickable! The tooltip is the Emacs documentation. Clicking on it opens the Help buffer. Pressing the super key and clicking should open the code for the function.
+   It recognizes variables too:   `elisp-symbol-keybinding-re'
+
+   The key-binding syntax is also recognized \\[bold-region-or-point] and hovering on it will show you the keybinding if there is one.
+
+2. The `ore' command will tell you about the org-element your cursor is on. It will give you some hints about what you can do (i.e. what commands/actions you can do) at that point.
+
+** Changes to org-mode behavior
+jmax advises C-c C-c behavior so it does not remove LaTeX overlays on equations.
+
+jmax provides `org-toggle-latex-overlays'.
+
+jmax refreshes all images after you execute a src-block.
+
+
+* Version control in jmax
+We use git for version control. There are three styles of using git with jmax:
+1. The emacs "vc-" commands and shortcuts
+2. The magit library
+3. The command line - use it in a terminal
+
+** version control on a single file
+I find these keyboard short cuts handy for working on a single file.
+
+| C-x v v | Does the next obvious vc thing, either add file or commit it. |
+| C-x v = | Shows a diff of the current file compared to the last commit. |
+| C-x v l | Show the current git log                                      |
+| C-x v p | Push current commits                                          |
+| C-x v P | Pull                                                          |
+| C-x v u | Revert last commit                                            |
+| C-x v s | Add a tag to the repo (it must be clean)                      |
+| C-x v t | Run `magit-status' for everything more complicated.           |
+
+There are many more commands under menu Tools -> Version Control.
+
+magit is pretty awesome. It is worth reading the manual info:magit.
+
+** Track changes
+The use of version control allows us to do track changes in jmax! You need to have a wdiff program (e.g. https://www.gnu.org/software/wdiff/) installed. We use a fork https://github.com/jkitchin/criticmarkup-emacs to enable [[http://criticmarkup.com][CriticMarkup]] in Emacs, with some extensions we have written.
+
+- `cm-wdiff-buffer-with-file' :: Show a track change of current version with last saved version
+
+- `cm-wdiff-git' :: Show a track change between two git versions of the open file.
+
+You can turn track changes on with the command `cm-follow-changes'. There is a hydra menu function `cm/body' that provides easy access to turn on track changes, navigate the changes, accept/reject them, etc...
+
+* TODO Scientific writing
+See `org-ref'.
+
+* Description of the files in jmax
 ** [[./init.el]]
 Here is where the initialization starts. This is where Emacs checks if jmax is up to date.
 
