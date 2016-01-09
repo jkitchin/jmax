@@ -106,7 +106,6 @@ commands and variables."
        beg end
        `(local-map ,map
 		   mouse-face highlight
-		   underline (when (eq 'variable (command-or-variable ,command)) t)
 		   help-echo ,(format
 			       "%s\n%s\nClick for documentation.%s"
 			       (if (fboundp (intern command))
@@ -119,7 +118,7 @@ commands and variables."
 			       (if (fboundp (intern command))
 				   (format
 				    "%s\ns-mouse-1 to find function." command)
-				 ""))
+				 "Variable"))
 		   keybinding t)))))
 
 
