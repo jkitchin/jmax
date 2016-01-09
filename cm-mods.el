@@ -322,6 +322,25 @@ where it came from. Otherwise we just save the buffer."
     (save-buffer)))
 
 
+(defun cm-wdiff-buffer-with-file ()
+  "Do a word-based diff of the buffer with the last saved version."
+  (interactive)
+  (let ((contents (buffer-string))
+	(tempf (make-temp-file "wdiff-"))
+	(fname (buffer-file-name)))
+    (with-temp-file tempf
+      (insert contents))
+
+    (switch-to-buffer "*wdiff-buffer*")
+    (insert
+     (shell-command-to-string
+      (format "%s %s %s"
+	      cm-wdiff-cmd
+	      fname
+	      tempf)))
+    (delete-file tempf)
+    (goto-char (point-min))
+    (cm-mode)))
 
 ;;* A Hydra menu
 (defhydra cm (:color blue :hint nil)
