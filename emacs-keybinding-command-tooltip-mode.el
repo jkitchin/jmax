@@ -6,26 +6,13 @@
 
 ;;; Code:
 
-(require 'rx)
-
-(defvar elisp-symbol-keybinding-re
-  (rx
-   ;; opening \\[
-   (eval "\\[")
-   ;; one or more characters that are not ]
-   (group (one-or-more (not (any "]"))))
-   ;; The closing ]
-   "]")
-"Regexp for an elisp command keybinding syntax, e.g. \\[some-command].
-Regexp group 1 matches `some-command'.")
-
 (defun match-next-keybinding (&optional limit)
-  "Move point to the next expression matching  `elisp-symbol-keybinding-re'.
+  "Move point to the next expression matching a key binding.
 LIMIT is the maximum point to search to. Then, put properties on
 the match that shows the key sequence. Non-bound commands are not
 fontified."
   (when (and (re-search-forward
-	      elisp-symbol-keybinding-re
+	      "\\\\\\[\\([[:ascii:]].*?[^ ]\\)\\]"
 	      limit t)
 	     (fboundp (intern (match-string 1))))
     (let* ((beg (match-beginning 0))
@@ -53,9 +40,12 @@ fontified."
 		   help-echo ,(format
 			       "%s\n\nClick for documentation.\ns-mouse-1 to find function."
 			       (substitute-command-keys s))
-		   keybinding t)))))
+		   keybinding t))
+      t)))
+
 
 (defun command-or-variable (symbol)
+  "Returns what SYMBOL is: 'command, 'variable or 'unknown."
   (cond
    ((fboundp symbol)
     'command)
@@ -71,7 +61,7 @@ LIMIT is the maximum point to look for a match. Then put a
 tooltip on the match that shows the key sequence. Works on
 commands and variables."
   (when (and (re-search-forward
-	      "`\\([^']+\\)'"
+	      "`\\([[:ascii:]].*?\\)'"
 	      limit t)
 	     (or (boundp (intern (match-string 1)))
 		 (fboundp (intern (match-string 1)))))
