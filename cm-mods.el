@@ -121,6 +121,7 @@ See `cm-forward-addition' for an alternative."
           t)
       nil)))
 
+
 (defun cm-next-comment (limit)
   "Find the next addition up to LIMIT.
 {>>content<<}.
@@ -176,6 +177,7 @@ See `cm-forward-comment' for an alternative."
       (cm-without-following-changes
 	(delete-region (third change) (fourth change))
 	(insert (cm-substitution-string change ?a))))))
+
 
 (defun cm-reject-all-changes ()
   "Reject all changes in the document."
