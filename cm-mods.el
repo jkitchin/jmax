@@ -346,11 +346,11 @@ where it came from. Otherwise we just save the buffer."
 (defhydra cm (:color blue :hint nil)
   "
 Track changes:
-_i_: insert text _d_: delete text     _c_: comment
-_n_: next change _p_: previous change _e_: accept/reject this change
-_a_: acc/rej all ^ ^                  _t_: toggle track changes
-_A_: accept all  _R_: reject all      _s_: save changes
-_g_: git wdiff   ^ ^                  _w_: make markup writeable  ^ ^
+_i_: insert text  _d_: delete text     _c_: comment
+_n_: next change  _p_: previous change _e_: accept/reject this change
+_a_: acc/rej all  ^ ^                  _t_: toggle track changes
+_A_: accept all   _R_: reject all      _s_: save changes
+_b_: buffer wdiff _g_: git wdiff       _w_: make markup writeable
 "
   ("i" cm-addition)
   ("d" cm-deletion)
@@ -367,6 +367,7 @@ _g_: git wdiff   ^ ^                  _w_: make markup writeable  ^ ^
   ("A" cm-accept-all-changes)
   ("R" cm-reject-all-changes)
   ("g" cm-wdiff-git)
+  ("b" cm-wdiff-buffer-with-file)
   ("s" cm-wdiff-save)
   ("w" (lambda () (interactive) (cm-make-markups-writable))))
 
