@@ -3,4 +3,4 @@
 	url = https://github.com/jkitchin/org-ref
 [submodule "criticmarkup-emacs"]
 	path = criticmarkup-emacs
-	url = ./criticmarkup-emacs
+	url = https://github.com/jkitchin/criticmarkup-emacs
