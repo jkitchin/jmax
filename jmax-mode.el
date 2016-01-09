@@ -96,12 +96,25 @@ one and open it."
      ["Toggle symbols" org-toggle-pretty-entities t]
      ["Toggle inline images" org-toggle-inline-images t]
      ["Toggle LaTeX images" org-toggle-latex-overlays t]
-     ("editing"
-      ["Insert citation" org-ref-insert-cite-link t]
-      ["Insert ref link" org-ref-insert-ref-link t]
-      ["Open notes at point" org-ref-open-notes-at-point t]
-      ["Open PDF at point" org-ref-open-pdf-at-point t]
-      ["Open url at point" org-ref-open-url-at-point t])
+     ("Markup"
+      ["Bold" bold-region-or-point t]
+      ["Italics" italics-region-or-point]
+      ["Underline" underline-region-or-point t]
+      ["Strikethrough" strikethrough-region-or-point t]
+      ["Verbatim" verbatim-region-or-point t]
+      ["Code" code-region-or-point t]
+      ["Superscript" superscript-region-or-point t]
+      ["Subscript" subscript-region-or-point t]
+      ["Latex snippet" latex-math-region-or-point t])
+     ("Track changes"
+      ["Toggle track changes" (lambda ()
+				(interactive)
+				(unless cm-mode
+				  (cm-mode))
+				(cm-follow-changes 'toggle))
+       t]
+      ["Accept/reject changes" cm-accept/reject-all-changes t]
+      ["Track change hydra" cm/body t])
      ("export"
       ["manuscript PDF" ox-manuscript-export-and-build-and-open t]
       ["submission PDF" ox-manuscript-build-submission-manuscript-and-open t]))
