@@ -723,7 +723,8 @@ Argument INFO Parse-tree from org-mode."
 F1 inserts utf-8 character
 F2 inserts entity code
 F3 inserts LaTeX code (does not wrap in math-mode)
-F4 inserts HTML code"
+F4 inserts HTML code
+F5 inserts the entity code."
   (interactive)
   (helm :sources (reverse
 		  (let ((sources '())
@@ -760,6 +761,10 @@ F4 inserts HTML code"
 				      ("insert html" . (lambda (x)
 							 (mapc (lambda (candidate)
 								 (insert (nth 3 candidate)))
+							       (helm-marked-candidates))))
+				      ("insert code" . (lambda (x)
+							 (mapc (lambda (candidate)
+								 (insert (format "%S" candidate)))
 							       (helm-marked-candidates)))))))))
 		      (when (and element (listp element))
 			(setf (cdr (assoc 'candidates (car sources)))
