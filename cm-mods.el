@@ -11,8 +11,6 @@
   "Global var to hold filename for cm-wdiff-git.")
 
 
-(setq font-lock-multiline t)
-
 ;;; Commentary:
 ;;
 
