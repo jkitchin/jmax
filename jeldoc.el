@@ -51,7 +51,7 @@ LIBRARY must be loaded before running this function."
     (switch-to-buffer "*org-doc*")
     (erase-buffer)
     (insert (format "#+TITLE: Documentation for %s
-,#+OPTIONS: toc:nil
+#+OPTIONS: toc:nil
 \\maketitle
 \\tableofcontents
 
@@ -111,9 +111,9 @@ Value:
 Documentation: %s
 
 Code:
-,#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp
 %s
-,#+END_SRC
+#+END_SRC
 
 "
 		      func
@@ -123,12 +123,14 @@ Code:
 		      (save-window-excursion
 			;; we do not have c-source, so check if func
 			;; is defined in a c file here.
-			(if
-			    (string= "c"
-				     (file-name-extension
-				      (find-lisp-object-file-name
-				       func
-				       (symbol-function func))))
+			(if (and (stringp (find-lisp-object-file-name
+					   func
+					   (symbol-function func)))
+			     (string= "c"
+				      (file-name-extension
+				       (find-lisp-object-file-name
+					func
+					(symbol-function func)))))
 			    (symbol-function func)
 			  ;;else
 			  (condition-case nil
@@ -149,9 +151,9 @@ Code:
 Documentation: %s
 
 Code:
-,#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp
 %s
-,#+END_SRC
+#+END_SRC
 
 "
 		      func
@@ -162,11 +164,14 @@ Code:
 			;; we do not have c-source, so check if func
 			;; is defined in a c file here.
 			(if
-			    (string= "c"
-				     (file-name-extension
-				      (find-lisp-object-file-name
-				       func
-				       (symbol-function func))))
+			    (and (stringp (find-lisp-object-file-name
+					    func
+					    (symbol-function func)))
+				 (string= "c"
+					  (file-name-extension
+					   (find-lisp-object-file-name
+					    func
+					    (symbol-function func)))))
 			    (symbol-function func)
 			  ;;else
 			  (condition-case nil
