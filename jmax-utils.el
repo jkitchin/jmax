@@ -82,6 +82,100 @@
   (interactive)
   (insert (buffer-file-name)))
 
+
+;;* markup commands for org-mode
+(defun subscript-region-or-point ()
+  "Subscript the region or character at point in org-mode format."
+  (interactive)
+  (if (region-active-p)
+      (progn
+	(goto-char (region-beginning))
+	(insert "_{")
+	(goto-char (region-end))
+	(insert "}"))
+    (insert "_{")
+    (forward-char)
+    (insert "}")))
+
+
+(defun superscript-region-or-point ()
+  "Superscript the region or character at point in org-mode format."
+  (interactive)
+  (if (region-active-p)
+      (progn
+	(goto-char (region-end))
+	(insert "}")
+	(goto-char (region-beginning))
+	(insert "^{"))
+    (insert "^{}")
+    (backward-char)))
+
+
+(defun bold-region-or-point ()
+  (interactive)
+  (if (region-active-p)
+      (progn
+	(goto-char (region-end))
+	(insert "*")
+	(goto-char (region-beginning))
+	(insert "*"))
+    (insert "**")
+    (backward-char)))
+
+
+(defun italicize-region-or-point ()
+  (interactive)
+  (if (region-active-p)
+      (progn
+	(goto-char (region-end))
+	(insert "/")
+	(goto-char (region-beginning))
+	(insert "/"))
+    (insert "//")
+    (backward-char)))
+
+
+(defun underline-region-or-point ()
+  (interactive)
+  (if (region-active-p)
+      (progn
+	(goto-char (region-end))
+	(insert "_")
+	(goto-char (region-beginning))
+	(insert "_"))
+    (insert "__")
+    (backward-char)))
+
+(defun latex-math-region-or-point (&optional arg)
+  "Wrap the selected region in $$ or \(\) (with prefix ARG) or @@latex:@@ with double prefix.
+Or insert those and put point in the middle to add an equation."
+  (interactive "P")
+  (let ((chars
+	 (cond
+	  ((null arg)
+	   '("$" . "$"))
+	  ((equal arg '(4))
+	   '("\\(" . "\\)"))
+	  ((equal arg '(16))
+	   '("@@latex:" . "@@")))))
+    (if (region-active-p)
+	(progn
+	  (goto-char (region-end))
+	  (insert (cdr chars))
+	  (goto-char (region-beginning))
+	  (insert (car chars)))
+      (insert (concat  (car chars) (cdr chars)))
+      (backward-char (length (cdr chars))))))
+
+
+(define-key global-map (kbd "s--") 'subscript-region-or-point)
+(define-key global-map (kbd "s-=") 'superscript-region-or-point)
+(define-key global-map (kbd "s-b") 'bold-region-or-point)
+(define-key global-map (kbd "s-i") 'italicize-region-or-point)
+(define-key global-map (kbd "s-u") 'underline-region-or-point)
+(define-key global-map (kbd "s-4") 'latex-math-region-or-point)
+
+
 (provide 'jmax-utils)
 
 ;;; jmax-utils.el ends here
