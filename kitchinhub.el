@@ -188,6 +188,14 @@ Selection is done with helm."
 
 (global-set-key (kbd "<f5>") 'magit-status)
 
+(require 'git-messenger)
+(add-hook 'prog-mode-hook
+	  (lambda ()
+	    (local-set-key
+	     (kbd "C-x v o")
+	     'git-messenger:popup-message)))
+
+
 (provide 'kitchinhub)
 
 ;;; kitchinhub.el ends here
