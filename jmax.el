@@ -255,6 +255,8 @@
 
 (require 'python-setup)
 
+(require 'jeldoc)
+
 ;;* Theme
 ;; load this last so that the user theme can be loaded
 (add-to-list 'custom-theme-load-path (expand-file-name "themes" starter-kit-dir))
