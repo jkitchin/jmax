@@ -183,6 +183,18 @@
 (add-to-list 'org-structure-template-alist
              '("lh" "#+latex_header: " ""))
 
+(add-to-list 'org-structure-template-alist
+             '("lc" "#+latex_class: " ""))
+
+(add-to-list 'org-structure-template-alist
+             '("lco" "#+latex_class_options: " ""))
+
+(add-to-list 'org-structure-template-alist
+             '("ao" "#+attr_org: " ""))
+
+(add-to-list 'org-structure-template-alist
+             '("al" "#+attr_latex: " ""))
+
 ;;* Babel settings
 ;; do not evaluate code on export by default
 (setq org-export-babel-evaluate nil)
@@ -474,24 +486,22 @@ citecolor=blue,filecolor=blue,menucolor=blue,urlcolor=blue"
     ad-do-it))
 
 
+(require 'ore)
 
 ;;* Python sessions
-;; (defun org-mode-tab (&optional arg)
-;;   "In org-mode make tab cycle on headlines, or insert 4 spaces."
-;;   (interactive "P")
-;;   (cond
-;;    ;; Cycle headlines
-;;    ((org-on-heading-p)
-;;     (org-cycle arg))
-;;    ;; expand source blocks
-;;    ((looking-back (format
-;;		   "^<%s"
-;;		   (regexp-opt (mapcar 'car org-structure-template-alist)))
-;;		  (line-beginning-position))
-;;     (org-try-structure-completion))
-;;    ;; or insert 4 spaces
-;;    (t
-;;     (insert "    "))))
+(defun org-mode-tab (&optional arg)
+  "In org-mode make tab cycle in some places, or insert 4 spaces.
+This is so when you are in text or code blocks you can use tab."
+  (interactive "P")
+  (cond
+   ;; Cycle headlines
+   ((or (org-on-heading-p)
+	(ore-src-block-header-p (org-element-context))
+	(memq (car (org-element-context)) '(table table-cell)))
+    (org-cycle arg))
+   ;; otherwise insert 4 spaces
+   (t
+    (insert "    "))))
 
 ;; (define-key org-mode-map (kbd "<tab>") 'org-mode-tab)
 
@@ -735,14 +745,22 @@ F4 inserts HTML code"
 				     (replace-regexp-in-string
 				      "\\*\\*" " - " secondlevel)))
 			   (candidates . nil)
-			   (action . (("insert utf-8 char" . (lambda (candidate)
-							       (insert (nth 6 candidate))))
-				      ("insert org entity" . (lambda (candidate)
-							   (insert (concat "\\" (car candidate)))))
-				      ("insert latex" . (lambda (candidate)
-							  (insert (nth 1 candidate))))
-				      ("insert html" . (lambda (candidate)
-							 (insert (nth 3 candidate)))))))))
+			   (action . (("insert utf-8 char" . (lambda (x)
+							       (mapc (lambda (candidate)
+								       (insert (nth 6 candidate)))
+								     (helm-marked-candidates))))
+				      ("insert org entity" . (lambda (x)
+							       (mapc (lambda (candidate)
+								       (insert (concat "\\" (car candidate))))
+								     (helm-marked-candidates))))
+				      ("insert latex" . (lambda (x)
+							  (mapc (lambda (candidate)
+								  (insert (nth 1 candidate)))
+								(helm-marked-candidates))))
+				      ("insert html" . (lambda (x)
+							 (mapc (lambda (candidate)
+								 (insert (nth 3 candidate)))
+							       (helm-marked-candidates)))))))))
 		      (when (and element (listp element))
 			(setf (cdr (assoc 'candidates (car sources)))
 			      (append
@@ -751,6 +769,8 @@ F4 inserts HTML code"
 				      (format "%10s %s" (nth 6 element) element)
 				      element))))))
 		    sources))))
+
+(define-key org-mode-map (kbd "s-y") 'helm-insert-org-entity)
 
 ;; setup english dictionary and spell check on windows.
 (cond
