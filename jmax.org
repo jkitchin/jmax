@@ -4,20 +4,106 @@
 jmax is a customization of emacs that facilitates writing technical documents. I found it takes extensive customization to get emacs to do what you want, and this is my collection of customizations.
 
 ** [[./init.el]]
+Here is where the initialization starts. This is where Emacs checks if jmax is up to date.
+
+The first thing this does is load [[./user/preload.el]]
+
+If you don't want jmax to auto-update all the time put this in that file.
+
+#+BEGIN_SRC emacs-lisp
+(setq jmax-auto-update nil)
+#+END_SRC
+
+You would also set jmax-user-theme in the preload file if you want something other than leuven.
+
 ** [[./packages.el]]
+Here is where the packages get installed.
+
 ** [[./jmax.el]]
+
+This is the next file to get loaded. This is where most of the Emacs configuration is done. It is mostly loading and configuring packages.
+
+** [[./jmax-utils.el]]
+This file contains some convenient utility functions
+
+** [[./python-setup.el]]
+This file sets up python mode, and some functions for org-mode and python.
+
 ** [[./jmax-org.el]]
-** [[./kitchingroup-mode.el]]
+This file is where org-mode is configured.
 
 ** [[file:email.el]]
-** [[file:ox-archive]]
-** [[file:org-ref.org]]
+This library contains functions for sending emails from Emacs, e.g. to email a selected region, buffer, and other things.
+
+** file:mail-merge.el
+Bring mail-merge to org-mode and emacs.
+
+** file:kitchinhub.el
+Some convenience functions for using github. Most importantly: elisp:kitchingroup
+
+** file:words.el
+Convenient functions to look up things in Emacs.
+
+** file:ore.el
+Org-element explorer elisp:ore will tell you about the element at point.
+
 ** [[file:ox-manuscript.el]]
+This library allows us to export org-mode files to scientific manuscripts.
+
+** file:org-ref
+The reference manager for org-mode. Helps with bibliographies, citations, and cross-references.
+
+** file:cm-mods.el
+Extensions for `cm-mode' to bring track changes to Emacs and org-mode.
+
+** [[file:ox-archive]]
 ** [[file:ox-cmu-ms-report.el]]
 ** [[file:ox-cmu-qualifier.el]]
 ** [[file:ox-cmu-dissertation.el]]
 ** user directory
-Put your personal setup and overrides here.
+Put your personal setup and overrides here. Everything in this directory will get loaded, in no particular order.
 
-* Latex setup 
-[[./texmf]]
+** [[file:themes]]
+Leuven is the best looking theme for org-mode in my opinion. It is the default.
+
+There are several alternative themes here including the popular zenburn and solarized themes.
+
+Set one of these like this in your preload.el file:
+
+#+BEGIN_SRC emacs-lisp
+(load-theme 'zenburn t)
+#+END_SRC
+
+#+RESULTS:
+: t
+
+#+BEGIN_SRC emacs-lisp
+(setq jmax-user-theme 'zenburn)
+#+END_SRC
+
+Some people like the Tomorrow themes (https://emacsthemes.com/themes/sanityinc-tomorrow-themes.html). Try it out.
+#+BEGIN_SRC emacs-lisp
+(add-to-list
+ 'custom-theme-load-path
+ (expand-file-name "themes/tomorrow-theme/GNU Emacs" starter-kit-dir))
+
+(load-theme 'tomorrow-day)
+#+END_SRC
+
+#+RESULTS:
+: t
+
+Or the solarized themes
+#+BEGIN_SRC emacs-lisp
+(add-to-list
+ 'custom-theme-load-path
+ (expand-file-name "themes/emacs-color-theme-solarized" starter-kit-dir))
+
+(load-theme 'solarized-dark)
+#+END_SRC
+
+#+RESULTS:
+: t
+
+* TODO Latex setup
+[[./texmf]] contains a texmf setup you can use with your latex setup. I don't think I actually use this anymore. It looks like I used to use it in Windows though [[file:texmf/README.org][(file:texmf/README.org]])
