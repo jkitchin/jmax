@@ -254,7 +254,8 @@ See `cm-forward-comment' for an alternative."
   (let* ((orgfile (if (buffer-file-name)
 		      (concat (file-name-base) "-wdiff.org")
 		    ;; no buffer file name
-		    (concat (file-name-base *cm-wdiff-git-source*) "-wdiff.org"))))
+		    (concat (file-name-base *cm-wdiff-git-source*)
+			    "-wdiff.org"))))
     (org-org-export-as-org)
     (cm-markup-to-org-latex)
     (write-file orgfile)
@@ -271,7 +272,10 @@ COMMIT selected from a helm command."
    (list
     (helm :sources `((name . "commits")
 		     (candidates . ,(mapcar (lambda (s)
-					      (let ((commit (nth 1 (split-string s)))
+					      (let ((commit
+						     (nth
+						      1
+						      (split-string s)))
 						    msg)
 						(string-match "|.*$" s)
 						(cons (concat
@@ -279,19 +283,22 @@ COMMIT selected from a helm command."
 						       (match-string 0 s))
 						      commit)))
 					    (split-string
-					     (shell-command-to-string "git hist") "\n")))
+					     (shell-command-to-string
+					      "git hist") "\n")))
 		     (action . (lambda (commit)
 				 (let* ((fname
 					 (file-relative-name
 					  (buffer-file-name)
 					  (vc-git-root (buffer-file-name))))
-					(git-root (vc-git-root (buffer-file-name)))
+					(git-root (vc-git-root
+						   (buffer-file-name)))
 					(mmode major-mode)
 					(cmd (format "%s <(git show %s:%s) %s"
 						     cm-wdiff-cmd
 						     commit fname
 						     fname))
-					(buf (get-buffer-create "*org-wdiff-git*")))
+					(buf (get-buffer-create
+					      "*org-wdiff-git*")))
 
 				   (setq *cm-wdiff-git-source* fname)
 				   (switch-to-buffer-other-window buf)
