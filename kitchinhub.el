@@ -186,6 +186,8 @@ Selection is done with helm."
 (define-key 'vc-prefix-map "p" 'vc-git-push)
 (define-key 'vc-prefix-map "P" 'vc-pull)
 
+(global-set-key (kbd "<f5>") 'magit-status)
+
 (provide 'kitchinhub)
 
 ;;; kitchinhub.el ends here
