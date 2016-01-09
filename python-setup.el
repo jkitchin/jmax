@@ -299,8 +299,7 @@ Opens a buffer with links to what is found. This function installs pyflakes, pep
 	    (setq buffer-read-only nil)
 	    (insert "\n* Org-Babel Error Output\n")
 	    (insert err)
-	    (setq buffer-read-only t)))))
-    ))
+	    (setq buffer-read-only t)))))))
 
 
 (defun jmax-activate-pycheck ()
