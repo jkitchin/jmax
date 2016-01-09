@@ -21,149 +21,66 @@
     (delete-other-windows))
 
 
-;; (defun jeldoc (library)
-;;   "Generate an org buffer containing the requires, variables and functions defined in LIBRARY.
-;; LIBRARY must be loaded before running this function."
-
-;;   (interactive "sLibrary to build doc for: ")
-
-;;   (let* ((lib-file (locate-library library))
-;;	 ;; these are the things defined in the library
-;;	 (elements (cdr
-;;		    (assoc
-;;		     (locate-library library)
-;;		     load-history)))
-;;	 ;; variables
-;;	 (vars (-filter 'symbolp elements))
-;;	 ;; things the library requires
-;;	 (requires
-;;	  (mapcar 'cdr
-;;		  (-filter (lambda (x)
-;;			     (and (consp x)
-;;				  (eq 'require (car x))))
-;;			   elements)))
-;;	 ;; functions defined in the library
-;;	 (funcs (mapcar
-;;		 'cdr
-;;		 (-filter (lambda (x)
-;;			    (and (consp x)
-;;				 (eq 'defun (car x))))
-;;			  elements))))
-
-;;     (switch-to-buffer "*org-doc*")
-;;     (erase-buffer)
-;;     (insert (format "#+TITLE: Documentation for %s
-;; #+OPTIONS: toc:nil
-;; \\maketitle
-;; \\tableofcontents
-
-;; %s
-
-;; " library  (cond
-;;	    ;; regular lisp file
-;;	    ((string= "el" (file-name-extension lib-file))
-;;	     (format "Source code: [[file:%s][%s]]" lib-file library))
-;;	    ;; compiled file. these are not easy to read so we try plain el file
-;;	    ((and (string= "elc" (file-name-extension lib-file))
-;;		  (file-exists-p
-;;		   (concat (file-name-sans-extension lib-file) ".el")))
-;;	     (format "Source code: [[file:%s][%s]]"
-;;		     (concat (file-name-sans-extension lib-file) ".el")
-;;		     library))
-;;	    ;; catch anything we cannot figure out
-;;	    (t
-;;	     (format "Source code: file:%s" lib-file)))))
+(defun unfill-paragraph ()
+  "Unfill paragraph at or after point."
+  (interactive "*")
+  (let ((fill-column most-positive-fixnum))
+    (fill-paragraph nil (region-active-p))))
 
 
-;;     (insert "* Requires\n")
-;;     ;; insert link to generate a jeldoc buffer for each require
-;;     (dolist (req requires)
-;;       (insert (format "- [[elisp:(jeldoc \"%s\")][%s]]\n" req req)))
+(defun double-space ()
+  "Make buffer look approximately double-spaced."
+  (interactive)
+  (setq line-spacing 10))
 
-;;     (insert "* Variables\n")
-;;     (dolist (var (sort vars 'string-lessp))
-;;       (insert (format "** %s
-;; Documentation: %s
 
-;; Value:
-;; %S\n\n"
-;;		      var
-;;		      (documentation-property var 'variable-documentation)
-;;		      (symbol-value var)
-;;		      )))
+(defun single-space ()
+  "Make buffer single-spaced."
+  (interactive)
+  (setq line-spacing nil))
 
-;;     (insert "* Functions\n\n")
+;;* utility functions
+;http://www.gnu.org/software/emacs/manual/html_node/elisp/File-Name-Expansion.html#File-Name-Expansion
 
-;;     (dolist (func (sort funcs 'string-lessp))
-;;       (insert (format "** %s %s
-;; Documentation: %s
+(defun get-path()
+  "Opens dired so you can navigate to a file to insert a path to it in the current buffer."
+  (interactive)
+  ; store current point so we can change back to it later
+  (setq current_point (point-marker))
+  ; now call dired to navigate to the path you want
+  (dired nil))
 
-;; Code:
-;; #+BEGIN_SRC emacs-lisp
-;; %s
-;; #+END_SRC
 
-;; "
-;;		      func
-;;		      (or (help-function-arglist func) "")
-;;		      (documentation func)
-;;		      ;; code defining the function
-;;		      (save-window-excursion
-;;			;; we do not have c-source, so check if func
-;;			;; is defined in a c file here.
-;;			(if
-;;			    (string=
-;;			     "c"
-;;			     (if (find-lisp-object-file-name
-;;				  func
-;;				  (symbol-function func))
+(defun insert-relative-path()
+  "Inserts the relative path between the original buffer and current file selected in dired."
+  (interactive)
+  (let ((selected_file (dired-get-filename)))
+    (switch-to-buffer (marker-buffer current_point))
+    (goto-char current_point)
+    (insert (file-relative-name selected_file))))
 
-;;				 (format "%s"
-;;					 (file-name-extension
-;;					  (find-lisp-object-file-name
-;;					   func
-;;					   (symbol-function func))))
-;;			       ""))
-;;			    (symbol-function func)
-;;			    func)
-;;			  ;;else
-;;			  (condition-case nil
-;;			      (let ((bp (find-function-noselect func t)))
-;;				(set-buffer (car bp))
-;;				(goto-char (cdr bp))
-;;				(when (sexp-at-point)
-;;				  (mark-sexp)
-;;				  (buffer-substring (point) (mark))))
-;;			    (error func)))))))
-;;     (org-mode)
 
-;;     ;; replace `' with links to describe function or variable, unless
-;;     ;; they are in a code block, then leave them alone.
-;;     (goto-char (point-min))
-;;     (while (re-search-forward "`\\([^' ]*\\)'" nil t)
-;;       (let ((result (match-string 1))
-;;	    (bg (match-beginning 1))
-;;	    (end (match-end 1)))
-;;	;; checking for code block changes match data, so
-;;	;; we save it here.
-;;	(unless (save-match-data
-;;		  (eq 'src-block (car (org-element-at-point))))
-;;	  (cond
-;;	   ;; known function
-;;	   ((fboundp (intern result))
-;;	    (setf (buffer-substring bg end)
-;;		  (format "[[elisp:(describe-function '%s)][%s]]"
-;;			  result result)))
-;;	   ;; known variable
-;;	   ((boundp (intern result))
-;;	    (setf (buffer-substring bg end)
-;;		  (format "[[elisp:(describe-variable '%s)][%s]]"
-;;			  result result)))
-;;	   ;; unknown quoted thing, just return it back
-;;	   (t
-;;	    (format "%s" result))))))
-;;     ;; finally jump to Requires section
-;;     (org-open-link-from-string "[[*Requires]]"))
+(defun insert-absolute-path()
+  "Inserts the absolute path to the file selected in dired to the previous buffer."
+  (interactive)
+  (let ((selected_file (dired-get-filename))) ; this is the file the cursor is on
+    (switch-to-buffer (marker-buffer current_point))
+    (goto-char current_point)
+    (insert  (expand-file-name selected_file))))
+
+
+(defun insert-path (&optional arg)
+  "Insert relative path unless prefix is used, then absolute path"
+  (interactive "P")
+  (if (equal arg nil)
+      (insert-relative-path)
+    (insert-absolute-path)))
+
+
+(defun insert-buffer-filename()
+  "Inserts filename associated with current buffer."
+  (interactive)
+  (insert (buffer-file-name)))
 
 (provide 'jmax-utils)
 
