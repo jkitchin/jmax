@@ -5,6 +5,13 @@
 
 ;;; Code:
 
+(defun jmax-help ()
+  "Open the ‘org-ref’ manual."
+  (interactive)
+  (find-file (expand-file-name
+              "jmax.org"
+	      starter-kit-dir)))
+
 
 (defun kill-all-buffers ()
   "Kill all buffers.  Leave one frame open."
