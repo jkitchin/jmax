@@ -385,7 +385,7 @@ _i_: insert text  _d_: delete text     _c_: comment
 _n_: next change  _p_: previous change _e_: accept/reject this change
 _a_: acc/rej all  ^ ^                  _t_: toggle track changes
 _A_: accept all   _R_: reject all      _s_: save changes
-_b_: buffer wdiff _g_: git wdiff       _w_: make markup writeable
+_b_: buffer wdiff _g_: git wdiff
 "
   ("i" cm-addition)
   ("d" cm-deletion)
@@ -403,8 +403,7 @@ _b_: buffer wdiff _g_: git wdiff       _w_: make markup writeable
   ("R" cm-reject-all-changes)
   ("g" cm-wdiff-git)
   ("b" cm-wdiff-buffer-with-file)
-  ("s" cm-wdiff-save)
-  ("w" (lambda () (interactive) (cm-make-markups-writable))))
+  ("s" cm-wdiff-save))
 
 (global-set-key (kbd "s-x") 'cm/body)
 
