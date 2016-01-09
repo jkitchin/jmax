@@ -265,52 +265,79 @@ See `cm-forward-comment' for an alternative."
 
 ;;* Get cm markup with wdiff and git
 
-(defun cm-wdiff-git (commit)
-  "Perform a wdiff on the current version to the one in a git COMMIT.
-COMMIT selected from a helm command."
-  (interactive
-   (list
-    (helm :sources `((name . "commits")
-		     (candidates . ,(mapcar (lambda (s)
-					      (let ((commit
-						     (nth
-						      1
-						      (split-string s)))
-						    msg)
-						(string-match "|.*$" s)
-						(cons (concat
-						       commit " "
-						       (match-string 0 s))
-						      commit)))
-					    (split-string
-					     (shell-command-to-string
-					      "git hist") "\n")))
-		     (action . (lambda (commit)
-				 (let* ((fname
-					 (file-relative-name
-					  (buffer-file-name)
-					  (vc-git-root (buffer-file-name))))
-					(git-root (vc-git-root
-						   (buffer-file-name)))
-					(mmode major-mode)
-					(cmd (format "%s <(git show %s:%s) %s"
-						     cm-wdiff-cmd
-						     commit fname
-						     fname))
-					(buf (get-buffer-create
-					      "*org-wdiff-git*")))
 
-				   (setq *cm-wdiff-git-source* fname)
-				   (switch-to-buffer-other-window buf)
-				   ;; Try to keep same major mode
-				   (funcall mmode)
-				   (erase-buffer)
-				   (let ((default-directory git-root))
-				     (insert (shell-command-to-string cmd)))
+(defun cm-git-commit-selector ()
+  "Return list of commits."
+  (helm :sources `((name . "commits")
+		   (candidates . ,(mapcar (lambda (s)
+					    (let ((commit
+						   (nth
+						    1
+						    (split-string s)))
+						  msg)
+					      (string-match "|.*$" s)
+					      (cons (concat
+						     commit " "
+						     (match-string 0 s))
+						    commit)))
+					  (split-string
+					   (shell-command-to-string
+					    "git hist") "\n")))
+		   (action . (lambda (candidate)
+			       (helm-marked-candidates))))))
 
-				   ;; Turn on cm-mode
-				   (cm-mode)
-				   (goto-char (point-min))))))))))
+
+(defun cm-wdiff-git ()
+  "Perform a wdiff between git commits.
+a helm selection buffer is used to choose commits.
+
+If you choose one commit, the wdiff is between that commit and
+the current version.
+
+If you choose two commits, the wdiff is between those two
+commits."
+  (interactive)
+  (let ((commits (cm-git-commit-selector))
+	(buf (get-buffer-create
+	      "*org-wdiff-git*"))
+	(mmode major-mode)
+	(git-root (vc-git-root
+		   (buffer-file-name)))
+	(fname
+	 (file-relative-name
+	  (buffer-file-name)
+	  (vc-git-root (buffer-file-name))))
+	cmd)
+    (cond
+     ;; current version vs commit
+     ((= 1 (length commits))
+      (setq cmd (format "%s <(git show %s:%s) %s"
+			cm-wdiff-cmd
+			(car commits) fname
+			fname)))
+     ;; more than 1 commit, we just take first two
+     ((> (length commits) 1)
+      (setq cmd (format "%s <(git show %s:%s) <(git show %s:%s)"
+			cm-wdiff-cmd
+			(nth 0 commits) fname
+			(nth 1 commits) fname))))
+
+    ;; Save fname in global var for convenience to save buffer later
+    (setq *cm-wdiff-git-source* fname)
+    (switch-to-buffer-other-window buf)
+    (let ((inhibit-read-only t))
+      (erase-buffer))
+
+    ;; Try to keep same major mode
+    (funcall mmode)
+
+    ;; get the wdiff. we do this in git-root so the paths are all correct.
+    (let ((default-directory git-root))
+      (insert (shell-command-to-string cmd)))
+
+    ;; Turn on cm-mode
+    (cm-mode)
+    (goto-char (point-min))))
 
 
 (defun cm-wdiff-save ()
@@ -330,7 +357,8 @@ where it came from. Otherwise we just save the buffer."
 
 
 (defun cm-wdiff-buffer-with-file ()
-  "Do a word-based diff of the buffer with the last saved version."
+  "Do a wdiff of the buffer with the last saved version.
+For line-based diff use `diff-buffer-with-file'."
   (interactive)
   (let ((contents (buffer-string))
 	(tempf (make-temp-file "wdiff-"))
