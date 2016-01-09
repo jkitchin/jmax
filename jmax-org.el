@@ -195,6 +195,29 @@
 (add-to-list 'org-structure-template-alist
              '("al" "#+attr_latex: " ""))
 
+(add-to-list 'org-structure-template-alist
+             '("ca" "#+caption: " ""))
+
+(add-to-list 'org-structure-template-alist
+             '("tn" "#+tblname: " ""))
+
+(add-to-list 'org-structure-template-alist
+             '("n" "#+name: " ""))
+
+;; table expansions
+(loop for i from 1 to 6
+      do
+      (let ((template (make-string i ?t))
+	    (expansion (concat "|"
+			       (mapconcat
+				'identity
+				(loop for j to i collect "   ")
+				"|"))))
+	(setf (substring expansion 2 3) "?")
+	(add-to-list 'org-structure-template-alist
+		     `(,template ,expansion ""))))
+
+
 ;;* Babel settings
 ;; do not evaluate code on export by default
 (setq org-export-babel-evaluate nil)
