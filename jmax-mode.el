@@ -140,11 +140,7 @@ one and open it."
      ["Lookup in Arxiv" words-arxiv]
      ["Lookup in Dictionary" words-dictionary t]
      ["Lookup in Thesaurus" words-thesaurus t])
-    ["Help with jmax" (find-file (expand-file-name
-			"jmax.org"
-			(file-name-directory
-			 (locate-library "jmax"))))
-     t]
+    ["Help with jmax" jmax-help t]
     ["Customize user.el" jmax-customize-user t]))
 
 
