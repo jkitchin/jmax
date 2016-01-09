@@ -409,6 +409,15 @@ citecolor=blue,filecolor=blue,menucolor=blue,urlcolor=blue"
 
 (require 'org-show)
 
+
+;;* cm-mode
+(add-to-list 'load-path
+	     (expand-file-name "criticmarkup-emacs" starter-kit-dir))
+
+(require 'cm-mode)
+(require 'cm-mods)
+
+
 ;;* https://github.com/jkitchin/org-ref
 (add-to-list 'load-path
 	     (expand-file-name "org-ref" starter-kit-dir))
