@@ -91,78 +91,43 @@
 
 
 ;;* markup commands for org-mode
-(defun subscript-region-or-point ()
-  "Subscript the region or character at point in org-mode format."
-  (interactive)
-  (if (region-active-p)
-      (progn
-	(goto-char (region-beginning))
-	(insert "_{")
-	(goto-char (region-end))
-	(insert "}"))
-    (insert "_{")
-    (forward-char)
-    (insert "}")))
+(loop for (type beginning-marker end-marker)
+      in '((subscript "_{" "}")
+	   (superscript "^{" "}")
+	   (italics "/" "/")
+	   (bold "*" "*")
+	   (verbatim "=" "=")
+	   (code "~" "~")
+	   (underline "_" "_")
+	   (strikethrough "+" "+"))
+      do
+      (eval `(defun ,(intern (format "%s-region-or-point" type)) ()
+	       ,(format "%s the region or character at point"
+			(upcase (symbol-name type)))
+	       (interactive)
+	       (if (region-active-p)
+		   (progn
+		     (goto-char (region-end))
+		     (insert ,end-marker)
+		     (goto-char (region-beginning))
+		     (insert ,beginning-marker)
+		     (re-search-forward (regexp-quote ,end-marker))
+		     (goto-char (match-end 0)))
+		 (insert ,(concat beginning-marker end-marker))
+		 (backward-char ,(length end-marker))))))
 
-
-(defun superscript-region-or-point ()
-  "Superscript the region or character at point in org-mode format."
-  (interactive)
-  (if (region-active-p)
-      (progn
-	(goto-char (region-end))
-	(insert "}")
-	(goto-char (region-beginning))
-	(insert "^{"))
-    (insert "^{}")
-    (backward-char)))
-
-
-(defun bold-region-or-point ()
-  (interactive)
-  (if (region-active-p)
-      (progn
-	(goto-char (region-end))
-	(insert "*")
-	(goto-char (region-beginning))
-	(insert "*"))
-    (insert "**")
-    (backward-char)))
-
-
-(defun italicize-region-or-point ()
-  (interactive)
-  (if (region-active-p)
-      (progn
-	(goto-char (region-end))
-	(insert "/")
-	(goto-char (region-beginning))
-	(insert "/"))
-    (insert "//")
-    (backward-char)))
-
-
-(defun underline-region-or-point ()
-  (interactive)
-  (if (region-active-p)
-      (progn
-	(goto-char (region-end))
-	(insert "_")
-	(goto-char (region-beginning))
-	(insert "_"))
-    (insert "__")
-    (backward-char)))
 
 (defun latex-math-region-or-point (&optional arg)
-  "Wrap the selected region in $$ or \(\) (with prefix ARG) or @@latex:@@ with double prefix.
+  "Wrap the selected region in latex math markup.
+\(\) or $$ (with prefix ARG) or @@latex:@@ with double prefix.
 Or insert those and put point in the middle to add an equation."
   (interactive "P")
   (let ((chars
 	 (cond
 	  ((null arg)
-	   '("$" . "$"))
-	  ((equal arg '(4))
 	   '("\\(" . "\\)"))
+	  ((equal arg '(4))
+	   '("$" . "$"))
 	  ((equal arg '(16))
 	   '("@@latex:" . "@@")))))
     (if (region-active-p)
@@ -175,12 +140,15 @@ Or insert those and put point in the middle to add an equation."
       (backward-char (length (cdr chars))))))
 
 
-(define-key global-map (kbd "s--") 'subscript-region-or-point)
-(define-key global-map (kbd "s-=") 'superscript-region-or-point)
-(define-key global-map (kbd "s-b") 'bold-region-or-point)
-(define-key global-map (kbd "s-i") 'italicize-region-or-point)
-(define-key global-map (kbd "s-u") 'underline-region-or-point)
-(define-key global-map (kbd "s-4") 'latex-math-region-or-point)
+(define-key org-mode-map (kbd "s--") 'subscript-region-or-point)
+(define-key org-mode-map (kbd "s-=") 'superscript-region-or-point)
+(define-key org-mode-map (kbd "s-i") 'italics-region-or-point)
+(define-key org-mode-map (kbd "s-b") 'bold-region-or-point)
+(define-key org-mode-map (kbd "s-v") 'verbatim-region-or-point)
+(define-key org-mode-map (kbd "s-c") 'code-region-or-point)
+(define-key org-mode-map (kbd "s-u") 'underline-region-or-point)
+(define-key org-mode-map (kbd "s-+") 'strikethrough-region-or-point)
+(define-key org-mode-map (kbd "s-4") 'latex-math-region-or-point)
 
 
 (provide 'jmax-utils)
