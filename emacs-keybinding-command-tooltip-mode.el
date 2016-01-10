@@ -121,9 +121,9 @@ get to the documentation."
   (font-lock-fontify-buffer))
 
 
-(add-hook 'org-mode-hook
-	  (lambda ()
-	    (emacs-keybinding-command-tooltip-mode +1)))
+;; (add-hook 'org-mode-hook
+;;	  (lambda ()
+;;	    (emacs-keybinding-command-tooltip-mode +1)))
 
 (provide 'emacs-keybinding-command-tooltip-mode)
 
