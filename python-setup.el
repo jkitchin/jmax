@@ -11,7 +11,7 @@
 (setq python-indent-offset 4)
 
 ;; turn off yasnippets in python mode
-(add-hook 'python-mode-hook #'(lambda () (yas-global-mode -1)))
+;; (add-hook 'python-mode-hook #'(lambda () (yas-global-mode -1)))
 
 ;; I want python to always show me the output. this advice makes that happen.
 (defadvice python-shell-send-buffer (after switch-to-python-output activate)
