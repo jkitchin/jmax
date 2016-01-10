@@ -87,8 +87,7 @@ Value:
 %S\n\n"
 		      var
 		      (documentation-property var 'variable-documentation)
-		      (symbol-value var)
-		      )))
+		      (symbol-value var))))
 
     (insert "* Regular Variables\n\n")
     (dolist (var (sort (-filter (lambda (x) (not (custom-variable-p x)))
@@ -101,8 +100,7 @@ Value:
 %S\n\n"
 		      var
 		      (documentation-property var 'variable-documentation)
-		      (symbol-value var)
-		      )))
+		      (symbol-value var))))
 
     (insert "* Interactive Functions\n\n")
 
@@ -118,29 +116,40 @@ Code:
 "
 		      func
 		      (or (help-function-arglist func) "")
-		      (documentation func)
+		      (let ((docstring (documentation func)))
+			(when docstring
+			  (setq docstring
+				(replace-regexp-in-string "^*" ",*" docstring))
+			  (setq docstring
+				(replace-regexp-in-string "^#" ",#" docstring)))
+			docstring)
 		      ;; code defining the function
-		      (save-window-excursion
-			;; we do not have c-source, so check if func
-			;; is defined in a c file here.
-			(if (and (stringp (find-lisp-object-file-name
-					   func
-					   (symbol-function func)))
-			     (string= "c"
-				      (file-name-extension
-				       (find-lisp-object-file-name
-					func
-					(symbol-function func)))))
-			    (symbol-function func)
-			  ;;else
-			  (condition-case nil
-			      (let ((bp (find-function-noselect func t)))
-				(set-buffer (car bp))
-				(goto-char (cdr bp))
-				(when (sexp-at-point)
-				  (mark-sexp)
-				  (buffer-substring (point) (mark))))
-			    (error func)))))))
+		      (let ((code (save-window-excursion
+				    ;; we do not have c-source, so check if func
+				    ;; is defined in a c file here.
+				    (if (and (stringp (find-lisp-object-file-name
+						       func
+						       (symbol-function func)))
+					     (string= "c"
+						      (file-name-extension
+						       (find-lisp-object-file-name
+							func
+							(symbol-function func)))))
+					(symbol-function func)
+				      ;;else
+				      (condition-case nil
+					  (let ((bp (find-function-noselect
+						     func t)))
+					    (set-buffer (car bp))
+					    (goto-char (cdr bp))
+					    (when (sexp-at-point)
+					      (mark-sexp)
+					      (buffer-substring (point) (mark))))
+					(error func))))))
+			(when (stringp code)
+			  (setq code (replace-regexp-in-string "^*" ",*" code))
+			  (setq code (replace-regexp-in-string "^#" ",#" code)))
+			code))) )
 
     (insert "* Non-interactive Functions\n\n")
 
@@ -158,30 +167,43 @@ Code:
 "
 		      func
 		      (or (help-function-arglist func) "")
-		      (documentation func)
+		      ;; escape some org-syntax
+		      (let ((docstring (documentation func)))
+			(when docstring
+			  (setq docstring
+				(replace-regexp-in-string "^*" ",*" docstring))
+			  (setq docstring
+				(replace-regexp-in-string "^#" ",#" docstring)))
+			docstring)
+
 		      ;; code defining the function
-		      (save-window-excursion
-			;; we do not have c-source, so check if func
-			;; is defined in a c file here.
-			(if
-			    (and (stringp (find-lisp-object-file-name
-					    func
-					    (symbol-function func)))
-				 (string= "c"
-					  (file-name-extension
-					   (find-lisp-object-file-name
-					    func
-					    (symbol-function func)))))
-			    (symbol-function func)
-			  ;;else
-			  (condition-case nil
-			      (let ((bp (find-function-noselect func t)))
-				(set-buffer (car bp))
-				(goto-char (cdr bp))
-				(when (sexp-at-point)
-				  (mark-sexp)
-				  (buffer-substring (point) (mark))))
-			    (error func)))))))
+		      (let ((code (save-window-excursion
+				    ;; we do not have c-source, so check if func
+				    ;; is defined in a c file here.
+				    (if
+					(and (stringp (find-lisp-object-file-name
+						       func
+						       (symbol-function func)))
+					     (string= "c"
+						      (file-name-extension
+						       (find-lisp-object-file-name
+							func
+							(symbol-function func)))))
+					(symbol-function func)
+				      ;;else
+				      (condition-case nil
+					  (let ((bp (find-function-noselect func t)))
+					    (set-buffer (car bp))
+					    (goto-char (cdr bp))
+					    (when (sexp-at-point)
+					      (mark-sexp)
+					      (buffer-substring (point) (mark))))
+					(error func))))))
+			;; escape org syntax
+			(when (stringp code) code
+			  (setq code (replace-regexp-in-string "^*" ",*" code))
+			  (setq code (replace-regexp-in-string "^#" ",#" code)))
+			code))))
     (org-mode)
 
     ;; replace `' with links to describe function or variable, unless
