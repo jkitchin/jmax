@@ -62,7 +62,8 @@ commands and variables."
 	    (cond ((fboundp (intern command))
 		   (documentation (intern command)))
 		  ((boundp (intern command))
-		   (describe-variable (intern command)))))
+		   (save-window-excursion
+		     (describe-variable (intern command))))))
 	   (describe-func
 	    `(lambda ()
 	       "Run `describe-function/variable' on the command."
@@ -109,10 +110,12 @@ get to the documentation."
   :lighter " KB"
   (if emacs-keybinding-command-tooltip-mode
       ;; turn them on
-      (font-lock-add-keywords
-       nil
-       '((match-next-keybinding 1 font-lock-constant-face)
-	 (match-next-emacs-command 1 font-lock-constant-face)))
+      (progn
+	(font-lock-add-keywords
+	 nil
+	 '((match-next-keybinding 1 font-lock-constant-face)
+	   (match-next-emacs-command 1 font-lock-constant-face)))
+	(add-to-list 'font-lock-extra-managed-props 'local-map))
     ;; turn them off
     (font-lock-remove-keywords
      nil
@@ -121,9 +124,9 @@ get to the documentation."
   (font-lock-fontify-buffer))
 
 
-;; (add-hook 'org-mode-hook
-;;	  (lambda ()
-;;	    (emacs-keybinding-command-tooltip-mode +1)))
+(add-hook 'org-mode-hook
+	  (lambda ()
+	    (emacs-keybinding-command-tooltip-mode +1)))
 
 (provide 'emacs-keybinding-command-tooltip-mode)
 

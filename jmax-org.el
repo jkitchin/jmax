@@ -11,6 +11,7 @@
 (require 'org-inlinetask)
 (require 'org-mouse)
 (require 'org-contacts)
+(require 'emacs-keybinding-command-tooltip-mode)
 
 ;;; Code:
 ;;* Basic variables
