@@ -15,7 +15,8 @@ fontified."
 	      "\\\\\\[\\([[:ascii:]]*?[^ ]\\)\\]"
 	      limit t)
 	     (fboundp (intern (match-string 1))))
-    (let* ((beg (match-beginning 0))
+    (let* ((mdata (match-data))
+	   (beg (match-beginning 0))
 	   (end (match-end 0))
 	   (s (match-string 0))
 	   (command (match-string 1))
@@ -40,6 +41,7 @@ fontified."
 		   help-echo ,(format
 			       "%s\n\nClick for documentation.\ns-mouse-1 to find function."
 			       (substitute-command-keys s))))
+      (set-match-data mdata)
       t)))
 
 
@@ -54,7 +56,8 @@ commands and variables."
 	     ;; Make sure the match is a variable or function
 	     (or (boundp (intern (match-string 1)))
 		 (fboundp (intern (match-string 1)))))
-    (let* ((beg (match-beginning 0))
+    (let* ((mdata (match-data))
+	   (beg (match-beginning 0))
 	   (end (match-end 0))
 	   (s (match-string 0))
 	   (command (match-string 1))
@@ -100,7 +103,9 @@ commands and variables."
 				   (format
 				    "%s\ns-mouse-1 to find function." command)
 				 ;; else, it is a variable
-				 "Variable")))))))
+				 "Variable"))))
+      (set-match-data mdata)
+      t)))
 
 
 (define-minor-mode emacs-keybinding-command-tooltip-mode
