@@ -12,7 +12,7 @@ LIMIT is the maximum point to search to. Then, put properties on
 the match that shows the key sequence. Non-bound commands are not
 fontified."
   (when (and (re-search-forward
-	      "\\\\\\[\\([[:ascii:]].*?[^ ]\\)\\]"
+	      "\\\\\\[\\([[:ascii:]]*?[^ ]\\)\\]"
 	      limit t)
 	     (fboundp (intern (match-string 1))))
     (let* ((beg (match-beginning 0))
@@ -49,7 +49,7 @@ LIMIT is the maximum point to look for a match. Then put a
 tooltip on the match that shows the key sequence. Works on
 commands and variables."
   (when (and (re-search-forward
-	      "`\\([[:ascii:]].*?\\)'"
+	      "`\\([[:ascii:]]*?\\)'"
 	      limit t)
 	     ;; Make sure the match is a variable or function
 	     (or (boundp (intern (match-string 1)))
