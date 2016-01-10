@@ -5,7 +5,7 @@
 ;; possible repos, and then clones and opens it.
 
 (require 'json)
-
+(require 'vc)
 ;;; Code:
 
 (defvar kitchinhub-userpass nil
