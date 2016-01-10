@@ -120,6 +120,11 @@ get to the documentation."
        (match-next-emacs-command 1 font-lock-constant-face))))
   (font-lock-fontify-buffer))
 
+
+(add-hook 'org-mode-hook
+	  (lambda ()
+	    (emacs-keybinding-command-tooltip-mode +1)))
+
 (provide 'emacs-keybinding-command-tooltip-mode)
 
 ;;; emacs-keybinding-command-tooltip-mode.el ends here
