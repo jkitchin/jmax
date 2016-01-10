@@ -88,8 +88,6 @@
 (require 'jmax-mode)
 (jmax-mode 1)
 
-
-;;* personal preferences
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; add this directory to the path for loading lisp files
@@ -297,6 +295,97 @@
 (require 'python-setup)
 
 (require 'jeldoc)
+
+;;* Spell-checking
+(when (setq-default ispell-program-name
+		    (or (executable-find "hunspell")
+			(executable-find "ispell")
+			(executable-find "aspell")))
+
+  (setq ispell-personal-dictionary (concat starter-kit-dir "user/.ispell"))
+  (setq ispell-silently-savep t)
+
+
+  ;; Spell-checking on the fly
+  (flyspell-mode +1)
+
+
+  (eval-after-load "flyspell"
+    '(progn
+       (define-key flyspell-mouse-map [s-mouse-1] #'flyspell-correct-word)))
+
+  ;; enabling flyspell in special edit source blocks.
+  (defadvice org-edit-src-code (around set-buffer-file-name activate compile)
+    (let ((file-name (buffer-file-name))) ;; (1)
+      ad-do-it				  ;; (2)
+      (setq buffer-file-name file-name))) ;; (3)
+
+  ;; flyspell mode for spell checking everywhere
+  (add-hook 'org-mode-hook 'turn-on-flyspell 'append)
+
+  ;; configure ispell to ignore some things
+  (defun endless/org-ispell ()
+    "Configure `ispell-skip-region-alist' for `org-mode'."
+    (make-local-variable 'ispell-skip-region-alist)
+    (add-to-list 'ispell-skip-region-alist '(org-property-drawer-re))
+    (add-to-list 'ispell-skip-region-alist '("~" "~"))
+    (add-to-list 'ispell-skip-region-alist '("=" "="))
+    ;; this next line ignores org-ref-links
+    (add-to-list 'ispell-skip-region-alist
+		 '(org-ref-cite-re org-ref-label-re org-ref-ref-re))
+    (add-to-list 'ispell-skip-region-alist '("^#\\+BEGIN_SRC" . "^#\\+END_SRC")))
+
+  (add-hook 'org-mode-hook #'endless/org-ispell)
+
+  (defun flyspell-check-next-highlighted-word ()
+    "Move to next error and check it."
+    (interactive)
+    (flyspell-goto-next-error)
+    (ispell-word))
+
+  (defhydra spell (:color red)
+    "spell"
+    ("s" flyspell-check-previous-highlighted-word "previous")
+    ("n" flyspell-check-next-highlighted-word "next")
+    ("c" ispell-continue "cont")
+    ("e" flyspell-goto-next-error "next error")
+    ("w" ispell-word "word")
+    ("b" ispell-buffer "buffer")
+    ("q" nil "quit" :color blue))
+
+  (global-set-key (kbd "s-s") 'flyspell-check-previous-highlighted-word)
+  (global-set-key (kbd "M-s-s") 'spell/body))
+
+(setq save-abbrevs t
+      only-global-abbrevs t)
+(setq-default abbrev-mode t)
+
+(defun jmax-define-abbrev (abbreviation expansion)
+  "Define an ABBREVIATION that globally expands to EXPANSION.
+for example: cheme to Chemical Engineering."
+  (interactive "sAbbreviation: \nsExpansion: ")
+  (define-abbrev global-abbrev-table abbreviation expansion))
+
+
+;; http://endlessparentheses.com/ispell-and-abbrev-the-perfect-auto-correct.html
+(define-key ctl-x-map "\C-i" 'endless/ispell-word-then-abbrev)
+
+(defun endless/ispell-word-then-abbrev (p)
+  "Call `ispell-word'. Then create an abbrev for the correction made.
+With prefix P, create local abbrev. Otherwise it will be global."
+  (interactive "P")
+  (let ((bef (downcase (or (thing-at-point 'word) ""))) aft)
+    (call-interactively 'ispell-word)
+    (setq aft (downcase (or (thing-at-point 'word) "")))
+    (unless (string= aft bef)
+      (message "\"%s\" now expands to \"%s\" %sally"
+               bef aft (if p "loc" "glob"))
+      (define-abbrev
+        (if p global-abbrev-table local-abbrev-table)
+        bef aft))))
+
+
+
 
 ;;* Theme
 ;; load this last so that the user theme can be loaded
