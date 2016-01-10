@@ -39,20 +39,8 @@ fontified."
 		   mouse-face highlight
 		   help-echo ,(format
 			       "%s\n\nClick for documentation.\ns-mouse-1 to find function."
-			       (substitute-command-keys s))
-		   keybinding t))
+			       (substitute-command-keys s))))
       t)))
-
-
-(defun command-or-variable (symbol)
-  "Returns what SYMBOL is: 'command, 'variable or 'unknown."
-  (cond
-   ((fboundp symbol)
-    'command)
-   ((boundp sympol)
-    'variable)
-   (t
-    'unknown)))
 
 
 (defun match-next-emacs-command (&optional limit)
@@ -63,6 +51,7 @@ commands and variables."
   (when (and (re-search-forward
 	      "`\\([[:ascii:]].*?\\)'"
 	      limit t)
+	     ;; Make sure the match is a variable or function
 	     (or (boundp (intern (match-string 1)))
 		 (fboundp (intern (match-string 1)))))
     (let* ((beg (match-beginning 0))
@@ -103,13 +92,14 @@ commands and variables."
 				   (substitute-command-keys
 				    (format "\\[%s]\n"
 					    command))
+				 ;; else, it is a variable
 				 "Variable")
 			       description
 			       (if (fboundp (intern command))
 				   (format
 				    "%s\ns-mouse-1 to find function." command)
-				 "Variable"))
-		   keybinding t)))))
+				 ;; else, it is a variable
+				 "Variable")))))))
 
 
 (define-minor-mode emacs-keybinding-command-tooltip-mode
