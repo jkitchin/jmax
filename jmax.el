@@ -227,6 +227,47 @@
   ;;; Save current position to mark ring
 (add-hook 'helm-goto-line-before-hook 'helm-save-current-pos-to-mark-ring)
 
+;; * helm extensions
+;; add some useful functions to helm-find-files
+
+(defun helm-attach-to-email (candidate)
+  (mml-attach-file candidate))
+
+
+(defun helm-find-files-insert-path (target)
+  "Insert relative path to TARGET."
+  (insert (file-relative-name target)))
+
+
+(defun helm-find-files-insert-absolute-path (target)
+  "Insert absolute path to TARGET."
+  (insert (expand-file-name target)))
+
+
+(add-hook 'helm-find-files-before-init-hook
+          (lambda ()
+
+	    (helm-add-action-to-source
+	     "Insert path"
+	     'helm-find-files-insert-path
+	     helm-source-find-files)
+
+	    (helm-add-action-to-source
+	     "Insert absolute path"
+	     'helm-find-files-insert-absolute-path
+	     helm-source-find-files)
+
+	    (helm-add-action-to-source
+	     "Attach file to email"
+	     'helm-attach-to-email helm-source-find-files)
+
+	    (helm-add-action-to-source
+	     "Make directory"
+	     (lambda (target)
+	       (make-directory target))
+	     helm-source-find-files)))
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;* other loads
