@@ -381,11 +381,14 @@ You can mark the paragraph with `mark-paragraph'.
 
 
 ;; Let's add to the org menu for "Help at point"
-(easy-menu-change
- '("Org")
- "Help"
- '(["Help at point" ore])
- "Show/Hide")
+(add-hook 'org-mode-hook
+	  (lambda ()
+	    (easy-menu-change
+	     '("Org")
+	     "Help"
+	     '(["Help at point" ore])
+	     "Show/Hide")))
+
 (provide 'ore)
 
 ;;; ore.el ends here
