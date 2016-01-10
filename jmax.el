@@ -362,8 +362,12 @@
 
 (defun jmax-define-abbrev (abbreviation expansion)
   "Define an ABBREVIATION that globally expands to EXPANSION.
-for example: cheme to Chemical Engineering."
+for example: cheme to Chemical Engineering. This is essentially
+like `inverse-add-blobal-abbrev', but doesn't require the prefix
+arg, and is easier to remember I think."
   (interactive "sAbbreviation: \nsExpansion: ")
+  (when (string-match " " abbreviation)
+    (error "No spaces allowed in an abbreviation"))
   (define-abbrev global-abbrev-table abbreviation expansion))
 
 
