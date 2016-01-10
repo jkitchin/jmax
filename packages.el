@@ -36,16 +36,17 @@
 	'org-plus-contrib
 	'jedi 'jedi-direx
 	'helm 'helm-themes 'helm-bibtex
-	'f ; file functions https://github.com/rejeep/f.el
-	's ; string functions
-	'dash ; list functions
-	'ht ; hash functions
+	'f			 ; file functions https://github.com/rejeep/f.el
+	's			 ; string functions
+	'dash			 ; list functions
+	'ht			 ; hash functions
         'rainbow-mode
 	'ace-jump-mode 'ace-isearch
 	'use-package
 	'hydra 'key-chord
 	'git-timemachine
 	'button-lock
+	'elfeed
 	)
   "Libraries that should be installed by default.")
 
