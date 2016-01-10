@@ -77,7 +77,37 @@ The following examples show the shortcuts defined in jmax for expansion. Put you
 <ao
 #+attr_org:
 
+<al
 #+attr_latex:
+
+<ca
+#+caption:
+
+<tn
+#+tblname:
+
+<n
+#+name:
+
+Here are some convenient table expansions.
+
+<t
+|  |
+
+<tt
+|  |   |
+
+<ttt
+|  |   |   |
+
+<tttt
+|  |   |   |   |
+
+<ttttt
+|  |   |   |   |   |
+
+<tttttt
+|  |   |   |   |   |   |
 
 ** LaTeX export classes in jmax
 The default article class is not usually what you want your PDF documents to look like.
@@ -86,15 +116,17 @@ The default article class is not usually what you want your PDF documents to loo
 - article-no-defaults :: bare article class with no default packages
 
 ** Getting help in Emacs
-jmax does a few things to help you get help.
+jmax does a few things to help you get help besides this manual.
 
 1. `emacs-keybinding-command-tooltip-mode'
    This minor mode recognizes command/variable syntax, fontifies it, puts a tooltip on it, and makes it clickable! The tooltip is the Emacs documentation. Clicking on it opens the Help buffer. Pressing the super key and clicking should open the code for the function.
-   It recognizes variables too:   `elisp-symbol-keybinding-re'
+   It recognizes variables too: `org-export-babel-evaluate'.
 
    The key-binding syntax is also recognized \\[bold-region-or-point] and hovering on it will show you the keybinding if there is one.
 
 2. The `ore' command will tell you about the org-element your cursor is on. It will give you some hints about what you can do (i.e. what commands/actions you can do) at that point.
+
+3. You may find the `jeldoc' command helpful to learn about libraries. It generates an org-file of all the requirements, variables and functions in a library. Try this link: [[elisp:(jeldoc "org-ref")]]. It works on most libraries, please report ones where it does not work.
 
 ** Changes to org-mode behavior
 jmax advises C-c C-c behavior so it does not remove LaTeX overlays on equations.
@@ -102,7 +134,6 @@ jmax advises C-c C-c behavior so it does not remove LaTeX overlays on equations.
 jmax provides `org-toggle-latex-overlays'.
 
 jmax refreshes all images after you execute a src-block.
-
 
 * Version control in jmax
 We use git for version control. There are three styles of using git with jmax:
@@ -137,6 +168,13 @@ You can turn track changes on with the command `cm-follow-changes'. There is a h
 
 * TODO Scientific writing
 See `org-ref'.
+
+** TODO spell checking
+
+* TODO Productivity
+** Org contacts
+** Email
+** RSS/elfeed
 
 * Description of the files in jmax
 ** [[./init.el]]
