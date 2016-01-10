@@ -172,6 +172,24 @@ See `org-ref'.
 ** TODO spell checking
 
 * TODO Productivity
+** hotspots
+The `hotspots' command provides a simple interface to do common things like run the `org-agenda' command, open files you use often, etc...
+
+For example to get easy commands to open my Google calendar, contatcts, agenda, and open my CV I have something like this in my user.el file:
+
+#+BEGIN_SRC emacs-lisp
+(setq jmax-user-hotspot-commands
+      '(("Calendar" . (lambda ()
+			(browse-url "https://www.google.com/calendar/render")))
+	("Contacts" . helm-org-contacts)
+	("Agenda" . (lambda () (org-agenda "" "w")))
+	("CV" . (lambda ()
+		  (org-open-file
+		   "/Users/jkitchin/Dropbox/CMU/CV and bios/kitchin_cv.docx"
+		   '(16))))))
+#+END_SRC
+
+
 ** Org contacts
 ** Email
 ** RSS/elfeed

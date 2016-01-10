@@ -5,6 +5,44 @@
 
 ;;; Code:
 
+(defcustom jmax-user-hotspot-commands '()
+  "A-list of hotspots to jump to in `hotspots'.
+These are shortcut to commands.
+(\"label\" . command)")
+
+(defcustom jmax-user-hotspot-locations '()
+  "A-list of hotspot locations to jump to in  `hotspots'.
+(\"label\" . \"Path to file\").
+
+These are like bookmarks.")
+
+
+
+(defun hotspots (arg)
+  "Helm interface to hotspot locations.
+This includes user defined
+commands (`jmax-user-hotspot-commands'),
+locations (`jmax-user-hotspot-locations'), org agenda files,
+recent files and bookmarks. You can set a bookmark also."
+  (interactive "P")
+  (helm :sources `(((name . "Commands")
+		    (candidates . ,jmax-user-hotspot-commands)
+		    (action . (("Open" . (lambda (x) (funcall x))))))
+		   ((name . "My Locations")
+		    (candidates . ,jmax-user-hotspot-locations)
+		    (action . (("Open" . (lambda (x) (find-file x))))))
+		   ((name . "My org files")
+		    (candidates . ,org-agenda-files)
+		    (action . (("Open" . (lambda (x) (find-file x))))))
+		   helm-source-recentf
+		   helm-source-bookmarks
+		   helm-source-bookmark-set)))
+
+(global-set-key [f9] 'hotspots)
+
+
+
+
 (defun jmax-help ()
   "Open the ‘org-ref’ manual."
   (interactive)
