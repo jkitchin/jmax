@@ -288,6 +288,27 @@
 ;; record time I finished a task when I change it to DONE
 (setq org-log-done 'time)
 
+(add-to-list
+ 'org-agenda-custom-commands
+ '("w" "Weekly Review"
+   ( ;; deadlines
+    (tags-todo "+DEADLINE<=\"<today>\""
+	       ((org-agenda-overriding-header "Late Deadlines")))
+    ;; scheduled  past due
+    (tags-todo "+SCHEDULED<=\"<today>\""
+	       ((org-agenda-overriding-header "Late Scheduled")))
+
+    ;; now the agenda
+    (agenda ""
+	    ((org-agenda-overriding-header "weekly agenda")
+	     (org-agenda-ndays 7)
+	     (org-agenda-tags-todo-honor-ignore-options t)
+	     (org-agenda-todo-ignore-scheduled nil)
+	     (org-agenda-todo-ignore-deadlines nil)
+	     (org-deadline-warning-days 0)))
+    ;; and last a global todo list
+    (todo "TODO"))))
+
 ;;* New org-links
 ;; support for links to microsoft docx,pptx,xlsx files
 ;; standard org-mode opens these as zip-files
