@@ -1,6 +1,5 @@
 ;;; cm-mods.el --- additions to cm-mode
 
-
 ;;; Code:
 
 (defcustom cm-wdiff-cmd
@@ -15,6 +14,7 @@
 ;;
 
 (require 'cm-mode)
+(require 'vc-git)
 
 ;; I like more obvious colors
 (set-face-foreground cm-deletion-face "red")
