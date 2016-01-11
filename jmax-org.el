@@ -513,6 +513,76 @@ citecolor=blue,filecolor=blue,menucolor=blue,urlcolor=blue"
 	  (lambda () (org-refresh-images)))
 
 
+;;* Insert org figures and tables
+(defun jmax-insert-figure (fname width params)
+  "Insert FNAME as a figure in org-mode.
+WIDTH specifies how wide it should be, e.g. 300, 3.25in, or 4cm.
+PARAMS is a string like \":placement [H]\"."
+  (interactive (list
+		(ido-read-file-name "File: ")
+		(read-input "Width: ")
+		(read-input "Parameters: ")))
+
+  ;; parse width
+  (let ((dpi 72)
+	org-width latex-width)
+    ;; calculate width
+    (cond
+     ((string= "" width)
+      (setq width nil
+	    org-width nil))
+     ((string-match "\\([0-9]\\.?[0-9]*\\)in" width)
+      (setq org-width (* dpi (string-to-number (string-match 1 width)))
+	    latex-width width))
+     ((string-match "\\([0-9]\\.?[0-9]*\\)cm" width)
+      (setq org-width (* dpi (string-to-number (string-match 1 width)) 2.54)
+	    latex-width width))
+     ((string-match "\\([0-9]*\\)" width)
+      (setq org-width (string-to-number width)
+	    latex-width (/ org-width dpi))))
+    (when width
+      (insert (format "#+attr_org: :width %s\n" org-width))
+      (insert (format "#+attr_latex: :width %s %s\n" latex-width params)))
+
+    (insert "#+caption: \n")
+    (insert (format "[[./%s]]\n" fname))
+    (forward-line -2)
+    (end-of-line)
+    (org-redisplay-inline-images)))
+
+
+;; make it possible to insert from helm.
+(defun helm-insert-org-figure (target)
+  (jmax-insert-figure
+   (file-relative-name target)
+   (read-input "Width: ")
+   (read-input "Parameters: ")))
+
+
+(add-hook 'helm-find-files-before-init-hook
+          (lambda ()
+	    (helm-add-action-to-source
+	     "Insert as org-mode figure"
+	     'helm-insert-org-figure
+	     helm-source-find-files)))
+
+
+(defun jmax-insert-table (ncols tblname attributes)
+  "Insert a table with NCOLS and named TBLNAME.
+If you enter ATTRIBUTES they are inserted as LaTeX attributes."
+  (interactive "nColumns: \nsName: \nsAttributes: ")
+  (when (not (string= "" tblname))
+    (insert (format "#+tblname: %s\n" tblname)))
+  (when (not (string= "" attributes))
+    (insert (format "#+attr_latex: %s\n" attributes)))
+  (insert "#+caption: \n")
+  (loop
+   initially (insert "|")
+   repeat ncols do (insert "  |" )
+   finally (insert "\n"))
+  (forward-line -2)
+  (end-of-line))
+
 ;;* Adapting C-c C-c for Latex overlays
 ;; Define a new toggling function for equations.
 (defun org-toggle-latex-overlays (arg)
