@@ -13,7 +13,7 @@
 (require 'techela-setup)
 (require 'techela-grade)
 
-(defvar tq-git-course "http://github.com/jkitchin/"
+(defvar tq-git-course "https://github.com/jkitchin/"
   "The git server there the anonymous access course is served.")
 
 (defvar tq-git-server "techela.cheme.cmu.edu"
