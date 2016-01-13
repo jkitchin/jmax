@@ -309,6 +309,14 @@
   ;; Spell-checking on the fly
   (flyspell-mode +1)
 
+  (add-hook 'flyspell-incorrect-hook
+	    (lambda (beg end sym)
+	      (message "%s misspelled. Type %s to fix it."
+		       (buffer-substring beg end)
+		       (substitute-command-keys "\\[flyspell-check-previous-highlighted-word]"))
+	      ;; return nil so word is still highlighted.
+	      nil))
+
 
   (eval-after-load "flyspell"
     '(progn
