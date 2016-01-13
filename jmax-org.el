@@ -904,6 +904,7 @@ F5 inserts the entity code."
 
 (defalias 'toc 'helm-org-in-buffer-headings)
 (defalias 'atoc 'helm-org-agenda-files-headings)
+(defalias 'top 'helm-top)
 
 ;;* The end
 (message "jmax-org.el loaded")
