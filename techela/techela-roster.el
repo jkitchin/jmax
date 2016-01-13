@@ -18,14 +18,20 @@ The data structure is (userid :name Full name :email userid@somewhere.edu
 Use it like this:
  (plist-get (cdr (assoc \"jboes\" (ta-roster))) :name)"
   (with-temp-buffer
-    (insert-file-contents ta-roster)
-    (let ((contents (cdr (csv-parse-buffer nil))))  ;; first line is header
+    (loop for file in ta-roster
+	  if (file-exists-p file)
+	  do
+	  (insert-file-contents file)
+	  ;; (insert "\n")
+	  )
+
+    (let ((contents (cdr (csv-parse-buffer nil)))) ;; first line is header
       (mapcar (lambda (x)
-		      (list (nth 8 x)                     ; userid
-			    :name (format "%s %s"
-					  (nth 6 x)       ; first name
-					  (nth 5 x))      ; last name
-			    :email (nth 9 x)))
+		(list (nth 8 x)		; userid
+		      :name (format "%s %s"
+				    (nth 6 x)	     ; first name
+				    (nth 5 x))	     ; last name
+		      :email (nth 9 x)))
 	      contents))))
 
 ;; (defun ta-roster ()

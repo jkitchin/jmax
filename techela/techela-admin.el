@@ -29,8 +29,9 @@
 (defvar ta-gitolite-admin-dir nil
   "Derived variable that stores the location of the admin directory.")
 
-(defvar ta-roster nil
-  "Derived variable absolute path to the roster file")
+(defvar ta-roster '("roster.dat" "visitors.dat")
+  "Derived variable containing a list of absolute paths to build
+  the roster file")
 
 (defvar ta-course-dir nil
   "Derived variable absolute path to the public course file.")
@@ -135,7 +136,8 @@
 				ta-root-dir))
 
 	;; path to the roster file
-	ta-roster (expand-file-name "roster.dat" ta-gitolite-admin-dir)
+	ta-roster (list (expand-file-name "roster.dat" ta-gitolite-admin-dir)
+			(expand-file-name "extra.dat" ta-gitolite-admin-dir))
 
 	;; local directory where assignment folders are
 	ta-course-assignments-dir (file-name-as-directory
@@ -1522,6 +1524,20 @@ git status:
 		      ta-course-name
 		      ta-course-server
 		      assignment))))))
+
+
+(defun ta-add-pub-key (pubfile)
+  (interactive (list
+		(ido-read-file-name "Pub file:" "~/Downloads/")))
+  (let* ((name (concat (read-input "Key name:" (file-name-base pubfile)) ".pub"))
+	 (fullname (expand-file-name name (concat ta-gitolite-admin-dir "keydir"))))
+
+    ;; move key to gitolite-admin/keydir/name, ask for confirmation if key
+    ;; already exists.
+    (rename-file pubfile fullname t)
+    (mygit (format "git add %s" fullname))
+    (mygit (format "git commit %s -m \"new key\"" fullname))
+    (mygit "git push")))
 
 
 (provide 'techela-admin)
