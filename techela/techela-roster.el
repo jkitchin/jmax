@@ -34,6 +34,16 @@ Use it like this:
 		      :email (nth 9 x)))
 	      contents))))
 
+(defun ta-replace-roster-file (roster-file file-to-replace)
+  "Move a ROSTER-FILE to gitolite-admin."
+  (interactive (list
+		(ido-read-file-name "Roster file: " "~/Downloads/")
+		(ido-read-file-name "Replace: " ta-gitolite-admin-dir "roster.dat" t)))
+  (rename-file roster-file file-to-replace t)
+  (ta-update-roster)
+  ;; TODO git commands to save things.
+  )
+
 ;; (defun ta-roster ()
 ;;   "Return a data structure of userids and names from roster.org
 ;; The data structure is (userid :name Full name :email userid@somewhere.edu
