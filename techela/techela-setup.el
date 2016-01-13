@@ -260,6 +260,15 @@ exec ssh -F \"%s\" -o \"BatchMode yes\" \"$@\"
   (shell-command "rm ~/.ssh/techela*"))
 
 
+(defun ta-unix-mail-pub-key ()
+  (interactive)
+  (shell-command
+   (format
+    "uuencode ~/techela/%s/%s.pub %s.pub | mail jkitchin@andrew.cmu.edu"
+    tq-current-course
+    tq-userid
+    tq-userid)))
+
 (provide 'techela-setup)
 
 ;;; techela-setup.el ends here
