@@ -1527,6 +1527,7 @@ git status:
 
 
 (defun ta-add-pub-key (pubfile)
+  "Add PUBFILE to gitolite-admin/keydir."
   (interactive (list
 		(ido-read-file-name "Pub file:" "~/Downloads/")))
   (let* ((name (concat (read-input "Key name:" (file-name-base pubfile)) ".pub"))
@@ -1537,7 +1538,8 @@ git status:
     (rename-file pubfile fullname t)
     (mygit (format "git add %s" fullname))
     (mygit (format "git commit %s -m \"new key\"" fullname))
-    (mygit "git push")))
+    (mygit "git push")
+    (message "%s pushed." name)))
 
 
 (provide 'techela-admin)
