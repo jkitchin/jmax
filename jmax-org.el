@@ -902,8 +902,25 @@ F5 inserts the entity code."
   (add-hook 'org-mode-hook 'turn-on-flyspell 'append)))
 
 
+;;* Table of contents commands
 (defalias 'toc 'helm-org-in-buffer-headings)
 (defalias 'atoc 'helm-org-agenda-files-headings)
+
+(defun helm-org-open-files-headings ()
+  "Preconfigured helm for org files headings in open org-files."
+  (interactive)
+  (helm :sources (helm-source-org-headings-for-files
+		  (loop for buffer in (buffer-list)
+			if (and (buffer-file-name buffer)
+				(string= "org"
+					 (file-name-extension (buffer-file-name buffer))))
+			collect (buffer-file-name buffer)))
+        :candidate-number-limit 99999
+        :buffer "*helm org headings*"))
+
+(defalias 'otoc 'helm-org-open-files-headings)
+
+
 (defalias 'top 'helm-top)
 
 ;;* The end
