@@ -901,6 +901,10 @@ F5 inserts the entity code."
   (flyspell-mode +1)
   (add-hook 'org-mode-hook 'turn-on-flyspell 'append)))
 
+
+(defalias 'toc 'helm-org-in-buffer-headings)
+(defalias 'atoc 'helm-org-agenda-files-headings)
+
 ;;* The end
 (message "jmax-org.el loaded")
 
