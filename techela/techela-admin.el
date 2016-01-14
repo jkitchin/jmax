@@ -225,8 +225,11 @@
   "Return list of userids from a roster file."
   (mapcar (lambda (x) (car x)) (ta-roster)))
 
+
 (defun ta-helm-emails (candidate)
+  "Action function for `ta-email' helm source."
   (mapconcat 'identity (helm-marked-candidates) ","))
+
 
 (defun ta-email (&optional input-userid)
   "Email USERID with helm completion.  Select *all* to email everyone.
@@ -234,24 +237,28 @@ Alternatively provide INPUT-USERID as the email address(es) to
 send email to."
   (interactive)
   (let* ((all-emails (mapconcat
-		      (lambda (userid)
-			(format "%s@%s" userid ta-email-host))
-		      (ta-get-userids)
+		      'identity
+		      (loop for entry in  (ta-roster)
+			    collect (plist-get (cdr entry) :email))
 		      ","))
-	 (userid))
-    (if input-userid
-	(setq userid input-userid)
-      (setq userid (helm :sources `((name . "Emails")
-				    (candidates . ,(append
-						    (list  (cons "*all*" all-emails))
-						    (mapcar
-						     (lambda (user)
-						       (let ((name (plist-get (cdr  user) :name))
-							     (email (plist-get (cdr  user) :email)))
-							 (cons (format "%-40s| %s" name email)
-							       email)))
-						     (ta-roster))))
-				    (action . ta-helm-emails)))))
+	 (userid (or (cond
+		      ((null input-userid)
+		       nil)
+		      ((string= "*all*" input-userid)
+		       all-emails)
+		      (t
+		       input-userid))
+		     (helm :sources `((name . "Emails")
+				      (candidates . ,(append
+						      (list  (cons "*all*" all-emails))
+						      (mapcar
+						       (lambda (user)
+							 (let ((name (plist-get (cdr  user) :name))
+							       (email (plist-get (cdr  user) :email)))
+							   (cons (format "%-40s| %s" name email)
+								 email)))
+						       (ta-roster))))
+				      (action . ta-helm-emails))))))
     (compose-mail-other-frame)
     (message-goto-to)
     (insert "jkitchin@andrew.cmu.edu")
