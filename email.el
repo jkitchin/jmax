@@ -41,7 +41,9 @@
 
 
 (defun email-heading-return ()
-  "After returning from compose do this."
+  "After returning from compose do this in the heading.
+Sets SENT-ON, TO and a Message-ID property.
+Removes unsent tag if there, and adds sent to tags"
   (switch-to-buffer (marker-buffer  *email-heading-point*))
   (goto-char (marker-position  *email-heading-point*))
   (setq *email-heading-point* nil)
@@ -53,15 +55,7 @@
   (let ((tags (org-get-tags-at)))
     (add-to-list 'tags "sent")
     (setq tags (-remove-item "unsent" tags))
-    (org-set-tags-to tags))
-
-  (dolist (email *email-to-addresses*)
-    (let ((contact (org-contacts-filter nil nil `("EMAIL" . ,email))))
-      (when (= 1 (length contact))
-	(setq contact (car contact))
-	(org-entry-put
-	 (nth 1 contact) "LAST_SENT_EMAIL"
-	 *email-mu4e-link-to-message*)))))
+    (org-set-tags-to tags)))
 
 
 (defun email-send-action ()
