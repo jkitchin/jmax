@@ -123,13 +123,12 @@ With prefix arg, also send the message and move to the next one."
       (when just-send
 	(message-send-and-exit))))
   (org-todo "DONE")
-  (org-set-tags-to
-   (-remove
-    (lambda (x) (string= x  "unsent"))
-    (org-get-tags-at)))
-  (if (org-get-tags-at)
-      (org-set-tags-to (append '("sent") (org-get-tags-at)))
-    (org-set-tags-to "sent"))
+
+  (let ((tags (-remove
+	       (lambda (x) (string= x "unsent"))
+	       (org-get-tags-at))))
+    (add-to-list 'tags "sent")
+    (org-set-tags-to tags))
   (message  (format "sent to %s" (org-entry-get (point) "TO")))
   (outline-hide-entry)
   (outline-next-heading)
