@@ -541,8 +541,8 @@ PARAMS is a string like \":placement [H]\"."
       (setq org-width (string-to-number width)
 	    latex-width (/ org-width dpi))))
     (when width
-      (insert (format "#+attr_org: :width %s\n" org-width))
-      (insert (format "#+attr_latex: :width %s %s\n" latex-width params)))
+      (insert (format "#+attr_latex: :width %s %s\n" latex-width params))
+      (insert (format "#+attr_org: :width %s\n" org-width)))
 
     (insert "#+caption: \n")
     (insert (format "[[./%s]]\n" fname))
