@@ -210,15 +210,15 @@ This assumes the assignment label is the filename you are in."
 	  (beginning-of-line)
 	  (kill-line)
 	  (when value
-	    (insert (format "#+%s: %s" tag value))))
+	    (insert (format "#+%s: %s\n" tag value))))
       ;; add new filetag
       (if (eq (line-beginning-position) (point))
 	  ;; at beginning of line
 	  (when value
-	    (insert (format "#+%s: %s" tag value)))
+	    (insert (format "#+%s: %s\n" tag value)))
 	;; at end of some line, so add a new line
 	(when value
-	  (insert (format "\n#+%s: %s" tag value)))))))
+	  (insert (format "\n#+%s: %s\n" tag value)))))))
 
 
 (defun gb-get-filetag (tag)
