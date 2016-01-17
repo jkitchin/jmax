@@ -520,7 +520,7 @@ WIDTH specifies how wide it should be, e.g. 300, 3.25in, or 4cm.
 PARAMS is a string like \":placement [H]\"."
   (interactive (list
 		(ido-read-file-name "File: ")
-		(read-input "Width: ")
+		(read-input "Org width: " "200")
 		(read-input "Parameters: ")))
 
   ;; parse width
@@ -541,7 +541,7 @@ PARAMS is a string like \":placement [H]\"."
       (setq org-width (string-to-number width)
 	    latex-width (/ org-width dpi))))
     (when width
-      (insert (format "#+attr_latex: :width %s %s\n" latex-width params))
+      (insert (format "#+attr_latex: :width %sin %s\n" latex-width params))
       (insert (format "#+attr_org: :width %s\n" org-width)))
 
     (insert "#+caption: \n")
