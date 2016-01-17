@@ -1,4 +1,26 @@
-;;; cm-mods.el --- additions to cm-mode
+;;; cm-mods.el --- some additions to cm-mode                              -*- lexical-binding: t; -*-
+
+;; Copyright (C) 2016  John Kitchin
+
+;; Author: John Kitchin <jkitchin@andrew.cmu.edu>
+;; Keywords:
+
+;; This program is free software; you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+
+;; You should have received a copy of the GNU General Public License
+;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+;;; Commentary:
+
+;; Builds on https://github.com/joostkremers/criticmarkup-emacs
 
 ;;; Code:
 
@@ -8,10 +30,6 @@
 
 (defvar *cm-wdiff-git-source* nil
   "Global var to hold filename for cm-wdiff-git.")
-
-
-;;; Commentary:
-;;
 
 (require 'cm-mode)
 (require 'vc-git)
@@ -33,6 +51,9 @@
 ;;  nil
 ;;  '((cm-next-deletion (0 cm-deletion-face))
 ;;    (cm-next-addition (0 cm-addition-face))))
+
+;; the original cm-mode regular expressions are used. Here I use a search based,
+;; parsing approach to be more robust over multiple lines.
 
 (defun cm-next-deletion (limit)
   "Find the next deletion up to LIMIT.
