@@ -6,6 +6,17 @@
 
 ;;; Code:
 
+(defun jeldoc-org-escape (s)
+  "Escape some org syntax in s.
+Headlines and # in the first position."
+  (if (stringp s)
+      (progn
+	(setq s (replace-regexp-in-string "^*" ",*" s))
+	(setq s (replace-regexp-in-string "^#" ",#" s))
+	s)
+    (format "%s" s)))
+
+
 (defun jeldoc (library)
   "Generate documentation for LIBRARY in an org buffer.
 LIBRARY must be loaded before running this function."
@@ -86,21 +97,23 @@ Documentation: %s
 Value:
 %S\n\n"
 		      var
-		      (documentation-property var 'variable-documentation)
-		      (symbol-value var))))
+		      (jeldoc-org-escape
+		       (documentation-property var 'variable-documentation))
+		      (jeldoc-org-escape (symbol-value var)))))
 
     (insert "* Regular Variables\n\n")
-    (dolist (var (sort (-filter (lambda (x) (not (custom-variable-p x)))
+    (dolist (var (sort (-filter (lambda (x)
+				  (not (custom-variable-p x)))
 				vars)
 		       'string-lessp))
-      (insert (format "** %s
-Documentation: %s
+      (insert (format "** %s\n" var))
+      (insert (jeldoc-org-escape
+	       (format "Documentation: %s
 
 Value:
-%S\n\n"
-		      var
-		      (documentation-property var 'variable-documentation)
-		      (symbol-value var))))
+%s\n\n"
+		       (documentation-property var 'variable-documentation)
+		       (symbol-value var)))))
 
     (insert "* Interactive Functions\n\n")
 
@@ -116,13 +129,8 @@ Code:
 "
 		      func
 		      (or (help-function-arglist func) "")
-		      (let ((docstring (documentation func)))
-			(when docstring
-			  (setq docstring
-				(replace-regexp-in-string "^*" ",*" docstring))
-			  (setq docstring
-				(replace-regexp-in-string "^#" ",#" docstring)))
-			docstring)
+
+		      (jeldoc-org-escape (documentation func))
 		      ;; code defining the function
 		      (let ((code (save-window-excursion
 				    ;; we do not have c-source, so check if func
@@ -146,10 +154,7 @@ Code:
 					      (mark-sexp)
 					      (buffer-substring (point) (mark))))
 					(error func))))))
-			(when (stringp code)
-			  (setq code (replace-regexp-in-string "^*" ",*" code))
-			  (setq code (replace-regexp-in-string "^#" ",#" code)))
-			code))) )
+			(jeldoc-org-escape code)))))
 
     (insert "* Non-interactive Functions\n\n")
 
@@ -168,14 +173,7 @@ Code:
 		      func
 		      (or (help-function-arglist func) "")
 		      ;; escape some org-syntax
-		      (let ((docstring (documentation func)))
-			(when docstring
-			  (setq docstring
-				(replace-regexp-in-string "^*" ",*" docstring))
-			  (setq docstring
-				(replace-regexp-in-string "^#" ",#" docstring)))
-			docstring)
-
+		      (jeldoc-org-escape (documentation func))
 		      ;; code defining the function
 		      (let ((code (save-window-excursion
 				    ;; we do not have c-source, so check if func
@@ -200,10 +198,7 @@ Code:
 					      (buffer-substring (point) (mark))))
 					(error func))))))
 			;; escape org syntax
-			(when (stringp code) code
-			  (setq code (replace-regexp-in-string "^*" ",*" code))
-			  (setq code (replace-regexp-in-string "^#" ",#" code)))
-			code))))
+			(jeldoc-org-escape code)))))
     (org-mode)
 
     ;; replace `' with links to describe function or variable, unless
