@@ -685,6 +685,68 @@ put the packages in the org file.
 	    ox-manuscript-build-with-comments)
 	(?a "As submission archive" ox-manuscript-make-submission-archive))))
 
+
+
+(defvar ox-manuscript-snippets (expand-file-name
+				"ox-manuscript-snippets/" starter-kit-dir)
+  "Directory where manuscript template snippets are.")
+
+;; * Add Snippets for manuscripts
+(add-hook 'org-mode-hook
+	  (lambda ()
+	    (yas-minor-mode)
+	    (add-to-list 'yas-snippet-dirs ox-manuscript-snippets)
+	    (yas-load-directory ox-manuscript-snippets)
+
+	    ;; This is a pattern for things that should be replaced in snippets.
+	    (font-lock-add-keywords
+	     nil
+	     '(("<replace:.*?>" 0 font-lock-warning-face t))
+	     t)))
+
+
+(defun ox-manuscript-parse-snippet-file (snippet-file)
+  "Parse the SNIPPET-FILE and return '(groups name key).
+Content is just the part to expand."
+  (with-current-buffer (find-file-noselect snippet-file)
+    (let ((data (yas--parse-template))
+	  (start (point))
+	  (end (point-max))
+	  key name group content)
+      (setq key (nth 0 data)
+	    name (nth 2 data)
+	    group (nth 4 data))
+      (list group name key))))
+
+
+(defun ox-manuscript-candidates ()
+  "Return a cons list of manuscript candidate templates
+These are snippets in `ox-manuscript-snippets' in the \"manuscript group\".
+'((name . snippet-key))."
+  (loop for snippet-file in (f-entries
+			     (expand-file-name
+			      "org-mode" ox-manuscript-snippets))
+	with data = nil
+	do (setq data (ox-manuscript-parse-snippet-file snippet-file))
+	if (-contains? (car data) "manuscript")
+	collect (cons (nth 1 data) (nth 2 data))))
+
+
+(defun ox-manuscript-new-manuscript (fname)
+  (interactive (list (ido-read-file-name "File: " "." "manuscript.org")))
+  (when (file-exists-p fname)
+    (error "%s already exists."))
+
+  (find-file fname)
+  (helm :sources
+	`((name . "Manuscript")
+	  (candidates . ,(ox-manuscript-candidates))
+	  (action . (lambda (snippet-key)
+		      (insert snippet-key)
+		      (yas-expand-from-trigger-key)
+		      (goto-char (point-min)))))))
+
+
 (provide 'ox-manuscript)
 
 ;;; ox-manuscript.el ends here
