@@ -686,65 +686,74 @@ put the packages in the org file.
 	(?a "As submission archive" ox-manuscript-make-submission-archive))))
 
 
-
-(defvar ox-manuscript-snippets (expand-file-name
-				"ox-manuscript-snippets/" starter-kit-dir)
-  "Directory where manuscript template snippets are.")
-
-;; * Add Snippets for manuscripts
-(add-hook 'org-mode-hook
-	  (lambda ()
-	    (yas-minor-mode)
-	    (add-to-list 'yas-snippet-dirs ox-manuscript-snippets)
-	    (yas-load-directory ox-manuscript-snippets)
-
-	    ;; This is a pattern for things that should be replaced in snippets.
-	    (font-lock-add-keywords
-	     nil
-	     '(("<replace:.*?>" 0 font-lock-warning-face t))
-	     t)))
+;; * Add templates for manuscripts
+(add-hook
+ 'org-mode-hook
+ (lambda ()
+   ;; This is a pattern for things that should be replaced in snippets.
+   (font-lock-add-keywords
+    nil
+    '(("<replace:.*?>" 0 font-lock-warning-face t))
+    t)))
 
 
-(defun ox-manuscript-parse-snippet-file (snippet-file)
-  "Parse the SNIPPET-FILE and return '(groups name key).
-Content is just the part to expand."
-  (with-current-buffer (find-file-noselect snippet-file)
-    (let ((data (yas--parse-template))
-	  (start (point))
-	  (end (point-max))
-	  key name group content)
-      (setq key (nth 0 data)
-	    name (nth 2 data)
-	    group (nth 4 data))
-      (list group name key))))
+(defvar ox-manuscript-templates
+  (expand-file-name
+   "ox-manuscript-templates/" starter-kit-dir)
+  "Directory where manuscript templates are.
+The templates are just org-files that can be inserted into a
+  buffer.")
+
+
+(defun jmax-get-filetag (tag fname)
+  "Return value for TAG in FNAME."
+  (interactive "sTag: fFile: ")
+  (with-current-buffer (find-file-noselect fname)
+    (setq kwds (org-element-map (org-element-parse-buffer 'element) 'keyword
+		 (lambda (keyword)
+		   (cons (org-element-property :key keyword)
+			 (org-element-property :value keyword)))))
+    (cdr (assoc (upcase tag) kwds))))
+
+
+(defun ox-manuscript-parse-template-file (template-file)
+  "Parse the TEMPLATE-FILE and return '(group name default-name path)."
+  (prog1
+      (list
+       (jmax-get-filetag "GROUP" template-file)
+       (jmax-get-filetag "TEMPLATE" template-file)
+       (jmax-get-filetag "DEFAULT-FILENAME" template-file)
+       template-file)
+    (kill-buffer (find-buffer-visiting template-file))))
 
 
 (defun ox-manuscript-candidates ()
   "Return a cons list of manuscript candidate templates
-These are snippets in `ox-manuscript-snippets' in the \"manuscript group\".
-'((name . snippet-key))."
-  (loop for snippet-file in (f-entries
-			     (expand-file-name
-			      "org-mode" ox-manuscript-snippets))
+These are snippets in `ox-manuscript-templates' in the \"manuscript\" group.
+'((name . data))."
+  (loop for template-file in (f-entries ox-manuscript-templates
+				       (lambda (f)
+					 (f-ext? f "org")))
 	with data = nil
-	do (setq data (ox-manuscript-parse-snippet-file snippet-file))
-	if (-contains? (car data) "manuscript")
-	collect (cons (nth 1 data) (nth 2 data))))
+	do (setq data (ox-manuscript-parse-template-file template-file))
+	if (string= (car data) "manuscript")
+	collect (cons (nth 1 data) data)))
 
 
-(defun ox-manuscript-new-manuscript (fname)
-  (interactive (list (ido-read-file-name "File: " "." "manuscript.org")))
-  (when (file-exists-p fname)
-    (error "%s already exists."))
-
-  (find-file fname)
+(defun ox-manuscript-new-manuscript ()
+  (interactive)
   (helm :sources
 	`((name . "Manuscript")
 	  (candidates . ,(ox-manuscript-candidates))
-	  (action . (lambda (snippet-key)
-		      (insert snippet-key)
-		      (yas-expand-from-trigger-key)
-		      (goto-char (point-min)))))))
+	  (action . (lambda (data)
+		      (let ((fname (ido-read-file-name
+				    "File: " "."
+				    (nth 2 data))))
+			(when (file-exists-p fname)
+			  (error "%s already exists."))
+			(find-file fname)
+			(insert-file-contents (nth 3 data))
+			(goto-char (point-min))))))))
 
 
 (provide 'ox-manuscript)
