@@ -513,6 +513,17 @@ citecolor=blue,filecolor=blue,menucolor=blue,urlcolor=blue"
 	  (lambda () (org-refresh-images)))
 
 
+;;* font-lock on LaTeX fragments
+(add-hook 'org-mode-hook
+	  (lambda ()
+	    (font-lock-add-keywords
+	     nil
+	     `((,(mapconcat (lambda (x)
+			      (nth 1 x))
+			    org-latex-regexps
+			    "\\|") 0 '(:foreground "blue"))
+	       ("@@latex:[^@]*@@" 0 '(:foreground "blue"))))))
+
 ;;* Insert org figures and tables
 (defun jmax-insert-figure (fname width params)
   "Insert FNAME as a figure in org-mode.
