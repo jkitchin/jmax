@@ -1,0 +1,8 @@
+# -*- mode: snippet; require-final-newline: nil -*-
+# name:
+# key:
+# group:
+# contributor: John Kitchin <jkitchin@andrew.cmu.edu>
+# binding: direct-keybinding
+# expand-env: ((yas-indent-line 'fixed))
+# --

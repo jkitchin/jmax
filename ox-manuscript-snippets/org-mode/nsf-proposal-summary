@@ -1,0 +1,21 @@
+# -*- mode: snippet; require-final-newline: nil -*-
+# name: NSF Proposal - project summary
+# key: nsf-proposal-summary
+# group: manuscript
+# contributor: John Kitchin <jkitchin@andrew.cmu.edu>
+# binding: direct-keybinding
+# expand-env: ((yas-indent-line 'fixed))
+# --
+#+LATEX_CLASS: cmu-article
+#+Latex_class_options: [12pt]
+#+OPTIONS: toc:nil ^:{}
+#+LATEX_HEADER: \usepackage{setspace}
+
+# Adjust this to fill the page. 1.0 is single line spacing.
+\setstretch{1.2}
+
+*Overview*:
+
+*Intellectual merit:*
+
+*Broader impact:*

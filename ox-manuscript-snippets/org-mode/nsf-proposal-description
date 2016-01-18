@@ -1,0 +1,29 @@
+# -*- mode: snippet; require-final-newline: nil -*-
+# name: NSF Proposal - project description
+# key: nsf-proposal-description
+# group: manuscript
+# contributor: John Kitchin <jkitchin@andrew.cmu.edu>
+# binding: direct-keybinding
+# expand-env: ((yas-indent-line 'fixed))
+# --
+#+latex_class: cmu-article
+#+Latex_class_options: [12pt]
+#+OPTIONS: toc:nil ^:{}
+#+LATEX_HEADER: \usepackage[font={small}]{caption}
+
+#+LATEX_HEADER: \usepackage{wrapfig}
+#+LATEX_HEADER: \usepackage{float}
+#+LATEX_HEADER: \newfloat{scheme}{thp}{lop}
+#+LATEX_HEADER: \floatname{scheme}{Scheme}
+#+LATEX_HEADER: \usepackage{setspace}
+\setstretch{1.21}
+
+#+TITLE: <replace: title>
+
+
+
+
+\newpage
+bibliographystyle:unsrtnat
+ # ibliography:longtitles.bib,../../../../bibliography/alloys/new-alloys-2.bib,../../../../bibliography/references.bib
+bibliography:<replace: bibfiles>
