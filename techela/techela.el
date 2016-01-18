@@ -285,6 +285,7 @@ Check *techela log* for error messages."
    (mygit "git add *")
    (mygit "git commit -am \"my changes\"")
    (mygit "git pull origin master")
+   (mygit "git submodule update")
    (mygit "git commit -am \"accepting merge\"")))
 
 
