@@ -4,12 +4,3 @@
 [submodule "criticmarkup-emacs"]
 	path = criticmarkup-emacs
 	url = https://github.com/jkitchin/criticmarkup-emacs
-[submodule "solarized"]
-	path = themes/emacs-color-theme-solarized
-	url = https://github.com/sellout/emacs-color-theme-solarized
-[submodule "replace-colorthemes"]
-	path = themes/replace-colorthemes
-        url = https://github.com/emacs-jp/replace-colorthemes
-[submodule "tomorrow-theme"]
-	path = themes/tomorrow-theme
-        url = https://github.com/chriskempson/tomorrow-theme
