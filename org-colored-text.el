@@ -46,7 +46,7 @@
 
 (defun next-color-link (limit)
   (when (re-search-forward
-	 "color:[a-zA-Z]\\{2,\\}")
+	 "color:[a-zA-Z]\\{2,\\}" limit t)
     (forward-char -2)
     (let* ((next-link (org-element-context))
 	   color beg end post-blanks)
