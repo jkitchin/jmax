@@ -66,7 +66,13 @@ commands and variables."
 		   (documentation (intern command)))
 		  ((boundp (intern command))
 		   (save-window-excursion
-		     (describe-variable (intern command))))))
+		     (prog1
+			 ;; this annoyingly opens a help buffer. we wrap it to
+			 ;; prevent the window from opening, and to eliminate
+			 ;; the minibuffer message.
+			 (describe-variable (intern command))
+		       ;; clear minbuffer
+		       (message ""))))))
 	   (describe-func
 	    `(lambda ()
 	       "Run `describe-function/variable' on the command."
