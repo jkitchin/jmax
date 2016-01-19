@@ -229,6 +229,68 @@ pdflatex, then bibtex to get one."
     (kill-buffer)))
 
 
+(defun ox-manuscript-nobibliography ()
+  "Create the separate bibliography file and build it.
+This occurs if you use a nobibliography link to specify that
+references should go into a separate file."
+  (interactive)
+  (let* ((org-file (file-name-nondirectory (buffer-file-name)))
+         (bbl-file (replace-regexp-in-string "org$" "bbl" org-file))
+	 (tex-file (replace-regexp-in-string "org$" "tex" org-file))
+         (references-tex-file (replace-regexp-in-string
+			       ".org$"
+			       "-references.tex" org-file))
+	 (references-pdf (replace-regexp-in-string "tex$" "pdf" references-tex-file))
+	 (bib-file (file-name-sans-extension tex-file))
+	 p1)
+
+    ;; if no .bbl run commands to get one.
+    (unless (file-exists-p bbl-file)
+      (ox-manuscript-latex tex-file)
+      (ox-manuscript-bibtex tex-file))
+
+    (when (file-exists-p references-tex-file)
+      (delete-file references-tex-file))
+
+    (when (file-exists-p references-pdf)
+      (delete-file references-pdf))
+
+    ;; The idea here is to take the original tex file and use the same layout,
+    ;; packages etc... in case any of the are important for building the
+    ;; references. Basically we delete everything between \begin{document} and
+    ;; \end{document} and then insert the bbl contents.
+    (find-file references-tex-file)
+
+    (insert-file-contents tex-file)
+    (goto-char (point-min))
+    (re-search-forward "begin{document}" (point-max))
+    (forward-line)
+    (beginning-of-line)
+    (setq p1 (point))
+    (re-search-forward "end{document}")
+    (beginning-of-line)
+    (forward-line -1)
+    (delete-region p1 (point))
+    (insert (format "\\input{%s}\n" bbl-file))
+
+    (save-buffer)
+    (kill-buffer)
+
+    ;; now build it
+    (ox-manuscript-latex references-tex-file)
+    (ox-manuscript-latex references-tex-file)
+
+    ;; now clean up
+    (loop for ext in '(".aux" ".out" ".pyg" ".log")
+	  with fname = (concat (file-name-sans-extension references-tex-file)
+			       ext)
+	  do
+	  (when (file-exists-p fname)
+	    (delete-file fname)))
+
+    (org-open-file references-pdf)))
+
+
 (defun ox-manuscript-run-bibtex-p ()
   "Return whether we need to run bibtex or not.
 Based on there being a cite link in the buffer.  We assume there
@@ -323,7 +385,8 @@ intermediate output steps."
 	 (cb (current-buffer))
 	 (run-makeindex-p)
 	 (run-makeglossary-p)
-	 (run-bibtex-p))
+	 (run-bibtex-p)
+	 (nobibliography-p))
 
     ;; start out clean
     (ox-manuscript-cleanup)
@@ -331,97 +394,107 @@ intermediate output steps."
     (when (file-exists-p pdf-file)
       (delete-file pdf-file))
 
+    ;; Figure out which things need to get run.
     (with-temp-buffer
       (insert-file-contents tex-file)
-      (beginning-of-buffer)
+      (goto-char (point-min))
       (setq run-makeindex-p (re-search-forward "\\\\makeindex" nil t))
-      (beginning-of-buffer)
+      (goto-char (point-min))
       (setq run-makeglossary-p (re-search-forward "\\\\makeglossaries" nil t))
-      (beginning-of-buffer)
-      (setq run-bibtex-p (re-search-forward "bibliography" nil t)))
+      (goto-char (point-min))
+      (setq run-bibtex-p (re-search-forward "bibliography" nil t))
+      (goto-char (point-min))
+      (setq nobibliography-p (re-search-forward "nobibliography" nil t)))
 
     (setq status (catch 'status
-      ;; run first latex
-      (ox-manuscript-latex tex-file)
-      (when ox-manuscript-interactive-build
-	(switch-to-buffer "*latex*")
-	(end-of-buffer)
-	(occur "warning\\|undefined\\|error\\|missing")
-	(if (y-or-n-p "Continue to bibtex? ")
-	    ;; continuing. delete buffers
-	    (progn
-	      (mapcar (lambda (x) (when (get-buffer x) (kill-buffer x)))
-		      '("*latex*" "*bibtex*" "*makeindex*" "*makeglossary*" "*Occur*"))
-	      (switch-to-buffer cb))
-	  ;; not continuing
-	  (throw 'status nil)))
+		   ;; run first latex
+		   (ox-manuscript-latex tex-file)
+		   (when ox-manuscript-interactive-build
+		     (switch-to-buffer "*latex*")
+		     (end-of-buffer)
+		     (occur "warning\\|undefined\\|error\\|missing")
+		     (if (y-or-n-p "Continue to bibtex? ")
+			 ;; continuing. delete buffers
+			 (progn
+			   (mapcar (lambda (x) (when (get-buffer x) (kill-buffer x)))
+				   '("*latex*" "*bibtex*" "*makeindex*"
+				     "*makeglossary*" "*Occur*"))
+			   (switch-to-buffer cb))
+		       ;; not continuing
+		       (throw 'status nil)))
 
-      ;; run bibtex if needed
-      (when run-bibtex-p
-	(ox-manuscript-bibtex tex-file)
-	(when ox-manuscript-interactive-build
-	  (switch-to-buffer "*bibtex*")
-	  (end-of-buffer)
-	  (occur "warning\\|undefined\\|error\\|missing")
-	  (if (y-or-n-p "Continue? ")
-	      ;; continuing. delete buffers
-	      (progn
-		(mapcar (lambda (x) (when (get-buffer x) (kill-buffer x)))
-			'("*latex*" "*bibtex*" "*makeindex*" "*Occur*"))
-		(switch-to-buffer cb))
-	    ;; not continuing
-	    (throw 'status nil))))
+		   ;; run bibtex if needed
+		   (when run-bibtex-p
+		     (ox-manuscript-bibtex tex-file)
+		     (when ox-manuscript-interactive-build
+		       (switch-to-buffer "*bibtex*")
+		       (end-of-buffer)
+		       (occur "warning\\|undefined\\|error\\|missing")
+		       (if (y-or-n-p "Continue? ")
+			   ;; continuing. delete buffers
+			   (progn
+			     (mapcar (lambda (x) (when (get-buffer x) (kill-buffer x)))
+				     '("*latex*" "*bibtex*" "*makeindex*" "*Occur*"))
+			     (switch-to-buffer cb))
+			 ;; not continuing
+			 (throw 'status nil))))
 
-      ;; glossary
-      (when run-makeglossary-p
-	(ox-manuscript-makeglossary tex-file)
-	(when ox-manuscript-interactive-build
-	  (switch-to-buffer "*makeglossary*")
-	  (end-of-buffer)
-	  (occur "warning\\|undefined\\|error\\|missing")
-	  (if (y-or-n-p "Continue to latex 2? ")
-	      ;; continuing. delete buffers
-	      (progn
-		(mapcar (lambda (x) (when (get-buffer x) (kill-buffer x)))
-			'("*latex*" "*bibtex*" "*makeindex*" "*makeglossary*" "*Occur*"))
-		(switch-to-buffer cb))
-	    ;; not continuing
-	    (throw 'status nil))))
+		   ;; Handle the nobibliography case.
+		   (when nobibliography-p
+		     (ox-manuscript-nobibliography))
 
-      ;; index
-      (when run-makeindex-p
-	(ox-manuscript-makeindex tex-file)
-	(when ox-manuscript-interactive-build
-	  (switch-to-buffer "*makeindex*")
-	  (end-of-buffer)
-	  (occur "warning\\|undefined\\|error\\|missing")
-	  (if (y-or-n-p "Continue to latex 2? ")
-	      ;; continuing. delete buffers
-	      (progn
-		(mapcar (lambda (x) (when (get-buffer x) (kill-buffer x)))
-			'("*latex*" "*bibtex*" "*makeindex*" "*makeglossary*" "*Occur*"))
-		(switch-to-buffer cb))
-	    ;; not continuing
-	    (throw 'status nil))))
+		   ;; glossary
+		   (when run-makeglossary-p
+		     (ox-manuscript-makeglossary tex-file)
+		     (when ox-manuscript-interactive-build
+		       (switch-to-buffer "*makeglossary*")
+		       (end-of-buffer)
+		       (occur "warning\\|undefined\\|error\\|missing")
+		       (if (y-or-n-p "Continue to latex 2? ")
+			   ;; continuing. delete buffers
+			   (progn
+			     (mapcar (lambda (x) (when (get-buffer x) (kill-buffer x)))
+				     '("*latex*" "*bibtex*" "*makeindex*"
+				       "*makeglossary*" "*Occur*"))
+			     (switch-to-buffer cb))
+			 ;; not continuing
+			 (throw 'status nil))))
 
-      (ox-manuscript-latex tex-file)
-      (when ox-manuscript-interactive-build
-	(switch-to-buffer "*latex*")
-	(end-of-buffer)
-	(occur "warning\\|undefined\\|error\\|missing")
-	(if (y-or-n-p "Continue to latex3? ")
-	    ;; continuing. delete buffers
-	    (progn
-	      (mapcar (lambda (x) (when (get-buffer x) (kill-buffer x)))
-		      '("*latex*" "*bibtex*" "*makeindex*" "*Occur*"))
-	      (switch-to-buffer cb))
-	  ;; not continuing
-	  (throw 'status nil)))
+		   ;; index
+		   (when run-makeindex-p
+		     (ox-manuscript-makeindex tex-file)
+		     (when ox-manuscript-interactive-build
+		       (switch-to-buffer "*makeindex*")
+		       (end-of-buffer)
+		       (occur "warning\\|undefined\\|error\\|missing")
+		       (if (y-or-n-p "Continue to latex 2? ")
+			   ;; continuing. delete buffers
+			   (progn
+			     (mapcar (lambda (x) (when (get-buffer x) (kill-buffer x)))
+				     '("*latex*" "*bibtex*" "*makeindex*"
+				       "*makeglossary*" "*Occur*"))
+			     (switch-to-buffer cb))
+			 ;; not continuing
+			 (throw 'status nil))))
 
-      (ox-manuscript-latex tex-file)
-      (mapcar (lambda (x) (when (get-buffer x) (kill-buffer x)))
-	      '("*latex*" "*bibtex*" "*makeindex*" "*Occur*"))
-      "done"))
+		   (ox-manuscript-latex tex-file)
+		   (when ox-manuscript-interactive-build
+		     (switch-to-buffer "*latex*")
+		     (end-of-buffer)
+		     (occur "warning\\|undefined\\|error\\|missing")
+		     (if (y-or-n-p "Continue to latex3? ")
+			 ;; continuing. delete buffers
+			 (progn
+			   (mapcar (lambda (x) (when (get-buffer x) (kill-buffer x)))
+				   '("*latex*" "*bibtex*" "*makeindex*" "*Occur*"))
+			   (switch-to-buffer cb))
+		       ;; not continuing
+		       (throw 'status nil)))
+
+		   (ox-manuscript-latex tex-file)
+		   (mapcar (lambda (x) (when (get-buffer x) (kill-buffer x)))
+			   '("*latex*" "*bibtex*" "*makeindex*" "*Occur*"))
+		   "done"))
 
     (message "Finished with status = %s. %s exists = %s in %s."
 	     status pdf-file (file-exists-p pdf-file) default-directory)
