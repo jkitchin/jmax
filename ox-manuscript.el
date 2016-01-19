@@ -766,7 +766,7 @@ put the packages in the org file.
    ;; This is a pattern for things that should be replaced in snippets.
    (font-lock-add-keywords
     nil
-    '(("<replace:.*?>" 0 font-lock-warning-face t))
+    '(("<replace:?.*?>" 0 font-lock-warning-face t))
     t)))
 
 
@@ -827,14 +827,13 @@ These are snippets in `ox-manuscript-templates' in the \"manuscript\" group.
    (let* ((entry (loop for entry in (ox-manuscript-candidates)
 		       if (string= template-key (plist-get entry :key))
 		       return entry))
-	  (new-fname (read-input "Filename: "
-				 (plist-get entry :default-filename))))
-     (when (file-exists-p new-fname)
-       (error "%s already exists."))
-     (find-file new-fname)
-     (insert-file-contents (plist-get entry :filename))
-     (goto-char (point-min))
-     (font-lock-fontify-buffer)))
+	  (new-fname (plist-get entry :default-filename)))
+     (if (file-exists-p new-fname)
+	 (find-file new-fname)
+       (find-file new-fname)
+       (insert-file-contents (plist-get entry :filename))
+       (goto-char (point-min))
+       (font-lock-fontify-buffer))))
 
 
 (provide 'ox-manuscript)
