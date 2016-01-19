@@ -1,5 +1,6 @@
 #+TEMPLATE: Surface Science - Elsevier
 #+group: manuscript
+#+key: surface-science
 #+contributor: John Kitchin <jkitchin@andrew.cmu.edu>
 #+default-filename: manuscript.org
 #+LATEX_CLASS: elsarticle

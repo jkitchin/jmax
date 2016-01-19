@@ -1,0 +1,27 @@
+#+TEMPLATE: NSF Proposal - data management plan
+#+key: nsf-proposal-data-plan
+#+group: manuscript
+#+contributor: John Kitchin <jkitchin@andrew.cmu.edu>
+#+default-filename: data-management-plan.org
+
+#+latex_class: cmu-article
+#+Latex_class_options: [12pt]
+#+options: toc:nil
+
+#+TITLE: Data Management Plan
+\author{}
+\date{}
+\maketitle
+
+* Types of data
+
+
+* Data and Metadata Standards
+
+
+* Policies for access and sharing and provisions for appropriate protection/privacy
+
+* Policies and provisions for re-use, re-distribution
+
+
+* Plans for archiving and preservation of access

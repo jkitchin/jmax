@@ -1,0 +1,16 @@
+#+TEMPLATE: NSF Proposal - postdoctoral mentoring plan
+#+key: nsf-proposal-postdoc-plan
+#+group: manuscript
+#+contributor: John Kitchin <jkitchin@andrew.cmu.edu>
+#+default-filename: postdoctoral-mentoring-plan.org
+
+#+LATEX_CLASS: cmu-article
+#+Latex_class_options: [12pt]
+#+OPTIONS: toc:nil ^:{}
+#+LATEX_HEADER: \usepackage{setspace}
+
+# Adjust this to fill the page. 1.0 is single line spacing.
+\setstretch{1.2}
+
+* Postdoctoral mentoring plan
+We do not intend to hire any post-doctoral researchers to work on this project.
