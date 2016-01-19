@@ -14,6 +14,8 @@
 #+LATEX_HEADER: \newfloat{scheme}{thp}{lop}
 #+LATEX_HEADER: \floatname{scheme}{Scheme}
 #+LATEX_HEADER: \usepackage{setspace}
+#+latex_header_extra: \usepackage{bibentry}
+
 \setstretch{1.21}
 
 #+TITLE: <replace: title>
@@ -25,3 +27,22 @@
 bibliographystyle:unsrtnat
  # ibliography:longtitles.bib,../../../../bibliography/alloys/new-alloys-2.bib,../../../../bibliography/references.bib
 bibliography:<replace: bibfiles>
+
+* build					:noexport:
+
+#+BEGIN_SRC latex :tangle references-cited.tex
+\documentclass[12 pt]{article}
+\usepackage[top=1in, bottom=1.in, left=1in, right=1in]{geometry}
+\usepackage[version=3]{mhchem}
+\begin{document}
+\input{project-description.bbl}
+\end{document}
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(org-babel-tangle)
+(shell-command "pdflatex -shell-escape references-cited")
+(shell-command "pdflatex -shell-escape references-cited")
+#+END_SRC
+
+#+RESULTS:
