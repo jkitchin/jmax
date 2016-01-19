@@ -717,14 +717,14 @@ The templates are just org-files that can be inserted into a
 
 
 (defun ox-manuscript-parse-template-file (template-file)
-  "Parse the TEMPLATE-FILE and return '(group name default-name path)."
+  "Parse the TEMPLATE-FILE and return a plist."
   (prog1
       (list
-       (jmax-get-filetag "GROUP" template-file)
-       (jmax-get-filetag "TEMPLATE" template-file)
-       (jmax-get-filetag "DEFAULT-FILENAME" template-file)
-       template-file)
-    (kill-buffer (find-buffer-visiting template-file))))
+       :key (jmax-get-filetag "KEY" template-file)
+       :group (jmax-get-filetag "GROUP" template-file)
+       :template (jmax-get-filetag "TEMPLATE" template-file)
+       :default-filename (jmax-get-filetag "DEFAULT-FILENAME" template-file)
+       :filename template-file)))
 
 
 (defun ox-manuscript-candidates ()
@@ -736,24 +736,32 @@ These are snippets in `ox-manuscript-templates' in the \"manuscript\" group.
 					 (f-ext? f "org")))
 	with data = nil
 	do (setq data (ox-manuscript-parse-template-file template-file))
-	if (string= (car data) "manuscript")
-	collect (cons (nth 1 data) data)))
+	if (string= (plist-get data :group) "manuscript")
+	collect data))
 
 
-(defun ox-manuscript-new-manuscript ()
-  (interactive)
-  (helm :sources
-	`((name . "Manuscript")
-	  (candidates . ,(ox-manuscript-candidates))
-	  (action . (lambda (data)
-		      (let ((fname (ido-read-file-name
-				    "File: " "."
-				    (nth 2 data))))
-			(when (file-exists-p fname)
-			  (error "%s already exists."))
-			(find-file fname)
-			(insert-file-contents (nth 3 data))
-			(goto-char (point-min))))))))
+(defun ox-manuscript-new-manuscript (template-key)
+  "Create a new manuscript file from TEMPLATE-KEY."
+  (interactive
+   (list
+    (helm :sources
+	  `((name . "Manuscript")
+	    (candidates . ,(loop for entry in (ox-manuscript-candidates)
+				 collect (cons (plist-get entry :template)
+					       (plist-get entry :key))))
+	    (action . (lambda (key)
+			key))))))
+   (let* ((entry (loop for entry in (ox-manuscript-candidates)
+		       if (string= template-key (plist-get entry :key))
+		       return entry))
+	  (new-fname (read-input "Filename: "
+				 (plist-get entry :default-filename))))
+     (when (file-exists-p new-fname)
+       (error "%s already exists."))
+     (find-file new-fname)
+     (insert-file-contents (plist-get entry :filename))
+     (goto-char (point-min))
+     (font-lock-fontify-buffer)))
 
 
 (provide 'ox-manuscript)
