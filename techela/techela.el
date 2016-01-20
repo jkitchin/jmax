@@ -592,6 +592,14 @@ a link in the heading."
      "assignment")))
 
 
+(defun tq-update-my-assignments ()
+  "Open each assignment.
+This will pull"
+  (loop for assignment in (tq-get-assigned-assignments)
+	do
+	(org-open-link-from-string (format "[[assignment:%s]]" assignment))))
+
+
 (defun tq-grade-report ()
   "Generate a *grade report* buffer with a summary of the graded assignments."
   (interactive)
