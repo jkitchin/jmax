@@ -1,0 +1,19 @@
+#+TEMPLATE: NSF Proposal - Current and pending
+#+key: nsf-proposal-current-and-pending
+#+group: manuscript
+#+contributor: John Kitchin <jkitchin@andrew.cmu.edu>
+#+default-filename: current-and-pending.org
+
+#+LATEX_CLASS: cmu-article
+#+Latex_class_options: [12pt]
+#+OPTIONS: toc:nil
+#+TITLE: Current and Pending for <replace: name >
+
+*Title:* <replace: title>                                     \\
+*PI:* <replace: name>                                         \\
+*Funding organization*: <replace: organization>               \\
+*Status:* <replace: status>                                   \\
+*Award period:* <replace: date range>                         \\
+*Total amount of award:* <replace: $amount>                   \\
+*Devoted person-months per year:* <replace: #months>          \\
+*Relevance to this proposal:* <replace: brief description>    \\
