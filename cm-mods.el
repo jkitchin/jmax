@@ -293,17 +293,13 @@ See `cm-forward-comment' for an alternative."
 		   (candidates . ,(mapcar (lambda (s)
 					    (let ((commit
 						   (nth
-						    1
-						    (split-string s)))
-						  msg)
-					      (string-match "|.*$" s)
-					      (cons (concat
-						     commit " "
-						     (match-string 0 s))
+						    0
+						    (split-string s))))
+					      (cons s
 						    commit)))
 					  (split-string
 					   (shell-command-to-string
-					    "git log --pretty=format:\"%h %ad | %s%d [%an]\" --graph --date=local") "\n")))
+					    "git log --pretty=format:\"%h %ad | %s%d [%an]\" --date=relative") "\n")))
 		   (action . (lambda (candidate)
 			       (helm-marked-candidates))))))
 
