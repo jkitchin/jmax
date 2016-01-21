@@ -303,7 +303,7 @@ See `cm-forward-comment' for an alternative."
 						    commit)))
 					  (split-string
 					   (shell-command-to-string
-					    "git hist") "\n")))
+					    "git log --pretty=format:\"%h %ad | %s%d [%an]\" --graph --date=local") "\n")))
 		   (action . (lambda (candidate)
 			       (helm-marked-candidates))))))
 
