@@ -48,13 +48,18 @@ In your init file:
 I installed emacs from homebrew:
 
 #+BEGIN_SRC sh
-brew install emacs --with-gnutls --with-imagemagick --with-librsvg --with-x --use-git-head --HEAD --cocoa
+brew install emacs --with-gnutls --with-imagemagick --with-librsvg --with-x11 --use-git-head --HEAD --with-cocoa
 #+END_SRC
 
 This got me:
-#+BEGIN_EXAMPLE
-GNU Emacs 24.4.50.1 (x86_64-apple-darwin13.3.0, NS appkit-1265.21 Version 10.9.4 (Build 13E28)) of 2014-08-07
-#+END_EXAMPLE
+#+BEGIN_SRC emacs-lisp
+(emacs-version)
+#+END_SRC
+
+#+RESULTS:
+: GNU Emacs 25.1.50.1 (x86_64-apple-darwin13.4.0, NS appkit-1265.21 Version 10.9.5 (Build 13F1077))
+:  of 2016-01-22
+
 
 I installed git from http://git-scm.com/download/mac
 
