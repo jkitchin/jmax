@@ -13,10 +13,35 @@
 (defun email-region (start end)
   "Send region as the body of an email."
   (interactive "r")
-  (let ((content (buffer-substring start end)))
+  (let ((content (buffer-substring start end))
+	cite
+	keys
+	bibfile p1 p2
+	(bib-entries '()))
+    (goto-char (region-beginning))
+    (while (org-ref-match-next-cite-link end)
+      (backward-char 2)
+      (setq cite (org-element-context)
+	    keys (s-split "," (org-element-property :path cite)))
+      (loop for key in keys
+	    do
+	    (setq bibfile
+		  (cdr (org-ref-get-bibtex-key-and-file key)))
+	    (with-current-buffer (find-file-noselect bibfile)
+	      (bibtex-search-entry key)
+	      (save-excursion
+		(bibtex-beginning-of-entry)
+		(setq p1 (point))
+		(bibtex-end-of-entry)
+		(setq p2 (point)))
+	      (pushnew (buffer-substring p1 p2) bib-entries))))
     (compose-mail)
     (message-goto-body)
     (insert content)
+    (loop for bib-entry in bib-entries
+	  do
+	  (insert "\n\n% Bibtex Entries:\n\n")
+	  (insert bib-entry))
     (message-goto-to)))
 
 
