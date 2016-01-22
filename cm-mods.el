@@ -220,22 +220,15 @@ See `cm-forward-comment' for an alternative."
   (interactive)
   (goto-char (point-min))
   (insert "
-#+latex_header: \\usepackage{soul}
+#+latex_header: \\usepackage[normalem]{ulem}
 #+latex_header: \\usepackage{todonotes}
+#+latex_header: \\usepackage[usenames, dvipsnames]{color}
 
-#+latex_header: \\newenvironment{deletion}{%
-#+latex_header:    \\setlength{\\parindent}{0pt}
-#+latex_header:    \\itshape
-#+latex_header:    \\color{red}
-#+latex_header: }{}
+#+latex_header: \\newcommand\\red{\\bgroup\\markoverwith{\\textcolor{red}{\\rule[0.5ex]{4pt}{1.4pt}}}\\ULon}
+#+latex_header: \\newcommand\\blue{\\bgroup\\markoverwith{\\textcolor{blue}{\\rule[-0.5ex]{4pt}{1.4pt}}}\\ULon}
 
-#+latex_header: \\newenvironment{insertion}{%
-#+latex_header:    \\setlength{\parindent}{0pt}
-#+latex_header:    \\itshape
-#+latex_header:    \\color{blue}
-#+latex_header: }{}
 ")
-  ;; comments should only be one line
+  ;; comments should only be one line so we wrap them in a snippet.
   (goto-char (point-min))
   (while (cm-next-comment nil)
     (replace-match "@@latex:\\\\todo{\\3}@@"))
@@ -247,12 +240,14 @@ See `cm-forward-comment' for an alternative."
 	(replace-match "
 #+BEGIN_LaTeX
 \\\\begin{deletion}
-\\\\st{\\3}
+\\\\sout{\\3}
 \\\\end{deletion}
 #+END_LaTeX
 ")
       ;; single line
-      (replace-match "@@latex:\\\\sout{\\\\textcolor{red}{\\3}}@@")))
+      ;; (replace-match "@@latex:\\\\sout{\\\\textcolor{red}{\\3}}@@")
+      ;; (replace-match "@@latex:\\\\hld{\\\\sout{\\3}}@@")
+      (replace-match "@@latex:\\\\red{\\3}@@")))
 
   ;; Additions
   (goto-char (point-min))
@@ -261,26 +256,35 @@ See `cm-forward-comment' for an alternative."
 	(replace-match "
 #+BEGIN_LaTeX
 \\\\begin{insertion}
-\\\\ul{\\3}
+\\\\uwave{\\3}
 \\\\end{insertion}
 #+END_LaTeX
 ")
       ;; single line
-      (replace-match "@@latex:\\\\uwave{\\\\textcolor{blue}{\\3}}@@"))))
+      ;; (replace-match "@@latex:\\\\uwave{\\\\textcolor{blue}{\\3}}@@")
+      ;; (replace-match "@@latex:\\\\hli{\\\\uwave{\\3}}@@")
+      (replace-match "@@latex:\\\\blue{\\3}@@"))))
 
 
-(defun cm-markup-to-org-latex-pdf ()
-  "Convert org-buffer with cm markup to PDF and open it."
-  (interactive)
-  (let* ((orgfile (if (buffer-file-name)
-		      (concat (file-name-base) "-wdiff.org")
-		    ;; no buffer file name
-		    (concat (file-name-base *cm-wdiff-git-source*)
-			    "-wdiff.org"))))
-    (org-org-export-as-org)
+(defun cm-wdiff-to-pdf (commits)
+  "On current buffer, select a commit(s) and convert the wdiff to
+a PDF."
+  (interactive (list (cm-git-commit-selector)))
+
+  (with-current-buffer
+      (cm-wdiff-git (list (if (= (length commits) 2)
+			      (nth 1 commits)
+			    "HEAD")
+			  (nth 0 commits)))
+
     (cm-markup-to-org-latex)
-    (write-file orgfile)
-    (org-open-file (org-latex-export-to-pdf))))
+    (let ((revised-org (replace-regexp-in-string
+			".org" "-revised.org"
+			*cm-wdiff-git-source*)))
+
+      (write-file revised-org)
+      (ox-manuscript-export-and-build-and-open)
+      (kill-buffer revised-org))))
 
 
 
@@ -304,7 +308,7 @@ See `cm-forward-comment' for an alternative."
 			       (helm-marked-candidates))))))
 
 
-(defun cm-wdiff-git ()
+(defun cm-wdiff-git (commits)
   "Perform a wdiff between git commits.
 a helm selection buffer is used to choose commits.
 
@@ -312,10 +316,10 @@ If you choose one commit, the wdiff is between that commit and
 the current version.
 
 If you choose two commits, the wdiff is between those two
-commits."
-  (interactive)
-  (let ((commits (cm-git-commit-selector))
-	(buf (get-buffer-create
+commits. Returns the buffer."
+  (interactive
+   (list (cm-git-commit-selector)))
+  (let ((buf (get-buffer-create
 	      "*org-wdiff-git*"))
 	(mmode major-mode)
 	(git-root (vc-git-root
@@ -354,7 +358,8 @@ commits."
 
     ;; Turn on cm-mode
     (cm-mode)
-    (goto-char (point-min))))
+    (goto-char (point-min))
+    buf))
 
 
 (defun cm-wdiff-save ()
