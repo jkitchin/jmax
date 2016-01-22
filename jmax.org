@@ -1,1 +1,456 @@
-#+TITLE: jmax - awesome editing in emacs#+AUTHOR: John Kitchin* Introductionjmax is a customization of emacs that facilitates writing technical documents. I found it takes extensive customization to get emacs to do what you want, and this is my collection of customizations.You do not need to learn a lot of keyboard shortcuts to use jmax. You can do almost everything from menus. The menus often show you if there is a shortcut, and if you see it often enough you might start using it. The keyboard shortcuts only make things faster.** Getting help in Emacsjmax does a few things to help you get help besides this manual.1. `emacs-keybinding-command-tooltip-mode'   This minor mode recognizes command/variable syntax, fontifies it, puts a tooltip on it, and makes it clickable! The tooltip is the Emacs documentation. Clicking on it opens the Help buffer. Pressing the super key and clicking should open the code for the function.   It recognizes variables too: `org-export-babel-evaluate'.   The key-binding syntax is also recognized, e.g. \\[bold-region-or-point]. Hovering on it will show you the keybinding if there is one.2. The `ore' command will tell you about the org-element your cursor is on. It will give you some hints about what you can do (i.e. what commands/actions you can do) at that point.3. You may find the `jeldoc' command helpful to learn about libraries. It generates an org-file of all the requirements, variables and functions in a library. Try this link: [[elisp:(jeldoc "org-ref")]]. It works on most libraries, please report ones where it does not work.4. You can select any text and run the command `words-hydra/body' to search the Internet for those words.5. Check out the org-mode manual info:org for more information about org-mode, and the emacs manual info:emacs for more information about Emacs.   You may also try these commands:   `apropos-documentation'  and `helm-apropos'   helm-info-* commands, e.g. `helm-info-org'.** Markup shortcutsorg-mode is a plain text format, but it supports the regular types of markup for text.jmax defines some shortcuts for org-mode markup. You can select text and type the shortcut to wrap the region in the markup, or type the short cut to wrap the character at point or create the markup with the cursor inside it to keep typing.| markup            | keyshortcut | emacs-command                   ||-------------------+-------------+---------------------------------|| *Bold*            | s-b         | `bold-region-or-point'          || /italics/         | s-i         | `italics-region-or-point'       || =verbatim=        | s-v         | `verbatim-region-or-point'      || ~code~            | s-c         | `code-region-or-point'          || _underline_       | s-u         | `underline-region-or-point'     || +strike+          | s-+         | `strikethrough-region-or-point' || _{subscript}      | s--         | `subscript-region-or-point'     || ^{superscript}    | s-=         | `superscript-region-or-point'   || \(equation\)      | s-4         | `latex-math-region-or-point'    || $inline eqn$      | C-u s-4     |                                 || @@latex:snippet@@ | C-u C-u 4   |                                 || °                 | s-y         | `helm-insert-org-entity'        || \deg              | s-y f2      |                                 || \textdegree{}     | s-y f3      |                                 || &deg;             | s-y f4      |                                 |Use  `helm-insert-org-entity' (s-y) for all accented charactersHere are some common ones, but there are alot of them!| angstrom | ("AA" "\\AA{}" nil "&Aring;" "A" "Å" "Å")     ||          | ("oslash" "\\o{}" nil "&oslash;" "o" "ø" "ø") ||          | ("uuml" "\\\"{u}" nil "&uuml;" "ue" "ü" "ü")  |** src-block expansion in org-modeThe following examples show the shortcuts defined in jmax for expansion. Put your cursor after the shortcut and press tab to expand them.<p#+BEGIN_SRC python#+END_SRC<por#+BEGIN_SRC python :results output raw#+END_SRC<pv#+BEGIN_SRC python :results value#+END_SRC<el#+BEGIN_SRC emacs-lisp#+END_SRC<sh#+BEGIN_SRC sh#+END_SRC<lh#+latex_header:<lc#+latex_class:<lco#+latex_class_options:<ao#+attr_org:<al#+attr_latex:<ca#+caption:<tn#+tblname:<n#+name:Here are some convenient table expansions.<t|  |<tt|  |   |<ttt|  |   |   |<tttt|  |   |   |   |<ttttt|  |   |   |   |   |<tttttt|  |   |   |   |   |   |You may also like to use `jmax-insert-figure' and `jmax-insert-table' to interactively insert figures and tables. Finally, from \\[helm-find-files] you can press TAB, and select "Insert as org-mode figure" to insert a file as a figure in org-mode.** LaTeX export classes in jmaxThe default article class is not usually what you want your PDF documents to look like.- cmu-article :: an article with 1inch margins and default packages- article-no-defaults :: bare article class with no default packages** Changes to vanilla org-mode behaviorjmax advises C-c C-c behavior so it does not remove LaTeX overlays on equations.jmax provides `org-toggle-latex-overlays'.jmax refreshes all images after you execute a src-block.** Learning more about org-mode and EmacsConsider buying Mastering Emacs https://www.masteringemacs.org. It is the newest book on Emacs, and very useful.You can get a paper copy of the org-mode manual http://www.amazon.com/The-Org-Mode-Reference-Manual/dp/9881327709. It is approximately the same as the org manual in Emacs, but you might find it easier to read a book.Some older books that you can also learn a lot from are:1. Learning Gnu Emacs http://www.amazon.com/gp/product/05960064892. Writing Gnu Emacs Extensions http://www.amazon.com/Writing-GNU-Emacs-Extensions-Glickstein/dp/1565922611You may want to follow http://planet.emacsen.orgI have also found lots of good information at these sites:http://ergoemacs.org/emacs/emacs.htmlhttp://ergoemacs.org/emacs/elisp.htmlWhen you eventually get to programming in emacs-lisp to make Emacs do what you want, start reading info:elisp. It is dense and massive.* Version control in jmaxWe use git for version control. There are three styles of using git with jmax:1. The emacs "vc-" commands and shortcuts2. The magit library3. The command line - use it in a terminalI find these keyboard short cuts handy for working on a single file, most of them run the "vc-" commands.| C-x v v | `vc-next-action' | Does the next obvious vc thing, either add file or commit it. || C-x v = | `vc-diff'        | Shows a diff of the current file compared to the last commit. || C-x v l | `vc-print-log'   | Show the current git log                                      || C-x v p | `vc-git-push'    | Push current commits                                          || C-x v P | `vc-pull'        | Pull                                                          || C-x v u | `vc-revert'      | Revert last commit                                            || C-x v s | `vc-create-tag'  | Add a tag to the repo (it must be clean)                      || C-x v t | `magit-status'   | Run `magit-status' for everything more complicated.           |There are many more commands under menu Tools -> Version Control.magit is pretty awesome. It is worth reading the manual info:magit. Start by running the command \\[magit-status] (it is also bound to f5).Only occasionally do I go to a command line to run git commands.** Track changesThe use of version control allows us to do track changes in jmax! You need to have a wdiff program (e.g. https://www.gnu.org/software/wdiff/) installed. We use a fork https://github.com/jkitchin/criticmarkup-emacs to enable [[http://criticmarkup.com][CriticMarkup]] in Emacs, with some extensions we have written.- `cm-wdiff-buffer-with-file' :: Show a track change of current version with last saved version- `cm-wdiff-git' :: Show a track change between two git versions of the open file.- `cm-wdiff-to-pdf' :: Convert a track change between two git versions to a PDF.You can turn track changes on with the command `cm-follow-changes'. There is a hydra menu function `cm/body' that provides easy access to turn on track changes, navigate the changes, accept/reject them, etc...* Scientific writingSee `org-ref'. elisp:org-ref-help** Spell checking and abbreviationsjmax configures spell checking for you if it finds hunspell, ispell or aspell installed. As you type, misspellings will be underlined with a red line. Run the command \\[flyspell-check-previous-highlighted-word] (s-s) to jump to the word, fix it and jump right back to the place you were. You will get some suggestions for words at the top of the screen and you select one with a number. Or, you type ? to see help. You can insert the word into a private dictionary to save it for later if it is a real word. You can also bda use the mouse to middle click or super-left click to correct the words.You can open your personal dictionary here: [[elisp:(find-file ispell-personal-dictionary)]]You can run `ispell-buffer' to spell-check the buffer, and `ispell-word' to check a particular word. There is a hydra menu: \\[spell/body] that helps with spell-checking.If you mistype a word very often, e.g. wehn instead of when, you can train Emacs to auto correct these. As soon as you type a word wrong like that, run the command \\[endless/ispell-word-then-abbrev] with the cursor right after the word. You will be prompted for the correct spelling, and after that, the word will automatically be corrected as you type.See your abbreviations here: [[elisp:(find-file abbrev-file-name)]].You can define your own abbreviations interactively with `jmax-define-abbrev', these automatically expand as you type. If you find you want to keep the actual abbreviation, run `unexpand-abbrev' to undo the last expansion, or type C-/ to undo the expansion, then type C-q to insert the next character. Edit your abbreviations with `edit-abbrevs'.You can do convenient things like expand CO2 to CO_{2} or CuPd to @@latex:\ce{Cu_xPd_{1-x}}@@, or degC to °C. Pretty handy...If you like this kind of expansion to save typing, checkout [[http://capitaomorte.github.io/yasnippet/][yasnippet]]. It is significantly more powerful than simple abbreviations, including interactive and dynamic expansion.* Programming** Pythonjmax is configured to use [[http://elpy.readthedocs.org/en/latest/index.html][elpy]] for Python.You can use the `pydoc' command to get information about Python commands from Emacs.In your org-mode Python src-blocks you can run `org-py-check' to check the code with pyflakes, pylint and pep8. This will give you some feedback on your code.#+BEGIN_SRC pythona=5print 6*a#+END_SRCNormally when you run a python block you have to wait for it to finish before you can do anything. Try running `org-babel-async-execute:python' to run the block asynchronously, so you can keep working while it finishes.* Productivity** hotspotsThe `hotspots' command provides a simple interface to do common things like run the `org-agenda' command, open files you use often, etc...For example to get easy commands to open my Google calendar, contatcts, agenda, and open my CV I have something like this in my user.el file:#+BEGIN_SRC emacs-lisp(setq jmax-user-hotspot-commands      '(("Calendar" . (lambda ()			(browse-url "https://www.google.com/calendar/render")))	("Contacts" . helm-org-contacts)	("Agenda" . (lambda () (org-agenda "" "w")))	("CV" . (lambda ()		  (org-open-file		   "/Users/jkitchin/Dropbox/CMU/CV and bios/kitchin_cv.docx"		   '(16))))))#+END_SRC** "Table of contents"jmax defines to alias commands `toc' and `atoc'. `toc' helps you navigate quickly to another headline in the current org-file. `atoc' helps you navigate to a headline in a file that is listed in `org-agenda-files'.** Using the org-agenda for task managementI actually started using org-mode for keeping track of all the things I have to get done. Org-mode provides an "agenda" which contains a list of all the TODO items you create in the files listed in the variable `org-agenda-files'. I recommend you create a directory to store all your org-files in and set this directory to be your `org-agenda-files' variable. I have all mine in the folder ~/Dropbox/org-mode and I set the variable like this.#+BEGIN_SRC emacs-lisp(setq org-agenda-files '("~/Dropbox/org-mode"))#+END_SRCThen, when you run the agenda command, org-mode will scan them all and present a list of things you need to do next. You access the agenda in one of the following ways:1. From the `hotspots' command if you configure it with an agenda command.2. The \\[org-agenda] command.3. The Org -> Agenda command menuA common agenda command is: [[elisp:(org-agenda nil "w")]] for a weekly agenda.See [[info:org#TODO%20Items][info:org#TODO Items]] for more information about making TODO items, and [[info:org#Agenda%20Views][info:org#Agenda Views]] for more information about the agenda.** RSS/elfeedThe `elfeed' command opens a reader of RSS feeds. I use this to keep track of scientific journal articles.This is my setup for elfeed for many scientific journals.#+BEGIN_SRC emacs-lisp(setq elfeed-feeds      '("http://feeds.feedburner.com/acs/accacs"	"http://feeds.feedburner.com/acs/enfuem"	"http://feeds.feedburner.com/acs/esthag"	"http://feeds.feedburner.com/acs/jacsat"	"http://feeds.feedburner.com/acs/jpcbfk"	"http://feeds.feedburner.com/acs/jpccck"	"http://feeds.feedburner.com/acs/jpclcd"	"http://feeds.feedburner.com/acs/cmatex"	"http://feeds.feedburner.com/acs/jctcce"	"http://feeds.feedburner.com/acs/jcisd8"	"http://feeds.feedburner.com/acs/iecred"	"http://feeds.aps.org/rss/recent/prl.xml"	"http://feeds.aps.org/rss/recent/prb.xml"	"http://www.sciencemag.org/rss/current.xml"	"http://feeds.nature.com/nature/rss/current"	"http://feeds.nature.com/nmat/rss/current"	"http://feeds.nature.com/nchem/rss/current"	"http://rss.sciencedirect.com/publication/science/09270256" ; computational materials science	"http://onlinelibrary.wiley.com/rss/journal/10.1002/(ISSN)1521-3773"));; Configure the appearance a bit(setq elfeed-search-title-max-width 150)(setq elfeed-search-trailing-width 30);; A snippet for periodic update for feeds (3 mins since Emacs start, then every;; half hour):(elfeed-update)(run-at-time 180 1800 (lambda () (unless elfeed-waiting (elfeed-update))));; capture template for elfeed(add-to-list 'org-capture-templates '("e" "Elfeed" entry (file "~/Dropbox/org-mode/elfeed.org")   "*  %:description  DEADLINE: %t \nLink: %a\n\n"))#+END_SRC** Send email from EmacsYou will probably want to send some stuff you have in Emacs to someone. You have to tell Emacs how to send email first. Here is how I setup Emacs to send mail from Gmail. Put something like this in your user.el file.#+BEGIN_SRC emacs-lisp(require 'smtpmail)(setq   user-mail-address "andrewid@andrew.cmu.edu"   user-full-name  "Your Name")(setq message-send-mail-function 'smtpmail-send-it     smtpmail-stream-type 'starttls     smtpmail-default-smtp-server "smtp.googlemail.com"     smtpmail-smtp-server "smtp.gmail.com"     smtpmail-smtp-service 587);; don't keep message buffers around(setq message-kill-buffer-on-exit t)#+END_SRCYou can email a whole buffer to someone with `email-buffer'.You can highlight a region and run `email-region' to send it to someone.You can email an org-mode heading with `email-heading' or just the body of a heading with `email-heading-body'.If you are in a bibtex entry, send it to someone with `email-bibtex-entry'.Checkout [[elisp:(find-library "mail-merge")]] if you need mail-merge capabilities.* Description of the files in jmax** [[./init.el]]Here is where the initialization starts. This is where Emacs checks if jmax is up to date.The first thing this does is load [[./user/preload.el]]If you don't want jmax to auto-update all the time put this in that file.#+BEGIN_SRC emacs-lisp(setq jmax-auto-update nil)#+END_SRCYou would also set jmax-user-theme in the preload file if you want something other than leuven.** [[./packages.el]]Here is where the packages get installed.** [[./jmax.el]]This is the next file to get loaded. This is where most of the Emacs configuration is done. It is mostly loading and configuring packages.** [[./jmax-utils.el]]This file contains some convenient utility functions** [[./python-setup.el]]This file sets up python mode, and some functions for org-mode and python.** [[./jmax-org.el]]This file is where org-mode is configured.** [[file:email.el]]This library contains functions for sending emails from Emacs, e.g. to email a selected region, buffer, and other things.** file:mail-merge.elBring mail-merge to org-mode and emacs.** file:kitchinhub.elSome convenience functions for using github. Most importantly: elisp:kitchingroup** file:words.elConvenient functions to look up things in Emacs.** file:ore.elOrg-element explorer elisp:ore will tell you about the element at point.** [[file:ox-manuscript.el]]This library allows us to export org-mode files to scientific manuscripts.** file:org-refThe reference manager for org-mode. Helps with bibliographies, citations, and cross-references.** file:cm-mods.elExtensions for `cm-mode' to bring track changes to Emacs and org-mode.** [[file:ox-archive]]** [[file:ox-cmu-ms-report.el]]** [[file:ox-cmu-qualifier.el]]** [[file:ox-cmu-dissertation.el]]** user directoryPut your personal setup and overrides here. Everything in this directory will get loaded, in no particular order.** [[file:themes]]Leuven is the best looking theme for org-mode in my opinion. It is the default.There are several alternative themes here including the popular zenburn and solarized themes.Set one of these like this in your preload.el file:#+BEGIN_SRC emacs-lisp(load-theme 'zenburn t)#+END_SRC#+RESULTS:: t#+BEGIN_SRC emacs-lisp(setq jmax-user-theme 'zenburn)#+END_SRCSome people like the Tomorrow themes (https://emacsthemes.com/themes/sanityinc-tomorrow-themes.html). Try it out.#+BEGIN_SRC emacs-lisp(add-to-list 'custom-theme-load-path (expand-file-name "themes/tomorrow-theme/GNU Emacs" starter-kit-dir))(load-theme 'tomorrow-day)#+END_SRC#+RESULTS:: tOr the solarized themes#+BEGIN_SRC emacs-lisp(add-to-list 'custom-theme-load-path (expand-file-name "themes/emacs-color-theme-solarized" starter-kit-dir))(load-theme 'solarized-dark)#+END_SRC#+RESULTS:: t* TODO Latex setup[[./texmf]] contains a texmf setup you can use with your latex setup. I don't think I actually use this anymore. It looks like I used to use it in Windows though [[file:texmf/README.org][(file:texmf/README.org]])
+#+TITLE: jmax - awesome editing in emacs
+#+AUTHOR: John Kitchin
+
+* Introduction
+jmax is a customization of emacs that facilitates writing technical documents. I found it takes extensive customization to get emacs to do what you want, and this is my collection of customizations.
+
+You do not need to learn a lot of keyboard shortcuts to use jmax. You can do almost everything from menus. The menus often show you if there is a shortcut, and if you see it often enough you might start using it. The keyboard shortcuts only make things faster.
+
+** Getting help in Emacs
+jmax does a few things to help you get help besides this manual.
+
+1. `emacs-keybinding-command-tooltip-mode'
+   This minor mode recognizes command/variable syntax, fontifies it, puts a tooltip on it, and makes it clickable! The tooltip is the Emacs documentation. Clicking on it opens the Help buffer. Pressing the super key and clicking should open the code for the function.
+   It recognizes variables too: `org-export-babel-evaluate'.
+
+   The key-binding syntax is also recognized, e.g. \\[bold-region-or-point]. Hovering on it will show you the keybinding if there is one.
+
+2. The `ore' command will tell you about the org-element your cursor is on. It will give you some hints about what you can do (i.e. what commands/actions you can do) at that point.
+
+3. You may find the `jeldoc' command helpful to learn about libraries. It generates an org-file of all the requirements, variables and functions in a library. Try this link: [[elisp:(jeldoc "org-ref")]]. It works on most libraries, please report ones where it does not work.
+
+4. You can select any text and run the command `words-hydra/body' to search the Internet for those words.
+
+5. Check out the org-mode manual info:org for more information about org-mode, and the emacs manual info:emacs for more information about Emacs.
+
+   You may also try these commands:
+
+   `apropos-documentation'  and `helm-apropos'
+
+   helm-info-* commands, e.g. `helm-info-org'.
+
+** Markup shortcuts
+org-mode is a plain text format, but it supports the regular types of markup for text.
+
+jmax defines some shortcuts for org-mode markup. You can select text and type the shortcut to wrap the region in the markup, or type the short cut to wrap the character at point or create the markup with the cursor inside it to keep typing.
+
+| markup            | keyshortcut | emacs-command                   |
+|-------------------+-------------+---------------------------------|
+| *Bold*            | s-b         | `bold-region-or-point'          |
+| /italics/         | s-i         | `italics-region-or-point'       |
+| =verbatim=        | s-v         | `verbatim-region-or-point'      |
+| ~code~            | s-c         | `code-region-or-point'          |
+| _underline_       | s-u         | `underline-region-or-point'     |
+| +strike+          | s-+         | `strikethrough-region-or-point' |
+| _{subscript}      | s--         | `subscript-region-or-point'     |
+| ^{superscript}    | s-=         | `superscript-region-or-point'   |
+| \(equation\)      | s-4         | `latex-math-region-or-point'    |
+| $inline eqn$      | C-u s-4     |                                 |
+| @@latex:snippet@@ | C-u C-u 4   |                                 |
+| °                 | s-y         | `helm-insert-org-entity'        |
+| \deg              | s-y f2      |                                 |
+| \textdegree{}     | s-y f3      |                                 |
+| &deg;             | s-y f4      |                                 |
+
+Use  `helm-insert-org-entity' (s-y) for all accented characters
+
+Here are some common ones, but there are alot of them!
+
+| angstrom | ("AA" "\\AA{}" nil "&Aring;" "A" "Å" "Å")     |
+|          | ("oslash" "\\o{}" nil "&oslash;" "o" "ø" "ø") |
+|          | ("uuml" "\\\"{u}" nil "&uuml;" "ue" "ü" "ü")  |
+
+** src-block expansion in org-mode
+
+The following examples show the shortcuts defined in jmax for expansion. Put your cursor after the shortcut and press tab to expand them.
+
+<p
+#+BEGIN_SRC python
+
+#+END_SRC
+
+<por
+#+BEGIN_SRC python :results output raw
+
+#+END_SRC
+
+<pv
+#+BEGIN_SRC python :results value
+
+#+END_SRC
+
+<el
+#+BEGIN_SRC emacs-lisp
+
+#+END_SRC
+
+<sh
+#+BEGIN_SRC sh
+
+#+END_SRC
+
+<lh
+#+latex_header:
+
+<lc
+#+latex_class:
+
+<lco
+#+latex_class_options:
+
+<ao
+#+attr_org:
+
+<al
+#+attr_latex:
+
+<ca
+#+caption:
+
+<tn
+#+tblname:
+
+<n
+#+name:
+
+Here are some convenient table expansions.
+
+<t
+|  |
+
+<tt
+|  |   |
+
+<ttt
+|  |   |   |
+
+<tttt
+|  |   |   |   |
+
+<ttttt
+|  |   |   |   |   |
+
+<tttttt
+|  |   |   |   |   |   |
+
+You may also like to use `jmax-insert-figure' and `jmax-insert-table' to interactively insert figures and tables. Finally, from \\[helm-find-files] you can press TAB, and select "Insert as org-mode figure" to insert a file as a figure in org-mode.
+
+** LaTeX export classes in jmax
+The default article class is not usually what you want your PDF documents to look like.
+
+- cmu-article :: an article with 1inch margins and default packages
+- article-no-defaults :: bare article class with no default packages
+
+** Changes to vanilla org-mode behavior
+jmax advises C-c C-c behavior so it does not remove LaTeX overlays on equations.
+
+jmax provides `org-toggle-latex-overlays'.
+
+jmax refreshes all images after you execute a src-block.
+
+** Learning more about org-mode and Emacs
+Consider buying Mastering Emacs https://www.masteringemacs.org. It is the newest book on Emacs, and very useful.
+
+You can get a paper copy of the org-mode manual http://www.amazon.com/The-Org-Mode-Reference-Manual/dp/9881327709. It is approximately the same as the org manual in Emacs, but you might find it easier to read a book.
+
+
+Some older books that you can also learn a lot from are:
+1. Learning Gnu Emacs http://www.amazon.com/gp/product/0596006489
+2. Writing Gnu Emacs Extensions http://www.amazon.com/Writing-GNU-Emacs-Extensions-Glickstein/dp/1565922611
+
+You may want to follow http://planet.emacsen.org
+
+I have also found lots of good information at these sites:
+http://ergoemacs.org/emacs/emacs.html
+http://ergoemacs.org/emacs/elisp.html
+
+When you eventually get to programming in emacs-lisp to make Emacs do what you want, start reading info:elisp. It is dense and massive.
+
+* Version control in jmax
+We use git for version control. There are three styles of using git with jmax:
+1. The emacs "vc-" commands and shortcuts
+2. The magit library
+3. The command line - use it in a terminal
+
+I find these keyboard short cuts handy for working on a single file, most of them run the "vc-" commands.
+
+| C-x v v | `vc-next-action' | Does the next obvious vc thing, either add file or commit it. |
+| C-x v = | `vc-diff'        | Shows a diff of the current file compared to the last commit. |
+| C-x v l | `vc-print-log'   | Show the current git log                                      |
+| C-x v p | `vc-git-push'    | Push current commits                                          |
+| C-x v P | `vc-pull'        | Pull                                                          |
+| C-x v u | `vc-revert'      | Revert last commit                                            |
+| C-x v s | `vc-create-tag'  | Add a tag to the repo (it must be clean)                      |
+| C-x v t | `magit-status'   | Run `magit-status' for everything more complicated.           |
+
+There are many more commands under menu Tools -> Version Control.
+
+magit is pretty awesome. It is worth reading the manual info:magit. Start by running the command \\[magit-status] (it is also bound to f5).
+
+Only occasionally do I go to a command line to run git commands.
+
+** Track changes
+The use of version control allows us to do track changes in jmax! You need to have a wdiff program (e.g. https://www.gnu.org/software/wdiff/) installed. We use a fork https://github.com/jkitchin/criticmarkup-emacs to enable [[http://criticmarkup.com][CriticMarkup]] in Emacs, with some extensions we have written.
+
+- `cm-wdiff-buffer-with-file' :: Show a track change of current version with last saved version
+
+- `cm-wdiff-git' :: Show a track change between two git versions of the open file.
+
+- `cm-wdiff-to-pdf' :: Convert a track change between two git versions to a PDF.
+
+You can turn track changes on with the command `cm-follow-changes'. There is a hydra menu function `cm/body' that provides easy access to turn on track changes, navigate the changes, accept/reject them, etc...
+
+* Scientific writing
+See `org-ref'. elisp:org-ref-help
+
+** Spell checking and abbreviations
+
+jmax configures spell checking for you if it finds hunspell, ispell or aspell installed. As you type, misspellings will be underlined with a red line. Run the command \\[flyspell-check-previous-highlighted-word] (s-s) to jump to the word, fix it and jump right back to the place you were. You will get some suggestions for words at the top of the screen and you select one with a number. Or, you type ? to see help. You can insert the word into a private dictionary to save it for later if it is a real word. You can also bda use the mouse to middle click or super-left click to correct the words.
+
+You can open your personal dictionary here: [[elisp:(find-file ispell-personal-dictionary)]]
+
+You can run `ispell-buffer' to spell-check the buffer, and `ispell-word' to check a particular word. There is a hydra menu: \\[spell/body] that helps with spell-checking.
+
+If you mistype a word very often, e.g. wehn instead of when, you can train Emacs to auto correct these. As soon as you type a word wrong like that, run the command \\[endless/ispell-word-then-abbrev] with the cursor right after the word. You will be prompted for the correct spelling, and after that, the word will automatically be corrected as you type.
+
+See your abbreviations here: [[elisp:(find-file abbrev-file-name)]].
+
+You can define your own abbreviations interactively with `jmax-define-abbrev', these automatically expand as you type. If you find you want to keep the actual abbreviation, run `unexpand-abbrev' to undo the last expansion, or type C-/ to undo the expansion, then type C-q to insert the next character. Edit your abbreviations with `edit-abbrevs'.
+
+You can do convenient things like expand CO2 to CO_{2} or CuPd to @@latex:\ce{Cu_xPd_{1-x}}@@, or degC to °C. Pretty handy...
+
+If you like this kind of expansion to save typing, checkout [[http://capitaomorte.github.io/yasnippet/][yasnippet]]. It is significantly more powerful than simple abbreviations, including interactive and dynamic expansion.
+
+* Programming
+** Python
+jmax is configured to use [[http://elpy.readthedocs.org/en/latest/index.html][elpy]] for Python.
+
+You can use the `pydoc' command to get information about Python commands from Emacs.
+
+In your org-mode Python src-blocks you can run `org-py-check' to check the code with pyflakes, pylint and pep8. This will give you some feedback on your code.
+
+#+BEGIN_SRC python
+a=5
+
+print 6*a
+#+END_SRC
+
+Normally when you run a python block you have to wait for it to finish before you can do anything. Try running `org-babel-async-execute:python' to run the block asynchronously, so you can keep working while it finishes.
+
+* Productivity
+** hotspots
+The `hotspots' command provides a simple interface to do common things like run the `org-agenda' command, open files you use often, etc...
+
+For example to get easy commands to open my Google calendar, contatcts, agenda, and open my CV I have something like this in my user.el file:
+
+#+BEGIN_SRC emacs-lisp
+(setq jmax-user-hotspot-commands
+      '(("Calendar" . (lambda ()
+			(browse-url "https://www.google.com/calendar/render")))
+	("Contacts" . helm-org-contacts)
+	("Agenda" . (lambda () (org-agenda "" "w")))
+	("CV" . (lambda ()
+		  (org-open-file
+		   "/Users/jkitchin/Dropbox/CMU/CV and bios/kitchin_cv.docx"
+		   '(16))))))
+#+END_SRC
+
+** "Table of contents"
+jmax defines to alias commands `toc' and `atoc'. `toc' helps you navigate quickly to another headline in the current org-file. `atoc' helps you navigate to a headline in a file that is listed in `org-agenda-files'.
+
+** Using the org-agenda for task management
+I actually started using org-mode for keeping track of all the things I have to get done. Org-mode provides an "agenda" which contains a list of all the TODO items you create in the files listed in the variable `org-agenda-files'. I recommend you create a directory to store all your org-files in and set this directory to be your `org-agenda-files' variable. I have all mine in the folder ~/Dropbox/org-mode and I set the variable like this.
+
+#+BEGIN_SRC emacs-lisp
+(setq org-agenda-files '("~/Dropbox/org-mode"))
+#+END_SRC
+
+Then, when you run the agenda command, org-mode will scan them all and present a list of things you need to do next. You access the agenda in one of the following ways:
+1. From the `hotspots' command if you configure it with an agenda command.
+2. The \\[org-agenda] command.
+3. The Org -> Agenda command menu
+
+A common agenda command is: [[elisp:(org-agenda nil "w")]] for a weekly agenda.
+
+See [[info:org#TODO%20Items][info:org#TODO Items]] for more information about making TODO items, and [[info:org#Agenda%20Views][info:org#Agenda Views]] for more information about the agenda.
+
+** RSS/elfeed
+The `elfeed' command opens a reader of RSS feeds. I use this to keep track of scientific journal articles.
+
+This is my setup for elfeed for many scientific journals.
+
+#+BEGIN_SRC emacs-lisp
+(setq elfeed-feeds
+      '("http://feeds.feedburner.com/acs/accacs"
+	"http://feeds.feedburner.com/acs/enfuem"
+	"http://feeds.feedburner.com/acs/esthag"
+	"http://feeds.feedburner.com/acs/jacsat"
+	"http://feeds.feedburner.com/acs/jpcbfk"
+	"http://feeds.feedburner.com/acs/jpccck"
+	"http://feeds.feedburner.com/acs/jpclcd"
+	"http://feeds.feedburner.com/acs/cmatex"
+	"http://feeds.feedburner.com/acs/jctcce"
+	"http://feeds.feedburner.com/acs/jcisd8"
+	"http://feeds.feedburner.com/acs/iecred"
+	"http://feeds.aps.org/rss/recent/prl.xml"
+	"http://feeds.aps.org/rss/recent/prb.xml"
+	"http://www.sciencemag.org/rss/current.xml"
+	"http://feeds.nature.com/nature/rss/current"
+	"http://feeds.nature.com/nmat/rss/current"
+	"http://feeds.nature.com/nchem/rss/current"
+	"http://rss.sciencedirect.com/publication/science/09270256" ; computational materials science
+	"http://onlinelibrary.wiley.com/rss/journal/10.1002/(ISSN)1521-3773"))
+
+;; Configure the appearance a bit
+(setq elfeed-search-title-max-width 150)
+(setq elfeed-search-trailing-width 30)
+
+;; A snippet for periodic update for feeds (3 mins since Emacs start, then every
+;; half hour):
+(elfeed-update)
+(run-at-time 180 1800 (lambda () (unless elfeed-waiting (elfeed-update))))
+
+;; capture template for elfeed
+(add-to-list
+ 'org-capture-templates
+ '("e" "Elfeed" entry (file "~/Dropbox/org-mode/elfeed.org")
+   "*  %:description
+  DEADLINE: %t
+
+ \nLink: %a\n\n"))
+#+END_SRC
+
+** Send email from Emacs
+You will probably want to send some stuff you have in Emacs to someone. You have to tell Emacs how to send email first. Here is how I setup Emacs to send mail from Gmail. Put something like this in your user.el file.
+
+#+BEGIN_SRC emacs-lisp
+(require 'smtpmail)
+
+(setq
+   user-mail-address "andrewid@andrew.cmu.edu"
+   user-full-name  "Your Name")
+
+(setq message-send-mail-function 'smtpmail-send-it
+     smtpmail-stream-type 'starttls
+     smtpmail-default-smtp-server "smtp.googlemail.com"
+     smtpmail-smtp-server "smtp.gmail.com"
+     smtpmail-smtp-service 587)
+
+;; don't keep message buffers around
+(setq message-kill-buffer-on-exit t)
+#+END_SRC
+You can email a whole buffer to someone with `email-buffer'.
+
+You can highlight a region and run `email-region' to send it to someone.
+
+You can email an org-mode heading with `email-heading' or just the body of a heading with `email-heading-body'.
+
+If you are in a bibtex entry, send it to someone with `email-bibtex-entry'.
+
+Checkout [[elisp:(find-library "mail-merge")]] if you need mail-merge capabilities.
+
+* Description of the files in jmax
+** [[./init.el]]
+Here is where the initialization starts. This is where Emacs checks if jmax is up to date.
+
+The first thing this does is load [[./user/preload.el]]
+
+If you don't want jmax to auto-update all the time put this in that file.
+
+#+BEGIN_SRC emacs-lisp
+(setq jmax-auto-update nil)
+#+END_SRC
+
+You would also set jmax-user-theme in the preload file if you want something other than leuven.
+
+** [[./packages.el]]
+Here is where the packages get installed.
+
+** [[./jmax.el]]
+
+This is the next file to get loaded. This is where most of the Emacs configuration is done. It is mostly loading and configuring packages.
+
+** [[./jmax-utils.el]]
+This file contains some convenient utility functions
+
+** [[./python-setup.el]]
+This file sets up python mode, and some functions for org-mode and python.
+
+** [[./jmax-org.el]]
+This file is where org-mode is configured.
+
+** [[file:email.el]]
+This library contains functions for sending emails from Emacs, e.g. to email a selected region, buffer, and other things.
+
+** file:mail-merge.el
+Bring mail-merge to org-mode and emacs.
+
+** file:kitchinhub.el
+Some convenience functions for using github. Most importantly: elisp:kitchingroup
+
+** file:words.el
+Convenient functions to look up things in Emacs.
+
+** file:ore.el
+Org-element explorer elisp:ore will tell you about the element at point.
+
+** [[file:ox-manuscript.el]]
+This library allows us to export org-mode files to scientific manuscripts.
+
+** file:org-ref
+The reference manager for org-mode. Helps with bibliographies, citations, and cross-references.
+
+** file:cm-mods.el
+Extensions for `cm-mode' to bring track changes to Emacs and org-mode.
+
+** [[file:ox-archive]]
+** [[file:ox-cmu-ms-report.el]]
+** [[file:ox-cmu-qualifier.el]]
+** [[file:ox-cmu-dissertation.el]]
+** user directory
+Put your personal setup and overrides here. Everything in this directory will get loaded, in no particular order.
+
+** [[file:themes]]
+Leuven is the best looking theme for org-mode in my opinion. It is the default.
+
+There are several alternative themes here including the popular zenburn and solarized themes.
+
+Set one of these like this in your preload.el file:
+
+#+BEGIN_SRC emacs-lisp
+(load-theme 'zenburn t)
+#+END_SRC
+
+#+RESULTS:
+: t
+
+#+BEGIN_SRC emacs-lisp
+(setq jmax-user-theme 'zenburn)
+#+END_SRC
+
+Some people like the Tomorrow themes (https://emacsthemes.com/themes/sanityinc-tomorrow-themes.html). Try it out.
+#+BEGIN_SRC emacs-lisp
+(add-to-list
+ 'custom-theme-load-path
+ (expand-file-name "themes/tomorrow-theme/GNU Emacs" starter-kit-dir))
+
+(load-theme 'tomorrow-day)
+#+END_SRC
+
+#+RESULTS:
+: t
+
+Or the solarized themes
+#+BEGIN_SRC emacs-lisp
+(add-to-list
+ 'custom-theme-load-path
+ (expand-file-name "themes/emacs-color-theme-solarized" starter-kit-dir))
+
+(load-theme 'solarized-dark)
+#+END_SRC
+
+#+RESULTS:
+: t
+
+* TODO Latex setup
+[[./texmf]] contains a texmf setup you can use with your latex setup. I don't think I actually use this anymore. It looks like I used to use it in Windows though [[file:texmf/README.org][(file:texmf/README.org]])
