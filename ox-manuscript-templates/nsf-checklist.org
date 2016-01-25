@@ -31,19 +31,19 @@ Start date: <replace: date>
 
 Duration: <replace: duration>
 
-* Checklist [0/12]
+* Checklist [1/12]
 
 - [ ] Budget                       [[http://www.nsf.gov/pubs/policydocs/pappguide/nsf14001/gpg_2.jsp#IIC2g][GPG IIC2g]]
-- [ ] Budget Justification         see [[id:87FEAFB7-0AAC-48A2-9FA6-87BED951656F][Budget notes]]
-- [ ] Statement of Work            see [[id:87FEAFB7-0AAC-48A2-9FA6-87BED951656F][Budget notes]]
+- [ ] [[https://engineering.cmu.edu/faculty_staff/services/research_resources/rasc/documents/budget-justification-template_nsf_11_09_15.docx][Budget Justification]]         see [[id:87FEAFB7-0AAC-48A2-9FA6-87BED951656F][Budget notes]]
+- [X] [[elisp:(ox-manuscript-new-manuscript "nsf-sow")][Statement of Work]]            see [[id:87FEAFB7-0AAC-48A2-9FA6-87BED951656F][Budget notes]]
 - [ ] SPEX signoff
 
 - [ ] [[elisp:(ox-manuscript-new-manuscript "nsf-proposal-biosketch")][Biographical Sketch]]          [[http://www.nsf.gov/pubs/policydocs/pappguide/nsf14001/gpg_2.jsp#IIC2f][GPG IIC2f]]
-- [ ] [[elisp:(ox-manuscript-new-manuscript "nsf-proposal-current-ending")][Current and Pending]]          [[http://www.nsf.gov/pubs/policydocs/pappguide/nsf14001/gpg_2.jsp#IIC2g][GPG IIC2g]]
+- [ ] [[elisp:(ox-manuscript-new-manuscript "nsf-proposal-current-and-pending")][Current and Pending]]          [[http://www.nsf.gov/pubs/policydocs/pappguide/nsf14001/gpg_2.jsp#IIC2g][GPG IIC2g]]
 - [ ] [[elisp:(ox-manuscript-new-manuscript "nsf-proposal-facilities")][Facilities]]                   [[http://www.nsf.gov/pubs/policydocs/pappguide/nsf14001/gpg_2.jsp#IIC2g][GPG IIC2g]]
 
-- [ ] [[elisp:(ox-manuscript-new-manuscript "nsf-proposal-summary")][Project Summary]]              [[http://www.nsf.gov/pubs/policydocs/pappguide/nsf14001/gpg_2.jsp#IIC2b][GPG IIC2b]]
-- [ ] [[elisp:(ox-manuscript-new-manuscript "nsf-proposal-description")][Project Description]]          [[http://www.nsf.gov/pubs/policydocs/pappguide/nsf14001/gpg_2.jsp#IIC2d][GPG IIC2d]]
+- [ ] [[elisp:(ox-manuscript-new-manuscript "nsf-project-summary")][Project Summary]]              [[http://www.nsf.gov/pubs/policydocs/pappguide/nsf14001/gpg_2.jsp#IIC2b][GPG IIC2b]]
+- [ ] [[elisp:(ox-manuscript-new-manuscript "nsf-project-description")][Project Description]]          [[http://www.nsf.gov/pubs/policydocs/pappguide/nsf14001/gpg_2.jsp#IIC2d][GPG IIC2d]]
 - [ ] References Cited             [[http://www.nsf.gov/pubs/policydocs/pappguide/nsf14001/gpg_2.jsp#IIC2e][GPG IIC2e]]
 
 - [ ] [[elisp:(ox-manuscript-new-manuscript "nsf-proposal-postdoc-plan")][Postdoctoral Mentoring Plan]]  [[http://www.nsf.gov/pubs/policydocs/pappguide/nsf14001/gpg_2.jsp#IIC2j][GPG IIC2j]]
