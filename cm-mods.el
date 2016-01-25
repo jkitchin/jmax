@@ -224,8 +224,8 @@ See `cm-forward-comment' for an alternative."
 #+latex_header: \\usepackage{todonotes}
 #+latex_header: \\usepackage[usenames, dvipsnames]{color}
 
-#+latex_header: \\newcommand\\red{\\bgroup\\markoverwith{\\textcolor{red}{\\rule[0.5ex]{4pt}{1.4pt}}}\\ULon}
-#+latex_header: \\newcommand\\blue{\\bgroup\\markoverwith{\\textcolor{blue}{\\rule[-0.5ex]{4pt}{1.4pt}}}\\ULon}
+#+latex_header: \\newcommand\\cmred{\\bgroup\\markoverwith{\\textcolor{red}{\\rule[0.5ex]{4pt}{1.4pt}}}\\ULon}
+#+latex_header: \\newcommand\\cmblue{\\bgroup\\markoverwith{\\textcolor{blue}{\\rule[-0.5ex]{4pt}{1.4pt}}}\\ULon}
 
 ")
   ;; comments should only be one line so we wrap them in a snippet.
@@ -236,34 +236,12 @@ See `cm-forward-comment' for an alternative."
   ;; Deletions
   (goto-char (point-min))
   (while (cm-next-deletion nil)
-    (if (multiline-p (match-string 3))
-	(replace-match "
-#+BEGIN_LaTeX
-\\\\begin{deletion}
-\\\\sout{\\3}
-\\\\end{deletion}
-#+END_LaTeX
-")
-      ;; single line
-      ;; (replace-match "@@latex:\\\\sout{\\\\textcolor{red}{\\3}}@@")
-      ;; (replace-match "@@latex:\\\\hld{\\\\sout{\\3}}@@")
-      (replace-match "@@latex:\\\\red{\\3}@@")))
+    (replace-match "@@latex:\\\\protect\\\\cmred{\\3}@@"))
 
   ;; Additions
   (goto-char (point-min))
   (while (cm-next-addition nil)
-    (if (multiline-p (match-string 3))
-	(replace-match "
-#+BEGIN_LaTeX
-\\\\begin{insertion}
-\\\\uwave{\\3}
-\\\\end{insertion}
-#+END_LaTeX
-")
-      ;; single line
-      ;; (replace-match "@@latex:\\\\uwave{\\\\textcolor{blue}{\\3}}@@")
-      ;; (replace-match "@@latex:\\\\hli{\\\\uwave{\\3}}@@")
-      (replace-match "@@latex:\\\\blue{\\3}@@"))))
+    (replace-match "@@latex:\\\\protect\\\\cmblue{\\3}@@")))
 
 
 (defun cm-wdiff-to-pdf (commits)
