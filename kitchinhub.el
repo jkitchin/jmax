@@ -65,6 +65,14 @@ http://github.com/jkitchin."
   (find-file (expand-file-name repo kitchinhub-root))
   (magit-status))
 
+(org-add-link-type
+ "kitchinhub"
+ (lambda (path) (kitchinhub-open-repo path)))
+
+(org-add-link-type
+ "github"
+ (lambda (username) (browse-url (format "http://github.com/%s" username))))
+
 
 (defun jkitchin-open-repo (repo)
   "Open REPO from jkitchin@github."
