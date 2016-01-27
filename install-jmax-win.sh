@@ -11,7 +11,7 @@ echo "or"
 echo "run the jmax.sh script created in this directory as ./jmax.sh in the terminal."
 
 echo "#!/bin/bash
-`pwd`\jmax\emacs\bin\runemacs.exe -q -l `pwd`\jmax\init.el
+`pwd`/jmax/emacs/bin/runemacs.exe -q -l `pwd`/jmax/init.el
 #end" > jmax.sh
 chmod +x jmax.sh
 #end
