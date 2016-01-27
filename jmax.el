@@ -338,9 +338,10 @@
     (add-to-list 'ispell-skip-region-alist '(org-property-drawer-re))
     (add-to-list 'ispell-skip-region-alist '("~" "~"))
     (add-to-list 'ispell-skip-region-alist '("=" "="))
-    ;; this next line ignores org-ref-links
-    (add-to-list 'ispell-skip-region-alist
-		 '(org-ref-cite-re org-ref-label-re org-ref-ref-re))
+    ;; this next line approximately ignores org-ref-links
+    (add-to-list 'ispell-skip-region-alist '("cite:" . " "))
+    (add-to-list 'ispell-skip-region-alist '("label:" . " "))
+    (add-to-list 'ispell-skip-region-alist '("ref:" . " "))
     (add-to-list 'ispell-skip-region-alist '("^#\\+BEGIN_SRC" . "^#\\+END_SRC")))
 
   (add-hook 'org-mode-hook #'endless/org-ispell)
