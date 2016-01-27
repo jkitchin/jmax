@@ -5,17 +5,55 @@
 Try it you might like it. These customizations have been compiled and derived from prelude and the emacs24-starterkit, and my own emacs hackery.
 
 * Installation
-To install this, clone the git repository, change into the jmax directory, and run this command:
+1. Change to a directory you want.
+
+2. Clone the repository like this. It will create a new directory called jmax in the current directory.
+#+BEGIN_SRC sh
+git clone https://github.com/jkitchin/jmax.git
+#+END_SRC
+
+3. Run this command in a terminal:
 #+begin_src sh
-emacs -q -l init.el
+emacs -q -l jmax/init.el
 #+end_src
 
 This will load the emacs on your path, without using whatever you have defined in .emacs.d.
 
-The first time you run this, a lot of packages will be downloaded into the elpa folder. This takes a few minutes. You might have to restart emacs.
+The first time you run this, a lot of packages will be downloaded into the elpa folder inside jmax. This takes a few minutes. You might have to restart emacs.
 
 ** Windows users
 There is an emacs binary in this repository for Windows. This [[./jmax.bat]] file should automatically run emacs with the right libraries.
+
+** Mac users
+
+Run the next command in your terminal in the location you want to install jmax. The command will make sure you have [[http://brew.sh][homebrew]], git, and emacs installed, and then will clone jmax and tell you how to use it. It will take some time to install.
+
+#+BEGIN_SRC sh
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/jkitchin/jmax/master/install-jmax-mac.sh)"
+#+END_SRC
+
+Alternatively, you can install [[http://brew.sh][homebrew]] yourself, install git from http://git-scm.com/download/mac, build your emacs like this:
+
+#+BEGIN_SRC sh
+brew install emacs --with-gnutls --with-imagemagick --with-librsvg --with-x11 --use-git-head --HEAD --with-cocoa
+#+END_SRC
+
+This got me:
+#+BEGIN_SRC emacs-lisp
+(emacs-version)
+#+END_SRC
+
+#+RESULTS:
+: GNU Emacs 25.1.50.1 (x86_64-apple-darwin13.4.0, NS appkit-1265.21 Version 10.9.5 (Build 13F1077))
+:  of 2016-01-22
+
+
+[[https://www.enthought.com/products/canopy/][Enthought Canopy]] has a Mac version of Python that I like.
+
+and MacTeX from http://www.tug.org/mactex if you plan to export org-mode files to LaTeX and convert them to PDF files.
+
+After that, I clone jmax as described above, and use the jmax-mac.sh script to open emacs configured to use jmax.
+
 
 ** Other software you probably need
 
@@ -43,33 +81,6 @@ In your init file:
 ;; adjust this path if it is not where aspell got installed
 (setq-default ispell-program-name "C:/Program Files/Aspell/bin/aspell.exe")
 #+END_SRC
-
-** Mac users
-I installed emacs from homebrew:
-
-#+BEGIN_SRC sh
-brew install emacs --with-gnutls --with-imagemagick --with-librsvg --with-x11 --use-git-head --HEAD --with-cocoa
-#+END_SRC
-
-This got me:
-#+BEGIN_SRC emacs-lisp
-(emacs-version)
-#+END_SRC
-
-#+RESULTS:
-: GNU Emacs 25.1.50.1 (x86_64-apple-darwin13.4.0, NS appkit-1265.21 Version 10.9.5 (Build 13F1077))
-:  of 2016-01-22
-
-
-I installed git from http://git-scm.com/download/mac
-
-Enthought Canopy has a Mac version.
-
-and MacTeX from http://www.tug.org/mactex.
-
-After that, I was able to clone jmax as described above, and I used the jmax-mac.sh script to open emacs configured to use jmax.
-
-I have previously used  Emacs 24.3 from http://emacsformacosx.com. I do not recall why I switched to brew, but I think the reason was to get gnutls support for email authentication.
 
 * Customization
 These files contain variables with paths specific to your computer. You probably need to change them.
