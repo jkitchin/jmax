@@ -22,7 +22,13 @@ This will load the emacs on your path, without using whatever you have defined i
 The first time you run this, a lot of packages will be downloaded into the elpa folder inside jmax. This takes a few minutes. You might have to restart emacs.
 
 ** Windows users
-There is an emacs binary in this repository for Windows. This [[./jmax.bat]] file should automatically run emacs with the right libraries.
+Install git (http://git-scm.com/download/win). Open a git bash terminal. Run this command.
+
+#+BEGIN_SRC sh
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/jkitchin/jmax/master/install-jmax-win.sh)"
+#+END_SRC
+
+There is an emacs binary in this repository for Windows. You should be able to run the jmax.sh command to launch jmax now.
 
 ** Mac users
 
