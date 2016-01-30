@@ -60,6 +60,12 @@ and MacTeX from http://www.tug.org/mactex if you plan to export org-mode files t
 
 After that, I clone jmax as described above, and use the jmax-mac.sh script to open emacs configured to use jmax.
 
+** Linux users
+Run this command. It checks for a git and emacs, but does not install them. You will have to use your package manager for that.
+
+#+BEGIN_SRC sh
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/jkitchin/jmax/master/install-jmax-linux.sh)"
+#+END_SRC
 
 ** Other software you probably need
 
