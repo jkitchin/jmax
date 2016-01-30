@@ -1,4 +1,28 @@
 ;;; techela.el --- functions for students to use in techela courses
+;; Copyright(C) 2014,2015 John Kitchin
+
+;; Author: John Kitchin <jkitchin@andrew.cmu.edu>
+;; URL: https://github.com/jkitchin/jmax
+;; Version: 0.1.0
+;; Keywords: org-mode, education
+;; Package-Requires: ((dash "2.11.0") (s "1.10.0") (f "0.18.0") (emacs "24.4"))
+
+;; This file is not currently part of GNU Emacs.
+
+;; This program is free software; you can redistribute it and/or
+;; modify it under the terms of the GNU General Public License as
+;; published by the Free Software Foundation; either version 2, or (at
+;; your option) any later version.
+
+;; This program is distributed in the hope that it will be useful, but
+;; WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+;; General Public License for more details.
+
+;; You should have received a copy of the GNU General Public License
+;; along with this program ; see the file COPYING.  If not, write to
+;; the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+;; Boston, MA 02111-1307, USA.
 
 ;;; Commentary:
 ;; A techela course has a course-name, and is served on a techela server at
