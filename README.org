@@ -38,6 +38,7 @@ Run the next command in your terminal in the location you want to install jmax. 
 bash -c "$(curl -fsSL https://raw.githubusercontent.com/jkitchin/jmax/master/install-jmax-mac.sh)"
 #+END_SRC
 
+*** Alternative manual installation of jmax for Mac users
 Alternatively, you can install [[http://brew.sh][homebrew]] yourself, install git from http://git-scm.com/download/mac, build your emacs like this:
 
 #+BEGIN_SRC sh
