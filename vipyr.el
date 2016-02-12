@@ -24,6 +24,7 @@
 ;; |--------+------------------------------------------------|
 ;; | l      | jump to a line with avy-goto-line              |
 ;; | d      | jump to a def or block/statement with avy      |
+;; | h      | jump to any def with helm                      |
 ;; |--------+------------------------------------------------|
 ;; | m      | mark the def, block or statement               |
 ;; | w      | copy the def, block or statement               |
@@ -36,6 +37,22 @@
 ;; | <      | indent the def, block or statement out a level |
 ;; |--------+------------------------------------------------|
 ;; | " "    | (space) type a hotkey in the special place     |
+
+
+;;; Code:
+
+(defun vsp ()
+  "Message about status of point"
+  (interactive)
+  (message-box "begin defun: %3S
+begin block: %3S   end block: %3S
+begin  stmt: %3S   end  stmt: %3S"
+	   (python-info-looking-at-beginning-of-defun)
+	   (python-info-beginning-of-block-p)
+	   (python-info-end-of-block-p)
+	   (python-info-beginning-of-statement-p)
+	   (python-info-end-of-statement-p)))
+
 
 ;;* Navigation
 (define-key python-mode-map (kbd "[")
@@ -76,11 +93,14 @@
 	      :filter (lambda (&optional _)
 			(message "space override")
 			(cond
-			 ((or (python-info-beginning-of-block-p)
-			      (python-info-looking-at-beginning-of-defun))
-			  (insert (read-char))
-			  (backward-char)
-			  (delete-char -1))))))
+			 ((or (python-info-looking-at-beginning-of-defun)
+			      (python-info-beginning-of-block-p)
+			      (python-info-end-of-block-p)
+			      (python-info-beginning-of-statement-p)
+			      (python-info-end-of-statement-p))
+			  (delete-char -1)
+			  (insert-char (read-char))
+			  )))))
 
 ;;** move to end of defun or block
 
@@ -93,8 +113,10 @@
 			 ;; go to end of block
 			 ((python-info-beginning-of-block-p)
 			  #'python-nav-end-of-block)
-			 ((python-info-beginning-of-statement-p)
+			 ((and (not (python-info-current-line-empty-p))
+			       (python-info-beginning-of-statement-p))
 			  #'python-nav-end-of-statement)))))
+
 
 (define-key python-mode-map "a"
   '(menu-item "python-nav" nil
@@ -131,7 +153,8 @@
 			    (python-nav-beginning-of-defun)))
 			 ((python-info-beginning-of-block-p)
 			  #'python-nav-forward-block)
-			 ((python-info-beginning-of-statement-p)
+			 ((and (not (python-info-beginning-of-statement-p))
+			       (python-info-beginning-of-statement-p))
 			  #'python-nav-forward-statement)))))
 
 
@@ -144,7 +167,8 @@
 			  #'python-nav-backward-defun)
 			 ((python-info-beginning-of-block-p)
 			  #'python-nav-backward-block)
-			 ((python-info-beginning-of-statement-p)
+			 ((and (not (python-info-beginning-of-statement-p))
+			       (python-info-beginning-of-statement-p))
 			  #'python-nav-backward-statement)))))
 
 
@@ -156,13 +180,14 @@
 			(when
 			    (or (python-info-looking-at-beginning-of-defun)
 				(python-info-beginning-of-block-p)
-				(python-info-beginning-of-statement-p))
+				(and (not (python-info-beginning-of-statement-p))
+				     (python-info-beginning-of-statement-p)))
 			  #'avy-goto-line))))
 
 
 ;; ** avy jump to block or def that is visible
 (defun avy-python-goto-block ()
-  "avy function to jump to a visible block."
+  "Jump to a visible block with avy."
   (interactive)
   (let (candidates
 	(start (point))
@@ -179,7 +204,7 @@
 
 
 (defun avy-python-goto-def ()
-  "avy function to jump to a visible def."
+  "Jump to a visible def with avy."
   (interactive)
   (let (candidates
 	(start (point))
@@ -200,8 +225,49 @@
 			  #'avy-python-goto-def)
 			 ((or
 			   (python-info-beginning-of-block-p)
-			   (python-info-beginning-of-statement-p))
+			   (and (not (python-info-current-line-empty-p))
+				(python-info-beginning-of-statement-p)))
 			  #'avy-python-goto-block)))))
+
+;;** jump to def with helm
+(defvar vipyr-helm-def-candidates '()
+  "Variable to hold candidates.")
+
+
+(defun helm-vipyr-def-candidates ()
+  "Get list of defs and positions for helm."
+  (message-box (buffer-name))
+  (save-restriction
+    (save-excursion
+      (let (candidates)
+	(goto-char (point-min))
+	(while (re-search-forward
+		python-nav-beginning-of-defun-regexp
+		(point-max) t)
+	  (push (cons (buffer-substring (line-beginning-position)
+					(line-end-position))
+		      (match-beginning 0))
+		candidates))
+	(setq vipyr-helm-def-candidates candidates)))))
+
+
+(defvar vipyr-helm-def
+  (helm-build-sync-source "vipyr def"
+    :init 'helm-vipyr-def-candidates
+    :candidates (lambda () vipyr-helm-def-candidates)
+    :action (lambda (candidate)
+	      (goto-char candidate))))
+
+
+(define-key python-mode-map "h"
+  '(menu-item "python-nav" nil
+              :filter (lambda (&optional _)
+			(cond
+			 ((python-info-looking-at-beginning-of-defun)
+			  (lambda ()
+			    (interactive)
+			    (helm :sources '(vipyr-helm-def))))))))
+
 
 ;;* mark, clone, copy and kill def or block
 (define-key python-mode-map "m"
@@ -217,7 +283,8 @@
 			    (interactive)
 			    (set-mark (point))
 			    (python-nav-end-of-block)))
-			 ((python-info-beginning-of-statement-p)
+			 ((and (not (python-info-current-line-empty-p))
+			       (python-info-beginning-of-statement-p))
 			  (lambda ()
 			    (interactive)
 			    (set-mark (point))
@@ -246,7 +313,8 @@
 			    (kill-new (buffer-substring (region-beginning)
 							(region-end)))))
 			 ;; mark a statement
-			 ((python-info-beginning-of-statement-p)
+			 ((and (not (python-info-current-line-empty-p))
+			       (python-info-beginning-of-statement-p))
 			  (lambda ()
 			    (interactive)
 			    (set-mark (point))
@@ -281,7 +349,8 @@
 			    (newline)
 			    (yank)))
 			 ;; mark a statement
-			 ((python-info-beginning-of-statement-p)
+			 ((and (not (python-info-current-line-empty-p))
+			       (python-info-beginning-of-statement-p))
 			  (lambda ()
 			    (interactive)
 			    (set-mark (point))
@@ -292,7 +361,7 @@
 			    (yank)))))))
 
 
-;; kill a def or block or staement
+;; kill a def or block or statement
 (define-key python-mode-map "k"
   '(menu-item "python-nav" nil
 	      :filter (lambda (&optional _)
@@ -314,7 +383,8 @@
 			    (kill-region (region-beginning)
 					 (region-end))))
 			 ;; mark a statement
-			 ((python-info-beginning-of-statement-p)
+			 ((and (not (python-info-current-line-empty-p))
+			       (python-info-beginning-of-statement-p))
 			  (lambda ()
 			    (interactive)
 			    (set-mark (point))
@@ -355,7 +425,8 @@
 				(while (< (point) p2)
 				  (python-indent-line)
 				  (forward-line))))))
-			 ((python-info-beginning-of-statement-p)
+			 ((and (not (python-info-current-line-empty-p))
+			       (python-info-beginning-of-statement-p))
 			  (lambda ()
 			    (interactive)
 			    (save-excursion
@@ -387,7 +458,8 @@
 			      (python-nav-end-of-block)
 			      (python-indent-shift-right (region-beginning)
 							 (region-end)))))
-			 ((python-info-beginning-of-statement-p)
+			 ((and (not (python-info-current-line-empty-p))
+			       (python-info-beginning-of-statement-p))
 			  (lambda ()
 			    (interactive)
 			    (save-excursion
@@ -411,7 +483,8 @@
 			      (python-nav-end-of-block)
 			      (python-indent-shift-left (region-beginning)
 							 (region-end)))))
-			 ((python-info-beginning-of-statement-p)
+			 ((and (not (python-info-current-line-empty-p))
+			       (python-info-beginning-of-statement-p))
 			  (lambda ()
 			    (interactive)
 			    (save-excursion
@@ -424,6 +497,37 @@
 
 
 
-
+(provide 'vipyr)
+;;* Send code to REPL
+(define-key python-mode-map "s"
+  '(menu-item "python-nav" nil
+              :filter (lambda (&optional _)
+			(cond
+			 ;; on a def
+			 ((python-info-looking-at-beginning-of-defun)
+			  (lambda ()
+			    (interactive)
+			    (save-excursion
+			      (python-mark-defun)
+			      (elpy-shell-send-region-or-buffer)
+			      (deactivate-mark))))
+			 ;; mark the block
+			 ((python-info-beginning-of-block-p)
+			  (lambda ()
+			    (interactive)
+			    (save-excursion
+			      (set-mark (point))
+			      (python-nav-end-of-block)
+			      (elpy-shell-send-region-or-buffer)
+			      (deactivate-mark))))
+			 ((and (not (python-info-current-line-empty-p))
+			       (python-info-beginning-of-statement-p))
+			  (lambda ()
+			    (interactive)
+			    (save-excursion
+			      (set-mark (point))
+			      (python-nav-end-of-statement)
+			      (elpy-shell-send-region-or-buffer)
+			      (deactivate-mark))))))))
 
 ;;; vipyr.el ends here
