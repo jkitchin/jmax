@@ -19,7 +19,6 @@
 ;; |--------+------------------------------------------------|
 ;; | n      | next def, block or statement                   |
 ;; | p      | previous def, block or statement               |
-;; | a      | goto beginning of def, block or statement      |
 ;; | e      | goto end of def, block or statement            |
 ;; |--------+------------------------------------------------|
 ;; | l      | jump to a line with avy-goto-line              |
@@ -40,6 +39,7 @@
 
 
 ;;; Code:
+(require 'python)
 
 (defun vsp ()
   "Message about status of point"
@@ -47,12 +47,54 @@
   (message-box "begin defun: %3S
 begin block: %3S   end block: %3S
 begin  stmt: %3S   end  stmt: %3S"
-	   (python-info-looking-at-beginning-of-defun)
-	   (python-info-beginning-of-block-p)
-	   (python-info-end-of-block-p)
-	   (python-info-beginning-of-statement-p)
-	   (python-info-end-of-statement-p)))
+	       (looking-at python-nav-beginning-of-defun-regexp)
+	       (python-info-beginning-of-block-p)
+	       (python-info-beginning-of-statement-p)))
 
+
+(defvar vipyr-original-cursor-color "#0FB300"
+  "Original cursor color. For resetting.")
+
+(defvar vipyr-position nil
+  "Last position")
+
+(defun vipyr-cursor-color ()
+  "change cursor color on special places."
+  (interactive)
+  (if (or (looking-at python-nav-beginning-of-defun-regexp)
+	  (python-info-beginning-of-block-p)
+	  (and (not (python-info-current-line-empty-p))
+	       (python-info-beginning-of-statement-p)))
+      (progn
+	(set-cursor-color "DarkOrange"))
+    (set-cursor-color vipyr-original-cursor-color)))
+
+
+;; Set an idle timer that will set the cursor color
+(defvar vipyr-idle-cursor-timer
+  nil
+  "Timer to change cursor color.")
+
+(defun vipyr-start-timer ()
+  (interactive)
+  (setq vipyr-idle-cursor-timer
+	(run-with-idle-timer 0.1 t 'vipyr-cursor-color))
+  (message "vipyr cursor timer is on."))
+
+
+(defun vipyr-cancel-timer ()
+  (interactive)
+  (cancel-timer vipyr-idle-cursor-timer))
+
+
+(add-hook 'python-mode-hook
+	  'vipyr-start-timer)
+
+
+(add-hook 'kill-buffer-hook
+          (lambda ()
+            (when (timerp vipyr-idle-cursor-timer)
+              (cancel-timer vipyr-idle-cursor-timer))))
 
 ;;* Navigation
 (define-key python-mode-map (kbd "[")
@@ -93,14 +135,14 @@ begin  stmt: %3S   end  stmt: %3S"
 	      :filter (lambda (&optional _)
 			(message "space override")
 			(cond
-			 ((or (python-info-looking-at-beginning-of-defun)
+			 ((or (looking-at
+			       python-nav-beginning-of-defun-regexp)
 			      (python-info-beginning-of-block-p)
-			      (python-info-end-of-block-p)
-			      (python-info-beginning-of-statement-p)
-			      (python-info-end-of-statement-p))
-			  (delete-char -1)
-			  (insert-char (read-char))
-			  )))))
+			      (python-info-beginning-of-statement-p))
+			  (lambda ()
+			    (interactive)
+			    (insert (read-char))
+			    (skip-chars-backward " ")))))))
 
 ;;** move to end of defun or block
 
@@ -108,7 +150,7 @@ begin  stmt: %3S   end  stmt: %3S"
   '(menu-item "python-nav" nil
               :filter (lambda (&optional _)
 			(cond
-			 ((python-info-looking-at-beginning-of-defun)
+			 ((looking-at python-nav-beginning-of-defun-regexp)
 			  #'python-nav-end-of-defun)
 			 ;; go to end of block
 			 ((python-info-beginning-of-block-p)
@@ -118,27 +160,25 @@ begin  stmt: %3S   end  stmt: %3S"
 			  #'python-nav-end-of-statement)))))
 
 
-(define-key python-mode-map "a"
-  '(menu-item "python-nav" nil
-              :filter (lambda (&optional _)
-			nil
-			(cond
-			 ((or (python-info-end-of-block-p)
-			      (python-info-end-of-statement-p))
-			  nil)
-			 ;; in a defun at block or statement
-			 ((and
-			   (or (python-info-beginning-of-block-p)
-			       (python-info-beginning-of-statement-p)
-			       (python-info-looking-at-beginning-of-defun)
-			       (python-info-current-defun)))
-			  (lambda ()
-			    (interactive)
-			    (python-nav-beginning-of-defun)))
-			 ((python-info-end-of-block-p)
-			  #'python-nav-beginning-of-block)
-			 ((python-info-end-of-statement-p)
-			  #'python-nav-beginning-of-statement)))))
+;; This has been a problematic key. The end positions are harder to get right
+;; than the beginning ones.
+;; (define-key python-mode-map "a"
+;;   '(menu-item "python-nav" nil
+;;               :filter (lambda (&optional _)
+;;			nil
+;;			(cond
+;;			 ;; in a defun at block or statement
+;;			 ((and
+;;			   (or (python-info-beginning-of-block-p)
+;;			       (python-info-beginning-of-statement-p)
+;;			       (looking-at python-nav-beginning-of-defun-regexp)))
+;;			  (lambda ()
+;;			    (interactive)
+;;			    (python-nav-beginning-of-defun)))
+;;			 ((python-info-end-of-block-p)
+;;			  #'python-nav-beginning-of-block)
+;;			 ((python-info-end-of-statement-p)
+;;			  #'python-nav-beginning-of-statement)))))
 
 
 ;;** next def, block, statement
@@ -146,14 +186,14 @@ begin  stmt: %3S   end  stmt: %3S"
   '(menu-item "python-nav" nil
               :filter (lambda (&optional _)
 			(cond
-			 ((python-info-looking-at-beginning-of-defun)
+			 ((looking-at python-nav-beginning-of-defun-regexp)
 			  (lambda ()
 			    (interactive)
 			    (python-nav-forward-defun 2)
 			    (python-nav-beginning-of-defun)))
 			 ((python-info-beginning-of-block-p)
 			  #'python-nav-forward-block)
-			 ((and (not (python-info-beginning-of-statement-p))
+			 ((and (not (python-info-current-line-empty-p))
 			       (python-info-beginning-of-statement-p))
 			  #'python-nav-forward-statement)))))
 
@@ -163,7 +203,7 @@ begin  stmt: %3S   end  stmt: %3S"
   '(menu-item "python-nav" nil
               :filter (lambda (&optional _)
 			(cond
-			 ((python-info-looking-at-beginning-of-defun)
+			 ((looking-at python-nav-beginning-of-defun-regexp)
 			  #'python-nav-backward-defun)
 			 ((python-info-beginning-of-block-p)
 			  #'python-nav-backward-block)
@@ -178,7 +218,7 @@ begin  stmt: %3S   end  stmt: %3S"
   '(menu-item "python-nav" nil
               :filter (lambda (&optional _)
 			(when
-			    (or (python-info-looking-at-beginning-of-defun)
+			    (or (looking-at python-nav-beginning-of-defun-regexp)
 				(python-info-beginning-of-block-p)
 				(and (not (python-info-beginning-of-statement-p))
 				     (python-info-beginning-of-statement-p)))
@@ -221,7 +261,7 @@ begin  stmt: %3S   end  stmt: %3S"
   '(menu-item "python-nav" nil
               :filter (lambda (&optional _)
 			(cond
-			 ((python-info-looking-at-beginning-of-defun)
+			 ((looking-at python-nav-beginning-of-defun-regexp)
 			  #'avy-python-goto-def)
 			 ((or
 			   (python-info-beginning-of-block-p)
@@ -236,7 +276,6 @@ begin  stmt: %3S   end  stmt: %3S"
 
 (defun helm-vipyr-def-candidates ()
   "Get list of defs and positions for helm."
-  (message-box (buffer-name))
   (save-restriction
     (save-excursion
       (let (candidates)
@@ -263,7 +302,7 @@ begin  stmt: %3S   end  stmt: %3S"
   '(menu-item "python-nav" nil
               :filter (lambda (&optional _)
 			(cond
-			 ((python-info-looking-at-beginning-of-defun)
+			 ((looking-at python-nav-beginning-of-defun-regexp)
 			  (lambda ()
 			    (interactive)
 			    (helm :sources '(vipyr-helm-def))))))))
@@ -275,7 +314,7 @@ begin  stmt: %3S   end  stmt: %3S"
               :filter (lambda (&optional _)
 			(cond
 			 ;; mark the def
-			 ((python-info-looking-at-beginning-of-defun)
+			 ((looking-at python-nav-beginning-of-defun-regexp)
 			  #'python-mark-defun)
 			 ;; mark the block
 			 ((python-info-beginning-of-block-p)
@@ -297,7 +336,7 @@ begin  stmt: %3S   end  stmt: %3S"
 	      :filter (lambda (&optional _)
 			(cond
 			 ;; mark the def
-			 ((python-info-looking-at-beginning-of-defun)
+			 ((looking-at python-nav-beginning-of-defun-regexp)
 			  (lambda ()
 			    (interactive)
 			    (set-mark (point))
@@ -329,7 +368,7 @@ begin  stmt: %3S   end  stmt: %3S"
 	      :filter (lambda (&optional _)
 			(cond
 			 ;; mark the def
-			 ((python-info-looking-at-beginning-of-defun)
+			 ((looking-at python-nav-beginning-of-defun-regexp)
 			  (lambda ()
 			    (interactive)
 			    (set-mark (point))
@@ -367,7 +406,7 @@ begin  stmt: %3S   end  stmt: %3S"
 	      :filter (lambda (&optional _)
 			(cond
 			 ;; kill the def
-			 ((python-info-looking-at-beginning-of-defun)
+			 ((looking-at python-nav-beginning-of-defun-regexp)
 			  (lambda ()
 			    (interactive)
 			    (set-mark (point))
@@ -399,7 +438,7 @@ begin  stmt: %3S   end  stmt: %3S"
   '(menu-item "python-nav" nil
               :filter (lambda (&optional _)
 			(cond
-			 ((python-info-looking-at-beginning-of-defun)
+			 ((looking-at python-nav-beginning-of-defun-regexp)
 			  (lambda ()
 			    (interactive)
 			    (save-excursion
@@ -448,7 +487,7 @@ begin  stmt: %3S   end  stmt: %3S"
   '(menu-item "python-nav" nil
 	      :filter (lambda (&optional _)
 			(cond
-			 ((or (python-info-looking-at-beginning-of-defun)
+			 ((or (looking-at python-nav-beginning-of-defun-regexp)
 			      (python-info-beginning-of-block-p))
 			  (lambda ()
 			    (interactive)
@@ -473,7 +512,7 @@ begin  stmt: %3S   end  stmt: %3S"
   '(menu-item "python-nav" nil
 	      :filter (lambda (&optional _)
 			(cond
-			 ((or (python-info-looking-at-beginning-of-defun)
+			 ((or (looking-at python-nav-beginning-of-defun-regexp)
 			      (python-info-beginning-of-block-p))
 			  (lambda ()
 			    (interactive)
@@ -504,7 +543,7 @@ begin  stmt: %3S   end  stmt: %3S"
               :filter (lambda (&optional _)
 			(cond
 			 ;; on a def
-			 ((python-info-looking-at-beginning-of-defun)
+			 ((looking-at python-nav-beginning-of-defun-regexp)
 			  (lambda ()
 			    (interactive)
 			    (save-excursion
