@@ -14,9 +14,9 @@
 ;; (add-hook 'python-mode-hook #'(lambda () (yas-global-mode -1)))
 
 ;; I want python to always show me the output. this advice makes that happen.
-(defadvice python-shell-send-buffer (after switch-to-python-output activate)
-  "Show python output in another frame after you run a script."
-  (switch-to-buffer-other-frame "*Python*"))
+;; (defadvice python-shell-send-buffer (after switch-to-python-output activate)
+;;   "Show python output in another frame after you run a script."
+;;   (switch-to-buffer-other-frame "*Python*"))
 
 
 (elpy-enable)
