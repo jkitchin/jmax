@@ -1,7 +1,0 @@
-BZR conflict list format 1
-path: EXTENSIONS.moved
-type: duplicate
-file_id: extensions-20120304161658-2iu3cilplatcjwvy-1
-action: Moved existing file to
-conflict_path: extensions
-conflict_file_id: extensions-20120806083047-ajp4l1exmmnus8wt-1
