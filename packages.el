@@ -32,7 +32,7 @@
         'undo-tree
 	'diminish
 	'eimp
-	'elpy 'pydoc
+	'elpy 'pydoc 'python-mode
 	'org-plus-contrib
 	'jedi 'jedi-direx
 	'helm 'helm-themes 'helm-bibtex
