@@ -36,6 +36,7 @@
 ;; | <      | indent the def, block or statement out a level |
 ;; |--------+------------------------------------------------|
 ;; | " "    | (space) type a hotkey in the special place     |
+;; | ?      | list hints                                     |
 
 
 ;;; Code:
@@ -45,28 +46,26 @@
   "Message about status of point"
   (interactive)
   (message-box "begin defun: %3S
-begin block: %3S   end block: %3S
-begin  stmt: %3S   end  stmt: %3S"
+begin block: %3S
+begin  stmt: %3S"
 	       (looking-at python-nav-beginning-of-defun-regexp)
 	       (python-info-beginning-of-block-p)
-	       (python-info-beginning-of-statement-p)))
+	       (and (not (python-info-current-line-empty-p))
+		    (python-info-beginning-of-statement-p))))
 
 
 (defvar vipyr-original-cursor-color "#0FB300"
   "Original cursor color. For resetting.")
 
-(defvar vipyr-position nil
-  "Last position")
 
 (defun vipyr-cursor-color ()
   "change cursor color on special places."
-  (interactive)
-  (if (or (looking-at python-nav-beginning-of-defun-regexp)
-	  (python-info-beginning-of-block-p)
-	  (and (not (python-info-current-line-empty-p))
-	       (python-info-beginning-of-statement-p)))
-      (progn
-	(set-cursor-color "DarkOrange"))
+  (if (and (eq major-mode 'python-mode)
+	   (or (and (not (python-info-current-line-empty-p))
+		    (python-info-beginning-of-statement-p))
+	       (python-info-beginning-of-block-p)
+	       (looking-at python-nav-beginning-of-defun-regexp)))
+      (set-cursor-color "DarkOrange")
     (set-cursor-color vipyr-original-cursor-color)))
 
 
@@ -78,23 +77,73 @@ begin  stmt: %3S   end  stmt: %3S"
 (defun vipyr-start-timer ()
   (interactive)
   (setq vipyr-idle-cursor-timer
-	(run-with-idle-timer 0.1 t 'vipyr-cursor-color))
+	(run-with-idle-timer 0.2 t 'vipyr-cursor-color))
   (message "vipyr cursor timer is on."))
 
 
 (defun vipyr-cancel-timer ()
   (interactive)
-  (cancel-timer vipyr-idle-cursor-timer))
+  (cancel-timer vipyr-idle-cursor-timer)
+  (setq vipyr-idle-cursor-timer nil))
+
+
+;; this is too slow. but it works.
+;; local hook
+;; (add-hook 'python-mode-hook
+;;	  (lambda ()
+;;	    (add-hook 'post-command-hook 'vipyr-cursor-color nil t)))
+;;
 
 
 (add-hook 'python-mode-hook
-	  'vipyr-start-timer)
+	  (lambda ()
+	    (vipyr-start-timer)))
 
 
 (add-hook 'kill-buffer-hook
           (lambda ()
             (when (timerp vipyr-idle-cursor-timer)
               (cancel-timer vipyr-idle-cursor-timer))))
+
+
+(define-key python-mode-map "?"
+  '(menu-item "python-nav" nil
+              :filter (lambda (&optional _)
+			(cond
+			 ((or (looking-at python-nav-beginning-of-defun-regexp)
+			      (python-info-beginning-of-block-p)
+			      (python-info-beginning-of-statement-p))
+			  (lambda ()
+			    (interactive)
+			    (with-help-window
+				(help-buffer)
+			      (princ ";; | hotkey | action                                         |
+ |--------+------------------------------------------------|
+ | [      | go to beginning of current/previous statement  |
+ | ]      | go to end of current/next statement            |
+ | {      | insert a pair of {}                            |
+ | }      | insert a pair of []                            |
+ |--------+------------------------------------------------|
+ | n      | next def, block or statement                   |
+ | p      | previous def, block or statement               |
+ | e      | goto end of def, block or statement            |
+ |--------+------------------------------------------------|
+ | l      | jump to a line with avy-goto-line              |
+ | d      | jump to a def or block/statement with avy      |
+ | h      | jump to any def with helm                      |
+ |--------+------------------------------------------------|
+ | m      | mark the def, block or statement               |
+ | w      | copy the def, block or statement               |
+ | c      | clone the def, block or statement              |
+ | k      | kill the def, block or statement               |
+ |--------+------------------------------------------------|
+ | i      | auto-indent the def, block or statement        |
+ |--------+------------------------------------------------|
+ | >      | indent the def, block or statement in a level  |
+ | <      | indent the def, block or statement out a level |
+ |--------+------------------------------------------------|
+ | \" \"    | (space) type a hotkey in the special place   |
+ | ?      | list hints                                     |"))))))))
 
 ;;* Navigation
 (define-key python-mode-map (kbd "[")
