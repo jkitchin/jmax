@@ -202,7 +202,7 @@ all keys and values are taken from properties."
     output))
 
 (defun bf-get-HTML ()
-  (let (;(bibliography (org-ref-get-html-bibliography))
+  (let (			 ;(bibliography (org-ref-get-html-bibliography))
 	(org-export-filter-link-functions '(ox-mrkup-filter-link))
 	(async nil)
 	(subtreep t)
@@ -210,15 +210,25 @@ all keys and values are taken from properties."
 	(body-only t)
 	(ext-plist '())
 	(bf-link-counter 0)
-	(url-list (bf-get-link-urls)))
+	(url-list (bf-get-link-urls))
+	(html))
     (org-html-export-as-html async subtreep visible-only body-only ext-plist)
     ;; now get the output into the org output
     (switch-to-buffer "*Org HTML Export*")
     (end-of-buffer)
-;    (insert bibliography)
-    (buffer-string)))
+    (setq html (buffer-string))
+    (kill-buffer "*Org HTML Export*")
+    html))
 
 (require 'browse-url)
+(defun bf-copyright ()
+  (format "<p>Copyright (C) %s by John Kitchin. See the <a href=\"/copying.html\">License</a> for information about copying.<p>
+<p><a href=\"%s\">org-mode source</a></p>
+<p>Org-mode version = %s</p>"
+	  (format-time-string "%Y")
+	  (bf-get-url-to-org-source)
+	  (org-version)))
+
 (defun bf-get-post-html ()
   "Return a string containing the YAML header, the post html, my copyright line, and a link to the org-source code."
   (interactive)
@@ -229,12 +239,7 @@ all keys and values are taken from properties."
     (with-temp-buffer
       (insert yaml)
       (insert body)
-      (insert
-       (format "<p>Copyright (C) %s by John Kitchin. See the <a href=\"/copying.html\">License</a> for information about copying.<p>"
-	       (format-time-string "%Y")))
-      (insert (format "<p><a href=\"%s\">org-mode source</a><p>"
-		      url-to-org))
-      (insert (format "<p>Org-mode version = %s</p>" (org-version)))
+      (insert (bf-copyright))
       (buffer-string))))
 
 (defun bf-get-permalink ()
@@ -366,7 +371,7 @@ would lead to this post filename
 	(with-temp-file post-filename
 	  (insert content)))
       ;; clean up
-      (kill-buffer "*Org HTML Export*")
+
       (switch-to-buffer thisb)
       (goto-char (point-min))		; beginning of buffer
       (widen)))
