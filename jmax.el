@@ -285,7 +285,8 @@
 
 ;; We load all .el files in the user directory. No order is guaranteed.
 (add-to-list 'load-path user-dir)
-(when (file-exists-p user-dir)
+(when (and (file-exists-p user-dir)
+	   jmax-load-user-dir)
   (dolist (file (directory-files user-dir 't "^[^#].*el$"))
     (message "Loading %s" file)
     (load file)))

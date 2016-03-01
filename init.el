@@ -19,6 +19,9 @@
 (defvar user-dir (expand-file-name "user" starter-kit-dir)
   "User directory for personal code.")
 
+(defvar jmax-load-user-dir t
+  "Load the user directory files.")
+
 (add-to-list 'load-path starter-kit-dir)
 (add-to-list 'load-path user-dir)
 
