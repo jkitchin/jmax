@@ -38,9 +38,7 @@ properties stripped"
 		   (org-entry-get nil "title") ; prefer title property
 		 ;; or get heading with no tags or todos
 		 (org-get-heading t t))))
-    ; strip the text properties.
-    (set-text-properties 0 (length title) nil title)
-    (format "%s" title)))
+    (substring-no-properties title)))
 
 (defun bf-get-YAML-heading ()
   "returns a string of the YAML heading from the current section
@@ -221,12 +219,18 @@ all keys and values are taken from properties."
     html))
 
 (require 'browse-url)
+;; (defun bf-copyright (url-to-org)
+;;   (format "<p>Copyright (C) %s by John Kitchin. See the <a href=\"/copying.html\">License</a> for information about copying.<p>
+;; <p><a href=\"%s\">org-mode source</a></p>
+;; <p>Org-mode version = %s</p>"
+;;	  (format-time-string "%Y")
+;;	  url-to-org
+;;	  (org-version)))
+
 (defun bf-copyright ()
   (format "<p>Copyright (C) %s by John Kitchin. See the <a href=\"/copying.html\">License</a> for information about copying.<p>
-<p><a href=\"%s\">org-mode source</a></p>
 <p>Org-mode version = %s</p>"
 	  (format-time-string "%Y")
-	  (bf-get-url-to-org-source)
 	  (org-version)))
 
 (defun bf-get-post-html ()
@@ -239,7 +243,12 @@ all keys and values are taken from properties."
     (with-temp-buffer
       (insert yaml)
       (insert body)
-      (insert (bf-copyright))
+      (insert (format "<p>Copyright (C) %s by John Kitchin. See the <a href=\"/copying.html\">License</a> for information about copying.<p>
+<p><a href=\"%s\">org-mode source</a></p>
+<p>Org-mode version = %s</p>"
+		      (format-time-string "%Y")
+		      url-to-org
+		      (org-version)))
       (buffer-string))))
 
 (defun bf-get-permalink ()
