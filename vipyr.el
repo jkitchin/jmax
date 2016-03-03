@@ -55,139 +55,101 @@ begin  stmt: %3S"
 		    (python-info-beginning-of-statement-p))))
 
 
-(defvar vipyr-original-cursor-color "#0FB300"
-  "Original cursor color. For resetting.")
-
-
-(defun vipyr-cursor-color ()
-  "change cursor color on special places."
-  (if (and (eq major-mode 'python-mode)
-	   (or (and (not (python-info-current-line-empty-p))
-		    (python-info-beginning-of-statement-p))
-	       (python-info-beginning-of-block-p)
-	       (looking-at python-nav-beginning-of-defun-regexp)))
-      (set-cursor-color "DarkOrange")
-    (set-cursor-color vipyr-original-cursor-color)))
-
-
-;; Set an idle timer that will set the cursor color
-(defvar vipyr-idle-cursor-timer
-  nil
-  "Timer to change cursor color.")
-
-(defun vipyr-start-timer ()
-  (interactive)
-  (setq vipyr-idle-cursor-timer
-	(run-with-idle-timer 0.2 t 'vipyr-cursor-color))
-  (message "vipyr cursor timer is on."))
-
-
-(defun vipyr-cancel-timer ()
-  (interactive)
-  (cancel-timer vipyr-idle-cursor-timer)
-  (setq vipyr-idle-cursor-timer nil))
-
-
-;; this is too slow. but it works.
-;; local hook
-;; (add-hook 'python-mode-hook
-;;	  (lambda ()
-;;	    (add-hook 'post-command-hook 'vipyr-cursor-color nil t)))
-;;
-
-
-(add-hook 'python-mode-hook
-	  (lambda ()
-	    (vipyr-start-timer)))
-
-
-(add-hook 'kill-buffer-hook
-          (lambda ()
-            (when (timerp vipyr-idle-cursor-timer)
-              (cancel-timer vipyr-idle-cursor-timer))))
-
-;;* Navigation
-(define-key python-mode-map (kbd "[")
-  (lambda ()
-    (interactive)
-    (let ((p (point)))
-      (when (= p (python-nav-beginning-of-statement))
-	(python-nav-backward-statement)))))
-
-
-(define-key python-mode-map (kbd "]")
-  (lambda ()
-    "go to end of statement, or next end of statement."
-    (interactive)
-    (let ((p (point)))
-      (when (= p (python-nav-end-of-statement))
-	(python-nav-forward-statement)
-	(python-nav-end-of-statement)))))
-
-
-;;** Now make it possible to put {} and [] back in
-(define-key python-mode-map (kbd "{") (lambda ()
-
-					(interactive)
-					(insert "{}")
-					(backward-char)))
-
-(define-key python-mode-map (kbd "}") (lambda ()
-					(interactive)
-					(insert "[]")
-					(backward-char)))
-
 
 
 ;; * Now the context aware keys
 (defvar vipyr-hotkeys '()
   "List of registered keys")
 
+
+(defvar vipyr-mode-map
+  (let ((map (make-sparse-keymap)))
+
+    map)
+  "Keymap for vipyr-mode.")
+
+
 (defmacro vipyr-conditional-key (key docstring conditional)
   "Define a conditional KEY.
 DOCSTRING describes the action. CONDITIONAL is a statement that
-returns the interactive function for the KEY."
+returns the interactive function for the KEY.
+
+Also registers the key in `vipyr-hotkeys' for help generation."
   (add-to-list
    'vipyr-hotkeys
    (cons key docstring)
    t)
 
-  `(define-key python-mode-map ,key
+  `(define-key vipyr-mode-map ,key
      '(menu-item "python-nav" nil
 		 :filter (lambda (&optional _)
 			   ,conditional))))
 
+
+(vipyr-conditional-key
+ "q" "Quit vipyr-mode."
+ (lambda ()
+   (interactive)
+   (vipyr-mode -1)))
+
 (vipyr-conditional-key
  "?"
  "Display help."
- (cond
-  ((or (looking-at python-nav-beginning-of-defun-regexp)
-       (python-info-beginning-of-block-p)
-       (python-info-beginning-of-statement-p))
-   (lambda ()
-     (interactive)
-     (with-help-window
-	 (help-buffer)
-       (cl-loop for (key . docstring) in vipyr-hotkeys
-		do
-		(princ (format "%s %s\n" key docstring))))))))
+ (lambda ()
+   (interactive)
+   (with-help-window
+       (help-buffer)
+     (cl-loop for (key . docstring) in vipyr-hotkeys
+	      do
+	      (princ (format "%s %s\n" key docstring))))))
 
-
-;; make it possible to overwrite special place. When we are there, press spc,
-;; then the letter to insert
+;;* Navigation
 (vipyr-conditional-key
- " "
- "Override special position and insert next typed character."
- (cond
-  ((or (looking-at
-	python-nav-beginning-of-defun-regexp)
-       (python-info-beginning-of-block-p)
-       (python-info-beginning-of-statement-p))
-   (lambda ()
-     (interactive)
-     (insert (read-char))
-     (skip-chars-backward " ")))))
+ "["
+ "Backward statement."
+ (lambda ()
+   (interactive)
+   (python-nav-backward-statement)))
 
+(vipyr-conditional-key
+ "{"
+ "Backward block."
+ (lambda ()
+   (interactive)
+   (python-nav-backward-block)))
+
+(vipyr-conditional-key
+ "]"
+ "Forward statement."
+ (lambda ()
+   (interactive)
+   (python-nav-forward-statement)))
+
+(vipyr-conditional-key
+ "}"
+ "Forward block."
+ (lambda ()
+   (interactive)
+   (python-nav-forward-block)))
+
+(vipyr-conditional-key
+ "."
+ "Goto symbol definition at point."
+ (lambda ()
+   (interactive)
+   (elpy-goto-definition)))
+
+(vipyr-conditional-key
+ "," "Go back to symbol."
+ (lambda ()
+   (interactive)
+   (xref-pop-marker-stack)))
+
+(vipyr-conditional-key
+ "d" "Get documentation for object at point."
+ (lambda ()
+   (interactive)
+   (elpy-doc)))
 
 (vipyr-conditional-key
  "v"
@@ -213,6 +175,7 @@ returns the interactive function for the KEY."
  "H"
  "Use helm to select action"
  (cond
+
   ((or (looking-at python-nav-beginning-of-defun-regexp)
        (python-info-beginning-of-block-p)
        (python-info-beginning-of-statement-p))
@@ -284,12 +247,7 @@ returns the interactive function for the KEY."
 (vipyr-conditional-key
  "l"
  "Jump to line with avy-goto-line"
- (when
-     (or (looking-at python-nav-beginning-of-defun-regexp)
-	 (python-info-beginning-of-block-p)
-	 (and (not (python-info-beginning-of-statement-p))
-	      (python-info-beginning-of-statement-p)))
-   #'avy-goto-line))
+ #'avy-goto-line)
 
 ;; ** avy jump to block or def that is visible
 (defun avy-python-goto-block ()
@@ -323,7 +281,7 @@ returns the interactive function for the KEY."
     (avy--process candidates (avy--style-fn 'post))))
 
 (vipyr-conditional-key
- "d"
+ "D"
  "Jump to def/block with avy."
  (cond
   ((looking-at python-nav-beginning-of-defun-regexp)
@@ -333,6 +291,22 @@ returns the interactive function for the KEY."
     (and (not (python-info-current-line-empty-p))
 	 (python-info-beginning-of-statement-p)))
    #'avy-python-goto-block)))
+
+;; * Jump to a char or 2 char or char-inline
+(vipyr-conditional-key
+ "1"
+ "Jump to visible char."
+ #'avy-goto-char)
+
+(vipyr-conditional-key
+ "2"
+ "Jump to pair of chars."
+ #'avy-goto-char-2)
+
+(vipyr-conditional-key
+ "6"
+ "Jump to char in line."
+ #'avy-goto-char-in-line)
 
 
 ;;** jump to def with helm
@@ -368,10 +342,9 @@ returns the interactive function for the KEY."
  "h"
  "Goto def with helm"
  (cond
-  ((looking-at python-nav-beginning-of-defun-regexp)
-   (lambda ()
-     (interactive)
-     (helm :sources '(vipyr-helm-def))))))
+  (lambda ()
+    (interactive)
+    (helm :sources '(vipyr-helm-def)))))
 
 
 ;;* mark, clone, copy and kill def or block
@@ -398,7 +371,7 @@ returns the interactive function for the KEY."
 
 ;; * Comment
 (vipyr-conditional-key
- "3"
+ "#"
  "Comment the def/block/statement"
  (cond
   ;; mark the def
@@ -427,7 +400,7 @@ returns the interactive function for the KEY."
 
 
 (vipyr-conditional-key
- "#"
+ "3"
  "Uncomment the def/block/statement"
  (cond
   ((and (not (python-info-current-line-empty-p))
@@ -676,6 +649,205 @@ returns the interactive function for the KEY."
        (python-nav-end-of-statement)
        (elpy-shell-send-region-or-buffer)
        (deactivate-mark))))))
+
+;;* Minor mode
+(defvar vipyr-original-cursor-color "#0FB300"
+  "Original cursor color. For resetting.")
+
+
+(define-minor-mode vipyr-mode
+  "Speed of thought Python navigation mode."
+  :lighter " Vipyr"
+  :keyap vipyr-mode-map
+  (if vipyr-mode
+      (set-cursor-color "DarkOrange")
+    (set-cursor-color vipyr-original-cursor-color)))
+
+;;* Python at the speed of thought
+;; adapted from https://github.com/Malabarba/speed-of-thought-lisp/blob/master/sotlisp.el
+;; and thoughts from
+;; http://nakkaya.com/2009/12/11/type-less-to-type-more/
+;; https://www.emacswiki.org/emacs/SkeletonMode
+
+;; Notes: _ is where the cursor will end up. @ are markers to jump to with C-n. To get a literal _, you need to escape it with \\_.
+
+(defun vipyr-escape (s)
+  "Escape _ and @ in s."
+  (setq s (replace-regexp-in-string "\\\\_" "XXXYYY" s))
+  (setq s (replace-regexp-in-string "\\\\@" "AAABBB" s))
+  (setq s (replace-regexp-in-string "\\\\>" "CCCDDD" s))
+  s)
+
+
+(defun vipyr-unescape (s)
+  "Convert escaped _ and @ back to their original values."
+  (setq s (replace-regexp-in-string "XXXYYY" "_" s))
+  (setq s (replace-regexp-in-string "AAABBB" "@" s))
+  (setq s (replace-regexp-in-string "CCCDDD" ">" s))
+  s)
+
+
+(defun vipyr-parse-template (s)
+  "Parse a skeleton string to skeleton lists.
+This does not support the full syntax.
+_
+@
+>
+"
+  (let ((i 0)
+	(parsed '()))
+    (if (string-match "_\\|@\\|>" s)
+	(progn
+	  (setq s (vipyr-escape s))
+	  (while (string-match "_\\|@\\|>" s i)
+	    (push (vipyr-unescape (substring s i (match-beginning 0)))
+		  parsed)
+	    (push (intern (match-string 0 s)) parsed)
+	    (setq i (match-end 0)))
+	  (push (vipyr-unescape (substring s (match-end 0)))
+		parsed))
+      (setq parsed (list s)))
+    (reverse parsed)))
+
+(defconst vipyr--default-abbrevs
+  '(("d" . "def _(@):\n    @")
+    ("c" . "class _(object):\n    @def \\_\\_init\\_\\_(self,@):\n    ")
+    ("str" . "def \\_\\_str\\_\\_(self):\n    @")
+    ("pr" . "print(_)@")
+    ("lf" . "[for _ in @]")
+    ("lfi" . "[for _ in @ if @]")
+    ("for" . "for _ in @:\n    @")
+
+    ;; numpy
+    ("inp" . "import numpy as np\n")
+    ("ila" . "import np.linalg as la")
+    ("npa" . "np.array(_)")
+    ("nls" . "np.linspace(_)")
+    ("npf" . "np.polyfit(_, @)")
+    ("npv" . "np.polyval(_)")
+    ("npd" . "np.polyder(_)")
+    ("nslv" . "np.linalg.solve(_, @)")
+
+    ;; matplotlib
+    ("imp" . "import matplotlib.pyplot as plt\n")
+    ("plt" . "plt.plot(_)")
+    ("pxl" . "plt.xlabel('_')")
+    ("pyl" . "plt.ylabel('_')")
+    ("pl" . "plt.legend(_)")
+    ("psf" . "plt.savefig('_')")
+    ("plf" . "plt.figure(_)@")
+
+    ;; jasp
+    ("ij" . "from jasp import *\n")
+    ("wj" . "with jasp('_',) as calc:\n    @")
+    ("cc" . "calc.calculate(atoms)")
+    ("cga" . "calc.get_atoms()")
+
+    ;; ase
+    ("ias" . "from ase import Atom, Atoms\n")
+    ("iav" . "from ase.visualize import view\n")
+    ("iaw" . "from ase.io import write\n")
+    ("atm" . "Atom('_', ['@', [@]]),")
+    ("ats" . "Atoms([_], cell=[@])")
+    ("ape" . "atoms.get_potential\\_energy()")
+    ("afg" . "atoms.get\\_forces()")
+    ("av" . "view(atoms)")
+    ("aw" . "write('_.png', atoms, show\\_unit\\_cell=2)")
+
+    ;; scipy
+    ("isod" . "from scipy.integrate import odeint\n")
+    ("isfs" . "from scipy.optimize import fsolve\n")
+    ("isq" . "from scipy.integrate import quad\n")
+    ("ode" . "odeint(_, @, @)@")
+    ("fsol" . "fsolve(_, @)@")
+    ("odel" . "X, F, TE, YE, IE = odelay(_, @, @, events=[@])@"))
+  "Alist of (ABBREV . EXPANSION) used by `vipyr'.")
+
+;; Here I want to define the skeletons, and load the abbrevs. You have to be a
+;; bit careful not to define skeletons that have the same name as emacs
+;; commands, as they can change the way emacs behaves badly. We avoid that here
+;; with a message alerting you if something would conflict.
+(defun vipyr-define-abbrev (name expansion)
+  (if (fboundp (intern name))
+      (message "%s already a function. Skipping (%s . %s)" name name expansion)
+    (eval `(define-skeleton ,(intern name) ,name nil ,@(vipyr-parse-template expansion)))
+    (define-abbrev python-mode-abbrev-table name "" (intern name))))
+
+(defun vipyr-load-abbrevs ()
+  (mapc (lambda (x)
+	  (vipyr-define-abbrev (car x) (cdr x)))
+	vipyr--default-abbrevs))
+
+(vipyr-load-abbrevs)
+
+;; this is kind of slow, for everytime you open a python file.
+;; (add-hook 'python-mode-hook 'vipyr-load-abbrevs)
+
+
+;;** skeleton markers
+(defvar *skeleton-markers* nil
+  "Markers for locations saved in skeleton-positions")
+
+(defvar *skeleton-min-position* nil
+  "Smallest position")
+
+(defvar *skeleton-max-position* nil
+  "Largest position")
+
+(defun skeleton-make-markers ()
+  (while *skeleton-markers*
+    (set-marker (pop *skeleton-markers*) nil))
+  (setq *skeleton-markers*
+	(mapcar 'copy-marker (reverse skeleton-positions)))
+
+  (when *skeleton-markers*
+    (setq *skeleton-max-position* `(max ,@*skeleton-markers*)
+	  *skeleton-min-position* `(min ,@*skeleton-markers*))))
+
+
+(add-hook 'skeleton-end-hook 'skeleton-make-markers)
+
+
+(defun skeleton-next-position (&optional reverse)
+  "Jump to next position in skeleton.
+         REVERSE - Jump to previous position in skeleton"
+  (interactive "P")
+  (let* ((positions (mapcar 'marker-position *skeleton-markers*))
+	 (positions (if reverse (reverse positions) positions))
+	 (comp (if reverse '> '<))
+	 pos)
+    (when positions
+      (if (catch 'break
+	    (while (setq pos (pop positions))
+	      (when (funcall comp (point) pos)
+		(throw 'break t))))
+	  (goto-char pos)
+	(goto-char (marker-position
+		    (car *skeleton-markers*)))))))
+
+;; Ideally, we would get rid of the markers while visiting them. That doesn't
+;; seem easy though, and there is no way to check if we are in the skeleton
+;; region.
+(defun vipyr-point-in-skeleton ()
+  (and (> (point) *skeleton-min-position*)
+       (< (point) *skeleton-max-position*)))
+
+(vipyr-conditional-key
+ (kbd "s-n")
+ "Next skeleton marker."
+ (when (vipyr-point-in-skeleton)
+   (lambda ()
+     (interactive)
+     (skeleton-next-position))))
+
+
+(vipyr-conditional-key
+ (kbd "s-p")
+ "Previous skeleton marker"
+ (when (vipyr-point-in-skeleton)
+   (lambda ()
+     (interactive)
+     (skeleton-next-position '(4)))))
 
 
 (provide 'vipyr)
