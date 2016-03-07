@@ -111,7 +111,7 @@ _n_: Navigate           _d_: delete
 
   ("i" ace-window)
 
-  ("h" helm-org-headlines)
+  ("h" helm-org-in-buffer-headings)
   ("a" helm-org-agenda-files-headings)
   ("q" helm-multi-swoop-org)
 
