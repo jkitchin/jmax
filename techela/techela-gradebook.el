@@ -120,24 +120,25 @@ column 5 is the fractional grade * points * category weight"
 	 (lg (gb-fraction-to-lettergrade fgrade)))
 
     ;; getting names of the student from the roster
-    (with-temp-buffer
-      (insert-file-contents ta-roster)
-      (let* ((contents (cdr (csv-parse-buffer nil)))  ;; first line is header
-	     (roster (mapcar (lambda (x)
-			       (list (nth 8 x)                     ; userid
-				     :firstname (nth 6 x)       ; first name
-				     :lastname (nth 5 x)))
-			     contents))
-	     (firstname (plist-get (cdr (assoc userid roster)) :firstname))
-	     (lastname  (plist-get (cdr (assoc userid roster)) :lastname)))
-
-	;; return value
-	(list
-	 lastname
-	 firstname
-	 userid
-	 fgrade ; fractional grade
-	 (gb-fraction-to-lettergrade fgrade))))))
+    (catch 'grade
+      (dolist (roster-file ta-roster)
+	(with-temp-buffer
+	  (insert-file-contents roster-file)
+	  (let* ((contents (cdr (csv-parse-buffer nil))) ;; first line is header
+		 (roster (mapcar (lambda (x)
+				   (list (nth 8 x)	      ; userid
+					 :firstname (nth 6 x) ; first name
+					 :lastname (nth 5 x)))
+				 contents))
+		 (firstname (plist-get (cdr (assoc userid roster)) :firstname))
+		 (lastname  (plist-get (cdr (assoc userid roster)) :lastname)))
+	    (when firstname
+	      (throw 'grade (list
+			     lastname
+			     firstname
+			     userid
+			     fgrade			; fractional grade
+			     (gb-fraction-to-lettergrade fgrade))))))))))
 
 
 (defun ta-get-user-category-grades (userid category)
