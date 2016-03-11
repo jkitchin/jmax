@@ -7,6 +7,9 @@ all: test
 test: clean-elc
 	${MAKE} unit
 
+no-user:
+	${CASK_EXEC} ${EMACS} -Q --eval "(setq jmax-load-user-dir nil)" -l init.el -l pydoc/pydoc.el
+
 unit:
 	${CASK_EXEC} ${EMACS} -Q -batch -l init.el -l jmax-test.el --eval "(ert t)"
 
