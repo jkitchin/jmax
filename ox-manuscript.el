@@ -836,10 +836,10 @@ These are snippets in `ox-manuscript-templates' in the \"manuscript\" group.
       (font-lock-fontify-buffer))))
 
 
-(defun ox-manuscript-texcount (&optional arg)
+(defun ox-manuscript-texcount ()
   "Use texcount to estimate words in an org-file if it exists.
 Fall back to `tex-count-words'"
-  (interactive "P")
+  (interactive)
   (if (executable-find "texcount")
     (let ((f (org-latex-export-to-latex)))
       (shell-command
