@@ -835,26 +835,20 @@ These are snippets in `ox-manuscript-templates' in the \"manuscript\" group.
       (goto-char (point-min))
       (font-lock-fontify-buffer))))
 
+
 (defun ox-manuscript-texcount (&optional arg)
   "Use texcount to estimate words in an org-file if it exists.
 Fall back to `tex-count-words'"
   (interactive "P")
-  (if arg
-      ;; texcount
-      (when (executable-find "texcount")
-	(let ((f (org-latex-export-to-latex)))
-	  (shell-command
-	   (concat "texcount "
-		   "-unicode "
-		   "-inc "
-		   (shell-quote-argument f)))
-	  ))
-    ;; default
-    (message "Default")
-    (let ((cb (org-latex-export-as-latex)))
-      (with-current-buffer cb
-	(tex-count-words (point-min) (point-max)))
-      (kill-buffer cb))))
+  (if (executable-find "texcount")
+    (let ((f (org-latex-export-to-latex)))
+      (shell-command
+       (concat "texcount "
+	       "-unicode "
+	       "-inc "
+	       (shell-quote-argument f))))
+    (message (concat "Warning: texcount not found. Word estimate does not exclude cite/ref commands. "
+	     (tex-count-words (region-beginning) (region-end))))))
 
 
 (provide 'ox-manuscript)
