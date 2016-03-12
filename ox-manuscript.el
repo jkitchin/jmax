@@ -854,7 +854,7 @@ Fall back to `tex-count-words'"
     (let ((cb (org-latex-export-as-latex)))
       (with-current-buffer cb
 	(tex-count-words (point-min) (point-max)))
-      (kill-buffer cb)))))
+      (kill-buffer cb))))
 
 
 (provide 'ox-manuscript)
