@@ -241,7 +241,8 @@
    (org . t)
    (dot . t)
    (plantuml . t)
-   (R . t)))
+   (R . t)
+   (C . t)))
 
 ;; no extra indentation in the source blocks
 (setq org-src-preserve-indentation t)
