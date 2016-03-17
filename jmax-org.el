@@ -616,21 +616,35 @@ If you enter ATTRIBUTES they are inserted as LaTeX attributes."
 (require 'ore)
 
 ;;* Python sessions
-(defun org-mode-tab (&optional arg)
-  "In org-mode make tab cycle in some places, or insert 4 spaces.
-This is so when you are in text or code blocks you can use tab."
-  (interactive "P")
-  (cond
-   ;; Cycle headlines
-   ((or (org-on-heading-p)
-	(ore-src-block-header-p (org-element-context))
-	(memq (car (org-element-context)) '(table table-cell)))
-    (org-cycle arg))
-   ;; otherwise insert 4 spaces
-   (t
-    (insert "    "))))
+;; (defun org-mode-tab (&optional arg)
+;;   "In org-mode make tab cycle in some places, or insert 4 spaces.
+;; This is so when you are in text or code blocks you can use tab."
+;;   (interactive "P")
+;;   (cond
+;;    ;; Cycle headlines
+;;    ((or (org-on-heading-p)
+;;	(ore-src-block-header-p (org-element-context))
+;;	(memq (car (org-element-context)) '(table table-cell)))
+;;     (org-cycle arg))
+;;    ;; otherwise insert 4 spaces
+;;    (t
+;;     (insert "    "))))
 
 ;; (define-key org-mode-map (kbd "<tab>") 'org-mode-tab)
+
+;; define a better org-mode tab
+(define-key org-mode-map (kbd "<tab>")
+  '(menu-item "org-mode-tab" nil
+	      :filter (lambda (&optional _)
+			(when
+			    (and
+			     (org-in-src-block-p t)
+			     (string= "python"
+				      (org-element-property
+				       :language
+				       (org-element-context))))
+			  (insert "    ")))))
+
 
 (defun org-babel-python-strip-session-chars ()
   "Remove >>> and ... from a Python session output."
@@ -646,7 +660,7 @@ This is so when you are in text or code blocks you can use tab."
       (when (org-babel-where-is-src-block-result)
 	(goto-char (org-babel-where-is-src-block-result))
 	(end-of-line 1)
-	;(while (looking-at "[\n\r\t\f ]") (forward-char 1))
+					;(while (looking-at "[\n\r\t\f ]") (forward-char 1))
 	(while (re-search-forward
 		"\\(>>> \\|\\.\\.\\. \\|: $\\|: >>>$\\)"
 		(org-element-property :end (org-element-at-point))
