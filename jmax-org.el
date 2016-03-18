@@ -713,6 +713,19 @@ If you enter ATTRIBUTES they are inserted as LaTeX attributes."
 				       :language
 				       (org-element-context))))
 			  (insert "    ")))))
+(define-key org-mode-map (kbd "S-<tab>")
+  '(menu-item "org-mode-tab" nil
+	      :filter (lambda (&optional _)
+			(when
+			    (and
+			     (org-in-src-block-p t)
+			     (string= "python"
+				      (org-element-property
+				       :language
+				       (org-element-context))))
+			  (let ((p (point)))
+			    (skip-chars-backward " ")
+			    (setf (buffer-substring p (point)) ""))))))
 
 
 (defun org-babel-python-strip-session-chars ()
