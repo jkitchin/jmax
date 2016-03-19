@@ -712,7 +712,9 @@ If you enter ATTRIBUTES they are inserted as LaTeX attributes."
 				      (org-element-property
 				       :language
 				       (org-element-context))))
-			  (insert "    ")))))
+			  (org-babel-do-key-sequence-in-edit-buffer
+			   (kbd "<tab>"))))))
+
 (define-key org-mode-map (kbd "S-<tab>")
   '(menu-item "org-mode-tab" nil
 	      :filter (lambda (&optional _)
