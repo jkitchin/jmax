@@ -56,7 +56,7 @@
 
 (defun kg-get-num-incoming-changes ()
   "Return number of changes the remote is different than local."
-  (unless (in-git-p)
+  (unless (shell-command "git rev-parse --is-inside-work-tree")
     (error "You are not in a git repo.  We think you are in %s" default-directory))
   (shell-command "git fetch origin")
   (string-to-number (shell-command-to-string "git rev-list HEAD...origin/master --count")))
