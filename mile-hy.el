@@ -102,18 +102,19 @@ Returns filename."
     (unwind-protect
 	(let ((tempfile (mile-hy-to-file body)))
 	  (setq result (shell-command-to-string
-			(format "hy2py %s" tempfile))))
-      (delete-file tempfile)))
+			(format "hy2py %s" tempfile)))
+	  (delete-file tempfile))))
 
    ((member "ast" result-params)
     (unwind-protect
 	(let ((tempfile (mile-hy-to-file body)))
 	  (setq result (shell-command-to-string
-			(format "hy2py -a -np %s" tempfile))))
-      (delete-file tempfile)))
+			(format "hy2py -a -np %s" tempfile)))
+	  (delete-file tempfile))))
    (t
-    (setq result
-	  (lispy--eval-hy (org-babel-expand-body:hy body params))))))
+    (setq
+     result
+     (lispy--eval-hy (org-babel-expand-body:hy body params))))))
 
 
 
