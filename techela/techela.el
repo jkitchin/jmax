@@ -265,7 +265,7 @@ Check *techela log* for error messages."
   (save-some-buffers t t)		; make sure all buffers are saved
 
   ;; add everything in this directory
-  (mygit "git add *")
+  ;; (mygit "git add *")
 
   (let ((status (car (mygit "git commit -am \"turning in\""))))
     (unless (or (= 0 status)		; no problem
