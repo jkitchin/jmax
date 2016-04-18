@@ -104,8 +104,7 @@ These are every other name after setv."
 
   (setq ac-sources '(ac-source-hy-keywords
 		     ac-source-hy-defns
-		     ac-source-hy-variables
-		     ))
+		     ac-source-hy-variables))
 
   (ac-set-trigger-key "TAB")
   (auto-complete-mode 1))
