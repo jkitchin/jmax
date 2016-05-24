@@ -99,21 +99,22 @@ the link then. We remove it here."
 (defun nikola-body-html ()
   "Get HTML of body.
 We need a filter to handle links."
-  (let ((*link-dir* (nikola-post-files-dir))
-	(*slug* (nikola-slug))
-	(org-export-filter-parse-tree-functions '(nikola-link-processor))
-	(org-export-filter-link-functions '(nikola-link-filter))
-	(async nil)
-	(subtreep t)
-	(visible-only nil)
-	(body-only t)
-	(ext-plist '())
-	(html))
-    (org-html-export-as-html async subtreep visible-only body-only ext-plist)
-    ;; now get the output into the org output
-    (setq html (with-current-buffer "*Org HTML Export*" (buffer-string)))
-    (kill-buffer "*Org HTML Export*")
-    html))
+  (save-excursion
+    (let ((*link-dir* (nikola-post-files-dir))
+	  (*slug* (nikola-slug))
+	  (org-export-filter-parse-tree-functions '(nikola-link-processor))
+	  (org-export-filter-link-functions '(nikola-link-filter))
+	  (async nil)
+	  (subtreep t)
+	  (visible-only nil)
+	  (body-only t)
+	  (ext-plist '())
+	  (html))
+      (org-html-export-as-html async subtreep visible-only body-only ext-plist)
+      ;; now get the output into the org output
+      (setq html (with-current-buffer "*Org HTML Export*" (buffer-string)))
+      (kill-buffer "*Org HTML Export*")
+      html)))
 
 
 (defun nikola-post-html ()
@@ -161,6 +162,7 @@ We need a filter to handle links."
 	 (fname (nikola-post-filename))
 	 (html (nikola-post-html)))
 
+
     (with-temp-file fname
       (insert html)
       (insert (format "
@@ -169,7 +171,20 @@ We need a filter to handle links."
 
     ;; make file directories
     (with-temp-file org-file
-      (insert org-src))))
+      (insert org-src))
+    (org-todo "DONE")
+    (org-entry-put
+     (point)
+     "POSTED"
+     (format-time-string "%Y-%m-%d %H:%M:%S"))))
+
+(defun nikola-deploy ()
+  "Write post, build and deploy."
+  (interactive)
+  (save-buffer)
+  (nikola-write-post)
+  (shell-command "nikola build")
+  (shell-command "nikola github_deploy"))
 
 (provide 'nikola)
 
