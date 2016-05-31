@@ -24,3 +24,8 @@ bibtex-utils/.hg*
 /.projectile
 examples/cmu*
 themes
+pydoc
+lispy
+hy-mode
+test.org
+test.py

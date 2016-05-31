@@ -658,7 +658,7 @@ Also registers the key in `vipyr-hotkeys' for help generation."
 (define-minor-mode vipyr-mode
   "Speed of thought Python navigation mode."
   :lighter " Vipyr"
-  :keyap vipyr-mode-map
+  :keymap vipyr-mode-map
   (if vipyr-mode
       (set-cursor-color "DarkOrange")
     (set-cursor-color vipyr-original-cursor-color)))
