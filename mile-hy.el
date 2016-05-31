@@ -10,18 +10,23 @@
 (require 'le-hy)
 
 (setq inferior-lisp-program "/Users/jkitchin/Dropbox/python/hyve/imhy")
-(setq hy-mode-inferior-lisp-command "/Users/jkitchin/Dropbox/python/hyve/imhy")
+(setq hy-mode-inferior-lisp-command
+      "/Users/jkitchin/Dropbox/python/hyve/imhy")
 
 (defun hy-eldoc-function ()
   "`eldoc-documentation-function' for hy."
   ;; hyldoc returns u'signature', this hacks off the u' and '
   (let ((func (lispy--current-function)))
     (cond
+     (t
+      "hyldoc disabled.")
      ((s-starts-with? "." func)
       "Can't do .functions yet.")
      ((not (null func))
       (substring
-       (lispy--eval-hy (format "(? %s)" func))
+       (lispy--eval-hy (format
+			"(try (? %s) (except [e Exception] \"\"))"
+			func))
        2 -1)))))
 
 ;; * auto-complete
@@ -32,7 +37,8 @@
   (let ((defns '()))
     (save-excursion
       (goto-char (point-min))
-      (while (re-search-forward "\\(?:defn\\|defmacro\\)[[:space:]]+\\(.*?\\) "nil t)
+      (while (re-search-forward
+	      "\\(?:defn\\|defmacro\\)[[:space:]]+\\(.*?\\) " nil t)
 	(push (match-string 1) defns)))
     defns))
 
@@ -63,17 +69,21 @@ These are every other name after setv."
 		      by #'cddr collect x)))))
     (append set-vars let-vars)))
 
+
 (defvar ac-source-hy-keywords
   `((candidates . ,(read (lispy--eval-hy "(hy-all-keywords-emacs-completion)"))))
   "Keywords known from hy. The command is defined in hyve.hylp.")
+
 
 (defvar ac-source-hy-defns
   '((candidates . hy-defns-macros))
   "Functions/macros defined in the file.")
 
+
 (defvar ac-source-hy-variables
   '((candidates . hy-variables))
   "Hy variables defined in the file.")
+
 
 (defun ac-strings ()
   (interactive)
@@ -114,10 +124,6 @@ These are every other name after setv."
              '("hy"
 	       "#+BEGIN_SRC hy\n?\n#+END_SRC"
 	       "<src lang=\"hy\">\n?\n</src>"))
-
-
-
-
 
 
 ;;* ob-hy setup
@@ -166,8 +172,7 @@ Returns filename."
 :results python - The hy code converted to python by hy2py
 :results ast - The AST code hy is converted to
 :results value - wraps the body in (print (do %s))
-:results output - captures the output
-"
+:results output - captures the output"
 
   (cond
    ((member "body" result-params)
@@ -186,8 +191,10 @@ Returns filename."
 	  (setq result (shell-command-to-string
 			(format "hy2py -a -np %s" tempfile)))
 	  (delete-file tempfile))))
+   ;; here we execute
    (t
     (cond
+     ;; use the repl
      ((assoc :repl params)
       (setq
        result
@@ -197,8 +204,9 @@ Returns filename."
 	 (lispy--eval-hy "(import os)")
 	 (lispy--eval-hy (format  "(os.chdir \"%s\")" default-directory))
 	 (lispy--eval-hy (org-babel-expand-body:hy body params)))))
+     ;; write to tempfile and shell-command it.
      (t
-      (let ((tempfile (mile-hy-to-file body)))
+      (let ((tempfile (mile-hy-to-file (org-babel-expand-body:hy body params))))
 	(setq result (shell-command-to-string
 		      (format "hy %s" tempfile)))
 	(delete-file tempfile))))))
