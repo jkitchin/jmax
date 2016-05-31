@@ -60,7 +60,8 @@
                                    "(with-output-to-string %s)"
                                  "(progn %s)")
                                (org-babel-expand-body:emacs-lisp
-                                body params))))))
+                                body params)))
+		 (assoc :lexical params))))
       (org-babel-result-cond (cdr (assoc :result-params params))
 	(let ((print-level nil)
               (print-length nil))
