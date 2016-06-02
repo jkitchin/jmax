@@ -1,1 +1,1 @@
-start "" "%~dp0\emacs\bin\runemacs.exe" -l "%~dp0\init.el" %1
+start "" "%~dp0\emacs-win\bin\runemacs.exe" -l "%~dp0\init.el" %1
