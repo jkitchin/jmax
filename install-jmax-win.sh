@@ -6,7 +6,7 @@ if [ ! -d "jmax" ]; then
 fi
 
 cd jmax
-git submodule add https://github.com/jkitchin/emacs-win.git
+git submodule add https://github.com/jkitchin/emacs-win
 git submodule update
 
 echo "jmax is installed. To use it, run this command in your terminal."
