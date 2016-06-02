@@ -18,4 +18,7 @@ echo "#!/bin/bash
 `pwd`/jmax/emacs-win/bin/runemacs.exe -q -l `pwd`/jmax/init.el
 #end" > jmax.sh
 chmod +x jmax.sh
+
+echo "Opening jmax. The first time it will install a lot of packages. Be patient."
+`pwd`/jmax/emacs-win/bin/runemacs.exe -q -l `pwd`/jmax/init.el
 #end
