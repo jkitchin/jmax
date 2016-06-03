@@ -13,14 +13,6 @@
 
 (setq package-user-dir (expand-file-name "elpa"  starter-kit-dir))
 
-;; we need this specific version of highlight-indentation. This is a little
-;; hackery to make sure we get the version from the elpy repo.
-;; (unless (file-directory-p (expand-file-name "elpa/highlight-indentation-0.6.0" starter-kit-dir))
-;;   (let ((package-archives '(("elpy" . "http://jorgenschaefer.github.io/packages/"))))
-;;     (package-initialize)
-;;     (package-refresh-contents)
-;;     (package-install 'highlight-indentation)))
-
 (package-initialize)
 
 (defvar starter-kit-packages
@@ -59,17 +51,5 @@
     (unless (package-installed-p package)
       (message "installing %s" package)
       (package-install package))))
-
-;; Make sure some packages are byte-compiled. This should only happen the first
-;; time.  I committed some packages to git without .elc files, so it seems like
-;; this is a good idea.
-
-;; (loop for library in '("org" "org-plus-contrib")
-;;       do
-;;       (when (locate-library library)
-;; 	(unless (string= "elc" (file-name-extension (locate-library library)))
-;; 	  (byte-recompile-directory
-;; 	   (file-name-directory (locate-library library))
-;; 	   0))))
 
 (provide 'packages)
