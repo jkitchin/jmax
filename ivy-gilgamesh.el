@@ -141,6 +141,35 @@ ivy actions to delete, info, hold, release."
 		       (ivy-read "Job: " (cdr (assoc 'jobids node))))
 		 "jobs on node")))))
 
+
+(defun ivy-net ()
+  (interactive)
+  (let* ((results (split-string
+		   (shell-command-to-string "beostat -R") "\n"))
+	 (output '())
+	 node rate)
+    (dolist (line results)
+      (when (string-match "= Node: \\(.*\\) (index" line)
+	(setq node (match-string 1 line)))
+      (when (string-match "Network rate \\([0-9]+\\) bytes/second" line)
+	(setq rate (/ (string-to-number
+		       (match-string 1 line)) (* 1024.0 1024.0)))
+	(add-to-list 'output (list
+			      (format "%-3s: %1.2f Mb/s"
+				      node rate)
+			      node rate))))
+
+    (ivy-read "Node: " (sort output (lambda (a b) (> (elt a 2)
+						     (elt b 2))))
+	      :action
+	      '(1
+		("p"  (lambda (node)
+			(ivy-node-ps (elt node 0)))
+		 "ivy-node-ps")
+		("h" (lambda (node)
+		       (gilgamesh-pbsnodes (elt node 0)))
+		 "gilgamesh-pbsnodes")))))
+
 (provide 'ivy-gilgamesh)
 
 ;;; ivy-gilgamesh.el ends here
