@@ -44,7 +44,7 @@ recent files and bookmarks. You can set a bookmark also."
 
 
 (defun jmax-help ()
-  "Open the ‘org-ref’ manual."
+  "Open the ‘jmax’ manual."
   (interactive)
   (find-file (expand-file-name
               "jmax.org"
