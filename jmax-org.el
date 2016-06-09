@@ -230,6 +230,10 @@ is positive, move after, and if negative, move before."
 (setq org-clock-into-drawer t)
 
 ;;* Expansions for blocks
+(require 'ob-ipython)
+(add-to-list 'org-structure-template-alist
+             '("ip" "#+BEGIN_SRC ipython :session\n?\n#+END_SRC" "<src lang=\"python\">\n?\n</src>"))
+
 ;; add <p for python expansion
 (add-to-list 'org-structure-template-alist
              '("p" "#+BEGIN_SRC python\n?\n#+END_SRC" "<src lang=\"python\">\n?\n</src>"))
