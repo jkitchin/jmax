@@ -200,3 +200,6 @@ Unique jobs
   "Helm interface to jobs in the queue."
   (interactive)
   (helm :sources '(helm-gilgamesh-actions helm-queue-source)))
+
+
+(setq helm-top-command "env COLUMNS=%s ps aux | bpstat -P master | sort -k 3 -n -r ")
