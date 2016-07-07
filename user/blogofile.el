@@ -141,9 +141,9 @@ all keys and values are taken from properties."
 			    ;; image
 			    ((and (string= type "file")
 				  (file-name-extension fname)
-				  (string-match
-				   "png"
-				   (file-name-extension fname)))
+				  (or (string-match
+				       "png\\|svg"
+				       (file-name-extension fname))))
 			     (progn
 			       (copy-file path (concat media-dir fname) t)
 			       (format "<img src=\"%s%s\"> "

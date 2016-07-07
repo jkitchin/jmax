@@ -135,7 +135,7 @@ With prefix arg, also send the message and move to the next one."
   (outline-show-entry))
 
 
-
+;;;###autoload
 (defun mail-merge ()
   "Run a mail-merge in the current heading.
 This will map over entries tagged unsent with a TO property, and

@@ -67,7 +67,7 @@ This is a little fragile because it uses positions in links.  These change if yo
         (insert "\n* feedback\n"))
 
       (save-restriction
-	(org-narrow-to-subtree)
+	;; (org-narrow-to-subtree)
 	(goto-char (point-max))
 	(insert  (format "[[elisp:(goto-char %s)][(%s) line %s:]] %s\n\n"
 			 current-point (user-login-name)  current-line comment ))))))
@@ -102,7 +102,6 @@ placed after the new link when it is done."
   ;; get location
   (let ((current-point (point))
         (current-line (count-lines (point-min) (point))))
-
     (save-excursion
       (goto-char (point-min))
       (unless (re-search-forward "* feedback\n" (point-max) 'end)
@@ -112,7 +111,7 @@ placed after the new link when it is done."
       (let ((ntypos (gb-get-filetag "NTYPOS")))
 	(if ntypos
 	    (gb-set-filetag "NTYPOS" (+ 1 (string-to-int ntypos)))
-      (gb-set-filetag "NTYPOS" 1)))
+	  (gb-set-filetag "NTYPOS" 1)))
       (insert  (format "[[elisp:(goto-char %s)][(%s) line %s:]] typo\n\n"
                        current-point (user-login-name)  current-line)))))
 
@@ -224,10 +223,19 @@ This assumes the assignment label is the filename you are in."
 (defun gb-get-filetag (tag)
   "Return value for TAG in the org-file."
   (interactive "sTag: ")
-  (setq kwds (org-element-map (org-element-parse-buffer 'element) 'keyword
-		       (lambda (keyword) (cons (org-element-property :key keyword)
-					       (org-element-property :value keyword)))))
-  (cdr (assoc tag kwds)))
+  ;; (setq kwds (org-element-map (org-element-parse-buffer 'element) 'keyword
+  ;;	       (lambda (keyword)
+  ;;		 (cons (org-element-property :key keyword)
+  ;;		       (org-element-property :value keyword)))))
+  ;; (cdr (assoc tag kwds))
+
+  ;; Apr 13, 2016 I am not sure why the code above stopped working. It seems to
+  ;; be the parse buffer command that hangs.
+  (save-excursion
+    (goto-char (point-min))
+    (if	(re-search-forward (format "#\\+%s:\\(.*\\)" tag) (point-max) t)
+	(match-string 1)
+      nil)))
 
 
 (defun gb-save-and-close-buffer ()

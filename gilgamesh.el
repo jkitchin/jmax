@@ -1,7 +1,14 @@
+;;; gilgamesh.el --- helm gilgamesh commands
 ;; Helm interfaces to gilgamesh
 
+
+;;; Commentary:
+;;
+
+;;; Code:
+
 (defun gilgamesh-net ()
-  "Open buffer  with network traffic on nodes"
+  "Open buffer  with network traffic on nodes."
   (interactive)
   (let* ((results (split-string
 		   (shell-command-to-string "beostat -R") "\n"))
@@ -30,7 +37,7 @@
     (local-set-key "q" #'(lambda () (interactive) (kill-buffer)))))
 
 (defun gilgamesh-pbsnodes (node)
-  "Open buffer with output from pbsnodes on NODE"
+  "Open buffer with output from pbsnodes on NODE."
   (interactive "sNode: ")
   (switch-to-buffer "*Node*")
   (setq buffer-read-only nil)
@@ -81,14 +88,14 @@ Unique jobs
        (shell-command (format "qdel %s" jobid)))))))
 
 (defun helm-job-candidates ()
-  "Candidates from qstat"
+  "Candidates from qstat."
   (loop for jobstring in (cddr (split-string (shell-command-to-string "qstat") "\n"))
 	collect
 	(cons jobstring (car (split-string jobstring)))))
 
 
 (defun qstat-f (jobid)
-  "Orgified output of qstat -f jobid"
+  "Orgified output of qstat -f JOBID."
   (interactive "sJobid: ")
   (switch-to-buffer "*qstat -f*")
   (setq buffer-read-only nil)
@@ -170,13 +177,16 @@ Unique jobs
 
 
 (defun helm-qdel-job (jobid)
+  "Delete JOBID from queue."
   (shell-command (format "qdel %s" jobid)))
 
 (defun helm-qhold-job (jobid)
+  "Put hold on JOBID."
   (shell-command
    (concat "qhold -h " (completing-read "Hold: " '("u" "o" "s") nil nil "u") " " jobid)))
 
 (defun helm-qrls-job (jobid)
+  "Release hold on JOBID."
   (shell-command
    (concat "qrls -h " (completing-read "Hold: " '("u" "o" "s")nil nil "uos") " " jobid)))
 
@@ -200,3 +210,10 @@ Unique jobs
   "Helm interface to jobs in the queue."
   (interactive)
   (helm :sources '(helm-gilgamesh-actions helm-queue-source)))
+
+
+(setq helm-top-command "env COLUMNS=%s ps aux | bpstat -P master | sort -k 3 -n -r ")
+
+(provide 'gilgamesh)
+
+;;; gilgamesh.el ends here
