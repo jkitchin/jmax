@@ -796,41 +796,41 @@ of the code block."
 		   pbuffer
 		   "python"
 		   tempfile))
-
+    
     ;; when the process is done, run this code to put the results in the
     ;; org-mode buffer.
     (set-process-sentinel
      process
      `(lambda (process event)
+	(delete-file ,tempfile)
 	(unwind-protect
 	    (save-window-excursion
 	      (save-excursion
 		(save-restriction
 		  (with-current-buffer (find-file-noselect ,current-file)
 		    (goto-char (point-min))
-		    (re-search-forward ,uuid)
-		    (beginning-of-line)
-		    (kill-line)
-		    (when (with-current-buffer
-			      ,pbuffer
-			    (buffer-string)))
-		    (insert
-		     (mapconcat
-		      (lambda (x)
-			(format ": %s" x))
-		      (butlast (split-string
-				(with-current-buffer
-				    ,pbuffer
-				  (buffer-string))
-				"\n"))
-		      "\n")))))))
-	;; delete the results buffer then delete the tempfile.
-	;; finally, delete the process.
-	(when (get-buffer ,pbuffer)
-	  (kill-buffer ,pbuffer)
-	  (delete-window))
-	(delete-file ,tempfile)
-	(delete-process process)))))
+		    (when (re-search-forward ,uuid nil t)
+		      (beginning-of-line)
+		      (kill-line)
+		      (when (with-current-buffer
+				,pbuffer
+			      (buffer-string)))
+		      (insert
+		       (mapconcat
+			(lambda (x)
+			  (format ": %s" x))
+			(butlast (split-string
+				  (with-current-buffer
+				      ,pbuffer
+				    (buffer-string))
+				  "\n"))
+			"\n")))))))
+	  ;; delete the results buffer then delete the tempfile.
+	  ;; finally, delete the process.
+	  (when (get-buffer ,pbuffer)
+	    (kill-buffer ,pbuffer)
+	    (delete-window)) 
+	  (delete-process process))))))
 
 
 (defun org-babel-kill-async ()
