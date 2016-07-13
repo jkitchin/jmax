@@ -1144,6 +1144,11 @@ F5 inserts the entity code."
 (defalias 'top 'helm-top)
 
 
+(defun jmax-todo-agenda ()
+  "Show the todo agenda in the current directory."
+  (interactive)
+  (let ((org-agenda-files (f-files "." (lambda (f) (f-ext? f "org")))))
+    (org-agenda nil "t")))
 
 
 
