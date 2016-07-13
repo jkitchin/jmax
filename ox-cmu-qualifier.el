@@ -55,29 +55,30 @@
 	 (author (plist-get info :author))
 	 (title (plist-get info :title)))
      (concat 
-   "
+      "
 \\begin{document}
 "
-(format "\\title{%s}\n" (org-export-data title info))
-(format "\\author{%s}\n" (org-export-data author info))
-"
+      (format "\\title{%s}\n" (org-export-data title info))
+      (format "\\author{%s}\n" (org-export-data author info))
+      "
 \\date{\\today}
-"
-(format "\\begin{abstract}\n%s\n\\end{abstract}\n" (org-export-data abstract info))
-"
 \\maketitle
+"
+      (format "\\begin{abstract}\n%s\n\\end{abstract}\n" (org-export-data abstract info))
+      "
+
 \\thispagestyle{empty}
 \\clearpage
 \\setcounter{page}{1}
 "
-contents
-"\n\\end{document}"
-))))
+      contents
+      "\n\\end{document}"
+      ))))
 
 
 ;;;###autoload
 (defun cmu-qualifier-export-as-latex
-  (&optional async subtreep visible-only body-only ext-plist)
+    (&optional async subtreep visible-only body-only ext-plist)
   "Export current buffer as a CMU MS report letter.
 
 If narrowing is active in the current buffer, only export its
