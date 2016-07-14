@@ -345,11 +345,13 @@ Remove link markup."
 
 
 (defun em-next-editmark ()
+  "Navigate forward to next editmark."
   (interactive)
   (re-search-forward "\\[\\[\\(comment\\|typo\\|insert\\|delete\\):" nil 'mv))
 
 
 (defun em-previous-editmark ()
+  "Navigate backward to previous editmark."
   (interactive)
   (re-search-backward "\\[\\[\\(comment\\|typo\\|insert\\|delete\\):" nil 'mv)
   (forward-char))
