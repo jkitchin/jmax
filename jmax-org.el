@@ -12,7 +12,7 @@
 (require 'org-mouse)
 (require 'org-contacts)
 (require 'emacs-keybinding-command-tooltip-mode)
-
+(require 'org-editmarks)
 ;;; Code:
 ;;* Basic variables
 (add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode))
