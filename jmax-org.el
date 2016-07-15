@@ -1159,7 +1159,7 @@ F5 inserts the entity code."
 	 (status (unless (file-directory-p report-dir)
 		   (make-directory report-dir t)))
 	 (default-directory (expand-file-name (file-name-as-directory report-dir))))
-    (ox-manuscript-new-helm "weekly-progress-report")))
+    (ox-manuscript-new-manuscript "weekly-progress-report")))
 
 (defun kitchinhub-annual-review ()
   "Create and open the annual review."
@@ -1168,7 +1168,7 @@ F5 inserts the entity code."
 	 (status (unless (file-directory-p review-dir)
 		   (make-directory review-dir t)))
 	 (default-directory (expand-file-name (file-name-as-directory review-dir))))
-    (ox-manuscript-new-helm "annual-student-review")))
+    (ox-manuscript-new-manuscript "annual-student-review")))
 
 
 ;;* The end
