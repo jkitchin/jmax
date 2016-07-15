@@ -1154,13 +1154,21 @@ F5 inserts the entity code."
 ;; * Kitchinhub weekly report
 
 (defun kitchinhub-weekly-report ()
-  "Create and open the report due next Tuesday."
-  (interactive)
-  (let* ((report-dir (org-read-date nil nil "Tue"))
+  "Create and open the report due next Tuesday." 
+  (let* ((report-dir (concat "reports/" (org-read-date nil nil "Tue")))
 	 (status (unless (file-directory-p report-dir)
-		   (make-directory report-dir)))
+		   (make-directory report-dir t)))
 	 (default-directory (expand-file-name (file-name-as-directory report-dir))))
     (ox-manuscript-new-helm "weekly-progress-report")))
+
+(defun kitchinhub-annual-review ()
+  "Create and open the annual review."
+  (let* ((review-dir (format "reports/annual-review-%s"
+			     (calendar-extract-year (calendar-current-date))))
+	 (status (unless (file-directory-p review-dir)
+		   (make-directory review-dir t)))
+	 (default-directory (expand-file-name (file-name-as-directory review-dir))))
+    (ox-manuscript-new-helm "annual-student-review")))
 
 
 ;;* The end
