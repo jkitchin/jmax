@@ -1151,6 +1151,17 @@ F5 inserts the entity code."
     (org-agenda nil "t")))
 
 
+;; * Kitchinhub weekly report
+
+(defun kitchinhub-weekly-report ()
+  "Create and open the report due next Tuesday."
+  (interactive)
+  (let* ((report-dir (org-read-date nil nil "Tue"))
+	 (status (unless (file-directory-p report-dir)
+		   (make-directory report-dir)))
+	 (default-directory (expand-file-name (file-name-as-directory report-dir))))
+    (ox-manuscript-new-helm "weekly-progress-report")))
+
 
 ;;* The end
 (message "jmax-org.el loaded")
