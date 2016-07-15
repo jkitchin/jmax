@@ -805,11 +805,10 @@ The templates are just org-files that can be inserted into a
 These are snippets in `ox-manuscript-templates' in the \"manuscript\" group.
 '((name . data))."
   (loop for template-file in (f-entries ox-manuscript-templates
-				       (lambda (f)
-					 (f-ext? f "org")))
+					(lambda (f)
+					  (f-ext? f "org")))
 	with data = nil
 	do (setq data (ox-manuscript-parse-template-file template-file))
-	if (string= (plist-get data :group) "manuscript")
 	collect data))
 
 
