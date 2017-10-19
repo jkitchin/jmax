@@ -340,9 +340,9 @@
     (add-to-list 'ispell-skip-region-alist '("~" "~"))
     (add-to-list 'ispell-skip-region-alist '("=" "="))
     ;; this next line approximately ignores org-ref-links
-    (add-to-list 'ispell-skip-region-alist '("cite:" . " "))
-    (add-to-list 'ispell-skip-region-alist '("label:" . " "))
-    (add-to-list 'ispell-skip-region-alist '("ref:" . " "))
+    (add-to-list 'ispell-skip-region-alist '("cite:" . "[[:space:]]"))
+    (add-to-list 'ispell-skip-region-alist '("label:" . "[[:space:]]"))
+    (add-to-list 'ispell-skip-region-alist '("ref:" . "[[:space:]]"))
     (add-to-list 'ispell-skip-region-alist '("^#\\+BEGIN_SRC" . "^#\\+END_SRC")))
 
   (add-hook 'org-mode-hook #'endless/org-ispell)
